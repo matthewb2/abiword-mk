@@ -1,0 +1,1 @@
+gda goffice iscii gdict google openwriter applix mht hrtext clarisworks openxml t602 latex grammar eml epub opendocument rsvg wpg bmp pdb collab pdf wikipedia garble mathview command psion gimp aiksaurus urldict wml wmf sdw mswrite loadbindings ots presentation paint hancom passepartout xslfo mif s5 freetranslation wordperfect docbook opml babelfish kword
