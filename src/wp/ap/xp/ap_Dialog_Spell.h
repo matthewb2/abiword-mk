@@ -22,6 +22,7 @@
 
 #include "xap_Frame.h"
 #include "xap_Dialog.h"
+#include "fl_BlockSpellIterator.h"
 #include "fv_View.h"
 #include "xav_View.h"
 #include "fl_SectionLayout.h"
@@ -41,7 +42,7 @@ class ABI_EXPORT AP_Dialog_Spell : public XAP_Dialog_NonPersistent
    AP_Dialog_Spell(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
    virtual ~AP_Dialog_Spell(void);
 
-   virtual void runModal(XAP_Frame * pFrame) = 0;
+   virtual void runModal(XAP_Frame * pFrame) override = 0;
 
    bool isSelection(void) const { return m_bIsSelection; };
    bool isComplete(void) const { return !m_bCancelled; };

@@ -67,7 +67,8 @@ extern "C" {const char * wvLIDToLangConverter(UT_uint16);}
 XAP_Win32App::XAP_Win32App(HINSTANCE hInstance, const char * szAppName)
 :	XAP_App(szAppName),
 	m_hInstance(hInstance),
-	m_dialogFactory(this)
+	m_dialogFactory(new AP_Win32DialogFactory(this)),
+	m_controlFactory(new AP_Win32Toolbar_ControlFactory)
 {
 	UT_return_if_fail(hInstance);
 
@@ -90,7 +91,7 @@ XAP_Win32App::XAP_Win32App(HINSTANCE hInstance, const char * szAppName)
 	GetLocaleInfoA(LOCALE_USER_DEFAULT,LOCALE_SENGLANGUAGE, &buf[0], 100);
 	s += buf;
 	s += "_";
-
+	
 	GetLocaleInfoA(LOCALE_USER_DEFAULT,LOCALE_SENGCOUNTRY, &buf[0], 100);
 	s += buf;
 	setlocale(LC_ALL, s.c_str());
@@ -111,17 +112,17 @@ XAP_Win32App::XAP_Win32App(HINSTANCE hInstance, const char * szAppName)
 		// this is our fall back ...
 		pGF->registerAsDefault(GR_Win32Graphics::s_getClassId(), true);
 		pGF->registerAsDefault(GR_Win32Graphics::s_getClassId(), false);
-
+		
 		// try to load Uniscribe; if we succeed we will make USP
 		// graphics the default
 
 #if ABI_OPT_DISABLE_USP
-		HINSTANCE hUniscribe = NULL;
+		HINSTANCE hUniscribe = nullptr;
 #else
 		HINSTANCE hUniscribe = LoadLibraryW(L"usp10.dll");
 #endif
 
-		if(hUniscribe && (NULL == g_getenv("ABIWORD_DISABLE_UNISCRIBE")))
+		if(hUniscribe && (nullptr == g_getenv("ABIWORD_DISABLE_UNISCRIBE")))
 		{
 			// register Uniscribe graphics and make it the default
 			bSuccess = pGF->registerClass(GR_Win32USPGraphics::graphicsAllocator,
@@ -133,10 +134,10 @@ XAP_Win32App::XAP_Win32App(HINSTANCE hInstance, const char * szAppName)
 			{
 				pGF->registerAsDefault(GR_Win32USPGraphics::s_getClassId(), true);
 				pGF->registerAsDefault(GR_Win32USPGraphics::s_getClassId(), false);
-
+			
 				// now g_free the library (GR_Win32USPGraphics will load it
 				// on its own behalf
-
+			
 				FreeLibrary(hUniscribe);
 			}
 		}
@@ -151,6 +152,8 @@ XAP_Win32App::~XAP_Win32App(void)
 {
 	m_pSlurp->disconnectSlurper();
 	DELETEP(m_pSlurp);
+	delete m_dialogFactory;
+	delete m_controlFactory;
 }
 
 HINSTANCE XAP_Win32App::getInstance() const
@@ -169,7 +172,7 @@ bool XAP_Win32App::initialize(const char * szKeyBindingsKey, const char * szKeyB
 	m_pSlurp = new XAP_Win32Slurp(this);
 	m_pSlurp->connectSlurper();
 	WCHAR bufExePathname[2048];
-	GetModuleFileNameW(NULL,bufExePathname,G_N_ELEMENTS(bufExePathname));
+	GetModuleFileNameW(nullptr,bufExePathname,G_N_ELEMENTS(bufExePathname));
 
 	// TODO these are Application-Specific values.  Move them out of here.
 	m_pSlurp->stuffRegistry(".abw",getApplicationName(),bufExePathname,"application/abiword");
@@ -183,19 +186,19 @@ void XAP_Win32App::reallyExit(void)
 	PostQuitMessage (0);
 }
 
-XAP_DialogFactory * XAP_Win32App::getDialogFactory(void)
+XAP_DialogFactory * XAP_Win32App::getDialogFactory(void) const
 {
-	return &m_dialogFactory;
+	return m_dialogFactory;
 }
 
-XAP_Toolbar_ControlFactory * XAP_Win32App::getControlFactory(void)
+XAP_Toolbar_ControlFactory * XAP_Win32App::getControlFactory(void) const
 {
-	return &m_controlFactory;
+	return m_controlFactory;
 }
 
-UT_uint32 XAP_Win32App::_getExeDir(LPWSTR pDirBuf, UT_uint32 iBufLen) const //pascal
+UT_uint32 XAP_Win32App::_getExeDir(LPWSTR pDirBuf, UT_uint32 iBufLen)
 {
-	UT_uint32 iResult = GetModuleFileNameW(NULL, pDirBuf, iBufLen);
+	UT_uint32 iResult = GetModuleFileNameW(nullptr, pDirBuf, iBufLen);
 
 	if (iResult > 0)
 	{
@@ -222,7 +225,7 @@ static bool isWriteable(LPWSTR lpPath)
 	if (rem < 13) return false;
 
 	lstrcpyW(&lpPath[len],L"/abiword.flg");
-	if (CreateDirectoryW(lpPath,NULL)) {
+	if (CreateDirectoryW(lpPath,nullptr)) {
 		RemoveDirectoryW(lpPath);
 		err=GetLastError();
 		if (err != ERROR_ACCESS_DENIED) result=true;
@@ -245,41 +248,14 @@ const char * XAP_Win32App::getUserPrivateDirectory(void) const
 	static char buf[PATH_MAX*6];
 	memset(buf,0,sizeof(buf));
 
-	DWORD len; //, len1, len2;
+	DWORD len, len1, len2;
 
 	UT_Win32LocaleString str;
 	UT_UTF8String utf8;
 
-	//pascal start
-/*
-	len = GetEnvironmentVariableW(L"APPDATA",wbuf,PATH_MAX);
-	if (len)
-	{
-		if (isWriteable(wbuf)) path_ok=true;
-#ifdef DEBUG
-		str.fromLocale(wbuf);
-		utf8=str.utf8_str();
-		UT_DEBUGMSG(("Getting preferences directory from exe dir [%s].\n",utf8.utf8_str()));
-#endif
-	}
-*/
+	// On W2K and later, APPDATA seems to be set to the directory containing per-user
+	// information.
 
-	if (_getExeDir(wbuf,sizeof(wbuf)) > 0)
-	{
-
-		if (isWriteable(wbuf)) path_ok=true;
-
-#ifdef DEBUG
-		str.fromLocale(wbuf);
-		utf8=str.utf8_str();
-		UT_DEBUGMSG(("Getting preferences directory from exe dir [%s].\n",utf8.utf8_str()));
-#endif
-
-	}
-
-	//pascal end
-
-/*
 	len = GetEnvironmentVariableW(L"APPDATA",wbuf,PATH_MAX);
 	if (len)
 	{
@@ -291,8 +267,6 @@ const char * XAP_Win32App::getUserPrivateDirectory(void) const
 #endif
 	}
 
-*/
-/*
 	if (!path_ok)
 	{
 		// On NT, USERPROFILE seems to be modern equivalent of $HOME
@@ -308,8 +282,7 @@ const char * XAP_Win32App::getUserPrivateDirectory(void) const
 #endif
 		}
 	}
-*/
-/*
+
 	if (!path_ok)
 	{
 		// If that doesn't work, look for HOMEDRIVE and HOMEPATH.  HOMEPATH
@@ -328,8 +301,7 @@ const char * XAP_Win32App::getUserPrivateDirectory(void) const
 #endif
 		}
 	}
-*/
-/*
+
 	if (!path_ok)
 	{
 		// If that doesn't work, let's just stick it in the WINDOWS directory.
@@ -345,7 +317,6 @@ const char * XAP_Win32App::getUserPrivateDirectory(void) const
 #endif
 		}
 	}
-*/
 
 	if (!path_ok)
 	{
@@ -388,18 +359,17 @@ const char * XAP_Win32App::getUserPrivateDirectory(void) const
 		}
 	}
 
-	UT_ASSERT(path_ok=true)
+	UT_ASSERT(path_ok=true);
 
 	if (lstrlenW(wbuf)+lstrlenW(szAbiDir)+2 >= PATH_MAX)
-		return NULL;
-//pascal
+		return nullptr;
 
 	if (wbuf[lstrlenW(wbuf)-1] != L'\\')
 		lstrcatW(wbuf,L"\\");
 	lstrcatW(wbuf,szAbiDir);
 
 #ifdef NO_WIN32_UNICODE_SUPPORT_YET
-	WideCharToMultiByte(CP_ACP,0,wbuf,-1,buf,MAX_PATH,"_",NULL);
+	WideCharToMultiByte(CP_ACP,0,wbuf,-1,buf,MAX_PATH,"_",nullptr);
 #else
 	str.fromLocale(wbuf);
 	utf8=str.utf8_str();
@@ -414,10 +384,7 @@ void XAP_Win32App::_setAbiSuiteLibDir(void)
 	char *utf8;
 	WCHAR buf[PATH_MAX];
 
-    //pascal
 	// see if ABIWORD_DATADIR was set in the environment
-
-	/*
 	if (GetEnvironmentVariableW(L"ABIWORD_DATADIR",buf,sizeof(buf)) > 0)
 	{
 		utf8 = (char*) getUTF8String(buf);
@@ -435,36 +402,29 @@ void XAP_Win32App::_setAbiSuiteLibDir(void)
 		XAP_App::_setAbiSuiteLibDir(p);
 		return;
 	}
-    */
 
 	if (_getExeDir(buf,sizeof(buf)) > 0)
 	{
-		//char *base;
-		size_t len;//, baselen;
+		char *base;
+		size_t len, baselen;
 
 		utf8 = (char*) getUTF8String(buf);
 
 		len = strlen(utf8);
-
-		if (len > 1 && utf8[len - 1] == '\\')
-        utf8[len - 1] = '\0';
-
-		/*
-		len = strlen(utf8);
 		base = g_path_get_basename(utf8);
 		baselen = strlen(base);
-		g_free (base), base = NULL;
+		g_free (base), base = nullptr;
 		if (len+1 > baselen && utf8[len - baselen - 2] == '\\')
 			utf8[len - baselen - 2] = 0;
 		else utf8[len - baselen - 1] = '\0';
-        */
-#if 1   //pascal #ifdef _MSC_VER
-
+#ifdef _MSC_VER
 		XAP_App::_setAbiSuiteLibDir(utf8);
 #else
-		gchar * dir = g_build_filename(utf8, "share", PACKAGE "-" ABIWORD_SERIES, NULL);
+		#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
+		gchar * dir = g_build_filename(utf8, "share", PACKAGE "-" STR(ABIWORD_SERIES), nullptr);
 		XAP_App::_setAbiSuiteLibDir(dir);
-		g_free (dir), dir = NULL;
+		g_free (dir), dir = nullptr;
 #endif
 		return;
 	}
@@ -553,10 +513,10 @@ void XAP_Win32App::_setBidiOS(void)
 	GCP_RESULTSW gcpResult;
 	gcpResult.lStructSize = sizeof(GCP_RESULTS);
 	gcpResult.lpOutString = (LPWSTR) outStr;     // Output string
-	gcpResult.lpOrder = NULL;			// Ordering indices
+	gcpResult.lpOrder = nullptr;			// Ordering indices
 	gcpResult.lpDx = distanceArray;     // Distances between character cells
-	gcpResult.lpCaretPos = NULL;		// Caret positions
-	gcpResult.lpClass = NULL;         // Character classifications
+	gcpResult.lpCaretPos = nullptr;		// Caret positions
+	gcpResult.lpClass = nullptr;         // Character classifications
 // w32api changed lpGlyphs from UINT * to LPWSTR to match MS PSDK in w32api v2.4
 #ifdef __MINGW32__
 #if (__W32API_MAJOR_VERSION == 2 && __W32API_MINOR_VERSION < 4)
@@ -564,14 +524,14 @@ void XAP_Win32App::_setBidiOS(void)
 #else
 	gcpResult.lpGlyphs = (LPWSTR) glyphArray;    // Character glyphs
 #endif
-#else
+#else	
 	gcpResult.lpGlyphs = (LPWSTR) glyphArray;    // Character glyphs
 #endif
 	gcpResult.nGlyphs = 2;              // Array size
 
 	UT_UCS2Char inStr[] = {araAin, one};
 
-	HDC displayDC = GetDC(NULL);
+	HDC displayDC = GetDC(nullptr);
 
 	if(!displayDC)
 	{
@@ -597,50 +557,50 @@ void XAP_Win32App::_setBidiOS(void)
 		}
 	}
 
-	ReleaseDC(NULL,displayDC);
+	ReleaseDC(nullptr,displayDC);
 }
 
 const char * XAP_Win32App::getDefaultEncoding () const
 {
-	return "UTF-8";
+	return "UTF-8";	
 }
 
 const WCHAR * XAP_Win32App::getWideString (const char * utf8input)
 {
-	int wlen = MultiByteToWideChar(CP_UTF8, 0, utf8input, -1, NULL, 0);
+	int wlen = MultiByteToWideChar(CP_UTF8, 0, utf8input, -1, nullptr, 0);
 	UT_ASSERT(wlen);
 	if (wlen && (wlen < MAX_CONVBUFFER)) {
 		wlen = MultiByteToWideChar(CP_UTF8, 0, utf8input, -1, m_wbuffer, MAX_CONVBUFFER);
 		UT_ASSERT(wlen);
 		return m_wbuffer;
 	}
-	else
+	else 
 	{
 		UT_ASSERT(wlen < MAX_CONVBUFFER);
 		UT_DEBUGMSG(("getWideString:converted string too long %d", wlen));
-		return NULL;
+		return nullptr;
 	}
 }
 
 const char * XAP_Win32App::getUTF8String (const WCHAR * p_str)
 {
-	int len = WideCharToMultiByte(CP_UTF8, 0, p_str, -1, NULL, 0, NULL, NULL);
+	int len = WideCharToMultiByte(CP_UTF8, 0, p_str, -1, nullptr, 0, nullptr, nullptr);
 	UT_ASSERT(len);
 	if (len && (len < MAX_CONVBUFFER*6)) {
-		len = WideCharToMultiByte(CP_UTF8, 0, p_str, -1, m_buffer, MAX_CONVBUFFER*6, NULL, NULL);
+		len = WideCharToMultiByte(CP_UTF8, 0, p_str, -1, m_buffer, MAX_CONVBUFFER*6, nullptr, nullptr);
 		UT_ASSERT(len);
 		return m_buffer;
 	}
-	else
+	else 
 	{
 		UT_ASSERT(len < MAX_CONVBUFFER*6);
 		UT_DEBUGMSG(("getUTF8String:converted string too long %d", len));
-		return NULL;
+		return nullptr;
 	}
 }
 
 
-void XAP_Win32App::getDefaultGeometry(UT_uint32& width, UT_uint32& height, UT_uint32& flags)
+void XAP_Win32App::getDefaultGeometry(UT_uint32& width, UT_uint32& height, UT_uint32& flags) const
 {
 	flags |= PREF_FLAG_GEOMETRY_MAXIMIZED;
 

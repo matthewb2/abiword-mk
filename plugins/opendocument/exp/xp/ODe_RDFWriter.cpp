@@ -18,11 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
- 
- 
-// External includes
-#include <gsf/gsf-output-stdio.h>
-#include <gsf/gsf-outfile.h>
 
 #include "ut_std_string.h"
 #include "pd_Document.h"
@@ -79,12 +74,12 @@ bool ODe_RDFWriter::writeRDF( PD_Document* pDoc, GsfOutfile* pODT, PD_RDFModelHa
     // add an entry that the manifest writing code will pick up
     //
     {
-        UT_ByteBuf pByteBuf;
+        UT_ByteBufPtr pByteBuf(new UT_ByteBuf);
         std::string mime_type = "application/rdf+xml";
-        PD_DataItemHandle* ppHandle = NULL;
-        
-        if( !pDoc->createDataItem( "manifest.rdf", 0, &pByteBuf, 
-                                   mime_type, ppHandle )) 
+        PD_DataItemHandle* ppHandle = nullptr;
+
+        if(!pDoc->createDataItem("manifest.rdf", 0, pByteBuf,
+                                   mime_type, ppHandle))
         {
             UT_DEBUGMSG(("writeRDF() setting up manifest entry failed!\n"));
         }

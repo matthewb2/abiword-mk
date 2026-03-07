@@ -1,6 +1,7 @@
 /* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
+ * Copyright (C) 2021 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -154,7 +155,7 @@ bool pt_PieceTable::changeStruxFmt(PTChangeFmt ptc,
 							bool bResult;
 							// get attributes for this fragement
 							const PP_AttrProp * pAP;
-							const gchar * pRevision = NULL;
+							const gchar * pRevision = nullptr;
 							const gchar name[] = "revision";
 
 							if(getAttrProp(pfs->getIndexAP(),&pAP))
@@ -175,11 +176,11 @@ bool pt_PieceTable::changeStruxFmt(PTChangeFmt ptc,
 							{
 								revPtc = PTC_AddFmt;
 
-								// used to set these to NULL, but that
+								// used to set these to nullptr, but that
 								// causes difficulties for attributes,
 								// because the attribute value gets
 								// stored directly in the hash and the
-								// hash considers NULL values invalid,
+								// hash considers nullptr values invalid,
 								// so we are not able to retrieve them
 								// (and any associated names
 								attrs = PP_std_setPropsToValue(attributes, "-/-");
@@ -350,7 +351,7 @@ bool pt_PieceTable::_realChangeStruxForLists(pf_Frag_Strux* sdh,
 	pf_Frag_Strux * pfs = (pf_Frag_Strux *) sdh;
 	PTStruxType pts = pfs->getStruxType();
 
-	const char * attributes[3] = {PT_PARENTID_ATTRIBUTE_NAME,pszParentID,NULL};
+	const char * attributes[3] = {PT_PARENTID_ATTRIBUTE_NAME,pszParentID,nullptr};
 
 	PT_AttrPropIndex indexNewAP;
 	PT_AttrPropIndex indexOldAP = pfs->getIndexAP();
@@ -395,7 +396,7 @@ bool pt_PieceTable::_realChangeSectionAttsNoUpdate(pf_Frag_Strux * pfs,
 											  const char * atts,
 											  const char * attsValue)
 {
-	const char * attributes[3] = {atts,attsValue,NULL};
+	const char * attributes[3] = {atts,attsValue,nullptr};
 
 	PT_AttrPropIndex indexNewAP;
 	PT_AttrPropIndex indexOldAP = pfs->getIndexAP();
@@ -472,8 +473,8 @@ bool pt_PieceTable::_realChangeStruxFmt(PTChangeFmt ptc,
 	}
 	else
 	{
-		pf_Frag * pfPos1 = NULL;
-		pf_Frag * pfPos2 = NULL;
+		pf_Frag * pfPos1 = nullptr;
+		pf_Frag * pfPos2 = nullptr;
 		bool bNoteFirst = isInsideFootnote(dpos1,&pfPos1);
 		bool bNoteEnd = isInsideFootnote(dpos2,&pfPos2);
 
@@ -577,24 +578,18 @@ bool pt_PieceTable::_realChangeStruxFmt(PTChangeFmt ptc,
 
 		PTChangeFmt ptcs = PTC_RemoveFmt;
 		pf_Frag_Strux * pfsContainer = pfs_First;
-		pf_Frag_Strux * pfsMainBlock = NULL;
-		pf_Frag * pfNewEnd = NULL;
+		pf_Frag_Strux * pfsMainBlock = nullptr;
+		pf_Frag * pfNewEnd = nullptr;
 		UT_uint32 fragOffsetNewEnd;
 		PP_PropertyVector sProps;
-		const gchar * sOldStyleBlock = NULL;
-		const gchar * sStyleMainBlock = NULL;
+		const gchar * sOldStyleBlock = nullptr;
+		const gchar * sStyleMainBlock = nullptr;
 		std::vector <std::string> vPropNames;
 		const std::string & szStyle = PP_getAttribute(PT_STYLE_ATTRIBUTE_NAME, attributes);
-		PD_Style * pStyle = NULL;
+		PD_Style * pStyle = nullptr;
 		getDocument()->getStyle(szStyle.c_str(), &pStyle);
 		UT_return_val_if_fail (pStyle,false);
-		UT_Vector vProps;
-		pStyle->getAllProperties(&vProps,0);
-		UT_uint32 countp = vProps.getItemCount();
-		for (UT_uint32 i = 0; i < countp; i++)
-		{
-			sProps.push_back((const gchar *)vProps.getNthItem(i));
-		}
+		pStyle->getAllProperties(sProps, 0);
 
 		// Changing block style should not affect character styles
 		PP_PropertyVector attrSpan = attributes;
@@ -731,7 +726,7 @@ bool pt_PieceTable::changeLastStruxFmtNoUndo(PT_DocPosition dpos, PTStruxType ps
 											 const PP_PropertyVector & attrs, const PP_PropertyVector & props,
 											 bool bSkipEmbededSections)
 {
-	UT_return_val_if_fail (NULL != m_fragments.getFirst(), false);
+	UT_return_val_if_fail (nullptr != m_fragments.getFirst(), false);
 
 	pf_Frag * pf = m_fragments.findFirstFragBeforePos(dpos);
 

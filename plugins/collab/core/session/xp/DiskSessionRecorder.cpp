@@ -20,7 +20,6 @@
  * 02110-1301 USA.
  */
 
-#include <gsf/gsf-output-stdio.h>
 #include <account/xp/Buddy.h>
 #include <plugin/xp/AbiCollab_Plugin.h>
 #include "DiskSessionRecorder.h"
@@ -31,10 +30,10 @@ DiskSessionRecorder::DiskSessionRecorder(AbiCollab* pSession)
 	UT_DEBUGMSG(("DiskSessionRecorder::DiskSessionRecorder()\n"));
 	
 	std::string pidStr;
-#ifndef WIN32
+#ifndef _WIN32
 	pidStr = str(boost::format( "%1%" ) % int(getpid()) );
 #endif
-	gchar *s = g_build_filename( getTargetDirectory(), (std::string(getPrefix())+pSession->getSessionId().utf8_str()).c_str(), NULL );
+	gchar *s = g_build_filename(getTargetDirectory(), std::string(getPrefix() + pSession->getSessionId()).c_str(), nullptr);
 	std::string fn = (char*)s;
 	fn += ".";
 	fn += pidStr;
@@ -177,7 +176,7 @@ bool DiskSessionRecorder::dumpSession(const std::string& filename)
 			
 			// display packet
 			printf("--------------------------------------------------------------------------------\n");
-#ifndef WIN32
+#ifndef _WIN32
 			// could someone find the equivalent of gmtime_r on win32? (or better: an XP function) 
 			time_t t = time_t(rp->m_timestamp);
 			struct tm time;
@@ -242,7 +241,7 @@ void DiskSessionRecorder::store(bool incoming, const Packet* pPacket, BuddyPtr p
 	}
 	
 	// store timestamp, make it 64-bit value always
-	UT_uint64 timestamp = UT_uint64( time(0) );
+	UT_uint64 timestamp = UT_uint64(time(nullptr));
 	os << timestamp;
 
 	// store packet class

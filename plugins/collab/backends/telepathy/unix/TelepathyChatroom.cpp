@@ -77,7 +77,7 @@ group_call_add_members_cb(TpChannel* chan,
 		UT_return_if_fail(pHandler);
 
 		GHashTable* params = tp_asv_new (
-				"title", G_TYPE_STRING, pChatroom->getDocName().utf8_str(),
+				"title", G_TYPE_STRING, pChatroom->getDocName().c_str(),
 				NULL);
 
 		// offer this tube to every participant in the room
@@ -239,7 +239,7 @@ DBusHandlerResult s_dbus_handle_message(DBusConnection *connection, DBusMessage 
 
 		DBusError error;
 		dbus_error_init (&error);
-		const char* packet_data = 0;
+		const char* packet_data = nullptr;
 		int packet_size = 0;
 		if (dbus_message_get_args(message, &error,
 					DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE, &packet_data, &packet_size,
@@ -324,7 +324,7 @@ retrieve_buddy_dbus_mappings_cb(TpProxy* proxy,
 }
 
 TelepathyChatroom::TelepathyChatroom(TelepathyAccountHandler* pHandler, TpChannel* pChannel,
-		PD_Document* pDoc, const UT_UTF8String& sSessionId)
+				     PD_Document* pDoc, const std::string& sSessionId)
 	: m_pHandler(pHandler),
 	m_pChannel(pChannel),
 	m_pDoc(pDoc),
@@ -460,10 +460,10 @@ void TelepathyChatroom::removeBuddy(TpHandle handle)
 	UT_ASSERT_HARMLESS(UT_NOT_REACHED);
 }
 
-UT_UTF8String TelepathyChatroom::getDocName()
+std::string TelepathyChatroom::getDocName()
 {
 	UT_return_val_if_fail(m_pDoc, "");
-	UT_UTF8String docName = m_pDoc->getFilename();
+        std::string docName = m_pDoc->getFilename();
 	if (docName == "")
 		return "Untitled"; // TODO: fetch the title from the frame somehow (which frame?) - MARCM
 	return docName;
@@ -554,7 +554,7 @@ void TelepathyChatroom::queueInvite(TelepathyBuddyPtr pBuddy)
 
 bool TelepathyChatroom::offerTube()
 {
-	UT_DEBUGMSG(("TelepathyChatroom::offerTube()\n - session id: %s\n", m_sSessionId.utf8_str()));
+	UT_DEBUGMSG(("TelepathyChatroom::offerTube()\n - session id: %s\n", m_sSessionId.c_str()));
 	UT_return_val_if_fail(m_sSessionId != "", false);
 	UT_return_val_if_fail(m_pChannel, false);
 
@@ -578,7 +578,7 @@ bool TelepathyChatroom::offerTube()
 	m_pending_invitees.clear();
 
 	// create the welcome string
-	UT_UTF8String sWelcomeMsg = UT_UTF8String_sprintf("A document called '%s' has been shared with you", getDocName().utf8_str());
+	UT_UTF8String sWelcomeMsg = UT_UTF8String_sprintf("A document called '%s' has been shared with you", getDocName().c_str());
 
 	UT_DEBUGMSG(("Inviting members to the room...\n"));
 	tp_cli_channel_interface_group_call_add_members(

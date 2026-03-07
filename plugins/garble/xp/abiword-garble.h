@@ -22,9 +22,12 @@
 
 #include <libxml/parser.h>
 #include <libxml/xmlwriter.h>
+
 #include <string>
 #include <vector>
-#include <gsf/gsf-utils.h>
+
+#include <gsf/gsf.h>
+
 #include "ut_rand.h"
 #include "ut_jpeg.h"
 #include "ut_go_file.h"
@@ -35,7 +38,6 @@
 #include "xav_View.h"
 #include "ev_EditMethod.h"
 #include "ap_Args.h"
-#include <gsf/gsf-input.h>
 
 using namespace std;
 

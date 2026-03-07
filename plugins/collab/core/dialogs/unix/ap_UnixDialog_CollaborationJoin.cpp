@@ -112,11 +112,7 @@ GtkWidget * AP_UnixDialog_CollaborationJoin::_constructWindow(void)
 	//const XAP_StringSet * pSS = XAP_App::getApp()->getStringSet();
 	
 	// load the dialog from the UI file
-#if GTK_CHECK_VERSION(3,0,0)
 	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_CollaborationJoin.ui");
-#else
-	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_CollaborationJoin-2.ui");
-#endif
 	
 	// Update our member variables with the important widgets that 
 	// might need to be queried or altered later
@@ -168,8 +164,6 @@ void AP_UnixDialog_CollaborationJoin::_populateWindowData()
 	GtkTreeSelection *sel;
 	_setModel(_constructModel());
 	
-	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (m_wBuddyTree), true);
-
 	// get the current selection
 	sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (m_wBuddyTree));
 	gtk_tree_selection_set_mode (sel, GTK_SELECTION_BROWSE);
@@ -306,7 +300,7 @@ void AP_UnixDialog_CollaborationJoin::eventOpen()
 	// see if we selected a row that has a document that we can still join
 	
 	// get the row data
-	gpointer doc_handle = 0;
+	gpointer doc_handle = nullptr;
 	guint handler_idx = 0;	
 	guint buddy_idx = 0;	
 

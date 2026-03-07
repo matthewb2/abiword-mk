@@ -1,11 +1,38 @@
 
-ACLOCAL_AMFLAGS = -I .
+ACLOCAL_AMFLAGS = -I m4
 
-DIST_SUBDIRS = goffice-bits goffice-bits2 src plugins po user icons tools
+DIST_SUBDIRS = src plugins po user icons tools
 
+SUBDIRS = src plugins po user
 
-SUBDIRS = src plugins po user icons
+if TOOLKIT_GTK_ALL
 
+SUBDIRS += icons
+
+desktopdir = $(datadir)/applications
+desktop_DATA = com.abisource.AbiWord.desktop
+
+mimedir = @ABIWORD_DATADIR@/mime-info
+mime_DATA = abiword.keys
+
+appdatadir = $(datarootdir)/metainfo
+appdata_DATA = com.abisource.AbiWord.appdata.xml
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = abiword-$(ABIWORD_SERIES).pc
+
+dist_man1_MANS = abiword.1
+
+endif
+
+if TOOLKIT_GTK
+# we disable introspection for distcheck as it fails because of
+# installation needing sudo
+DISTCHECK_CONFIGURE_FLAGS = \
+	--enable-introspection=no \
+	--with-gir-dir=\$${datadir}/gir-1.0 \
+	--with-typelib-dir=\$${libdir}/girepository-1.0
+endif
 
 EXTRA_DIST = \
 	AUTHORS \
@@ -18,7 +45,6 @@ EXTRA_DIST = \
 	README \
 	ChangeLog \
 	abiword.desktop \
-	$(appdata_DATA) \
 	abiword.keys \
 	abiword.png \
 	libabiword.pc.in \

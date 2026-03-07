@@ -28,7 +28,7 @@
 
 #include "xap_CocoaDialog_Utilities.h"
 
-#include "gr_CocoaCairoGraphics.h"
+#include "gr_CocoaGraphics.h"
 
 #include "xap_App.h"
 #include "xap_CocoaApp.h"
@@ -51,7 +51,7 @@ XAP_Dialog * AP_CocoaDialog_PageNumbers::static_constructor(XAP_DialogFactory * 
 AP_CocoaDialog_PageNumbers::AP_CocoaDialog_PageNumbers(XAP_DialogFactory * pDlgFactory,
                                                  XAP_Dialog_Id dlgid)
     : AP_Dialog_PageNumbers(pDlgFactory,dlgid),
-		m_pG(NULL),
+		m_pG(nullptr),
 		m_dlg(nil)
 {
   m_recentControl = m_control;
@@ -81,10 +81,10 @@ void AP_CocoaDialog_PageNumbers::event_Cancel(void)
 }
 
 
-void AP_CocoaDialog_PageNumbers::event_PreviewExposed(void)
+void AP_CocoaDialog_PageNumbers::event_previewInvalidate(void)
 {
 	if(m_preview) {
-		m_preview->draw();
+		m_preview->queueDraw();
 	}
 }
 
@@ -113,17 +113,18 @@ void AP_CocoaDialog_PageNumbers::runModal(XAP_Frame * /*pFrame*/)
 	DELETEP (m_pG);
 	
 	// make a new Cocoa GC
-	XAP_CocoaNSView* view = [m_dlg preview];
-	NSSize size = [view frame].size;
-	GR_CocoaCairoAllocInfo ai(view);
-	m_pG = (GR_CocoaCairoGraphics*)XAP_App::getApp()->newGraphics(ai);
+	XAP_CocoaNSView* view = m_dlg.preview;
+	NSSize size = view.frame.size;
+	GR_CocoaAllocInfo ai(view);
+	m_pG = (GR_CocoaGraphics*)XAP_App::getApp()->newGraphics(ai);
 
 	// let the widget materialize
 	_createPreviewFromGC(m_pG, (UT_uint32) lrintf(size.width), (UT_uint32) lrintf(size.height));
+	view.drawable = m_preview;
 	
 	// hack in a quick draw here
 	_updatePreview(m_recentAlign, m_recentControl);
-	event_PreviewExposed ();
+	event_previewInvalidate();
 
 	[NSApp runModalForWindow:window];
 
@@ -143,7 +144,7 @@ void AP_CocoaDialog_PageNumbers::runModal(XAP_Frame * /*pFrame*/)
 
 -(void)discardXAP
 {
-	_xap = NULL; 
+	_xap = nullptr;
 }
 
 -(void)dealloc

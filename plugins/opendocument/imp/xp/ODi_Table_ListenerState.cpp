@@ -1,3 +1,4 @@
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
 /* AbiSource
  * 
  * Copyright (C) 2002 Dom Lachowicz <cinamod@hotmail.com>
@@ -31,8 +32,8 @@
 #include "ODi_ListenerStateAction.h"
 
 // AbiWord includes
-#include <pd_Document.h>
-#include <ut_std_string.h>
+#include "pd_Document.h"
+#include "ut_std_string.h"
 
 
 /**
@@ -123,7 +124,7 @@ void ODi_Table_ListenerState::endElement (const gchar* pName,
             if (m_onFirstPass) {
                 m_onFirstPass = false;
             } else {
-                m_pAbiDocument->appendStrux(PTX_EndTable, NULL);
+                m_pAbiDocument->appendStrux(PTX_EndTable, PP_NOPROPS);
                 rAction.popState();
             }
         } else {
@@ -137,7 +138,7 @@ void ODi_Table_ListenerState::endElement (const gchar* pName,
         if (m_onFirstPass) {
             // Do nothing.
         } else{
-            m_pAbiDocument->appendStrux(PTX_EndCell,NULL);
+            m_pAbiDocument->appendStrux(PTX_EndCell, PP_NOPROPS);
         }
     }
     
@@ -155,10 +156,9 @@ void ODi_Table_ListenerState::_parseTableStart(const gchar** ppAtts,
         if (m_onFirstPass) {
             rAction.repeatElement();
         } else {
-            const gchar* ppAttribs[10];
             std::string props;
             const gchar* pVal;
-            const ODi_Style_Style* pStyle = NULL;
+            const ODi_Style_Style* pStyle = nullptr;
             
             pVal = UT_getAttribute("table:style-name", ppAtts);
             if (pVal) {
@@ -167,14 +167,14 @@ void ODi_Table_ListenerState::_parseTableStart(const gchar** ppAtts,
             }
             
             // Background color
-            if (pStyle != NULL) {
+            if (pStyle != nullptr) {
                 if (!pStyle->getBackgroundColor()->empty()) {
                     props += "background-color:";
                     props += pStyle->getBackgroundColor()->c_str();
                 }
             }
             // Left table pos
-            if (pStyle != NULL) {
+            if (pStyle != nullptr) {
                 if (!pStyle->getTableMarginLeft()->empty()) {
 		    if (!props.empty()) {
 		        props += "; ";
@@ -186,7 +186,7 @@ void ODi_Table_ListenerState::_parseTableStart(const gchar** ppAtts,
             }
 
             // table width
-            if (pStyle != NULL) {
+            if (pStyle != nullptr) {
                 if (!pStyle->getTableWidth()->empty()) {
 		    if (!props.empty()) {
 		        props += "; ";
@@ -199,7 +199,7 @@ void ODi_Table_ListenerState::_parseTableStart(const gchar** ppAtts,
 
 
             // table relative width 
-            if (pStyle != NULL) {
+            if (pStyle != nullptr) {
                 if (!pStyle->getTableRelWidth()->empty()) {
 		    if (!props.empty()) {
 		        props += "; ";
@@ -229,27 +229,24 @@ void ODi_Table_ListenerState::_parseTableStart(const gchar** ppAtts,
                 props += "table-rel-column-props:";
                 props += m_columnRelWidths;
             }
-            
+
             // Row heights
             if (!props.empty()) {
                 props += "; ";
             }
             props += "table-row-heights:";
             props += m_rowHeights;
-            
-	    
-            
+
             if (!props.empty()) {
-                ppAttribs[0] = "props";
-                ppAttribs[1] = props.c_str();
-                ppAttribs[2] = 0; // Signal the end of the array.
-                
+                PP_PropertyVector ppAttribs = {
+                    "props", props
+                };
+
                 m_pAbiDocument->appendStrux(PTX_SectionTable, ppAttribs);
             } else {
-                m_pAbiDocument->appendStrux(PTX_SectionTable, NULL);
+                m_pAbiDocument->appendStrux(PTX_SectionTable, PP_NOPROPS);
             }
-            
-            
+
             // Initialize cell variables.
             m_row = 0;
             m_col = 0;
@@ -283,11 +280,10 @@ void ODi_Table_ListenerState::_parseRowStart (const gchar** ppAtts,
 
         std::string rowHeight = "";
 
-        if (pStyleName != NULL) 
-        {
+        if (pStyleName != nullptr) {
             pStyle = m_pStyles->getTableRowStyle(pStyleName,
                         m_onContentStream);
-            UT_ASSERT(pStyle != NULL);
+            UT_ASSERT(pStyle != nullptr);
 
             if (pStyle)
             {
@@ -335,18 +331,17 @@ void ODi_Table_ListenerState::_parseColumnStart (const gchar** ppAtts,
 {
     if (m_onFirstPass) 
     {
-        const gchar* pStyleName=NULL;
-        const ODi_Style_Style* pStyle=NULL;
-        const gchar* pNumberColumnsRepeated = NULL;
+        const gchar* pStyleName=nullptr;
+        const ODi_Style_Style* pStyle=nullptr;
+        const gchar* pNumberColumnsRepeated = nullptr;
         int nColsRepeated= 0;
         UT_sint32 i=0;
         
         pStyleName = UT_getAttribute("table:style-name", ppAtts);
-        if (pStyleName != NULL) 
-        {
+        if (pStyleName != nullptr) {
             pStyle = m_pStyles->getTableColumnStyle(pStyleName,
                                                     m_onContentStream);
-            UT_ASSERT_HARMLESS(pStyle != NULL);
+            UT_ASSERT_HARMLESS(pStyle != nullptr);
             UT_DEBUGMSG(("style-name %s pstyle = %p \n",pStyleName,pStyle));
             if (pStyle && (pStyle->getColumnWidth()->empty() && pStyle->getColumnRelWidth()->empty())) 
             {
@@ -355,8 +350,7 @@ void ODi_Table_ListenerState::_parseColumnStart (const gchar** ppAtts,
             else if (pStyle) 
             {
                 pNumberColumnsRepeated = UT_getAttribute("table:number-columns-repeated", ppAtts);
-                if (pNumberColumnsRepeated != NULL) 
-                {
+                if (pNumberColumnsRepeated != nullptr) {
                     nColsRepeated = atoi(pNumberColumnsRepeated);
                     UT_ASSERT(nColsRepeated > 0);
                 } 
@@ -402,12 +396,12 @@ void ODi_Table_ListenerState::_parseCellStart (const gchar** ppAtts,
     } else {    
 
         const gchar* xmlid = UT_getAttribute("xml:id", ppAtts);
-        UT_DEBUGMSG(("ODi_Table_ListenerState::_parseCellStart() xmlid:%s\n",
+        xxx_UT_DEBUGMSG(("ODi_Table_ListenerState::_parseCellStart() xmlid:%s\n",
                      xmlid ? xmlid : "_undefined_" ));
         
         std::string props;
         const gchar* pVal;
-        const ODi_Style_Style* pStyle = NULL;
+        const ODi_Style_Style* pStyle = nullptr;
         UT_sint32 colSpan;
         UT_sint32 rowSpan;
         m_col++;
@@ -554,25 +548,23 @@ void ODi_Table_ListenerState::_parseCellStart (const gchar** ppAtts,
             }
         }
 
-        int idx = 0;
-        const gchar *cell_props[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        PP_PropertyVector cell_props;
         if( xmlid )
         {
-            cell_props[idx++] = PT_XMLID;
-            cell_props[idx++] = xmlid;
+            cell_props.push_back(PT_XMLID);
+            cell_props.push_back(xmlid);
             props += "; xmlid:";
             props += xmlid;
-            UT_DEBUGMSG(("ODi_Table_ListenerState::_parseCellStart() adding xmlid:%s\n", xmlid ));
+            xxx_UT_DEBUGMSG(("ODi_Table_ListenerState::_parseCellStart() adding xmlid:%s\n", xmlid ));
         }
-        cell_props[idx++] = "props";
-        cell_props[idx++] = props.c_str();
-        UT_DEBUGMSG(("ODi_Table_ListenerState::_parseCellStart() props:%s\n", props.c_str() ));
+        cell_props.push_back("props");
+        cell_props.push_back(props);
+        xxx_UT_DEBUGMSG(("ODi_Table_ListenerState::_parseCellStart() props:%s\n", props.c_str() ));
         if(dataID.length() > 0)
         {
-            cell_props[idx++] = "strux-image-dataid";
-            cell_props[idx++] = dataID.c_str();
+            cell_props.push_back("strux-image-dataid");
+            cell_props.push_back(dataID);
         }
-        cell_props[idx++] = 0;
         m_pAbiDocument->appendStrux(PTX_SectionCell, cell_props);
 
         // Now parse the cell text content.

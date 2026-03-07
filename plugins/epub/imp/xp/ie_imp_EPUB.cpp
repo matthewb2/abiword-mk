@@ -204,7 +204,7 @@ UT_Error IE_Imp_EPUB::uncompress()
     m_tmpDir += G_DIR_SEPARATOR_S;
     m_tmpDir += getDoc()->getDocUUIDString();
 
-    if (!UT_go_directory_create(m_tmpDir.c_str(), 0644, NULL))
+    if (!UT_go_directory_create(m_tmpDir.c_str(), NULL))
     {
         UT_DEBUGMSG(("Can`t create temporary directory\n"));
         return UT_ERROR;
@@ -264,8 +264,8 @@ UT_Error IE_Imp_EPUB::readStructure()
 
         if (i != m_spine.begin())
         {
-            getDoc()->insertStrux(posEnd, PTX_Section, NULL, NULL);
-            getDoc()->insertStrux(posEnd+1, PTX_Block, NULL, NULL);
+            getDoc()->insertStrux(posEnd, PTX_Section, PP_NOPROPS, PP_NOPROPS);
+            getDoc()->insertStrux(posEnd+1, PTX_Block, PP_NOPROPS, PP_NOPROPS);
             posEnd+=2;
         }
 
@@ -296,7 +296,7 @@ UT_Error IE_Imp_EPUB::readStructure()
 
         // PT_DocPosition pos;
         // currentDoc->getBounds(true, pos);
-        // currentDoc->insertStrux(pos, PTX_Block, attributes, NULL, NULL);
+        // currentDoc->insertStrux(pos, PTX_Block, attributes, PP_NOPROPS, PP_NOPROPS);
 
         IE_Imp_PasteListener * pPasteListener = new IE_Imp_PasteListener(
                 getDoc(), posEnd, currentDoc);
@@ -327,7 +327,7 @@ GsfOutput* IE_Imp_EPUB::createFileByPath(const char* path)
         bool fileExists = UT_go_file_exists(uri);
         if (!fileExists && (components[current] != NULL))
         {
-            UT_go_directory_create(uri, 0644, NULL);
+            UT_go_directory_create(uri, NULL);
         }
         else
         {

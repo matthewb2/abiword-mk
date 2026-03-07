@@ -19,9 +19,7 @@
  */
 
 
-
-#ifndef _ODE_THUMBNAILSWRITER_H_
-#define _ODE_THUMBNAILSWRITER_H_
+#pragma once
 
 #include <gsf/gsf.h>
 
@@ -37,5 +35,3 @@ private:
 
     ODe_ThumbnailsWriter ();
 };
-
-#endif //_ODE_THUMBNAILSWRITER_H_

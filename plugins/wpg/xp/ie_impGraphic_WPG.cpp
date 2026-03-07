@@ -26,42 +26,42 @@
 #endif
 
 #include "ie_impGraphic_WPG.h"
-#include <gsf/gsf-utils.h>
-#include <gsf/gsf-infile.h>
-#include <gsf/gsf-input-memory.h>
-#include <gsf/gsf-input-stdio.h>
-#include <gsf/gsf-infile-msole.h>
-#include <libwpd-stream/libwpd-stream.h>
+#include <librevenge-stream/librevenge-stream.h>
 #include "xap_Module.h"
 
 using libwpg::WPGraphics;
 
 ABI_PLUGIN_DECLARE("WPG")
 
-class AbiWordPerfectGraphicsInputStream : public WPXInputStream
+class AbiWordPerfectGraphicsInputStream : public librevenge::RVNGInputStream
 {
 public:
 	AbiWordPerfectGraphicsInputStream(GsfInput *input);
 	~AbiWordPerfectGraphicsInputStream();
 
-	virtual bool isOLEStream();
-	virtual WPXInputStream * getDocumentOLEStream();
-	virtual WPXInputStream * getDocumentOLEStream(const char * name);
-	virtual const unsigned char *read(unsigned long numBytes, unsigned long &numBytesRead);
-	virtual int seek(long offset, WPX_SEEK_TYPE seekType);
-	virtual long tell();
-	virtual bool atEOS();
+	virtual bool isStructured() override;
+	virtual unsigned subStreamCount() override;
+	virtual const char* subStreamName(unsigned) override;
+	virtual bool existsSubStream(const char*) override;
+	virtual librevenge::RVNGInputStream* getSubStreamByName(const char*) override;
+	virtual librevenge::RVNGInputStream* getSubStreamById(unsigned) override;
+	virtual const unsigned char *read(unsigned long numBytes, unsigned long &numBytesRead) override;
+	virtual int seek(long offset, librevenge::RVNG_SEEK_TYPE seekType) override;
+	virtual long tell() override;
+	virtual bool isEnd() override;
 
 private:
 
 	GsfInput *m_input;
 	GsfInfile *m_ole;
+	std::map<unsigned, std::string> m_substreams;
 };
 
 AbiWordPerfectGraphicsInputStream::AbiWordPerfectGraphicsInputStream(GsfInput *input) :
-	WPXInputStream(),
+	librevenge::RVNGInputStream(),
 	m_input(input),
-	m_ole(NULL)
+	m_ole(nullptr),
+	m_substreams()
 {
 	g_object_ref(G_OBJECT(input));
 }
@@ -76,9 +76,9 @@ AbiWordPerfectGraphicsInputStream::~AbiWordPerfectGraphicsInputStream()
 
 const unsigned char * AbiWordPerfectGraphicsInputStream::read(unsigned long numBytes, unsigned long &numBytesRead)
 {
-	const unsigned char *buf = gsf_input_read(m_input, numBytes, NULL);
+	const unsigned char *buf = gsf_input_read(m_input, numBytes, nullptr);
 
-	if (buf == NULL)
+	if (buf == nullptr)
 		numBytesRead = 0;
 	else
 		numBytesRead = numBytes;
@@ -86,48 +86,141 @@ const unsigned char * AbiWordPerfectGraphicsInputStream::read(unsigned long numB
 	return buf;
 }
 
-int AbiWordPerfectGraphicsInputStream::seek(long offset, WPX_SEEK_TYPE seekType) 
+int AbiWordPerfectGraphicsInputStream::seek(long offset, librevenge::RVNG_SEEK_TYPE seekType) 
 {
 	GSeekType gsfSeekType = G_SEEK_SET;
 	switch(seekType)
 	{
-	case WPX_SEEK_CUR:
+	case librevenge::RVNG_SEEK_CUR:
 		gsfSeekType = G_SEEK_CUR;
 		break;
-	case WPX_SEEK_SET:
+	case librevenge::RVNG_SEEK_SET:
 		gsfSeekType = G_SEEK_SET;
+		break;
+	case librevenge::RVNG_SEEK_END:
+		gsfSeekType = G_SEEK_END;
 		break;
 	}
 
 	return gsf_input_seek(m_input, offset, gsfSeekType);
 }
 
-bool AbiWordPerfectGraphicsInputStream::isOLEStream()
+bool AbiWordPerfectGraphicsInputStream::isStructured()
 {
 	if (!m_ole)
-		m_ole = GSF_INFILE(gsf_infile_msole_new (m_input, NULL)); 
+		m_ole = GSF_INFILE(gsf_infile_msole_new (m_input, nullptr));
 
-	if (m_ole != NULL)
+	if (!m_ole)
+		m_ole = GSF_INFILE(gsf_infile_zip_new (m_input, nullptr));
+
+	if (m_ole)
 		return true;
 
 	return false;
 }
 
-WPXInputStream * AbiWordPerfectGraphicsInputStream::getDocumentOLEStream()
+unsigned AbiWordPerfectGraphicsInputStream::subStreamCount()
 {
-	return getDocumentOLEStream("PerfectOffice_MAIN");
+	if (!m_ole)
+		m_ole = GSF_INFILE(gsf_infile_msole_new (m_input, nullptr));
+
+	if (!m_ole)
+		m_ole = GSF_INFILE(gsf_infile_zip_new (m_input, nullptr));
+
+	if (m_ole)
+		{
+			int numChildren = gsf_infile_num_children(m_ole);
+			if (numChildren > 0)
+				return numChildren;
+			return 0;
+		}
+
+	return 0;
 }
 
-WPXInputStream * AbiWordPerfectGraphicsInputStream::getDocumentOLEStream(const char * name)
+const char * AbiWordPerfectGraphicsInputStream::subStreamName(unsigned id)
 {
-	WPXInputStream *documentStream = NULL;
-	
 	if (!m_ole)
-		m_ole = GSF_INFILE(gsf_infile_msole_new (m_input, NULL)); 
-	
+		m_ole = GSF_INFILE(gsf_infile_msole_new (m_input, nullptr));
+
+	if (!m_ole)
+		m_ole = GSF_INFILE(gsf_infile_zip_new (m_input, nullptr));
+
+	if (m_ole)
+		{
+			if ((int)id >= gsf_infile_num_children(m_ole))
+			{
+				return nullptr;
+			}
+			std::map<unsigned, std::string>::iterator i = m_substreams.lower_bound(id);
+			if (i == m_substreams.end() || m_substreams.key_comp()(id, i->first))
+				{
+					std::string name = gsf_infile_name_by_index(m_ole, (int)id);
+					i = m_substreams.insert(i, std::map<unsigned, std::string>::value_type(id, name));
+				}
+			return i->second.c_str();
+		}
+
+	return nullptr;
+}
+
+bool AbiWordPerfectGraphicsInputStream::existsSubStream(const char * name)
+{
+	if (!m_ole)
+		m_ole = GSF_INFILE(gsf_infile_msole_new (m_input, nullptr));
+
+	if (!m_ole)
+		m_ole = GSF_INFILE(gsf_infile_zip_new (m_input, nullptr));
+
 	if (m_ole)
 		{
 			GsfInput *document = gsf_infile_child_by_name(m_ole, name);
+			if (document) 
+				{
+					g_object_unref(G_OBJECT (document));
+					return true;
+				}
+		}
+	
+	return false;
+}
+
+librevenge::RVNGInputStream * AbiWordPerfectGraphicsInputStream::getSubStreamByName(const char * name)
+{
+	librevenge::RVNGInputStream *documentStream = nullptr;
+
+	if (!m_ole)
+		m_ole = GSF_INFILE(gsf_infile_msole_new (m_input, nullptr));
+
+	if (!m_ole)
+		m_ole = GSF_INFILE(gsf_infile_zip_new (m_input, nullptr));
+
+	if (m_ole)
+		{
+			GsfInput *document = gsf_infile_child_by_name(m_ole, name);
+			if (document) 
+				{
+					documentStream = new AbiWordPerfectGraphicsInputStream(document);
+					g_object_unref(G_OBJECT (document)); // the only reference should be encapsulated within the new stream
+				}
+		}
+	
+	return documentStream;
+}
+
+librevenge::RVNGInputStream * AbiWordPerfectGraphicsInputStream::getSubStreamById(unsigned id)
+{
+	librevenge::RVNGInputStream *documentStream = nullptr;
+
+	if (!m_ole)
+		m_ole = GSF_INFILE(gsf_infile_msole_new (m_input, nullptr));
+
+	if (!m_ole)
+		m_ole = GSF_INFILE(gsf_infile_zip_new (m_input, nullptr));
+
+	if (m_ole)
+		{
+			GsfInput *document = gsf_infile_child_by_index(m_ole, (int)id);
 			if (document) 
 				{
 					documentStream = new AbiWordPerfectGraphicsInputStream(document);
@@ -143,12 +236,12 @@ long AbiWordPerfectGraphicsInputStream::tell()
 	return gsf_input_tell(m_input);
 }
 
-bool AbiWordPerfectGraphicsInputStream::atEOS()
+bool AbiWordPerfectGraphicsInputStream::isEnd()
 {
 	return gsf_input_eof(m_input);
 }
 
-static IE_Imp_WordPerfectGraphics_Sniffer * m_ImpSniffer = 0;
+static IE_Imp_WordPerfectGraphics_Sniffer * m_ImpSniffer = nullptr;
 
 ABI_FAR_CALL
 int abi_plugin_register (XAP_ModuleInfo * mi)
@@ -173,17 +266,17 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-	mi->name    = 0;
-	mi->desc    = 0;
-	mi->version = 0;
-	mi->author  = 0;
-	mi->usage   = 0;
+	mi->name = nullptr;
+	mi->desc = nullptr;
+	mi->version = nullptr;
+	mi->author = nullptr;
+	mi->usage = nullptr;
 
 	UT_ASSERT (m_ImpSniffer);
 
 	IE_ImpGraphic::unregisterImporter (m_ImpSniffer);
 	delete m_ImpSniffer;
-	m_ImpSniffer = 0;
+	m_ImpSniffer = nullptr;
 	
 	return 1;
 }
@@ -235,23 +328,33 @@ bool IE_Imp_WordPerfectGraphics_Sniffer::getDlgLabels (const char ** szDesc,
 UT_Error IE_Imp_WordPerfectGraphics_Sniffer::constructImporter(IE_ImpGraphic **ppieg)
 {
 	*ppieg = new IE_Imp_WordPerfectGraphics();
-	if (*ppieg == NULL)                                                                                                                     
+	if (*ppieg == nullptr)
 		return UT_IE_NOMEMORY;
-	return UT_OK;   
+	return UT_OK;
 }
 
 
-UT_Error IE_Imp_WordPerfectGraphics::importGraphic(GsfInput *input, FG_Graphic **ppfg)
+UT_Error IE_Imp_WordPerfectGraphics::importGraphic(GsfInput *input, FG_ConstGraphicPtr& pfg)
 {
 	AbiWordPerfectGraphicsInputStream gsfInput(input);
-	WPXString svgOutput;
-	if (WPGraphics::generateSVG(&gsfInput, svgOutput))
+	librevenge::RVNGString svgOutput;
+	librevenge::RVNGStringVector vec;
+	librevenge::RVNGSVGDrawingGenerator generator(vec, "");
+
+	if (!libwpg::WPGraphics::parse(&gsfInput, &generator) || vec.empty() || vec[0].empty())
 	{
-		GsfInput * svgInput = gsf_input_memory_new((const guint8*)svgOutput.cstr(), svgOutput.len(), false);
-		UT_Error result = IE_ImpGraphic::loadGraphic(svgInput, IE_ImpGraphic::fileTypeForSuffix(".svg"), ppfg);
-		g_object_unref(svgInput);
-		return result;
+		return UT_ERROR;
 	}
-	return UT_ERROR;
+
+	svgOutput.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
+	svgOutput.append("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"");
+	svgOutput.append(" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n");
+	svgOutput.append(vec[0]);
+	svgOutput.append("\n");
+
+	GsfInput * svgInput = gsf_input_memory_new((const guint8*)svgOutput.cstr(), svgOutput.len(), false);
+	UT_Error result = IE_ImpGraphic::loadGraphic(svgInput, IE_ImpGraphic::fileTypeForSuffix(".svg"), pfg);
+	g_object_unref(svgInput);
+	return result;
 }
 

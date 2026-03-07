@@ -28,12 +28,12 @@
 #include "ODi_ListLevelStyleFormats.h"
 
 // AbiWord includes
-#include <pd_Document.h>
-#include <fp_types.h>
-#include <ut_string_class.h>
-#include <ut_units.h>
-#include <ut_locale.h>
-#include <ut_std_string.h>
+#include "pd_Document.h"
+#include "fp_types.h"
+#include "ut_string_class.h"
+#include "ut_units.h"
+#include "ut_locale.h"
+#include "ut_std_string.h"
 
 //External includes
 #include <stdlib.h>
@@ -45,7 +45,7 @@
 ODi_ListLevelStyle::ODi_ListLevelStyle(const char* pStateName,
 									 ODi_ElementStack& rElementStack) :
                         ODi_ListenerState(pStateName, rElementStack),
-                        m_pTextStyle(NULL)
+                        m_pTextStyle(nullptr)
 {
 }
 
@@ -57,7 +57,7 @@ void ODi_ListLevelStyle::startElement (const gchar* pName,
                                       const gchar** ppAtts,
 									   ODi_ListenerStateAction& /*rAction*/) 
 {
-    const gchar* pVal = NULL;
+    const gchar* pVal = nullptr;
 
     if (!strcmp("text:list-level-style-bullet", pName) ||
         !strcmp("text:list-level-style-number", pName) ||
@@ -178,23 +178,16 @@ void ODi_ListLevelStyle::setAbiListID(UT_uint32 abiListID) {
  * list level style.
  */
 void ODi_ListLevelStyle::defineAbiList(PD_Document* pDocument) {
-    const gchar* ppAttr[13];
-    
-    ppAttr[0] = "id";
-    ppAttr[1] = m_abiListID.c_str();
-    ppAttr[2] = "parentid";
-    ppAttr[3] = m_abiListParentID.c_str();
-    ppAttr[4] = "type";
-    ppAttr[5] = m_abiListType.c_str();
-    ppAttr[6] = "start-value";
-    ppAttr[7] = m_abiListStartValue.c_str();
-    ppAttr[8] = "list-delim";
-    ppAttr[9] = m_abiListListDelim.c_str();
-    ppAttr[10] = "list-decimal";
-    ppAttr[11] = m_abiListListDecimal.c_str();
-    ppAttr[12] = 0;
-    
-    pDocument->appendList(ppAttr);
+  const PP_PropertyVector ppAttr = {
+    "id", m_abiListID,
+    "parentid", m_abiListParentID,
+    "type", m_abiListType,
+    "start-value", m_abiListStartValue,
+    "list-delim", m_abiListListDelim,
+    "list-decimal", m_abiListListDecimal
+  };
+
+  pDocument->appendList(ppAttr);
 }
 
 
@@ -234,7 +227,7 @@ void ODi_ListLevelStyle::getAbiProperties(std::string& rProps,
     std::string odTextIndent;
 
     // 1. The properties of the style denoted by the paragraph's style:list-style-name
-    if (pStyle != NULL && !pStyle->getListStyleName().empty())
+    if (pStyle != nullptr && !pStyle->getListStyleName().empty())
     {
         if (!m_marginLeft.empty())
             odMarginLeft = m_marginLeft;
@@ -243,9 +236,9 @@ void ODi_ListLevelStyle::getAbiProperties(std::string& rProps,
     }
 
     // 2. The properties of the paragraph's parent style
-    if (pStyle != NULL && !strcmp(pStyle->getFamily()->c_str(), "paragraph")) {
+    if (pStyle != nullptr && !strcmp(pStyle->getFamily()->c_str(), "paragraph")) {
         const ODi_Style_Style* pParentStyle = pStyle->getParent();
-        if (pParentStyle != NULL && !strcmp(pParentStyle->getFamily()->c_str(), "paragraph")) {
+        if (pParentStyle != nullptr && !strcmp(pParentStyle->getFamily()->c_str(), "paragraph")) {
             if (pStyle->getMarginLeft() && !pStyle->getMarginLeft()->empty())
                 odMarginLeft = *(pStyle->getMarginLeft());
             if (pStyle->getTextIndent() && !pStyle->getTextIndent()->empty())
@@ -254,7 +247,7 @@ void ODi_ListLevelStyle::getAbiProperties(std::string& rProps,
     }
 
     // 3. The properties of the paragraph style
-    if (pStyle != NULL && !strcmp(pStyle->getFamily()->c_str(), "paragraph")) {
+    if (pStyle != nullptr && !strcmp(pStyle->getFamily()->c_str(), "paragraph")) {
         if (pStyle->getMarginLeft() && !pStyle->getMarginLeft()->empty())
             odMarginLeft = *(pStyle->getMarginLeft());
         if (pStyle->getTextIndent() && !pStyle->getTextIndent()->empty())
@@ -332,7 +325,7 @@ void ODi_Bullet_ListLevelStyle::startElement(const gchar* pName,
                                              const gchar** ppAtts,
                                              ODi_ListenerStateAction& rAction) {
 
-    const gchar* pVal = NULL;
+    const gchar* pVal = nullptr;
     UT_UCS4String ucs4Str;
     
     // Let the parent class do the processing common to all list types.
@@ -341,7 +334,7 @@ void ODi_Bullet_ListLevelStyle::startElement(const gchar* pName,
     if (!strcmp("text:list-level-style-bullet", pName)) {
         pVal = UT_getAttribute ("text:bullet-char", ppAtts);
         
-        if (pVal != NULL) {
+        if (pVal != nullptr) {
         
             ucs4Str = pVal;
             
@@ -409,7 +402,7 @@ void ODi_Bullet_ListLevelStyle::startElement(const gchar* pName,
                 };
                 
             } // if (!ucs4Str.empty())
-        } else /* from if (pVal != NULL) */ {
+        } else /* from if (pVal != nullptr) */ {
             // Bullet List
             m_abiListType = UT_std_string_sprintf("%d", BULLETED_LIST);
         }

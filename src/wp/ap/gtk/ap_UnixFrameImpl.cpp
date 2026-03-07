@@ -20,11 +20,9 @@
 #include "config.h"
 #endif
 
-#include "ut_compiler.h"
-ABI_W_NO_CONST_QUAL
 #include <gtk/gtk.h>
-ABI_W_POP
 
+#include "ut_std_string.h"
 #include "ap_UnixFrameImpl.h"
 #include "ap_UnixApp.h"
 #include "ev_UnixToolbar.h"
@@ -40,16 +38,16 @@ ABI_W_POP
 
 AP_UnixFrameImpl::AP_UnixFrameImpl(AP_UnixFrame *pUnixFrame) :
 	XAP_UnixFrameImpl(static_cast<XAP_Frame *>(pUnixFrame)),
-	m_dArea(NULL),
-	m_pVadj(NULL),
-	m_pHadj(NULL),
-	m_hScroll(NULL),
-	m_vScroll(NULL),
-	m_topRuler(NULL),
-	m_leftRuler(NULL),
-	m_grid(NULL),
-	m_innergrid(NULL),
-	m_wSunkenBox(NULL),
+	m_dArea(nullptr),
+	m_pVadj(nullptr),
+	m_pHadj(nullptr),
+	m_hScroll(nullptr),
+	m_vScroll(nullptr),
+	m_topRuler(nullptr),
+	m_leftRuler(nullptr),
+	m_grid(nullptr),
+	m_innergrid(nullptr),
+	m_wSunkenBox(nullptr),
 	m_iHScrollSignal(0),
 	m_iVScrollSignal(0)
 {
@@ -145,8 +143,8 @@ GtkWidget * AP_UnixFrameImpl::_createDocumentWindow()
 	bool bShowRulers = static_cast<AP_FrameData*>(pFrame->getFrameData())->m_bShowRuler;
 
 	// create the rulers
-	AP_UnixTopRuler * pUnixTopRuler = NULL;
-	AP_UnixLeftRuler * pUnixLeftRuler = NULL;
+	AP_UnixTopRuler * pUnixTopRuler = nullptr;
+	AP_UnixLeftRuler * pUnixLeftRuler = nullptr;
 
 	if ( bShowRulers )
 	{
@@ -165,14 +163,14 @@ GtkWidget * AP_UnixFrameImpl::_createDocumentWindow()
 		  }
 		else
 		  {
-		    m_leftRuler = NULL;
+		    m_leftRuler = nullptr;
 		    //pUnixTopRuler->setOffsetLeftRuler(0);
 		  }
 	}
 	else
 	{
-		m_topRuler = NULL;
-		m_leftRuler = NULL;
+		m_topRuler = nullptr;
+		m_leftRuler = nullptr;
 	}
 
 	static_cast<AP_FrameData*>(pFrame->getFrameData())->m_pTopRuler = pUnixTopRuler;
@@ -185,7 +183,7 @@ GtkWidget * AP_UnixFrameImpl::_createDocumentWindow()
 	g_object_set_data(G_OBJECT(m_hScroll), "user_data", this);
 	gtk_widget_set_hexpand(m_hScroll, TRUE);
 
-	m_iHScrollSignal = g_signal_connect(G_OBJECT(m_pHadj), "value_changed", G_CALLBACK(XAP_UnixFrameImpl::_fe::hScrollChanged), NULL);
+	m_iHScrollSignal = g_signal_connect(G_OBJECT(m_pHadj), "value_changed", G_CALLBACK(XAP_UnixFrameImpl::_fe::hScrollChanged), nullptr);
 
 	m_pVadj = reinterpret_cast<GtkAdjustment *>(gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
 	m_vScroll = gtk_scrollbar_new(GTK_ORIENTATION_VERTICAL, m_pVadj);
@@ -193,7 +191,7 @@ GtkWidget * AP_UnixFrameImpl::_createDocumentWindow()
 	g_object_set_data(G_OBJECT(m_vScroll), "user_data", this);
 	gtk_widget_set_vexpand(m_vScroll, TRUE);
 
-	m_iVScrollSignal = g_signal_connect(G_OBJECT(m_pVadj), "value_changed", G_CALLBACK(XAP_UnixFrameImpl::_fe::vScrollChanged), NULL);
+	m_iVScrollSignal = g_signal_connect(G_OBJECT(m_pVadj), "value_changed", G_CALLBACK(XAP_UnixFrameImpl::_fe::vScrollChanged), nullptr);
 
 	// we don't want either scrollbar grabbing events from us
 	gtk_widget_set_can_focus(m_hScroll, false);
@@ -201,7 +199,7 @@ GtkWidget * AP_UnixFrameImpl::_createDocumentWindow()
 
 	// create a drawing area in the for our document window.
 	m_dArea = ap_DocView_new();
-	g_object_set(G_OBJECT(m_dArea), "expand", TRUE, NULL);
+	g_object_set(G_OBJECT(m_dArea), "expand", TRUE, nullptr);
 	g_object_set_data(G_OBJECT(m_dArea), "user_data", this);
 	UT_DEBUGMSG(("!!! drawing area m_dArea created! %p for %p \n",m_dArea,this));
 	gtk_widget_set_can_focus(m_dArea, true);	// allow it to be focussed
@@ -215,30 +213,31 @@ GtkWidget * AP_UnixFrameImpl::_createDocumentWindow()
 						    GDK_ENTER_NOTIFY_MASK |
 						    GDK_FOCUS_CHANGE_MASK |
 						    GDK_LEAVE_NOTIFY_MASK |
-						    GDK_SCROLL_MASK));
+						    GDK_SCROLL_MASK |
+						    GDK_SMOOTH_SCROLL_MASK));
 	g_signal_connect(G_OBJECT(m_dArea), "draw",
-					   G_CALLBACK(XAP_UnixFrameImpl::_fe::draw), NULL);
+					   G_CALLBACK(XAP_UnixFrameImpl::_fe::draw), nullptr);
 
 	g_signal_connect(G_OBJECT(m_dArea), "key_press_event",
-					   G_CALLBACK(XAP_UnixFrameImpl::_fe::key_press_event), NULL);
+					   G_CALLBACK(XAP_UnixFrameImpl::_fe::key_press_event), nullptr);
 
 	g_signal_connect(G_OBJECT(m_dArea), "key_release_event",
-					   G_CALLBACK(XAP_UnixFrameImpl::_fe::key_release_event), NULL);
+					   G_CALLBACK(XAP_UnixFrameImpl::_fe::key_release_event), nullptr);
 
 	g_signal_connect(G_OBJECT(m_dArea), "button_press_event",
-					   G_CALLBACK(XAP_UnixFrameImpl::_fe::button_press_event), NULL);
+					   G_CALLBACK(XAP_UnixFrameImpl::_fe::button_press_event), nullptr);
 
 	g_signal_connect(G_OBJECT(m_dArea), "button_release_event",
-					   G_CALLBACK(XAP_UnixFrameImpl::_fe::button_release_event), NULL);
+					   G_CALLBACK(XAP_UnixFrameImpl::_fe::button_release_event), nullptr);
 
 	g_signal_connect(G_OBJECT(m_dArea), "motion_notify_event",
-					   G_CALLBACK(XAP_UnixFrameImpl::_fe::motion_notify_event), NULL);
+					   G_CALLBACK(XAP_UnixFrameImpl::_fe::motion_notify_event), nullptr);
 
 	g_signal_connect(G_OBJECT(m_dArea), "scroll_event",
-					   G_CALLBACK(XAP_UnixFrameImpl::_fe::scroll_notify_event), NULL);
+					   G_CALLBACK(XAP_UnixFrameImpl::_fe::scroll_notify_event), nullptr);
 
 	g_signal_connect(G_OBJECT(m_dArea), "configure_event",
-					   G_CALLBACK(XAP_UnixFrameImpl::_fe::configure_event), NULL);
+					   G_CALLBACK(XAP_UnixFrameImpl::_fe::configure_event), nullptr);
 
 	// focus and XIM related
 	g_signal_connect(G_OBJECT(m_dArea), "enter_notify_event", G_CALLBACK(ap_focus_in_event), this);
@@ -254,7 +253,7 @@ GtkWidget * AP_UnixFrameImpl::_createDocumentWindow()
 	// create a table for scroll bars, rulers, and drawing area
 
 	m_grid = gtk_grid_new();
-	g_object_set(G_OBJECT(m_grid), "expand", TRUE, NULL);
+	g_object_set(G_OBJECT(m_grid), "expand", TRUE, nullptr);
 	g_object_set_data(G_OBJECT(m_grid),"user_data", this);
 
 	// NOTE:  in order to display w/ and w/o rulers, gtk needs two tables to
@@ -276,7 +275,7 @@ GtkWidget * AP_UnixFrameImpl::_createDocumentWindow()
 
 	// arrange the widgets within our inner table.
 	m_innergrid = gtk_grid_new();
-	g_object_set(G_OBJECT(m_innergrid), "expand", TRUE, NULL);
+	g_object_set(G_OBJECT(m_innergrid), "expand", TRUE, nullptr);
 	gtk_grid_attach(GTK_GRID(m_grid), m_innergrid, 0, 0, 1, 1); 
 
 	if ( bShowRulers )
@@ -294,7 +293,7 @@ GtkWidget * AP_UnixFrameImpl::_createDocumentWindow()
 	}
 	// create a 3d box and put the table in it, so that we
 	// get a sunken in look.
-	m_wSunkenBox = gtk_frame_new(NULL);
+	m_wSunkenBox = gtk_frame_new(nullptr);
 	gtk_frame_set_shadow_type(GTK_FRAME(m_wSunkenBox), GTK_SHADOW_IN);
 	gtk_container_add(GTK_CONTAINER(m_wSunkenBox), m_grid);
 
@@ -325,11 +324,11 @@ void AP_UnixFrameImpl::_setWindowIcon()
 {
 	// attach program icon to window
 	GtkWidget * window = getTopLevelWindow();
-	GdkPixbuf* icon = NULL;
+	GdkPixbuf* icon = nullptr;
 
 #if 0 // we don't need to use the theme.
 	GtkIconTheme * theme = gtk_icon_theme_get_default();
-	icon = gtk_icon_theme_load_icon(theme, "abiword", 48, GTK_ICON_LOOKUP_USE_BUILTIN, NULL);
+	icon = gtk_icon_theme_load_icon(theme, "abiword", 48, GTK_ICON_LOOKUP_USE_BUILTIN, nullptr);
 	if (icon)
 	{
 		gtk_window_set_icon (GTK_WINDOW (window), icon);
@@ -339,7 +338,7 @@ void AP_UnixFrameImpl::_setWindowIcon()
 #endif
 	// Hmm, we can't load the icon from the theme. This happens when we are
 	// are installed in a custom prefix, so let's try to load the icon manually.
-	GError* error = NULL;
+	GError* error = nullptr;
 	static const char* s_icon_sizes[] = {
 		"16x16",
 		"22x22",
@@ -347,16 +346,17 @@ void AP_UnixFrameImpl::_setWindowIcon()
 		"48x48",
 		"256x256",
 		"512x512",
-		NULL
+		nullptr
 	};
 
 	const char** currentSize = s_icon_sizes;
-	GList* iconList = NULL;
+	GList* iconList = nullptr;
 	while(*currentSize)
 	{
-		std::string icon_path = std::string(ICONDIR) + "/hicolor/"
-			+ *currentSize + "/apps/abiword.png";
-		icon = gdk_pixbuf_new_from_file(icon_path.c_str(), &error);
+		std::string icon_path =
+			UT_std_string_sprintf("/com/abisource/AbiWord/%s/apps/abiword.png",
+								  *currentSize);
+		icon = gdk_pixbuf_new_from_resource(icon_path.c_str(), &error);
 		if (icon)
 		{
 			iconList = g_list_append(iconList, icon);
@@ -369,6 +369,7 @@ void AP_UnixFrameImpl::_setWindowIcon()
 			if (error)
 			{
 				g_error_free(error);
+				error = nullptr;
 			}
 		}
 		currentSize++;
@@ -412,7 +413,7 @@ GtkWidget * AP_UnixFrameImpl::_createStatusBarWindow()
 	
 	return pUnixStatusBar->createWidget();
 #else
-	return NULL;
+	return nullptr;
 #endif
 }
 

@@ -21,7 +21,7 @@
 #include "ut_debugmsg.h"
 
 IE_Exp_XML::IE_Exp_XML(PD_Document * pDocument):
-	IE_Exp (pDocument), m_zip(0), m_xml(0)
+	IE_Exp(pDocument), m_zip(nullptr), m_xml(nullptr)
 {
 }
 
@@ -34,7 +34,7 @@ void IE_Exp_XML::setupFile(bool compressed)
 	UT_ASSERT_HARMLESS (!m_xml);
 	if (compressed)
 	{
-		m_zip = gsf_output_gzip_new(getFp (), NULL);
+		m_zip = gsf_output_gzip_new(getFp (), nullptr);
 		m_xml = gsf_xml_out_new (m_zip);
 	}
 	else
@@ -48,11 +48,11 @@ void IE_Exp_XML::closeHandle()
 {
 	if (m_xml) {
 		g_object_unref(m_xml);
-		m_xml = 0;
+		m_xml = nullptr;
 	}
 	if (m_zip) {
 		g_object_unref(m_zip);
-		m_zip = 0;
+		m_zip = nullptr;
 	}
 }
 
@@ -194,5 +194,5 @@ void IE_Exp_XML::addUint(char const *id, unsigned value)
 
 void IE_Exp_XML::setPrettyPrint(bool pretty)
 {
-	g_object_set (m_xml, "pretty-print", pretty, NULL);
+	g_object_set (m_xml, "pretty-print", pretty, nullptr);
 }

@@ -56,7 +56,7 @@ XAP_Dialog * AP_UnixDialog_New::static_constructor(XAP_DialogFactory * pFactory,
 
 AP_UnixDialog_New::AP_UnixDialog_New(XAP_DialogFactory * pDlgFactory,
 										 XAP_Dialog_Id id)
-  : AP_Dialog_New(pDlgFactory,id), m_pFrame(0)
+  : AP_Dialog_New(pDlgFactory,id), m_pFrame(nullptr)
 {
 }
 
@@ -236,7 +236,7 @@ static void s_radiobutton_clicked (GtkWidget * /*w*/, AP_UnixDialog_New * dlg)
 /*************************************************************************/
 
 // TODO we could make this some utility function and use for all platforms
-// Can return NULL
+// Can return nullptr
 // The list must be free'd by the caller, but the filenames are owned by the system.
 static std::list<std::string> awt_only (const std::string& path) {
 
@@ -250,15 +250,15 @@ static std::list<std::string> awt_only (const std::string& path) {
 	if (!g_file_test (path.c_str(), G_FILE_TEST_IS_DIR))
 		return list;
 
-	err = NULL;
+	err = nullptr;
 	dir = g_dir_open (path.c_str(), 0, &err);
 	if (err) {
 		g_warning ("%s", err->message);
-		g_error_free (err), err = NULL;
+		g_error_free (err), err = nullptr;
 		return list;
 	}
 
-	while (NULL != (name = g_dir_read_name (dir))) {
+	while (nullptr != (name = g_dir_read_name (dir))) {
 		len = strlen (name);
 		if (len < 5)
 			continue;
@@ -267,7 +267,7 @@ static std::list<std::string> awt_only (const std::string& path) {
 			list.push_front(name);
 		}
 	}
-	g_dir_close (dir), dir = NULL;
+	g_dir_close (dir), dir = nullptr;
 
 	return list;
 }
@@ -299,7 +299,7 @@ GtkWidget * AP_UnixDialog_New::_constructWindow ()
 	GtkTreeViewColumn *column;
 	
 	// load the dialog from the UI file
-	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_New.ui");
+	GtkBuilder* builder = newDialogBuilderFromResource("ap_UnixDialog_New.ui");
 	
 	// Update our member variables with the important widgets that 
 	// might need to be queried or altered later
@@ -320,7 +320,7 @@ GtkWidget * AP_UnixDialog_New::_constructWindow ()
 							 renderer,
 							 "text", 
 							 0,
-							 (gchar*)NULL);
+							 (gchar*)nullptr);
 	gtk_tree_view_append_column( GTK_TREE_VIEW(m_choicesList), column);
 
 	std::string templateList[2];

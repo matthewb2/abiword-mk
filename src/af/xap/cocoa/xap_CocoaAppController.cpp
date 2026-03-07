@@ -1,22 +1,22 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; ident-tabs-mode: t -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 
 /* AbiSource Application Framework
- * Copyright (C) 2003-2016 Hubert Figuiere
+ * Copyright (C) 2003-2021 Hubert Figuiere
  * Copyright (C) 2004 Francis James Franklin
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
  */
 
@@ -27,6 +27,7 @@
 #include "ev_EditMethod.h"
 #include "ev_CocoaMenuBar.h"
 
+#include "gr_CocoaFont.h"
 #include "xap_CocoaApp.h"
 #include "xap_CocoaAppController.h"
 #include "xap_CocoaModule.h"
@@ -47,33 +48,33 @@ struct EV_CocoaKeyEquiv
 };
 
 static struct EV_CocoaKeyEquiv KeyEquiv[] = {
-	{	AP_MENU_ID_FILE_NEW,				"n",	NSCommandKeyMask									}, // Cmd-N
-	{	AP_MENU_ID_FILE_NEW_USING_TEMPLATE,	"N",	NSCommandKeyMask									}, // Cmd-Shift-N
-	{	AP_MENU_ID_FILE_OPEN,				"o",	NSCommandKeyMask									}, // Cmd-O
-	{	AP_MENU_ID_FILE_SAVE,				"s",	NSCommandKeyMask									}, // Cmd-S
-	{	AP_MENU_ID_FILE_SAVEAS,				"S",	NSCommandKeyMask									}, // Cmd-Shift-S
-	{	AP_MENU_ID_FILE_CLOSE,				"w",	NSCommandKeyMask									}, // Cmd-W
-	{	AP_MENU_ID_FILE_PAGESETUP,			"P",	NSCommandKeyMask									}, // Cmd-Shift-P
-	{	AP_MENU_ID_FILE_PRINT,				"p",	NSCommandKeyMask									}, // Cmd-P
-	{	AP_MENU_ID_EDIT_UNDO,				"z",	NSCommandKeyMask									}, // Cmd-Z
-	{	AP_MENU_ID_EDIT_REDO,				"Z",	NSCommandKeyMask									}, // Cmd-Shift-Z
-	{	AP_MENU_ID_EDIT_CUT,				"x",	NSCommandKeyMask									}, // Cmd-X
-	{	AP_MENU_ID_EDIT_COPY,				"c",	NSCommandKeyMask									}, // Cmd-C
-	{	AP_MENU_ID_EDIT_PASTE,				"v",	NSCommandKeyMask									}, // Cmd-V
-	{	AP_MENU_ID_EDIT_PASTE_SPECIAL,		"V",	NSCommandKeyMask|NSAlternateKeyMask					}, // Cmd-Shift-Alt-V
-	{	AP_MENU_ID_EDIT_SELECTALL,			"a",	NSCommandKeyMask									}, // Cmd-A
-	{	AP_MENU_ID_EDIT_FIND,				"f",	NSCommandKeyMask									}, // Cmd-F
-	{	AP_MENU_ID_EDIT_GOTO,				"j",	NSCommandKeyMask									}, // Cmd-J
-	{	AP_MENU_ID_VIEW_RULER,				"r",	NSCommandKeyMask									}, // Cmd-R
-	{	AP_MENU_ID_FMT_FONT,				"t",	NSCommandKeyMask									}, // Cmd-T
-	{	AP_MENU_ID_FMT_BOLD,				"b",	NSCommandKeyMask									}, // Cmd-B
-	{	AP_MENU_ID_FMT_ITALIC,				"i",	NSCommandKeyMask									}, // Cmd-I
-	{	AP_MENU_ID_FMT_UNDERLINE,			"u",	NSCommandKeyMask									}, // Cmd-U
-	{	AP_MENU_ID_TOOLS_SPELL,				":",	NSCommandKeyMask									}, // Cmd-:
-	{	AP_MENU_ID_ALIGN_LEFT,				"{",	NSCommandKeyMask									}, // Cmd-{
-	{	AP_MENU_ID_ALIGN_CENTER,			"|",	NSCommandKeyMask									}, // Cmd-|
-	{	AP_MENU_ID_ALIGN_RIGHT,				"}",	NSCommandKeyMask									}, // Cmd-}
-	{	0,									0,		0													}
+	{	AP_MENU_ID_FILE_NEW,				"n",	NSEventModifierFlagCommand									}, // Cmd-N
+	{	AP_MENU_ID_FILE_NEW_USING_TEMPLATE,	"N",	NSEventModifierFlagCommand									}, // Cmd-Shift-N
+	{	AP_MENU_ID_FILE_OPEN,				"o",	NSEventModifierFlagCommand									}, // Cmd-O
+	{	AP_MENU_ID_FILE_SAVE,				"s",	NSEventModifierFlagCommand									}, // Cmd-S
+	{	AP_MENU_ID_FILE_SAVEAS,				"S",	NSEventModifierFlagCommand									}, // Cmd-Shift-S
+	{	AP_MENU_ID_FILE_CLOSE,				"w",	NSEventModifierFlagCommand									}, // Cmd-W
+	{	AP_MENU_ID_FILE_PAGESETUP,			"P",	NSEventModifierFlagCommand									}, // Cmd-Shift-P
+	{	AP_MENU_ID_FILE_PRINT,				"p",	NSEventModifierFlagCommand									}, // Cmd-P
+	{	AP_MENU_ID_EDIT_UNDO,				"z",	NSEventModifierFlagCommand									}, // Cmd-Z
+	{	AP_MENU_ID_EDIT_REDO,				"Z",	NSEventModifierFlagCommand									}, // Cmd-Shift-Z
+	{	AP_MENU_ID_EDIT_CUT,				"x",	NSEventModifierFlagCommand									}, // Cmd-X
+	{	AP_MENU_ID_EDIT_COPY,				"c",	NSEventModifierFlagCommand									}, // Cmd-C
+	{	AP_MENU_ID_EDIT_PASTE,				"v",	NSEventModifierFlagCommand									}, // Cmd-V
+	{	AP_MENU_ID_EDIT_PASTE_SPECIAL,		"V",	NSEventModifierFlagCommand|NSEventModifierFlagOption					}, // Cmd-Shift-Alt-V
+	{	AP_MENU_ID_EDIT_SELECTALL,			"a",	NSEventModifierFlagCommand									}, // Cmd-A
+	{	AP_MENU_ID_EDIT_FIND,				"f",	NSEventModifierFlagCommand									}, // Cmd-F
+	{	AP_MENU_ID_EDIT_GOTO,				"j",	NSEventModifierFlagCommand									}, // Cmd-J
+	{	AP_MENU_ID_VIEW_RULER,				"r",	NSEventModifierFlagCommand									}, // Cmd-R
+	{	AP_MENU_ID_FMT_FONT,				"t",	NSEventModifierFlagCommand									}, // Cmd-T
+	{	AP_MENU_ID_FMT_BOLD,				"b",	NSEventModifierFlagCommand									}, // Cmd-B
+	{	AP_MENU_ID_FMT_ITALIC,				"i",	NSEventModifierFlagCommand									}, // Cmd-I
+	{	AP_MENU_ID_FMT_UNDERLINE,			"u",	NSEventModifierFlagCommand									}, // Cmd-U
+	{	AP_MENU_ID_TOOLS_SPELL,				":",	NSEventModifierFlagCommand									}, // Cmd-:
+	{	AP_MENU_ID_ALIGN_LEFT,				"{",	NSEventModifierFlagCommand									}, // Cmd-{
+	{	AP_MENU_ID_ALIGN_CENTER,			"|",	NSEventModifierFlagCommand									}, // Cmd-|
+	{	AP_MENU_ID_ALIGN_RIGHT,				"}",	NSEventModifierFlagCommand									}, // Cmd-}
+	{	0,									nullptr,		0													}
 };
 
 @implementation XAP_CocoaApplication
@@ -123,13 +124,13 @@ static struct EV_CocoaKeyEquiv KeyEquiv[] = {
 
 	bool bEventHandled = false;
 
-	if ([anEvent type] == NSKeyDown)
+	if ([anEvent type] == NSEventTypeKeyDown)
 	{
 		unsigned int modifierFlags = [anEvent modifierFlags];
 
-		if (modifierFlags & NSCommandKeyMask)
+		if (modifierFlags & NSEventModifierFlagCommand)
 		{
-			if ((bFrameIsActive || !keyWindow) && !(modifierFlags & (NSShiftKeyMask|NSControlKeyMask)))
+			if ((bFrameIsActive || !keyWindow) && !(modifierFlags & (NSEventModifierFlagShift|NSEventModifierFlagControl)))
 			{
 				NSString * str = [anEvent charactersIgnoringModifiers];
 				if ([str length] == 1)
@@ -142,7 +143,7 @@ static struct EV_CocoaKeyEquiv KeyEquiv[] = {
 						switch (static_cast<char>(uc))
 						{
 						case ',': // Cmd-, (preferences)
-							if (!(modifierFlags & NSAlternateKeyMask))
+							if (!(modifierFlags & NSEventModifierFlagOption))
 							{
 								UT_DEBUGMSG(("[XAP_CocoaApplication -sendEvent: (Cmd-,)]\n"));
 								[self orderFrontPreferencesPanel:self];
@@ -151,7 +152,7 @@ static struct EV_CocoaKeyEquiv KeyEquiv[] = {
 							break;
 
 						case '?': // Cmd-? (help)
-							if (!(modifierFlags & NSAlternateKeyMask))
+							if (!(modifierFlags & NSEventModifierFlagOption))
 							{
 								UT_DEBUGMSG(("[XAP_CocoaApplication -sendEvent: (Cmd-?)]\n"));
 								[self openContextHelp:self];
@@ -160,7 +161,7 @@ static struct EV_CocoaKeyEquiv KeyEquiv[] = {
 							break;
 
 						case 'h': // Alt-Cmd-H (hide others)
-							if (modifierFlags & NSAlternateKeyMask)
+							if (modifierFlags & NSEventModifierFlagOption)
 							{
 								UT_DEBUGMSG(("[XAP_CocoaApplication -sendEvent: (Alt-Cmd-H)]\n"));
 								[self hideOtherApplications:self];
@@ -175,7 +176,7 @@ static struct EV_CocoaKeyEquiv KeyEquiv[] = {
 							break;
 
 						case 'm': // Cmd-M (minimize current frame/window)
-							if (bFrameIsActive && keyWindow && !(modifierFlags & NSAlternateKeyMask))
+							if (bFrameIsActive && keyWindow && !(modifierFlags & NSEventModifierFlagOption))
 							{
 								UT_DEBUGMSG(("[XAP_CocoaApplication -sendEvent: (Cmd-M)]\n"));
 								[keyWindow miniaturize:self];
@@ -184,7 +185,7 @@ static struct EV_CocoaKeyEquiv KeyEquiv[] = {
 							break;
 
 						case 'n': // Cmd-N (open untitled)
-							if (pController && !(modifierFlags & NSAlternateKeyMask))
+							if (pController && !(modifierFlags & NSEventModifierFlagOption))
 							{
 								UT_DEBUGMSG(("[XAP_CocoaApplication -sendEvent: (Cmd-N)]\n"));
 								[pController applicationOpenUntitledFile:self];
@@ -193,7 +194,7 @@ static struct EV_CocoaKeyEquiv KeyEquiv[] = {
 							break;
 
 						case 'o': // Cmd-O (open file)
-							if (pController && !(modifierFlags & NSAlternateKeyMask))
+							if (pController && !(modifierFlags & NSEventModifierFlagOption))
 							{
 								UT_DEBUGMSG(("[XAP_CocoaApplication -sendEvent: (Cmd-O)]\n"));
 								[pController applicationOpenFile:self];
@@ -202,7 +203,7 @@ static struct EV_CocoaKeyEquiv KeyEquiv[] = {
 							break;
 
 						case 'q': // Cmd-Q (quit)
-							if (!(modifierFlags & NSAlternateKeyMask))
+							if (!(modifierFlags & NSEventModifierFlagOption))
 							{
 								UT_DEBUGMSG(("[XAP_CocoaApplication -sendEvent: (Cmd-Q)]\n"));
 								[self terminate:self];
@@ -217,12 +218,12 @@ static struct EV_CocoaKeyEquiv KeyEquiv[] = {
 				}
 			}
 
-			if (!bEventHandled && false /* m_MenuDelegate */ && bFrameIsActive)
+			if (!bEventHandled && (false) /* m_MenuDelegate */ && bFrameIsActive)
 			{
 				id  target;
 				SEL action;
 
-				if (false /* [m_MenuDelegate menuHasKeyEquivalent:[self mainMenu] forEvent:anEvent target:&target action:&action] */)
+				if ((false) /* [m_MenuDelegate menuHasKeyEquivalent:[self mainMenu] forEvent:anEvent target:&target action:&action] */)
 				{
 					[self sendAction:action to:target from:self];
 					bEventHandled = true;
@@ -339,6 +340,11 @@ static XAP_CocoaAppController * XAP_AppController_Instance = nil;
 	m_PanelMenu   = [[NSMenu alloc] initWithTitle:@"Panels"];
 	m_ContextMenu = [[NSMenu alloc] initWithTitle:@"Context Menu"];
 
+    m_FontReferenceDictionary = [[NSMutableDictionary alloc] initWithCapacity:128];
+    m_FontFamilyDictionary    = [GR_CocoaFontFamilyHelper fontFamilyHelperDictionary:m_FontReferenceDictionary];
+
+    [m_FontFamilyDictionary retain];
+    
 	m_MenuIDRefDictionary = [[NSMutableDictionary alloc] initWithCapacity:16];
 
 	m_Plugins      = [[NSMutableArray alloc] initWithCapacity:16];
@@ -356,6 +362,8 @@ static XAP_CocoaAppController * XAP_AppController_Instance = nil;
 	[m_FilesRequestedDuringLaunch release];
 	[m_PanelMenu release];
 	[m_ContextMenu release];
+    [m_FontReferenceDictionary release];
+    [m_FontFamilyDictionary release];
 	[m_MenuIDRefDictionary release];
 	[m_Plugins release];
 	[m_PluginsTools release];
@@ -440,11 +448,11 @@ static XAP_CocoaAppController * XAP_AppController_Instance = nil;
 
 	BOOL bFileOpenedDuringLaunch = NO;
 
-	unsigned count = [m_FilesRequestedDuringLaunch count];
+	NSUInteger count = [m_FilesRequestedDuringLaunch count];
 
-	for (unsigned i = 0; i < count; i++) // filter out plugins from list and open those first
+	for (NSUInteger i = 0; i < count; i++) // filter out plugins from list and open those first
 	{
-		NSString * filename = (NSString *) [m_FilesRequestedDuringLaunch objectAtIndex:i];
+		NSString* filename = (NSString*)[m_FilesRequestedDuringLaunch objectAtIndex:i];
 
 		std::string path([filename UTF8String]);
 
@@ -453,20 +461,19 @@ static XAP_CocoaAppController * XAP_AppController_Instance = nil;
 			[self application:NSApp openFile:filename];
 		}
 	}
-	for (unsigned i = 0; i < count; i++) // open the rest
-	{
-		NSString * filename = (NSString *) [m_FilesRequestedDuringLaunch objectAtIndex:i];
+	for (NSUInteger i = 0; i < count; i++) // open the rest
+    {
+		NSString* filename = (NSString*)[m_FilesRequestedDuringLaunch objectAtIndex:i];
 
 		std::string path([filename UTF8String]);
 
-		if (!XAP_CocoaModule::hasPluginExtension(path))
-			if ([self application:NSApp openFile:filename])
-			{
+        if (!XAP_CocoaModule::hasPluginExtension(path)) {
+			if ([self application:NSApp openFile:filename]) {
 				bFileOpenedDuringLaunch = YES;
 			}
+        }
 	}
-	if (bFileOpenedDuringLaunch == NO)
-	{
+	if (bFileOpenedDuringLaunch == NO) {
 		UT_DEBUGMSG(("[...FinishLaunching] No file opened during launch, so opening untitled document:\n"));
 		[self applicationOpenUntitledFile:NSApp];
 	}
@@ -560,7 +567,7 @@ static XAP_CocoaAppController * XAP_AppController_Instance = nil;
 		return NO;
 	}
 
-	return (pEM->Fn(0,0) ? YES : NO);
+	return (pEM->Fn(nullptr, nullptr) ? YES : NO);
 }
 
 - (BOOL)applicationOpenFile:(NSApplication *)theApplication
@@ -576,7 +583,7 @@ static XAP_CocoaAppController * XAP_AppController_Instance = nil;
 		return NO;
 	}
 
-	return (pEM->Fn(0,0) ? YES : NO);
+	return (pEM->Fn(nullptr, nullptr) ? YES : NO);
 }
 
 - (id)dockFileNew:(id)sender
@@ -643,7 +650,7 @@ static XAP_CocoaAppController * XAP_AppController_Instance = nil;
 
 - (const char *)keyEquivalentForMenuID:(int /* XAP_Menu_Id */)menuid modifierMask:(unsigned int *)mask
 {
-	const char * equiv = 0;
+	const char * equiv = nullptr;
 
 	struct EV_CocoaKeyEquiv * pKE = KeyEquiv;
 	while (pKE->equiv)
@@ -768,6 +775,37 @@ static XAP_CocoaAppController * XAP_AppController_Instance = nil;
 	[self clearMenu:XAP_CocoaAppMenu_Help  ];
 }
 
+- (NSString*)familyNameForFont:(NSString *)fontName
+{
+       NSString * familyName = nil;
+
+       if (GR_CocoaFontReference* fontRef = [m_FontReferenceDictionary objectForKey:fontName]) {
+               familyName = [fontRef fontFamily];
+       }
+       return familyName;
+}
+
+- (GR_CocoaFontReference*)helperReferenceForFont:(NSString *)fontName
+{
+       return [m_FontReferenceDictionary objectForKey:fontName];
+}
+
+- (GR_CocoaFontFamilyHelper*)helperForFontFamily:(NSString *)fontFamilyName
+{
+       return [m_FontFamilyDictionary objectForKey:fontFamilyName];
+}
+
+- (GR_CocoaFontFamilyHelper*)helperForUnknownFontFamily:(NSString *)fontFamilyName
+{
+       GR_CocoaFontFamilyHelper* helper = [[GR_CocoaFontFamilyHelper alloc] initWithFontFamilyName:fontFamilyName known:NO];
+
+       [m_FontFamilyDictionary setObject:helper forKey:fontFamilyName];
+
+       [helper addFontReferences:m_FontReferenceDictionary];
+       [helper release];
+
+       return helper;
+}
 
 - (void)reappendPluginMenuItems
 {
@@ -853,13 +891,13 @@ static XAP_CocoaAppController * XAP_AppController_Instance = nil;
 	}
 	if ((m_pViewCurrent == view) && (m_pFrameCurrent == frame))
 	{
-		m_pViewCurrent = NULL;
-		m_pFrameCurrent = NULL;
+		m_pViewCurrent = nullptr;
+		m_pFrameCurrent = nullptr;
 	}
 	if ((m_pViewPrevious == view) && (m_pFramePrevious == frame))
 	{
-		m_pViewPrevious = NULL;
-		m_pFramePrevious = NULL;
+		m_pViewPrevious = nullptr;
+		m_pFramePrevious = nullptr;
 	}
 	[self notifyFrameViewChange];
 }
@@ -1016,16 +1054,16 @@ static XAP_CocoaAppController * XAP_AppController_Instance = nil;
  */
 - (id <NSObject, XAP_CocoaPlugin_ToolProvider>)toolProvider:(NSString *)name
 {
-	id <NSObject, XAP_CocoaPlugin_ToolProvider> matched_provider = 0;
+	id <NSObject, XAP_CocoaPlugin_ToolProvider> matched_provider = nil;
 
 	int count = [m_ToolProviders count];
 	int i;
 
 	if (!name)
-		return 0;
+		return nil;
 
 	if ([name length] == 0)
-		return 0;
+		return nil;
 
 	for (i = 0; i < count; i++)
 		{

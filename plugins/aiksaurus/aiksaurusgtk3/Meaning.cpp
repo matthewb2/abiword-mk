@@ -9,7 +9,7 @@ using namespace std;
 namespace AiksaurusGTK_impl
 {
 
-    static void ucwords(string& str) throw()
+    static void ucwords(string& str) noexcept
     {
         bool ws = true;
         for(int i = 0;i < static_cast<int>(str.size());++i)
@@ -26,7 +26,6 @@ namespace AiksaurusGTK_impl
     }
 
     Meaning::Meaning(const string& title, vector<string>& words, Display& display)
-    throw(bad_alloc)
         : d_title(title), d_words(words), d_display(display), d_lists(4), d_models(4)
     {
         d_masterLayout = gtk_event_box_new();
@@ -126,12 +125,12 @@ namespace AiksaurusGTK_impl
 
     }
 
-    Meaning::~Meaning() throw()
+    Meaning::~Meaning()
     {
 
     }
 
-    GtkWidget* Meaning::getLayout() throw()
+    GtkWidget* Meaning::getLayout() noexcept
     {
         return d_masterLayout;
     }
@@ -139,7 +138,7 @@ namespace AiksaurusGTK_impl
 
     gint Meaning::_wordclick
     (GtkTreeSelection *sel, gpointer data)
-    throw(std::bad_alloc)
+
     {
         Meaning *m = static_cast<Meaning*>(data);
 		GtkTreeView *tv = gtk_tree_selection_get_tree_view(sel);
@@ -150,16 +149,16 @@ namespace AiksaurusGTK_impl
 		if (gtk_tree_selection_get_selected (sel, &model, &iter))
 		{
             char* text;
-            gtk_tree_model_get (model, 0, &text, -1);
+            gtk_tree_model_get (model, nullptr, &text, -1);
 		    GdkEvent *e = gtk_get_current_event ();
-            m->d_display._handleClick((e->type == GDK_2BUTTON_PRESS), text);
+            m->d_display._handleClick((gdk_event_get_event_type(e) == GDK_DOUBLE_BUTTON_PRESS), text);
 		}
 
         return 0;
     }
 
 
-    void Meaning::unselectListsExcept(GtkWidget* list) throw()
+    void Meaning::unselectListsExcept(GtkWidget* list) noexcept
     {
         for(int i = 0;i < static_cast<int>(d_lists.size());++i)
         {

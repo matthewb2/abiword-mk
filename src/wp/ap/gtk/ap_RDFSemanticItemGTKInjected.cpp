@@ -51,7 +51,7 @@ static const ssList_t ssListContact[] =
     {AP_STRING_ID_MENU_LABEL_RDF_SEMITEM_STYLESHEET_CONTACT_NAME_PHONE, RDF_SEMANTIC_STYLESHEET_CONTACT_NAME_PHONE},   
     {AP_STRING_ID_MENU_LABEL_RDF_SEMITEM_STYLESHEET_CONTACT_NICK_PHONE, RDF_SEMANTIC_STYLESHEET_CONTACT_NICK_PHONE},   
     {AP_STRING_ID_MENU_LABEL_RDF_SEMITEM_STYLESHEET_CONTACT_NAME_HOMEPAGE_PHONE, RDF_SEMANTIC_STYLESHEET_CONTACT_NAME_HOMEPAGE_PHONE},   
-    {0, NULL}
+    {0, nullptr}
 };
 
 static const ssList_t ssListEvent[] =
@@ -61,22 +61,22 @@ static const ssList_t ssListEvent[] =
     {AP_STRING_ID_MENU_LABEL_RDF_SEMITEM_STYLESHEET_EVENT_SUMMARY_LOCATION, RDF_SEMANTIC_STYLESHEET_EVENT_SUMMARY_LOCATION},
     {AP_STRING_ID_MENU_LABEL_RDF_SEMITEM_STYLESHEET_EVENT_SUMMARY_LOCATION_TIMES, RDF_SEMANTIC_STYLESHEET_EVENT_SUMMARY_LOCATION_TIMES},
     {AP_STRING_ID_MENU_LABEL_RDF_SEMITEM_STYLESHEET_EVENT_SUMMARY_TIMES, RDF_SEMANTIC_STYLESHEET_EVENT_SUMMARY_TIMES},
-    {0, NULL}
+    {0, nullptr}
 };
 
 static const ssList_t ssListLocation[] =
 {
     {AP_STRING_ID_MENU_LABEL_RDF_SEMITEM_STYLESHEET_LOCATION_NAME, RDF_SEMANTIC_STYLESHEET_LOCATION_NAME},
     {AP_STRING_ID_MENU_LABEL_RDF_SEMITEM_STYLESHEET_LOCATION_NAME_LATLONG, RDF_SEMANTIC_STYLESHEET_LOCATION_NAME_LATLONG},
-    {0, NULL}
+    {0, nullptr}
 };
 
 static combo_box_t combo_box_data[] =
 {
-    {"Contact", RDF_SEMANTIC_STYLESHEET_CONTACT_NAME, ssListContact, NULL, 0},
-    {"Event", RDF_SEMANTIC_STYLESHEET_EVENT_NAME, ssListEvent, NULL, 0},
-    {"Location", RDF_SEMANTIC_STYLESHEET_LOCATION_NAME, ssListLocation, NULL, 0},
-    {NULL, NULL, NULL, NULL, 0}
+    {"Contact", RDF_SEMANTIC_STYLESHEET_CONTACT_NAME, ssListContact, nullptr, 0},
+    {"Event", RDF_SEMANTIC_STYLESHEET_EVENT_NAME, ssListEvent, nullptr, 0},
+    {"Location", RDF_SEMANTIC_STYLESHEET_LOCATION_NAME, ssListLocation, nullptr, 0},
+    {nullptr, nullptr, nullptr, nullptr, 0}
 };
 
 static const char *getStylesheetName( const ssList_t *ssList, const gchar *translation )
@@ -85,7 +85,7 @@ static const char *getStylesheetName( const ssList_t *ssList, const gchar *trans
     std::string text;
     int i;
 
-    if (!translation) return NULL;
+    if (!translation) return nullptr;
 
     for (i = 0; ssList[i].stylesheet; i++)
     {
@@ -118,7 +118,7 @@ void OnSemItemEdited ( GtkDialog* d, gint /*response_id*/,
     UT_DEBUGMSG(("OnSemItemEdited()\n"));
     PD_RDFSemanticItemHandle h = getHandle( d );
     h->updateFromEditorData();
-    gtk_widget_destroy( GTK_WIDGET(d) );
+    gtk_widget_destroy(GTK_WIDGET(d)); // TOPLEVEL
 }
 
 
@@ -147,7 +147,7 @@ void OnSemItemListEdited ( GtkDialog* d, gint response_id,
             c->updateFromEditorData();
         }
     }
-    gtk_widget_destroy( GTK_WIDGET(d) );
+    gtk_widget_destroy(GTK_WIDGET(d)); // TOPLEVEL
 }
 
 
@@ -161,7 +161,7 @@ OnSemanticStylesheetsDialogResponse( GtkWidget* dialog,
                                      GtkTreeView* /*tree*/,
                                      FV_View* /*pView*/)
 {
-    gtk_widget_destroy(dialog);
+    gtk_widget_destroy(dialog); // TOPLEVEL
 }
 
 
@@ -241,11 +241,8 @@ ApplySemanticStylesheets( const std::string& semItemClassRestriction,
 
 
 static gboolean
-OnSemanticStylesheetsSet_cb (GtkWidget *widget, GdkEvent *event, combo_box_t *box)
+OnSemanticStylesheetsSet_cb (GtkWidget *, GdkEvent *, combo_box_t *box)
 {
-    UT_UNUSED(widget);
-    UT_UNUSED(event);
-
     const char *t = getStylesheetName(box->ssList, gtk_combo_box_get_active_id(GTK_COMBO_BOX(box->combo_box)));
     std::string ssName = t ? t : box->defaultStylesheet;
 
@@ -317,7 +314,7 @@ OnInsertReferenceBase( GtkWidget* dialog,
         }
     }
     if( found )
-        gtk_widget_destroy(dialog);
+        gtk_widget_destroy(dialog); // TOPLEVEL
 
 }
 
@@ -372,12 +369,12 @@ public:
     {
         g_free(s_id);
     }
-    virtual void runSemanticStylesheetsDialog( FV_View* pView )
+    virtual void runSemanticStylesheetsDialog(FV_View* pView) override
     {
         const XAP_StringSet *pSS = XAP_App::getApp()->getStringSet();
         std::string text;
 
-        GtkBuilder* builder   = newDialogBuilder("ap_UnixDialog_SemanticStylesheets.ui");
+        GtkBuilder* builder   = newDialogBuilderFromResource("ap_UnixDialog_SemanticStylesheets.ui");
         GtkWidget*  window    = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
         GtkWidget*  lbExplanation = GTK_WIDGET(gtk_builder_get_object(builder, "lbExplanation"));         
         combo_box_data[0].combo_box = GTK_WIDGET(gtk_builder_get_object(builder, "contacts"));
@@ -422,7 +419,7 @@ public:
 
         // set max. text width for explanation
         GtkRequisition requisition;
-        gtk_widget_get_preferred_size(gtk_widget_get_parent(lbExplanation), &requisition, NULL);
+        gtk_widget_get_preferred_size(gtk_widget_get_parent(lbExplanation), &requisition, nullptr);
         gtk_widget_set_size_request(lbExplanation, requisition.width, -1);
 
         // window title and icon
@@ -444,12 +441,12 @@ public:
         gtk_widget_show_all (window);
         
     }
-    std::pair< PT_DocPosition, PT_DocPosition > runInsertReferenceDialog( FV_View* pView )
+    std::pair<PT_DocPosition, PT_DocPosition> runInsertReferenceDialog(FV_View* pView) override
     {
         const XAP_StringSet *pSS = XAP_App::getApp()->getStringSet();
         std::string text;
 
-        GtkBuilder* builder = newDialogBuilder("pd_RDFInsertReference.ui");
+        GtkBuilder* builder = newDialogBuilderFromResource("pd_RDFInsertReference.ui");
         GtkWidget*  window  = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
         GtkWidget*  tv      = GTK_WIDGET(gtk_builder_get_object(builder, "tv"));
 
@@ -473,13 +470,13 @@ public:
 
         GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (tv));
 
-        GtkTreeViewColumn *column = NULL;
-        GtkCellRenderer *renderer = NULL;
+        GtkTreeViewColumn *column = nullptr;
+        GtkCellRenderer *renderer = nullptr;
         renderer = gtk_cell_renderer_text_new ();
         gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (tv),
                                                      -1, "Name", renderer,
                                                      "text", COLUMN_REFDLG_NAME,
-                                                     NULL);
+                                                     nullptr);
         column = gtk_tree_view_get_column (GTK_TREE_VIEW (tv), COLUMN_REFDLG_NAME );
         gtk_tree_view_column_set_sort_column_id (column, COLUMN_REFDLG_NAME );
 
@@ -490,7 +487,7 @@ public:
         if (l.begin() != l.end())
         {
             pSS->getValueUTF8(AP_STRING_ID_DLG_RDF_SemanticItemInsert_Column_Refdlg, text);
-            gtk_tree_store_append (GTK_TREE_STORE (model), &parentiter, 0);
+            gtk_tree_store_append(GTK_TREE_STORE(model), &parentiter, nullptr);
             gtk_tree_store_set (GTK_TREE_STORE (model), &parentiter, 
                                 COLUMN_REFDLG_NAME, text.c_str(),
                                 -1);

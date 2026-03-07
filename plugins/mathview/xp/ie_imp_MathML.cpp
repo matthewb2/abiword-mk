@@ -1,4 +1,4 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t; -*- */
 
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
@@ -49,7 +49,7 @@ static const AbiMathViewEntityMapItem mathmlEntitiesMap[] = {
 
 static int compareEntities(const void * pSz, const void * pEnt)
 {
-	AbiMathViewEntityMapItem ** pE = NULL;
+	AbiMathViewEntityMapItem ** pE = nullptr;
 
 	pE  = reinterpret_cast<AbiMathViewEntityMapItem **>(reinterpret_cast<void **>(const_cast<void *>(pEnt)));
 
@@ -61,8 +61,8 @@ static int compareEntities(const void * pSz, const void * pEnt)
 
 static int sortEntities(const void * pEnt1, const void * pEnt2)
 {
-	AbiMathViewEntityMapItem ** pE1 = NULL;
-	AbiMathViewEntityMapItem ** pE2 = NULL;
+	AbiMathViewEntityMapItem ** pE1 = nullptr;
+	AbiMathViewEntityMapItem ** pE2 = nullptr;
 
 	pE1 = reinterpret_cast<AbiMathViewEntityMapItem **>(reinterpret_cast<void **>(const_cast<void *>(pEnt1)));
 	pE2 = reinterpret_cast<AbiMathViewEntityMapItem **>(reinterpret_cast<void **>(const_cast<void *>(pEnt2)));
@@ -92,7 +92,7 @@ IE_Imp_MathML_EntityTable::~IE_Imp_MathML_EntityTable ()
 
 /* caller's responsibility to free returned bytebuf
  */
-bool IE_Imp_MathML_EntityTable::convert(const char * buffer, unsigned long length, UT_ByteBuf & To) const
+bool IE_Imp_MathML_EntityTable::convert(const char * buffer, unsigned long length, const UT_ByteBufPtr & To) const
 {
 	if (!buffer || !length)
 	{
@@ -138,7 +138,7 @@ bool IE_Imp_MathML_EntityTable::convert(const char * buffer, unsigned long lengt
 		}
 		if (ptr1 != start)
 		{
-			To.append(reinterpret_cast<const UT_Byte *>(start), ptr1 - start);
+			To->append(reinterpret_cast<const UT_Byte *>(start), ptr1 - start);
 		}
 
 		bool bEntity = true;
@@ -174,7 +174,7 @@ bool IE_Imp_MathML_EntityTable::convert(const char * buffer, unsigned long lengt
 			if (*(ptr1 + 1) == '#') // unicode value; just leave alone...
 			{
 				++ptr2;
-				To.append(reinterpret_cast<const UT_Byte *>(ptr1), ptr2 - ptr1);
+				To->append(reinterpret_cast<const UT_Byte *>(ptr1), ptr2 - ptr1);
 				ptr1 = ptr2;
 			}
 			else
@@ -201,7 +201,7 @@ bool IE_Imp_MathML_EntityTable::convert(const char * buffer, unsigned long lengt
 
 					UT_DEBUGMSG(("Replacing entity \"&%s;\" with \"%s\".\n", pszNew, szEntVal));
 
-					To.append(reinterpret_cast<const UT_Byte *>(szEntVal), strlen(szEntVal));
+					To->append(reinterpret_cast<const UT_Byte *>(szEntVal), strlen(szEntVal));
 					ptr1 = ptr2 + 1;
 				}
 				else
@@ -209,7 +209,7 @@ bool IE_Imp_MathML_EntityTable::convert(const char * buffer, unsigned long lengt
 					UT_DEBUGMSG(("Entity \"&%s;\" unmatched; leaving alone...\n", pszNew));
 
 					++ptr2;
-					To.append(reinterpret_cast<const UT_Byte *>(ptr1), ptr2 - ptr1);
+					To->append(reinterpret_cast<const UT_Byte *>(ptr1), ptr2 - ptr1);
 					ptr1 = ptr2;
 				}
 				DELETEPV(pszNew);
@@ -220,12 +220,12 @@ bool IE_Imp_MathML_EntityTable::convert(const char * buffer, unsigned long lengt
 			UT_DEBUGMSG(("Found unmatched \"&\" - replacing with \"&amp;\"!\n"));
 
 			const char * amp = "&amp;";
-			To.append(reinterpret_cast<const UT_Byte *>(amp), 5);
+			To->append(reinterpret_cast<const UT_Byte *>(amp), 5);
 			++ptr1;
 		}
 		start = ptr1;
 	}
-	To.append(reinterpret_cast<const UT_Byte *>(start), end - start);
+	To->append(reinterpret_cast<const UT_Byte *>(start), end - start);
 
 	return true; 
 }
@@ -268,17 +268,19 @@ const IE_MimeConfidence * IE_Imp_MathML_Sniffer::getMimeConfidence ()
 /*!
   Check if buffer contains data meant for this importer.
 
- We don't attmpt to recognize since other filetypes (HTML) can
+ We don't attempt to recognize since other filetypes (HTML) can
  use the same encodings a text file can.
  We also don't want to steal recognition when user wants to use
  the Encoded Text importer.
  */
 UT_Confidence_t IE_Imp_MathML_Sniffer::recognizeContents(const char * szBuf,
-													   UT_uint32 /*iNumbytes*/)
+													   UT_uint32 iNumbytes)
 {
 	const char * magic = "<math";
-	if(strncmp(szBuf, magic, strlen(magic)) == 0)
-	   return UT_CONFIDENCE_PERFECT;
+	const size_t magic_len = strlen(magic);
+	if (iNumbytes >= magic_len && strncmp(szBuf, magic, magic_len) == 0) {
+		return UT_CONFIDENCE_PERFECT;
+	}
 	return UT_CONFIDENCE_ZILCH;
 }
 
@@ -315,7 +317,7 @@ UT_Error IE_Imp_MathML::_loadFile(GsfInput * fp)
 	ImportStreamFile * pStream = new ImportStreamFile(fp);
 	UT_Error error;
 
-	pStream->init(NULL);
+	pStream->init(nullptr);
 	X_CleanupIfError(error,_parseStream(pStream));
 	error = UT_OK;
 
@@ -346,7 +348,6 @@ IE_Imp_MathML::IE_Imp_MathML(PD_Document * pDocument, const IE_Imp_MathML_Entity
 
 IE_Imp_MathML::~IE_Imp_MathML(void)
 {
-	DELETEP(m_pByteBuf);
 }
 
 /*****************************************************************/
@@ -365,7 +366,7 @@ UT_Error IE_Imp_MathML::_parseStream(ImportStream * pStream)
 {
 	UT_return_val_if_fail(pStream, UT_ERROR);
 
-	UT_ByteBuf BB;
+	UT_ByteBufPtr BB(new UT_ByteBuf);
 	UT_UCSChar c;
 	unsigned char uc;
 	while (pStream->getChar(c))
@@ -374,10 +375,10 @@ UT_Error IE_Imp_MathML::_parseStream(ImportStream * pStream)
 		if(c!=((UT_UCSChar)0x00EF) && c!=((UT_UCSChar)0x00BB) && c!=((UT_UCSChar)0x00BF))
 		{
 			uc = static_cast<unsigned char>(c);
-			BB.append(&uc,1);
+			BB->append(&uc,1);
 		}
 	}
-	return m_EntityTable->convert(reinterpret_cast<const char *>(BB.getPointer(0)), BB.getLength(), *m_pByteBuf) ? UT_OK : UT_ERROR;
+	return m_EntityTable->convert(reinterpret_cast<const char *>(BB->getPointer(0)), BB->getLength(), m_pByteBuf) ? UT_OK : UT_ERROR;
 }
 
 bool IE_Imp_MathML::pasteFromBuffer(PD_DocumentRange * pDocRange,
@@ -389,7 +390,7 @@ bool IE_Imp_MathML::pasteFromBuffer(PD_DocumentRange * pDocRange,
 
 	ImportStreamClipboard stream(pData, lenData);
 	setClipboard (pDocRange->m_pos1);
-	stream.init(NULL);
+	stream.init(nullptr);
 	_parseStream(&stream);
 	return true;
 }

@@ -1,19 +1,19 @@
 /* AbiSuite
- * Copyright (C) 2001 Dom Lachowicz <cinamod@hotmail.com>
- *
+ * Copyright (C) 2001 Dom Lachowicz <cinamod@hotmail.com> 
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
 
@@ -64,16 +64,16 @@ bool SpellChecker::requestDictionary (const char * szLang)
 SpellChecker::SpellCheckResult SpellChecker::checkWord(const UT_UCSChar* word, size_t len)
 {
 	UT_return_val_if_fail( word, SpellChecker::LOOKUP_SUCCEEDED );
-
+	
 	SpellChecker::SpellCheckResult ret = SpellChecker::LOOKUP_FAILED;
 
 	m_bIsBarbarism = false;
 	m_bIsDictionaryWord = false;
-
+	
     if (m_BarbarismChecker.checkWord (word, len))
 	{
 		UT_DEBUGMSG(("SPELL:  spell %p %s barb \"%s\"\n",
-					 this, getLanguage().c_str(), UT_UTF8String (word, len).utf8_str()));
+                     (void*)this, getLanguage().c_str(), UT_UTF8String (word, len).utf8_str()));
 		m_bIsBarbarism = true;
 		return SpellChecker::LOOKUP_FAILED;
 	}
@@ -82,7 +82,7 @@ SpellChecker::SpellCheckResult SpellChecker::checkWord(const UT_UCSChar* word, s
 	// we split each construction into the constituent words and check each word
 	// individually -- if they all pass, we consider the whole phrase good, if any fails,
 	// we try the entire hyphenated phrase
-
+	
 	const UT_uint32 iMaxWords = 10;
 	const UT_UCS4Char * pWords[iMaxWords];
 	size_t iWordLengths[iMaxWords];
@@ -92,7 +92,7 @@ SpellChecker::SpellCheckResult SpellChecker::checkWord(const UT_UCSChar* word, s
 
 	// initialise the first word to the start of the string we were given
 	pWords[0] = word;
-
+	
 	for(i = 0, p = word; i < len; ++i, ++p)
 	{
 		if(*p == '-')
@@ -111,7 +111,7 @@ SpellChecker::SpellCheckResult SpellChecker::checkWord(const UT_UCSChar* word, s
 
 	// compute the length of the last word
 	iWordLengths[iWordCount] = len - (pWords[iWordCount] - word);
-
+	
 	// NB iWordCount is really 'word count' - 1 after the loop above, hence the <=
 	for(i = 0; i <= iWordCount; ++i)
 	{
@@ -129,9 +129,9 @@ SpellChecker::SpellCheckResult SpellChecker::checkWord(const UT_UCSChar* word, s
 	return ret;
 }
 
-UT_GenericVector<UT_UCSChar*> *SpellChecker::suggestWord(const UT_UCSChar* word, size_t len)
+std::unique_ptr<std::vector<UT_UCSChar*>> SpellChecker::suggestWord(const UT_UCSChar* word, size_t len)
 {
-	UT_GenericVector<UT_UCSChar*> *pvSugg = _suggestWord(word, len);
+	auto pvSugg = _suggestWord(word, len);
 
 	m_BarbarismChecker.suggestWord(word, len, pvSugg);
 
@@ -154,9 +154,9 @@ void SpellChecker::correctWord (const UT_UCSChar * /*toCorrect*/, size_t /*toCor
 	XAP_Frame           * pFrame = pApp->getLastFocussedFrame ();
 	char				szLangName[255];
 	UT_Language			lang;
-
+	
 	UT_uint32 id = lang.getIndxFromCode(szLang);
-	const gchar* pLang  = lang.getNthLangName(id);
+	const gchar* pLang  = lang.getNthLangName(id);	
 	sprintf(szLangName, "%s [%s]", pLang, szLang); // language name [language_code]
 
 	UT_String buf (UT_String_sprintf(pApp->getStringSet ()->getValue (XAP_STRING_ID_SPELL_CANTLOAD_DICT),
@@ -184,7 +184,7 @@ void SpellChecker::correctWord (const UT_UCSChar * /*toCorrect*/, size_t /*toCor
  * and destroying instances of the ISpellChecker class
  */
 /* private */ SpellManager::SpellManager ()
-  : m_map (NBUCKETS), m_lastDict(0), m_nLoadedDicts(0)
+  : m_map (NBUCKETS), m_lastDict(nullptr), m_nLoadedDicts(0)
 {
 	m_missingHashs += "-none-";
 }
@@ -225,18 +225,18 @@ SpellManager::instance ()
 SpellChecker *
 SpellManager::requestDictionary (const char * szLang)
 {
-	SpellCheckerClass * checker = 0;
+	SpellCheckerClass * checker = nullptr;
 
 	// Don't try to load hashes we know are missing
 	if (strstr(m_missingHashs.c_str(), szLang))
-		return 0;
+		return nullptr;
 
 	// first look up the entry in the hashtable
-	if (m_map.contains (szLang, 0))
+	if (m_map.contains(szLang, nullptr))
 	{
 		return static_cast<SpellCheckerClass *>(const_cast<void *>(m_map.pick (szLang)));
 	}
-
+	
 	// not found, so insert it
 	checker = new SpellCheckerClass ();
 
@@ -254,7 +254,7 @@ SpellManager::requestDictionary (const char * szLang)
 		checker->setDictionaryFound(false);
 		m_missingHashs += szLang;
 		delete checker;
-		checker = NULL;
+		checker = nullptr;
     }
 
 	return checker;

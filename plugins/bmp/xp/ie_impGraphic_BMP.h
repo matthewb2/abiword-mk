@@ -32,21 +32,21 @@
 class IE_ImpGraphicBMP_Sniffer : public IE_ImpGraphicSniffer
 {
  public:
-	virtual const IE_SuffixConfidence * getSuffixConfidence ();
-	virtual const IE_MimeConfidence * getMimeConfidence () { return NULL; }
-	virtual UT_Confidence_t recognizeContents (const char * szBuf,
-					UT_uint32 iNumbytes);
-	virtual bool getDlgLabels (const char ** szDesc,
+	virtual const IE_SuffixConfidence * getSuffixConfidence() override;
+	virtual const IE_MimeConfidence * getMimeConfidence() override { return nullptr; }
+	virtual UT_Confidence_t recognizeContents(const char * szBuf,
+					UT_uint32 iNumbytes) override;
+	virtual bool getDlgLabels(const char ** szDesc,
 				   const char ** szSuffixList,
-				   IEGraphicFileType * ft);
-	virtual UT_Error constructImporter (IE_ImpGraphic ** ppieg);
+				   IEGraphicFileType * ft) override;
+	virtual UT_Error constructImporter(IE_ImpGraphic ** ppieg) override;
 };
 
 class IE_ImpGraphic_BMP : public IE_ImpGraphic
 {
 public:
-    	virtual UT_Error	importGraphic(UT_ByteBuf* pBB,
-					      FG_Graphic ** ppfg);
+    virtual UT_Error importGraphic(const UT_ConstByteBufPtr &pBB,
+                                          FG_ConstGraphicPtr & pfg) override;
 
 private:
 	// PNG structures used
@@ -87,22 +87,22 @@ private:
 	bool		m_bHeaderDone;		// Check to see if finshed Reading Header
 
 	void InitializePrivateClassData();
-	UT_Error _convertGraphic(UT_ByteBuf * pBB);
+	UT_Error _convertGraphic(const UT_ConstByteBufPtr & pBB);
 
 	// Functions for Reading Bitmaps
-	UT_Error Read_BMP_Header    (UT_ByteBuf* pBB);
+	UT_Error Read_BMP_Header    (const UT_ConstByteBufPtr & pBB);
 
 	UT_Error Initialize_PNG();
-	UT_Error Convert_BMP_Pallet (UT_ByteBuf* pBB);
-	UT_Error Convert_BMP        (UT_ByteBuf* pBB);
+	UT_Error Convert_BMP_Pallet (const UT_ConstByteBufPtr & pBB);
+	UT_Error Convert_BMP        (const UT_ConstByteBufPtr & pBB);
 
 	// Function to Read ByteBuffer
-	UT_Byte		ReadByte  (UT_ByteBuf* pBB, UT_uint32 offset);
-	UT_uint16	Read2Bytes(UT_ByteBuf* pBB, UT_uint32 offset);
-	UT_uint32   Read4Bytes(UT_ByteBuf* pBB, UT_uint32 offset);
-	UT_uint32   ReadBytes (UT_ByteBuf* pBB, UT_uint32 offset, UT_uint32 num_bytes);
+	UT_Byte		ReadByte  (const UT_ConstByteBufPtr & pBB, UT_uint32 offset);
+	UT_uint16	Read2Bytes(const UT_ConstByteBufPtr & pBB, UT_uint32 offset);
+	UT_uint32   Read4Bytes(const UT_ConstByteBufPtr & pBB, UT_uint32 offset);
+	UT_uint32   ReadBytes (const UT_ConstByteBufPtr & pBB, UT_uint32 offset, UT_uint32 num_bytes);
 
-	UT_ByteBuf*  m_pBB;				// pBB Converted to PNG File
+	UT_ConstByteBufPtr  m_pBB;				// pBB Converted to PNG File
 };
 
 #endif /* IE_IMPGRAPHIC_BMP_H */

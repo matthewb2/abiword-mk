@@ -55,12 +55,12 @@ public:
 	virtual XAP_Frame *				newFrame(void);
 	virtual bool					forgetFrame(XAP_Frame * pFrame);
 	virtual bool					shutdown(void);
-	virtual bool					getPrefsValueDirectory(bool bAppSpecific, const gchar * szKey, const gchar ** pszValue) const;
+	virtual bool getPrefsValueDirectory(bool bAppSpecific, const gchar * szKey, std::string& alue) const;
 	virtual const XAP_StringSet *	getStringSet(void) const;
 	virtual const char *			getAbiSuiteAppDir(void) const;
 	virtual void					copyToClipboard(PD_DocumentRange * pDocRange, bool bUseClipboard = true);
 	virtual void					pasteFromClipboard(PD_DocumentRange * pDocRange, bool bUseClipboard, bool bHonorFormatting = true);
-	virtual bool					canPasteFromClipboard(void);
+	virtual bool canPasteFromClipboard(void) const;
 
 	virtual void					setSelectionStatus(AV_View * pView);
 
@@ -75,7 +75,7 @@ public:
 	  Gets the View Selection
 	  \return The View currently selected.
 	*/
-	inline virtual AV_View *                        getViewSelection(void)
+	inline virtual AV_View* getViewSelection(void) const
 	{ return m_pViewSelection; }
 	virtual void					clearSelection(void);
 	virtual bool					getCurrentSelection(const char** formatList,
@@ -89,12 +89,11 @@ public:
 
 	void loadAllPlugins ();
 
-	virtual void errorMsgBadArg(const char*);
 	virtual void errorMsgBadFile(XAP_Frame * pFrame, const char * file,
 								 UT_Error error);
 	virtual bool doWindowlessArgs (const AP_Args *, bool & bSuccess);
 	virtual GR_Graphics * newDefaultScreenGraphics() const
-		{ UT_ASSERT(UT_NOT_IMPLEMENTED); return NULL; };
+		{ UT_ASSERT(UT_NOT_IMPLEMENTED); return nullptr; };
 
 private:	// JCA: Why in the hell we have so many (any) protected variables?
 	XAP_StringSet *			m_pStringSet;

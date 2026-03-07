@@ -21,16 +21,16 @@
  */
 
 // Class definition include
-#include <OXMLi_ListenerState_HdrFtr.h>
+#include "OXMLi_ListenerState_HdrFtr.h"
 
 // Internal includes
-#include <OXML_Element.h>
-#include <OXML_Section.h>
-#include <OXML_Document.h>
-#include <OXML_Types.h>
+#include "OXML_Element.h"
+#include "OXML_Section.h"
+#include "OXML_Document.h"
+#include "OXML_Types.h"
 
 // AbiWord includes
-#include <ut_debugmsg.h>
+#include "ut_debugmsg.h"
 
 // External includes
 #include <cstring>
@@ -69,7 +69,7 @@ void OXMLi_ListenerState_HdrFtr::endElement (OXMLi_EndElementRequest * rqst)
 		}
 
 		OXML_Document * doc = OXML_Document::getInstance();
-		UT_return_if_fail( this->_error_if_fail(doc != NULL) );
+		UT_return_if_fail( this->_error_if_fail(doc != nullptr) );
 
 		if (nameMatches(rqst->pName, NS_W_KEY, "hdr"))
 			doc->addHeader(s);

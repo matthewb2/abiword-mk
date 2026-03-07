@@ -1,8 +1,7 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
-
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2004 Hubert Figuière
+ * Copyright (C) 2004-2021 Hubert FiguiÃ¨re
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,8 +19,7 @@
  * 02110-1301 USA.
  */
 
-#ifndef AP_LEFTRULER_H
-#define AP_LEFTRULER_H
+#pragma once
 
 #include "xap_Features.h"
 // Class for dealing with the horizontal ruler at the top of
@@ -37,7 +35,9 @@
 #include "ev_EditBits.h"
 #include "pt_Types.h"
 #include "xap_Strings.h"
+#include "xap_Prefs.h"
 #include "xap_CustomWidget.h"
+#include "ap_Ruler.h"
 
 class XAP_App;
 class XAP_Frame;
@@ -81,7 +81,7 @@ public:
 								m_iNumRows(0),
 								m_iCurrentRow(0),
 								m_iTablePadding(0),
-								m_vecTableRowInfo(NULL)
+								m_vecTableRowInfo(nullptr)
 		{
 		}
 	virtual ~AP_LeftRulerInfo(void)
@@ -118,7 +118,7 @@ public:
 
 /*****************************************************************/
 
-class ABI_EXPORT AP_LeftRuler : public AV_Listener, public XAP_CustomWidgetLU
+class ABI_EXPORT AP_LeftRuler : public AP_Ruler, public AV_Listener
 {
 public:
 	AP_LeftRuler(XAP_Frame * pFrame);
@@ -132,20 +132,20 @@ public:
 		{ return m_bIsHidden;}
 	AV_View *           getView(void) const
 		{return m_pView;}
-	void				setHeight(UT_uint32 iHeight);
+	virtual void		setHeight(UT_uint32 iHeight) override;
 	UT_uint32			getHeight(void) const;
-	void				setWidth(UT_uint32 iWidth);
+	virtual void		setWidth(UT_uint32 iWidth) override;
 	UT_uint32			getWidth(void) const;
 	void				scrollRuler(UT_sint32 yoff, UT_sint32 ylimit);
 
-	void			    mouseMotion(EV_EditModifierState ems, UT_sint32 x, UT_sint32 y);
-	void                mousePress(EV_EditModifierState ems, EV_EditMouseButton emb, UT_uint32 x, UT_uint32 y);
+	virtual void	    mouseMotion(EV_EditModifierState ems, UT_sint32 x, UT_sint32 y) override;
+	virtual void        mousePress(EV_EditModifierState ems, EV_EditMouseButton emb, UT_uint32 x, UT_uint32 y) override;
 
-	void                mouseRelease(EV_EditModifierState ems, EV_EditMouseButton emb, UT_sint32 x, UT_sint32 y);
+	virtual void        mouseRelease(EV_EditModifierState ems, EV_EditMouseButton emb, UT_sint32 x, UT_sint32 y) override;
 	UT_sint32           setTableLineDrag(PT_DocPosition pos, UT_sint32 & iFixed, UT_sint32 y);
 	/* used with AV_Listener */
-	virtual bool		notify(AV_View * pView, const AV_ChangeMask mask);
-    virtual  AV_ListenerType getType(void) { return AV_LISTENER_LEFTRULER;}
+	virtual bool notify(AV_View * pView, const AV_ChangeMask mask) override;
+	virtual AV_ListenerType getType(void) const override { return AV_LISTENER_LEFTRULER;}
 
 	/* used with AV_ScrollObj */
 	static void			_scrollFuncX(void * pData, UT_sint32 xoff, UT_sint32 xlimit);
@@ -154,18 +154,20 @@ public:
 	/* for use with the prefs listener top_ruler_prefs_listener */
 	UT_Dimension	    getDimension() const { return m_dim; }
 	void			    setDimension( UT_Dimension newdim );
-	GR_Graphics *       getGraphics(void) const { return m_pG;}
+	virtual GR_Graphics* getGraphics(void) const override { return m_pG; }
+	virtual XAP_Frame* getFrame() const override {	return m_pFrame; }
+
 protected:
-	void                _refreshView(void);
+	virtual void        _refreshView(void) override;
 
 	/* don't call this function directly, use XAP_CustomWidget::queueDraw() instead */
-	virtual void drawLU(const UT_Rect *clip);
+	virtual void		drawImmediateLU(const UT_Rect *clip) override;
 
 //	void				_draw3DFrame(const UT_Rect * pClipRect, AP_TopRulerInfo * pInfo,
 //									 UT_sint32 x, UT_sint32 h);
 
 	// must be static so that I can pass as a functional arg - shack
-	static void _prefsListener( XAP_Prefs *pPrefs, UT_StringPtrMap *phChanges, void *data );
+	static void _prefsListener( XAP_Prefs *pPrefs, const XAP_PrefsChangeSet *phChanges, void *data );
 
 	XAP_Frame *			m_pFrame;
 	GR_Graphics *		m_pG;
@@ -186,10 +188,10 @@ protected:
 											  GR_Graphics::GR_Color3D clr);
 private:
 
-	void                _getCellMarkerRects(const AP_LeftRulerInfo * pInfo, UT_sint32 iCell, UT_Rect &rCell, fp_TableContainer * pBroke=NULL);
+	void                _getCellMarkerRects(const AP_LeftRulerInfo * pInfo, UT_sint32 iCell, UT_Rect &rCell, fp_TableContainer * pBroke=nullptr);
 	void		        _drawCellProperties(const AP_LeftRulerInfo * pInfo);
 protected:
-	virtual void		_drawCellMark(UT_Rect *prDrag, bool bUp);
+	virtual void		_drawCellMark(UT_Rect *prDrag, bool bUp) ;
 private:
 	void                _xorGuide(bool bClear=false);
 	void				_displayStatusMessage(XAP_String_Id messageID, const ap_RulerTicks &tick, double dValue);
@@ -237,5 +239,3 @@ private:
 	GR_Image*			m_guideCache;
 #endif
 };
-
-#endif /* AP_LEFTRULER_H */

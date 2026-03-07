@@ -28,7 +28,7 @@
 #include "ev_EditMethod.h"
 #include "ev_EditBinding.h"
 #include "ev_EditEventMapper.h"
-#include "gr_CocoaCairoGraphics.h"
+#include "gr_CocoaGraphics.h"
 #include "xav_View.h"
 
 EV_CocoaMouse::EV_CocoaMouse(EV_EditEventMapper * pEEM)
@@ -70,7 +70,7 @@ void EV_CocoaMouse::mouseUp(AV_View* pView, NSEvent* e, NSView* hitView)
 			UT_ASSERT(pEM);
 			NSPoint pt = [e locationInWindow];
 			pt = [hitView convertPoint:pt fromView:nil];
-			GR_CocoaCairoGraphics* pG = dynamic_cast<GR_CocoaCairoGraphics*>(pView->getGraphics());
+			GR_CocoaGraphics* pG = dynamic_cast<GR_CocoaGraphics*>(pView->getGraphics());
 			if (!pG->_isFlipped()) {
 				pt.y = [hitView bounds].size.height - pt.y;
 			}
@@ -108,9 +108,9 @@ void EV_CocoaMouse::mouseClick(AV_View* pView, NSEvent* e, NSView *hitView)
 
 	NSEventType evtType = [e type];
 	switch (evtType) {
-	case NSLeftMouseDown:
-	case NSRightMouseDown:
-	case NSOtherMouseDown:
+	case NSEventTypeLeftMouseDown:
+	case NSEventTypeRightMouseDown:
+	case NSEventTypeOtherMouseDown:
 		switch ([e clickCount]) {
 		case 1:
 			mop = EV_EMO_SINGLECLICK;
@@ -127,7 +127,7 @@ void EV_CocoaMouse::mouseClick(AV_View* pView, NSEvent* e, NSView *hitView)
 
 	pt = [e locationInWindow];
 	pt = [hitView convertPoint:pt fromView:nil];
-	GR_CocoaCairoGraphics* pG = dynamic_cast<GR_CocoaCairoGraphics*>(pView->getGraphics());
+	GR_CocoaGraphics* pG = dynamic_cast<GR_CocoaGraphics*>(pView->getGraphics());
 	if (!pG->_isFlipped()) {
 		pt.y = [hitView bounds].size.height - pt.y;
 	}
@@ -182,7 +182,7 @@ void EV_CocoaMouse::mouseMotion(AV_View* pView, NSEvent *e, NSView *hitView)
 	// TODO mouse button that we did the capture on.
 	pt = [e locationInWindow];
 	pt = [hitView convertPoint:pt fromView:nil];
-	GR_CocoaCairoGraphics* pG = dynamic_cast<GR_CocoaCairoGraphics*>(pView->getGraphics());
+	GR_CocoaGraphics* pG = dynamic_cast<GR_CocoaGraphics*>(pView->getGraphics());
 	if (!pG->_isFlipped()) {
 		pt.y = [hitView bounds].size.height - pt.y;
 	}
@@ -273,13 +273,13 @@ EV_EditMouseButton EV_CocoaMouse::_convertMouseButton(int btn, bool rightBtn)
 EV_EditModifierState EV_CocoaMouse::_convertModifierState(unsigned int modifiers, bool &rightBtn)
 {
 	EV_EditModifierState ems = 0;
-	if (modifiers & NSShiftKeyMask)
+	if (modifiers & NSEventModifierFlagShift)
 		ems |= EV_EMS_SHIFT;
-	if (modifiers & NSCommandKeyMask)
+	if (modifiers & NSEventModifierFlagCommand)
 		ems |= EV_EMS_ALT;
-	if (modifiers & NSAlternateKeyMask)
+	if (modifiers & NSEventModifierFlagOption)
 		ems |= EV_EMS_CONTROL;
-	if (modifiers & NSControlKeyMask)
+	if (modifiers & NSEventModifierFlagControl)
 		rightBtn = true;
 	return ems;
 }

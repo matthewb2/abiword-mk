@@ -28,6 +28,7 @@
 // This header defines some functions for Unix dialogs,
 // like centering them, measuring them, etc.
 #include "xap_UnixDialogHelper.h"
+#include "xap_GtkUtils.h"
 
 #include "xap_App.h"
 #include "xap_UnixApp.h"
@@ -50,12 +51,12 @@ XAP_Dialog * AP_UnixDialog_InsertHyperlink::static_constructor(XAP_DialogFactory
 AP_UnixDialog_InsertHyperlink::AP_UnixDialog_InsertHyperlink(XAP_DialogFactory * pDlgFactory,
 										 XAP_Dialog_Id id)
 	: AP_Dialog_InsertHyperlink(pDlgFactory,id),
-	m_entry(0),
-	m_windowMain(0),
+	m_entry(nullptr),
+	m_windowMain(nullptr),
 	// m_comboEntry(0),
-	m_clist(0),
-	m_swindow(0),
-	m_titleEntry(0),
+	m_clist(nullptr),
+	m_swindow(nullptr),
+	m_titleEntry(nullptr),
 	m_iRow(-1)
 	
 {
@@ -78,7 +79,7 @@ static void s_blist_clicked(GtkTreeSelection * select,
 		gint* rows = gtk_tree_path_get_indices(path);
 		if(rows) {
 			me->setRow(*rows);
-			gtk_entry_set_text(GTK_ENTRY(me->m_entry), 
+			XAP_gtk_entry_set_text(GTK_ENTRY(me->m_entry), 
 					   me->m_pBookmarks[*rows].c_str());
 		}
 	}
@@ -112,8 +113,8 @@ void AP_UnixDialog_InsertHyperlink::event_OK(void)
 {
 	UT_ASSERT(m_windowMain);
 	// get the bookmark name, if any (return cancel if no name given)
-	const gchar * res = gtk_entry_get_text(GTK_ENTRY(m_entry));
-	const gchar * title = gtk_entry_get_text(GTK_ENTRY(m_titleEntry));
+	const gchar * res = XAP_gtk_entry_get_text(GTK_ENTRY(m_entry));
+	const gchar * title = XAP_gtk_entry_get_text(GTK_ENTRY(m_titleEntry));
 	if(res && *res)
 	{
 		setAnswer(AP_Dialog_InsertHyperlink::a_OK);
@@ -154,16 +155,16 @@ void AP_UnixDialog_InsertHyperlink::_constructWindowContents ( GtkWidget * vbox2
   {
     if (*hyperlink == '#')
     {
-      gtk_entry_set_text ( GTK_ENTRY(m_entry), hyperlink + 1) ;
+      XAP_gtk_entry_set_text ( GTK_ENTRY(m_entry), hyperlink + 1) ;
     }
     else
     {
-      gtk_entry_set_text ( GTK_ENTRY(m_entry), hyperlink ) ;
+      XAP_gtk_entry_set_text ( GTK_ENTRY(m_entry), hyperlink ) ;
     }
   }
 
   // the bookmark list
-  m_swindow  = gtk_scrolled_window_new(NULL, NULL);
+  m_swindow  = gtk_scrolled_window_new(nullptr, nullptr);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (m_swindow),GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_widget_show(m_swindow);
   gtk_box_pack_start (GTK_BOX (vbox2), m_swindow, TRUE, TRUE, 0);
@@ -180,7 +181,7 @@ void AP_UnixDialog_InsertHyperlink::_constructWindowContents ( GtkWidget * vbox2
   GtkCellRenderer *renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new());
   GtkTreeViewColumn *col;
   col = gtk_tree_view_column_new_with_attributes("",
-												 renderer, "text", 0, NULL);
+												 renderer, "text", 0, nullptr);
   gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), col);
   //gtk_box_pack_start (GTK_BOX (vbox2), m_blist, FALSE, FALSE, 0);
 
@@ -213,7 +214,7 @@ void AP_UnixDialog_InsertHyperlink::_constructWindowContents ( GtkWidget * vbox2
 
   if (hyperlinkTitle && *hyperlinkTitle)
   {
-      gtk_entry_set_text(GTK_ENTRY(m_titleEntry), hyperlinkTitle);
+      XAP_gtk_entry_set_text(GTK_ENTRY(m_titleEntry), hyperlinkTitle);
   }
 }
 
@@ -228,16 +229,17 @@ GtkWidget*  AP_UnixDialog_InsertHyperlink::_constructWindow(void)
   pSS->getValueUTF8(AP_STRING_ID_DLG_InsertHyperlink_Title,s);
   m_windowMain = abiDialogNew("insert table dialog", TRUE, s.c_str());
 
-  frame1 = gtk_frame_new (NULL);
+  frame1 = gtk_frame_new (nullptr);
   gtk_widget_show (frame1);
   gtk_box_pack_start(GTK_BOX (gtk_dialog_get_content_area(GTK_DIALOG(m_windowMain))), frame1,true,true,0);
-  gtk_container_set_border_width (GTK_CONTAINER (frame1), 4);
+  XAP_gtk_widget_set_margin(frame1, 4);
+
   gtk_frame_set_shadow_type(GTK_FRAME(frame1), GTK_SHADOW_NONE);
 
   vbox2 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
   gtk_widget_show (vbox2);
   gtk_container_add (GTK_CONTAINER (frame1), vbox2);
-  gtk_container_set_border_width (GTK_CONTAINER (vbox2), 5);
+  XAP_gtk_widget_set_margin(vbox2, 5);
 
   _constructWindowContents ( vbox2 );
 

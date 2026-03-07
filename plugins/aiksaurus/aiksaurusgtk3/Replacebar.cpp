@@ -22,10 +22,12 @@
 #include "DialogMediator.h"
 #include <gdk/gdkkeysyms.h>
 
+#include "xap_GtkUtils.h"
+
 namespace AiksaurusGTK_impl
 {
 
-    Replacebar::Replacebar(DialogMediator& mediator) throw()
+    Replacebar::Replacebar(DialogMediator& mediator) noexcept
         : d_mediator(mediator)
     {
         // Build GUI widgets.
@@ -59,7 +61,7 @@ namespace AiksaurusGTK_impl
     }
 
 
-    Replacebar::~Replacebar() throw()
+    Replacebar::~Replacebar()
     {
 
     }
@@ -85,21 +87,21 @@ namespace AiksaurusGTK_impl
     }
 
 
-    GtkWidget* Replacebar::getReplacebar() throw()
+    GtkWidget* Replacebar::getReplacebar() noexcept
     {
         return d_replacebar_ptr;
     }
 
 
-    const char* Replacebar::getText() const throw()
+    const char* Replacebar::getText() const noexcept
     {
-        return gtk_entry_get_text(GTK_ENTRY(d_replacewith_ptr));
+        return XAP_gtk_entry_get_text(GTK_ENTRY(d_replacewith_ptr));
     }
 
 
-    void Replacebar::setText(const char* word) throw()
+    void Replacebar::setText(const char* word) noexcept
     {
-        gtk_entry_set_text(GTK_ENTRY(d_replacewith_ptr), word);
+        XAP_gtk_entry_set_text(GTK_ENTRY(d_replacewith_ptr), word);
     }
 
 }

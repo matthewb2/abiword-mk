@@ -28,9 +28,6 @@
 #include "ut_types.h"
 #include "ie_imp_Text.h"
 
-#include <gsf/gsf-input-stdio.h>
-#include <gsf/gsf-output-stdio.h>
-
 #include "xap_Module.h"
 
 #ifdef ABI_PLUGIN_BUILTIN
@@ -55,14 +52,14 @@ static const struct
 
 static UT_Error temp_name (UT_String& out_filename)
 {
-	char *temporary_file = NULL;
-	GError *err = NULL;
+	char *temporary_file = nullptr;
+	GError *err = nullptr;
 	gint tmp_fp = g_file_open_tmp ("XXXXXX", &temporary_file, &err);
 	
 	if (err) 
 		{
 			g_warning ("%s", err->message);
-			g_error_free (err); err = NULL;
+			g_error_free (err); err = nullptr;
 			return UT_ERROR;
 		}
 
@@ -95,19 +92,19 @@ public:
 		pdftoabw_argv[argc++] = pdf_conversion_programs[which].conversion_program;
 		pdftoabw_argv[argc++] = pdf_on_disk.c_str ();
 		pdftoabw_argv[argc++] = output_on_disk.c_str ();
-		pdftoabw_argv[argc++] = NULL;
+		pdftoabw_argv[argc++] = nullptr;
 		
 		// run conversion
-		if (g_spawn_sync (NULL,
+		if (g_spawn_sync (nullptr,
 						  (gchar **)pdftoabw_argv,
-						  NULL,
+						  nullptr,
 						  (GSpawnFlags)(G_SPAWN_SEARCH_PATH | G_SPAWN_STDOUT_TO_DEV_NULL | G_SPAWN_STDERR_TO_DEV_NULL),
-						  NULL,
-						  NULL,
-						  NULL,
-						  NULL,
-						  NULL,
-						  NULL))
+						  nullptr,
+						  nullptr,
+						  nullptr,
+						  nullptr,
+						  nullptr,
+						  nullptr))
 			{
 				char * uri = UT_go_filename_to_uri (output_on_disk.c_str ());
 				if (uri)
@@ -121,7 +118,7 @@ public:
 		return rval;
 	}
 
-  virtual UT_Error _loadFile(GsfInput * input)
+  virtual UT_Error _loadFile(GsfInput * input) override
   {
     UT_Error rval = UT_ERROR;
 
@@ -134,7 +131,7 @@ public:
 	rval = temp_name (abw_on_disk);
 	if (rval != UT_OK) return rval;
 
-	GsfOutput * output = gsf_output_stdio_new (pdf_on_disk.c_str (), NULL);
+	GsfOutput * output = gsf_output_stdio_new (pdf_on_disk.c_str (), nullptr);
 	if (output)
 		{
 			// copy input to disk
@@ -190,27 +187,27 @@ public:
   {
   }
   
-  const IE_SuffixConfidence * getSuffixConfidence ()
+  const IE_SuffixConfidence * getSuffixConfidence() override
   {
 	return IE_Imp_PDF_Sniffer__SuffixConfidence;
   }
 
-  const IE_MimeConfidence * getMimeConfidence ()
+  const IE_MimeConfidence * getMimeConfidence() override
   {
 	return IE_Imp_PDF_Sniffer__MimeConfidence;
   }
 
-  virtual UT_Confidence_t recognizeContents (const char * szBuf,
-					     UT_uint32 /*iNumbytes*/)
+  virtual UT_Confidence_t recognizeContents(const char * szBuf,
+					     UT_uint32 /*iNumbytes*/) override
   {
     if (!strncmp (szBuf, "%PDF-", 5))
       return UT_CONFIDENCE_PERFECT;
     return UT_CONFIDENCE_ZILCH;
   }
 
-  virtual bool getDlgLabels (const char ** pszDesc,
+  virtual bool getDlgLabels(const char ** pszDesc,
 							 const char ** pszSuffixList,
-							 IEFileType * ft)
+							 IEFileType * ft) override
   {
     *pszDesc = "PDF (.pdf)";
     *pszSuffixList = "*.pdf";
@@ -218,8 +215,8 @@ public:
     return true;
   }
 
-  virtual UT_Error constructImporter (PD_Document * pDocument,
-				      IE_Imp ** ppie)
+  virtual UT_Error constructImporter(PD_Document * pDocument,
+				      IE_Imp ** ppie) override
   {
     *ppie = new IE_Imp_PDF(pDocument);
     return UT_OK;
@@ -231,7 +228,7 @@ public:
 /*****************************************************************/
 
 // we use a reference-counted sniffer
-static IE_Imp_PDF_Sniffer * m_impSniffer = 0;
+static IE_Imp_PDF_Sniffer * m_impSniffer = nullptr;
 
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_register (XAP_ModuleInfo * mi)
@@ -268,17 +265,17 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-  mi->name = 0;
-  mi->desc = 0;
-  mi->version = 0;
-  mi->author = 0;
-  mi->usage = 0;
+  mi->name = nullptr;
+  mi->desc = nullptr;
+  mi->version = nullptr;
+  mi->author = nullptr;
+  mi->usage = nullptr;
   
   if (m_impSniffer)
 	  {
 		  IE_Imp::unregisterImporter (m_impSniffer);
 		  delete m_impSniffer;
-		  m_impSniffer = 0;
+		  m_impSniffer = nullptr;
 	  }
 
   return 1;

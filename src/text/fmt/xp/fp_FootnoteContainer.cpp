@@ -37,6 +37,7 @@
 #include "fv_View.h"
 #include "gr_Painter.h"
 #include "fp_Run.h"
+#include "fp_AnnotationRun.h"
 /*!
   Create Footnote container
   \param iType Container type
@@ -44,7 +45,7 @@
  */
 fp_FootnoteContainer::fp_FootnoteContainer(fl_SectionLayout* pSectionLayout) 
 	: fp_VerticalContainer(FP_CONTAINER_FOOTNOTE, pSectionLayout),
-	  m_pPage(NULL)
+	  m_pPage(nullptr)
 {
 }
 
@@ -57,12 +58,12 @@ fp_FootnoteContainer::fp_FootnoteContainer(fl_SectionLayout* pSectionLayout)
  */
 fp_FootnoteContainer::~fp_FootnoteContainer()
 {
-	m_pPage = NULL;
+	m_pPage = nullptr;
 }
 
 void fp_FootnoteContainer::setPage(fp_Page * pPage)
 {
-	if(pPage && (m_pPage != NULL) && m_pPage != pPage)
+	if(pPage && (m_pPage != nullptr) && m_pPage != pPage)
 	{
 		clearScreen();
 		m_pPage->removeFootnoteContainer(this);
@@ -75,7 +76,7 @@ void fp_FootnoteContainer::setPage(fp_Page * pPage)
 	}
 	else
 	{
-		getFillType().setParent(NULL);
+		getFillType().setParent(nullptr);
 	}
 }
 
@@ -91,7 +92,7 @@ UT_sint32 fp_FootnoteContainer::getValue(void)
 
 void fp_FootnoteContainer::clearScreen(void)
 {
-	if(getPage() == NULL)
+	if(getPage() == nullptr)
 	{
 		return;
 	}
@@ -121,7 +122,7 @@ void fp_FootnoteContainer::clearScreen(void)
 		getFillType().Fill(getGraphics(),srcX,srcY,xoffStart-1, yline, xoffEnd-xoffStart +2, iLineThick+1);
 	}
 
-	fp_Container * pCon = NULL;
+	fp_Container * pCon = nullptr;
 	UT_sint32 i = 0;
 	for(i=0; i< countCons(); i++)
 	{
@@ -137,7 +138,7 @@ void fp_FootnoteContainer::setContainer(fp_Container * pContainer)
 		return;
 	}
 
-	if (getContainer() && (pContainer != NULL))
+	if (getContainer() && (pContainer != nullptr))
 	{
 		clearScreen();
 	}
@@ -162,7 +163,7 @@ fl_DocSectionLayout * fp_FootnoteContainer::getDocSectionLayout(void)
  */
 void fp_FootnoteContainer::draw(dg_DrawArgs* pDA)
 {
-	if(getPage() == NULL)
+	if(getPage() == nullptr)
 	{
 		return;
 	}
@@ -235,7 +236,7 @@ fp_Container * fp_FootnoteContainer::getNextContainerInSection() const
 	{
 		return pNext->getFirstContainer();
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -252,7 +253,7 @@ fp_Container * fp_FootnoteContainer::getPrevContainerInSection() const
 	{
 		return pPrev->getLastContainer();
 	}
-	return NULL;
+	return nullptr;
 }
 
 void fp_FootnoteContainer::layout(void)
@@ -265,7 +266,7 @@ void fp_FootnoteContainer::layout(void)
 	iMaxFootHeight = pDSL->getActualColumnHeight();
 	iMaxFootHeight -= getGraphics()->tlu(20)*3;
 	UT_uint32 iCountContainers = countCons();
-	fp_Container *pContainer, *pPrevContainer = NULL;
+	fp_Container *pContainer, *pPrevContainer = nullptr;
 	for (UT_uint32 i=0; i < iCountContainers; i++)
 	{
 		pContainer = static_cast<fp_Container*>(getNthCon(i));
@@ -333,7 +334,7 @@ void fp_FootnoteContainer::layout(void)
  */
 fp_AnnotationContainer::fp_AnnotationContainer(fl_SectionLayout* pSectionLayout) 
 	: fp_VerticalContainer(FP_CONTAINER_ANNOTATION, pSectionLayout),
-	  m_pPage(NULL),
+	  m_pPage(nullptr),
 	  m_iLabelWidth(0),
 	  m_iXLabel(0),
 	  m_iYLabel(0)
@@ -349,14 +350,14 @@ fp_AnnotationContainer::fp_AnnotationContainer(fl_SectionLayout* pSectionLayout)
  */
 fp_AnnotationContainer::~fp_AnnotationContainer()
 {
-	m_pPage = NULL;
+	m_pPage = nullptr;
 }
 
 void fp_AnnotationContainer::setPage(fp_Page * pPage)
 {
   //
 
-	if(pPage && (m_pPage != NULL) && m_pPage != pPage)
+	if(pPage && (m_pPage != nullptr) && m_pPage != pPage)
 	{
 		clearScreen();
 		m_pPage->removeAnnotationContainer(this);
@@ -369,7 +370,7 @@ void fp_AnnotationContainer::setPage(fp_Page * pPage)
 	}
 	else
 	{
-		getFillType().setParent(NULL);
+		getFillType().setParent(nullptr);
 	}
 }
 
@@ -385,19 +386,19 @@ UT_sint32 fp_AnnotationContainer::getValue(void)
 
 void fp_AnnotationContainer::clearScreen(void)
 {
-	if(getPage() == NULL)
+	if(getPage() == nullptr)
 	{
 		return;
 	}
-	fp_Container * pCon = NULL;
+	fp_Container * pCon = nullptr;
 	if(getColumn() && (getHeight() != 0))
 	{
-		if(getPage() == NULL)
+		if(getPage() == nullptr)
 		{
 			return;
 		}
 		fl_DocSectionLayout * pDSL = getPage()->getOwningSection();
-		if(pDSL == NULL)
+		if(pDSL == nullptr)
 		{
 			return;
 		}
@@ -407,7 +408,7 @@ void fp_AnnotationContainer::clearScreen(void)
 		iWidth = iWidth - iLeftMargin - iRightMargin;
 		UT_sint32 xoff,yoff;
 		pCon = static_cast<fp_Container *>(getNthCon(0));
-		if(pCon == NULL)
+		if(pCon == nullptr)
 		  return;
 		getScreenOffsets(pCon,xoff,yoff);
 		UT_sint32 srcX = getX();
@@ -435,7 +436,7 @@ void fp_AnnotationContainer::setContainer(fp_Container * pContainer)
 		return;
 	}
 
-	if (getContainer() && (pContainer != NULL))
+	if (getContainer() && (pContainer != nullptr))
 	{
 		clearScreen();
 	}
@@ -460,7 +461,7 @@ fl_DocSectionLayout * fp_AnnotationContainer::getDocSectionLayout(void)
  */
 void fp_AnnotationContainer::draw(dg_DrawArgs* pDA)
 {
-	if(getPage() == NULL)
+	if(getPage() == nullptr)
 	{
 		return;
 	}
@@ -470,7 +471,7 @@ void fp_AnnotationContainer::draw(dg_DrawArgs* pDA)
 	if(!pDL->displayAnnotations())
 	  return;
 
-	UT_DEBUGMSG(("Annotation: Drawing unbroken annotation %p x %d, y %d width %d height %d \n",this,getX(),getY(),getWidth(),getHeight()));
+	UT_DEBUGMSG(("Annotation: Drawing unbroken annotation %p x %d, y %d width %d height %d \n", (void*)this, getX(), getY(), getWidth(), getHeight()));
 
 	UT_DEBUGMSG(("Annotation: Drawing PDA->xoff %d, pDA->yoff  %ld \n",pDA->xoff,pDA->yoff));
 
@@ -520,7 +521,7 @@ fp_Container * fp_AnnotationContainer::getNextContainerInSection() const
 	{
 		return pNext->getFirstContainer();
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -537,7 +538,7 @@ fp_Container * fp_AnnotationContainer::getPrevContainerInSection() const
 	{
 		return pPrev->getLastContainer();
 	}
-	return NULL;
+	return nullptr;
 }
 
 void fp_AnnotationContainer::setY(UT_sint32 iy)
@@ -555,7 +556,7 @@ void fp_AnnotationContainer::layout(void)
 	iMaxFootHeight = pDSL->getActualColumnHeight();
 	iMaxFootHeight -= getGraphics()->tlu(20)*3;
 	UT_uint32 iCountContainers = countCons();
-	fp_Container *pContainer, *pPrevContainer = NULL;
+	fp_Container *pContainer, *pPrevContainer = nullptr;
 	for (UT_uint32 i=0; i < iCountContainers; i++)
 	{
 		pContainer = static_cast<fp_Container*>(getNthCon(i));
@@ -622,8 +623,8 @@ void fp_AnnotationContainer::layout(void)
  */
 fp_EndnoteContainer::fp_EndnoteContainer(fl_SectionLayout* pSectionLayout) 
 	: fp_VerticalContainer(FP_CONTAINER_ENDNOTE, pSectionLayout),
-	  m_pLocalNext(NULL),
-	  m_pLocalPrev(NULL),
+	  m_pLocalNext(nullptr),
+	  m_pLocalPrev(nullptr),
 	  m_iY(0),
 	  m_bOnPage(false),
 	  m_bCleared(false)
@@ -640,8 +641,8 @@ fp_EndnoteContainer::fp_EndnoteContainer(fl_SectionLayout* pSectionLayout)
 fp_EndnoteContainer::~fp_EndnoteContainer()
 {
 	xxx_UT_DEBUGMSG(("deleting endnote container %x \n",this));
-	m_pLocalNext = NULL;
-	m_pLocalPrev = NULL;
+	m_pLocalNext = nullptr;
+	m_pLocalPrev = nullptr;
 	m_bOnPage = false;
 }
 
@@ -672,7 +673,7 @@ UT_sint32 fp_EndnoteContainer::getValue(void)
 
 void fp_EndnoteContainer::clearScreen(void)
 {
-	UT_DEBUGMSG(("Clearscreen on Endnote container %p , height = %d \n",this,getHeight()));
+	UT_DEBUGMSG(("Clearscreen on Endnote container %p , height = %d \n", (void*)this, getHeight()));
 	fl_ContainerLayout * pCL = static_cast<fl_ContainerLayout *>(getSectionLayout());
 	pCL->setNeedsRedraw();
 	if(!m_bOnPage)
@@ -685,12 +686,12 @@ void fp_EndnoteContainer::clearScreen(void)
 	}
 	if(getColumn() && (getHeight() != 0))
 	{
-		if(getPage() == NULL)
+		if(getPage() == nullptr)
 		{
 			return;
 		}
 		fl_DocSectionLayout * pDSL = getPage()->getOwningSection();
-		if(pDSL == NULL)
+		if(pDSL == nullptr)
 		{
 			return;
 		}
@@ -704,7 +705,7 @@ void fp_EndnoteContainer::clearScreen(void)
 		UT_sint32 srcY = getY();
 		getFillType().Fill(getGraphics(),srcX,srcY,xoff,yoff,iWidth,getHeight());
 	}
-	fp_Container * pCon = NULL;
+	fp_Container * pCon = nullptr;
 	UT_sint32 i = 0;
 	for(i=0; i< countCons(); i++)
 	{
@@ -738,11 +739,11 @@ void fp_EndnoteContainer::setContainer(fp_Container * pContainer)
 		return;
 	}
 
-	if (getContainer() && (pContainer != NULL))
+	if (getContainer() && (pContainer != nullptr))
 	{
 		clearScreen();
 	}
-	if(pContainer != NULL)
+	if(pContainer != nullptr)
 	{
 		m_bOnPage = true;
 	}
@@ -809,7 +810,7 @@ void fp_EndnoteContainer::layout(void)
 	UT_sint32 iY = 0, iPrevY = 0;
 	iY= 0;
 	UT_uint32 iCountContainers = countCons();
-	fp_Container *pContainer, *pPrevContainer = NULL;
+	fp_Container *pContainer, *pPrevContainer = nullptr;
 	for (UT_uint32 i=0; i < iCountContainers; i++)
 	{
 		pContainer = static_cast<fp_Container*>(getNthCon(i));

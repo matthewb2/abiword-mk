@@ -1,19 +1,19 @@
 /* AbiWord
  * Copyright (C) 2000 AbiSource, Inc.
- *
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
 
@@ -53,10 +53,10 @@ XAP_Win32Dialog_Insert_Symbol::XAP_Win32Dialog_Insert_Symbol(XAP_DialogFactory *
 										 XAP_Dialog_Id id)
 	: XAP_Dialog_Insert_Symbol(pDlgFactory,id)
 {
-	m_pSymbolPreviewWidget = NULL;
-	m_pSamplePreviewWidget = NULL;
-	m_DrawSymbolSample     = NULL;
-
+	m_pSymbolPreviewWidget = nullptr;
+	m_pSamplePreviewWidget = nullptr;
+	m_DrawSymbolSample     = nullptr;
+	
 }
 
 XAP_Win32Dialog_Insert_Symbol::~XAP_Win32Dialog_Insert_Symbol(void)
@@ -71,7 +71,7 @@ void XAP_Win32Dialog_Insert_Symbol::runModal(XAP_Frame * pFrame)
 {
 	UT_ASSERT(pFrame);
 	UT_ASSERT(m_id == XAP_DIALOG_ID_INSERT_SYMBOL);
-
+	
 	setDialog(this);
 	createModal(pFrame, MAKEINTRESOURCEW(XAP_RID_DIALOG_INSERT_SYMBOL));
 }
@@ -84,7 +84,7 @@ void XAP_Win32Dialog_Insert_Symbol::runModeless(XAP_Frame * pFrame)
 	setDialog(this);
 	HWND hWndDialog = createModeless( pFrame, MAKEINTRESOURCEW(XAP_RID_DIALOG_INSERT_SYMBOL) );
 
-	UT_ASSERT((hWndDialog != NULL));
+	UT_ASSERT((hWndDialog != nullptr));
 	ShowWindow(hWndDialog, SW_SHOW);
 
 	m_pApp->rememberModelessId(m_id, this);
@@ -124,7 +124,7 @@ void XAP_Win32Dialog_Insert_Symbol::notifyActiveFrame(XAP_Frame *pFrame)
         setDialogTitle(m_WindowName);
 
 		SetWindowLongPtrW(m_hDlg, GWLP_HWNDPARENT, (LONG_PTR)frameHWND);
-		SetWindowPos(m_hDlg, NULL, 0, 0, 0, 0,
+		SetWindowPos(m_hDlg, nullptr, 0, 0, 0, 0,
 						SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
 	}
 }
@@ -135,7 +135,7 @@ void XAP_Win32Dialog_Insert_Symbol::notifyCloseFrame(XAP_Frame *pFrame)
 	if((HWND)GetWindowLongPtrW(m_hDlg, GWLP_HWNDPARENT) == static_cast<XAP_Win32FrameImpl*>(pFrame->getFrameImpl())->getTopLevelWindow())
 	{
 		SetWindowLongPtrW(m_hDlg, GWLP_HWNDPARENT, 0);
-		SetWindowPos(m_hDlg, NULL, 0, 0, 0, 0,
+		SetWindowPos(m_hDlg, nullptr, 0, 0, 0, 0,
 						SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
 	}
 }
@@ -174,14 +174,14 @@ BOOL XAP_Win32Dialog_Insert_Symbol::_onInitDialog(HWND hWnd, WPARAM /*wParam*/, 
 	m_pSamplePreviewWidget->getWindowSize(&w,&h);
 	_createSymbolareaFromGC(m_pSamplePreviewWidget->getGraphics(), w, h);
 
-	m_DrawSymbolSample = new XAP_Draw_Symbol_sample(m_DrawSymbol, m_pSamplePreviewWidget->getGraphics());
-
+	m_DrawSymbolSample = new XAP_Draw_Symbol_sample(m_DrawSymbol, m_pSamplePreviewWidget->getGraphics()); 
+		
 	// TODO: Colour
 	GR_Win32Graphics* gr = (GR_Win32Graphics*) m_DrawSymbolSample->m_pSymbolDraw->getGraphics();
-
-
+	
+	
 	gr->setBrush((HBRUSH)GetSysColorBrush(COLOR_3DFACE));
-
+	
 	m_pSamplePreviewWidget->setPreview(m_DrawSymbolSample);
 
 	UT_DebugOnly<XAP_Draw_Symbol *> iDrawSymbol = _getCurrentSymbolMap();
@@ -189,18 +189,18 @@ BOOL XAP_Win32Dialog_Insert_Symbol::_onInitDialog(HWND hWnd, WPARAM /*wParam*/, 
 
 	// Fill the list box with symbol fonts.
 
-	HDC hDCScreen = CreateDCW(L"DISPLAY", NULL, NULL, NULL);
+	HDC hDCScreen = CreateDCW(L"DISPLAY", nullptr, nullptr, nullptr);
 
 #if 1
-	EnumFontFamiliesW(hDCScreen, (const wchar_t *)NULL, (FONTENUMPROCW)fontEnumProcedure, (LPARAM)this);
+	EnumFontFamiliesW(hDCScreen, (const wchar_t *)nullptr, (FONTENUMPROCW)fontEnumProcedure, (LPARAM)this);
 #else
 	LOGFONTW LogFont;
 //	LogFont.lfCharSet = SYMBOL_CHARSET; - all fonts enum is more inline with XP nature
 	LogFont.lfCharSet = DEFAULT_CHARSET;
 	LogFont.lfFaceName[0] = '\0';
 	EnumFontFamiliesExW(hDCScreen, &LogFont, (FONTENUMPROCW)fontEnumProcedure, (LPARAM)this, 0);
-#endif
-
+#endif	
+	
 	DeleteDC(hDCScreen);
 
 	// Select the current font.
@@ -218,8 +218,8 @@ BOOL XAP_Win32Dialog_Insert_Symbol::_onInitDialog(HWND hWnd, WPARAM /*wParam*/, 
 
 	// Update the caption
 	ConstructWindowName();
-    setDialogTitle(m_WindowName);
-    centerDialog();
+    setDialogTitle(m_WindowName);	
+    centerDialog();	
 
 	return 1;							// 1 == we did not call SetFocus()
 }
@@ -291,8 +291,6 @@ void XAP_Win32Dialog_Insert_Symbol::_setFontFromCombo(UT_sint32 Index)
 
 		if(Length != CB_ERR)
 		{
-			//pascal
-			/*
 			char *p_buffer = new char[Length + 1];
 
 			SendDlgItemMessageW(m_hDlg, XAP_RID_DIALOG_INSERTSYMBOL_FONT_LIST, CB_GETLBTEXT, Index, (LPARAM)p_buffer);
@@ -302,29 +300,14 @@ void XAP_Win32Dialog_Insert_Symbol::_setFontFromCombo(UT_sint32 Index)
 			UT_UCSChar *p_UC_buffer = new UT_UCSChar[Length + 1];
 
 			UT_UCS4_strcpy_char(p_UC_buffer, p_buffer);
-
+			
 			m_DrawSymbol->setSelectedFont(p_buffer);
-			m_DrawSymbol->draw();
+			//m_DrawSymbol->draw();
+			m_DrawSymbol->drawImmediate();
 			m_DrawSymbol->drawarea(m_CurrentSymbol, m_PreviousSymbol);
 
 			delete [] p_UC_buffer;
 			delete [] p_buffer;
-			*/
-
-			wchar_t* p_buffer = (wchar_t*)g_try_malloc((Length+1) * sizeof (wchar_t));
-
-            UT_uint32 dataLength =  SendDlgItemMessageW(m_hDlg, XAP_RID_DIALOG_INSERTSYMBOL_FONT_LIST, CB_GETLBTEXT, Index, (LPARAM)p_buffer);
-
-            char char_buf[256];
-
-            std::wcstombs(char_buf, p_buffer, 256);
-
-            m_DrawSymbol->setSelectedFont(char_buf);
-            m_DrawSymbol->draw();
-            m_DrawSymbol->drawarea(m_CurrentSymbol, m_PreviousSymbol);
-
-            g_free (p_buffer);
-
 
 		}
 		else

@@ -85,7 +85,7 @@ IE_Exp_DocBook::IE_Exp_DocBook(PD_Document * pDocument)
 {
 	m_error = 0;
 	s_align = 0;
-	m_pListener = NULL;
+	m_pListener = nullptr;
 }
 
 IE_Exp_DocBook::~IE_Exp_DocBook()
@@ -374,7 +374,7 @@ void s_DocBook_Listener :: _closeSpan(void)
 	
 	if (pAP)
 	{
-		const gchar * szValue = 0;
+		const gchar * szValue = nullptr;
 
 		if (pAP->getProperty(static_cast<const gchar *>("text-position"), szValue))
 		{
@@ -394,7 +394,7 @@ void s_DocBook_Listener :: _closeSpan(void)
 		}
 		
 		_tagClose(TT_PHRASE,"phrase",false,false,false);
-		m_pAP_Span = NULL;
+		m_pAP_Span = nullptr;
 	}
 
 	m_bInSpan = false;
@@ -506,13 +506,13 @@ void s_DocBook_Listener :: _openParagraph(PT_AttrPropIndex api)
 		_openCell();
 	}
 
-	const PP_AttrProp * pAP = NULL;
+	const PP_AttrProp * pAP = nullptr;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP), indent = false;
 	UT_UTF8String buf("");
 
 	if (bHaveProp && pAP)
 	{
-		const gchar * szValue = 0;
+		const gchar * szValue = nullptr;
 
 		if (pAP->getAttribute(static_cast<const gchar *>(PT_STYLE_ATTRIBUTE_NAME), szValue))
 		{	
@@ -756,9 +756,9 @@ void s_DocBook_Listener :: _openSection (PT_AttrPropIndex api, int sub, const UT
 		_closeSectionTitle();
 
 	UT_UTF8String section = "section", escaped = "";
-	const PP_AttrProp * pAP = NULL;
+	const PP_AttrProp * pAP = nullptr;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
-	const gchar * szValue = 0;
+	const gchar * szValue = nullptr;
 
 	if(content.length())
 	{
@@ -799,12 +799,12 @@ void s_DocBook_Listener :: _openSpan(PT_AttrPropIndex api)
 		_closeSpan();
 	
 	UT_UTF8String buf = "phrase";
-	const PP_AttrProp * pAP = NULL;
+	const PP_AttrProp * pAP = nullptr;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 	
 	if (bHaveProp && pAP)
 	{
-		const gchar * szValue = 0;
+		const gchar * szValue = nullptr;
 
 		if ((pAP->getAttribute(static_cast<const gchar *>("revision"), szValue)))
 		{
@@ -1221,8 +1221,8 @@ void s_DocBook_Listener::_handleDocument(void)
 {
 	UT_UTF8String buf("book");
 	PT_AttrPropIndex docApi = m_pDocument->getAttrPropIndex();
-	const PP_AttrProp * pDAP = NULL;
-	const gchar* szValue = 0;
+	const PP_AttrProp * pDAP = nullptr;
+	const gchar* szValue = nullptr;
 
 	m_pDocument->getAttrProp (docApi, &pDAP);
 
@@ -1391,34 +1391,30 @@ void s_DocBook_Listener::_handleMetaData(void)
 
 void s_DocBook_Listener::_handleRevisions(void)
 {
-	const AD_Revision * pRev = NULL;
-	const UT_GenericVector<AD_Revision*> & vRevisions = m_pDocument->getRevisions();
+	const auto& vRevisions = m_pDocument->getRevisions();
 
-	UT_sint32 k = 0;
-	for (k=0; k < vRevisions.getItemCount(); k++)
+	for (UT_uint32 k = 0; k < vRevisions.size(); k++)
 	{
 		if(k == 0)
 			_tagOpen(TT_REVHISTORY,"revhistory");
 
-		pRev = vRevisions.getNthItem(k);
-		if(!pRev)
-			continue;
+		const auto rev = vRevisions[k];
 
 		UT_UTF8String s;
 		UT_UCS4String s4;
 
-		UT_UTF8String_sprintf(s, "%d", pRev->getId());
+		UT_UTF8String_sprintf(s, "%d", rev.getId());
 		_tagOpen(TT_REVISION,"revision");
 		_tagOpen(TT_REVNUMBER,"revnumber",false);
 		m_pie->write(s.utf8_str());
 		_tagClose(TT_REVNUMBER,"revnumber",true,false);
 		s.clear();
 
-		UT_UTF8String_sprintf(s, "%d", pRev->getStartTime());
+		UT_UTF8String_sprintf(s, "%d", rev.getStartTime());
 		_tagOpen(TT_DATE,"date",false);
 		m_pie->write(s.utf8_str());
 		_tagClose(TT_DATE,"date",true,false);
-		s4 = pRev->getDescription();
+		s4 = rev.getDescription();
 
 		if(s4.length())
 		{
@@ -1439,8 +1435,8 @@ void s_DocBook_Listener::_handleRevisions(void)
 void s_DocBook_Listener::_handleImage(PT_AttrPropIndex api)
 {
 	UT_UTF8String buf(""), escaped("");
-	const gchar* szValue = 0;
-	const PP_AttrProp * pAP = NULL;
+	const gchar* szValue = nullptr;
+	const PP_AttrProp * pAP = nullptr;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 	UT_LocaleTransactor t(LC_NUMERIC, "C");
 
@@ -1462,11 +1458,10 @@ void s_DocBook_Listener::_handleImage(PT_AttrPropIndex api)
 		char * fstripped = _stripSuffix(temp, '.');
 
         std::string mimeType;
-        const UT_ByteBuf * pByteBuf = 0;
+        UT_ConstByteBufPtr pByteBuf;
         const char * extension = "png";
         const char * format = "PNG";
-        m_pDocument->getDataItemDataByName(szValue, &pByteBuf, 
-                                           &mimeType, NULL);
+        m_pDocument->getDataItemDataByName(szValue, pByteBuf, &mimeType, nullptr);
         if(mimeType == "image/jpeg") {
             extension = "jpg";
             format = "JPEG";
@@ -1545,8 +1540,8 @@ void s_DocBook_Listener::_handleImage(PT_AttrPropIndex api)
 void s_DocBook_Listener::_handlePositionedImage(PT_AttrPropIndex api)
 {
 	UT_UTF8String buf(""), escaped("");
-	const gchar* szValue = 0;
-	const PP_AttrProp * pAP = NULL;
+	const gchar* szValue = nullptr;
+	const PP_AttrProp * pAP = nullptr;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 	UT_LocaleTransactor t(LC_NUMERIC, "C");
 
@@ -1557,11 +1552,11 @@ void s_DocBook_Listener::_handlePositionedImage(PT_AttrPropIndex api)
 		char * fstripped = _stripSuffix(temp, '.');
 
         std::string mimeType;
-        const UT_ByteBuf * pByteBuf = 0;
+        UT_ConstByteBufPtr pByteBuf;
         const char * extension = "png";
         const char * format = "PNG";
-        m_pDocument->getDataItemDataByName(szValue, &pByteBuf, 
-                                           &mimeType, NULL);
+        m_pDocument->getDataItemDataByName(szValue, pByteBuf,
+                                           &mimeType, nullptr);
         if(mimeType == "image/jpeg") {
             extension = "jpg";
             format = "JPEG";
@@ -1640,8 +1635,8 @@ void s_DocBook_Listener::_handlePositionedImage(PT_AttrPropIndex api)
 void s_DocBook_Listener::_handleMath(PT_AttrPropIndex api)
 {
 	UT_UTF8String buf(""), escaped("");
-	const gchar* szValue = 0;
-	const PP_AttrProp * pAP = NULL;
+	const gchar* szValue = nullptr;
+	const PP_AttrProp * pAP = nullptr;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 	UT_LocaleTransactor t(LC_NUMERIC, "C");
 
@@ -1718,8 +1713,8 @@ void s_DocBook_Listener::_handleMath(PT_AttrPropIndex api)
 void s_DocBook_Listener::_handleEmbedded(PT_AttrPropIndex api)
 {
 	UT_UTF8String buf(""), escaped("");
-	const gchar* szValue = 0;
-	const PP_AttrProp * pAP = NULL;
+	const gchar* szValue = nullptr;
+	const PP_AttrProp * pAP = nullptr;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 	UT_LocaleTransactor t(LC_NUMERIC, "C");
 
@@ -1781,9 +1776,9 @@ void s_DocBook_Listener::_handleEmbedded(PT_AttrPropIndex api)
 void s_DocBook_Listener::_handleField(const PX_ChangeRecord_Object * pcro, PT_AttrPropIndex api)
 {
 	UT_UTF8String buf(""), escaped("");
-	const PP_AttrProp * pAP = NULL;
+	const PP_AttrProp * pAP = nullptr;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
-	const gchar * szValue = 0, * szStyle = 0;
+	const gchar * szValue = nullptr, * szStyle = nullptr;
 
 	if(!m_bInParagraph)
 		_openBlock(false);
@@ -1857,8 +1852,8 @@ void s_DocBook_Listener::_handleTOC(PT_AttrPropIndex api)
 {
 	std::string buf;
 	UT_UTF8String content("toc");
-	const gchar* szValue = 0;
-	const PP_AttrProp * pAP = NULL;
+	const gchar* szValue = nullptr;
+	const PP_AttrProp * pAP = nullptr;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 
 	/* TOCs are supposed to be at the beginning or end of a section, so we
@@ -1891,8 +1886,8 @@ void s_DocBook_Listener::_handleTOC(PT_AttrPropIndex api)
 void s_DocBook_Listener::_handleHyperlink(PT_AttrPropIndex api)
 {
 	UT_UTF8String buf(""), escaped("");
-	const gchar* szValue = 0;
-	const PP_AttrProp * pAP = NULL;
+	const gchar* szValue = nullptr;
+	const PP_AttrProp * pAP = nullptr;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 
 	if(bHaveProp && pAP && pAP->getAttribute("xlink:href", szValue))
@@ -1932,8 +1927,8 @@ void s_DocBook_Listener::_handleHyperlink(PT_AttrPropIndex api)
 void s_DocBook_Listener::_handleBookmark(PT_AttrPropIndex api)
 {
 	UT_UTF8String buf(""), escaped("");
-	const gchar* szValue = 0;
-	const PP_AttrProp * pAP = NULL;
+	const gchar* szValue = nullptr;
+	const PP_AttrProp * pAP = nullptr;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 
 	if(bHaveProp && pAP && pAP->getAttribute("type", szValue))
@@ -1953,8 +1948,8 @@ void s_DocBook_Listener::_handleBookmark(PT_AttrPropIndex api)
 void s_DocBook_Listener::_handleHdrFtr(PT_AttrPropIndex api)
 {
 	UT_UTF8String buf("abi-");  //prefix the type to prevent confusion on import (e.g. if there's a 'footer' style)
-	const gchar* szValue = 0;
-	const PP_AttrProp * pAP = NULL;
+	const gchar* szValue = nullptr;
+	const PP_AttrProp * pAP = nullptr;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 
 	if(bHaveProp && pAP && pAP->getAttribute("type", szValue))
@@ -1967,8 +1962,8 @@ void s_DocBook_Listener::_handleHdrFtr(PT_AttrPropIndex api)
 void s_DocBook_Listener::_handleFootnote(PT_AttrPropIndex api)
 {
 	UT_UTF8String buf("footnote id=\"footnote-id-");  //make it an NCNAME to prevent validation errors
-	const gchar* szValue = 0;
-	const PP_AttrProp * pAP = NULL;
+	const gchar* szValue = nullptr;
+	const PP_AttrProp * pAP = nullptr;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 
 	if(bHaveProp && pAP && pAP->getAttribute("footnote-id", szValue))
@@ -2026,7 +2021,7 @@ bool s_DocBook_Listener::populateStrux(pf_Frag_Strux* sdh,
 {
 	UT_ASSERT(pcr->getType() == PX_ChangeRecord::PXT_InsertStrux);
 	const PX_ChangeRecord_Strux * pcrx = static_cast<const PX_ChangeRecord_Strux *> (pcr);
-	*psfh = 0;							// we don't need it.
+	*psfh = nullptr;							// we don't need it.
 
 	switch (pcrx->getStruxType())
 	{
@@ -2038,7 +2033,7 @@ bool s_DocBook_Listener::populateStrux(pf_Frag_Strux* sdh,
 			return true;
 		}
 
-        case PTX_SectionEndnote:
+		case PTX_SectionEndnote:
 		{
 			// don't do anything - handled in _handleField()
 			m_bInNote = true;
@@ -2070,7 +2065,7 @@ bool s_DocBook_Listener::populateStrux(pf_Frag_Strux* sdh,
 			if(m_iTableDepth <= 2)
 			{
 				_closeParagraph();
-				mTableHelper.OpenTable(sdh,pcr->getIndexAP()) ;
+				mTableHelper.openTable(sdh,pcr->getIndexAP()) ;
 				_openTable(pcr->getIndexAP());
 			}
 			return true;
@@ -2084,7 +2079,7 @@ bool s_DocBook_Listener::populateStrux(pf_Frag_Strux* sdh,
 			if((m_iNestedTable == 2) && (m_iTableDepth == 1)) //the last cell had a nested table; reset the value
 				m_iNestedTable = -1;
 
-			pf_Frag_Strux* nextTable = NULL, *nextCell = NULL;
+			pf_Frag_Strux* nextTable = nullptr, *nextCell = nullptr;
 			bool bNextTable = m_pDocument->getNextStruxOfType(sdh, PTX_SectionTable, &nextTable);
 			bool bEndCell = m_pDocument->getNextStruxOfType(sdh, PTX_EndCell, &nextCell);
 
@@ -2093,7 +2088,7 @@ bool s_DocBook_Listener::populateStrux(pf_Frag_Strux* sdh,
 				if(m_pDocument->getStruxPosition(nextTable) < m_pDocument->getStruxPosition(nextCell)) //nested table
 				{
 					_closeParagraph();
-					mTableHelper.OpenCell(pcr->getIndexAP());
+					mTableHelper.openCell(pcr->getIndexAP());
 					m_iNestedTable = 0;  //pending, so don't allow any writing
 					return true;
 				}
@@ -2103,7 +2098,7 @@ bool s_DocBook_Listener::populateStrux(pf_Frag_Strux* sdh,
 			{
 				// regular cell
 				_closeParagraph();
-				mTableHelper.OpenCell(pcr->getIndexAP());
+				mTableHelper.openCell(pcr->getIndexAP());
 				_openCell();
 			}
 			return true;
@@ -2120,7 +2115,7 @@ bool s_DocBook_Listener::populateStrux(pf_Frag_Strux* sdh,
 			_closeParagraph();
 			_closeRow();
 			_closeTable();
-			mTableHelper.CloseTable();
+			mTableHelper.closeTable();
 
 			if(m_iNestedTable != 2) //don't allow any content after an </entrytbl>
 				m_iNestedTable = -1;
@@ -2134,7 +2129,7 @@ bool s_DocBook_Listener::populateStrux(pf_Frag_Strux* sdh,
 
 			_closeParagraph();
 			_closeCell();
-			mTableHelper.CloseCell();
+			mTableHelper.closeCell();
 			return true;
 		}
 
@@ -2243,11 +2238,11 @@ UT_Error IE_Exp_DocBook::_writeDocument(void)
 void s_DocBook_Listener::_handleDataItems(void)
 {
 	// Lifted from HTML listener
- 	const char * szName = 0;
-    std::string mimeType;
-	const UT_ByteBuf * pByteBuf;
-	
-	for (UT_uint32 k=0; (m_pDocument->enumDataItems(k,NULL,&szName,&pByteBuf,
+	const char * szName = nullptr;
+	std::string mimeType;
+	UT_ConstByteBufPtr pByteBuf;
+
+	for (UT_uint32 k=0; (m_pDocument->enumDataItems(k, nullptr, &szName, pByteBuf,
                                                     &mimeType)); k++)
 	{
 		UT_sint32 loc = -1;
@@ -2266,8 +2261,8 @@ void s_DocBook_Listener::_handleDataItems(void)
 			
 			UT_UTF8String_sprintf(fname, "%s_data", m_pie->getFileName());
 			/* int result = */
-			UT_go_directory_create(fname.utf8_str(), 0750, NULL);
-			
+			UT_go_directory_create(fname.utf8_str(), nullptr);
+
 			if (mimeType == "image/svg+xml")
 				UT_UTF8String_sprintf(fname, "%s/%s_%d.svg", fname.utf8_str(), szName, loc);
 			else if (mimeType == "application/mathml+xml")
@@ -2286,7 +2281,7 @@ void s_DocBook_Listener::_handleDataItems(void)
 			}
 			
 			
-			GsfOutput *fp = UT_go_file_create (fname.utf8_str(), NULL);
+			GsfOutput *fp = UT_go_file_create (fname.utf8_str(), nullptr);
 			
 			if(!fp)
 			  continue;

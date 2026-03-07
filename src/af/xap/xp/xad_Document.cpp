@@ -9,15 +9,15 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
 
@@ -28,7 +28,7 @@
 #include "ut_string.h"
 #include "ut_std_string.h"
 #include "ut_hash.h"
-#include "ut_vector.h"
+#include "ut_std_vector.h"
 #include "ut_uuid.h"
 #include "ut_misc.h"
 #include "ut_path.h"
@@ -52,13 +52,13 @@ AD_Document::AD_Document() :
 #ifdef ENABLE_RESOURCE_MANAGER
 	m_pResourceManager(new XAP_ResourceManager),
 #else
-	m_pResourceManager(0),
+	m_pResourceManager(nullptr),
 #endif
 	m_iRefCount(1),
 	m_szEncodingName(""), // Should this have a default? UTF-8, perhaps?
     m_bPieceTableChanging(false),
 	m_lastSavedTime(0),
-	m_lastOpenedTime(time(NULL)),
+	m_lastOpenedTime(time(nullptr)),
     m_iEditTime(0),
     m_iVersion(0),
 	m_bHistoryWasSaved(false),
@@ -68,13 +68,13 @@ AD_Document::AD_Document() :
 	m_iShowRevisionID(0), // show all
 	m_bAutoRevisioning(false),
     m_bForcedDirty(false),
-	m_pUUID(NULL),
-	m_pOrigUUID(NULL),
-	m_pMyUUID(NULL),
+	m_pUUID(nullptr),
+	m_pOrigUUID(nullptr),
+	m_pMyUUID(nullptr),
 	m_bDoNotAdjustHistory(false),
 	m_bAfterFirstSave(false)
 {	// TODO: clear the ignore list
-
+	
 
 	// create UUID for this doc
 	UT_return_if_fail(XAP_App::getApp() && XAP_App::getApp()->getUUIDGenerator());
@@ -100,9 +100,6 @@ AD_Document::AD_Document() :
 	m_sMyUUIDString = m_pMyUUID->toString().unwrap_or("");
 	UT_DEBUGMSG(("!!!!!!!!!!----------------- Created string %s \n",s.c_str()));
 	UT_DEBUGMSG(("!!!!!!!!!!----------------- Orig string %s \n", m_sOrigUUIDString.c_str()));
-
-	//pascal pour ouvrir un doc sans créer une nouvelle fenêtre
-	m_szFilename = "";
 }
 
 AD_Document::~AD_Document()
@@ -115,9 +112,6 @@ AD_Document::~AD_Document()
 #ifdef ENABLE_RESOURCE_MANAGER
 	DELETEP(m_pResourceManager);
 #endif
-
-	UT_VECTOR_PURGEALL(AD_VersionData*, m_vHistory);
-	UT_VECTOR_PURGEALL(AD_Revision*, m_vRevisions);
 
 	DELETEP(m_pUUID);
 	DELETEP(m_pOrigUUID);
@@ -136,7 +130,7 @@ void AD_Document::setPrintFilename(const std::string & sFilename)
 
 bool AD_Document::isOrigUUID(void) const
 {
-  if((m_pMyUUID== NULL) || (m_pOrigUUID == NULL))
+  if((m_pMyUUID== nullptr) || (m_pOrigUUID == nullptr))
 	  return false;
   std::string sDoc = m_pMyUUID->toString().unwrap_or("");
   std::string sOrig = m_pOrigUUID->toString().unwrap_or("");
@@ -161,11 +155,11 @@ UT_UUIDPtr AD_Document::getNewUUID() const
 	// part of the doc uuid. This will ensure that all uuid's in the
 	// present document are unique even though we no longer use MAC
 	// addrress in them
-	UT_return_val_if_fail(XAP_App::getApp() && XAP_App::getApp()->getUUIDGenerator(), NULL);
-	UT_return_val_if_fail(m_pUUID, NULL);
+	UT_return_val_if_fail(XAP_App::getApp() && XAP_App::getApp()->getUUIDGenerator(), nullptr);
+	UT_return_val_if_fail(m_pUUID, nullptr);
 	UT_UUID * pUUID = XAP_App::getApp()->getUUIDGenerator()->createUUID(*m_pUUID);
 
-	UT_return_val_if_fail(pUUID, NULL);
+	UT_return_val_if_fail(pUUID, nullptr);
 	pUUID->resetTime();
 	UT_ASSERT(pUUID->isValid());
 
@@ -232,7 +226,7 @@ const std::string & AD_Document::getFilename(void) const
 
 void AD_Document::setEncodingName(const char *szEncodingName)
 {
-	if (szEncodingName == NULL)
+	if (szEncodingName == nullptr)
 		szEncodingName = "";
 
 	m_szEncodingName = szEncodingName;
@@ -240,12 +234,12 @@ void AD_Document::setEncodingName(const char *szEncodingName)
 
 const char * AD_Document::getEncodingName(void) const
 {
-	return m_szEncodingName.size() ? m_szEncodingName.c_str() : 0;
+	return m_szEncodingName.size() ? m_szEncodingName.c_str() : nullptr;
 }
 
 void AD_Document::purgeHistory()
 {
-	UT_VECTOR_PURGEALL(AD_VersionData*, m_vHistory);
+	/// XXX shouldn't we clear the m_vHistory?
 	m_bHistoryWasSaved = false;
 }
 
@@ -253,11 +247,9 @@ void AD_Document::purgeHistory()
 /*!
     Add given version data to the document history.
 */
-void AD_Document::addRecordToHistory(const AD_VersionData &vd)
+void AD_Document::addRecordToHistory(AD_VersionData&& vd)
 {
-	AD_VersionData * v = new AD_VersionData(vd);
-	UT_return_if_fail(v);
-	m_vHistory.addItem((void*)v);
+	m_vHistory.emplace_back(vd);
 }
 
 /*!
@@ -265,89 +257,66 @@ void AD_Document::addRecordToHistory(const AD_VersionData &vd)
 */
 UT_uint32 AD_Document::getHistoryNthId(UT_sint32 i)const
 {
-	if(!m_vHistory.getItemCount())
+	if(m_vHistory.empty())
 		return 0;
 
-	AD_VersionData * v = (AD_VersionData*)m_vHistory.getNthItem(i);
-
-	if(!v)
-		return 0;
-
-	return v->getId();
+	const AD_VersionData& v = m_vHistory[i];
+	return v.getId();
 }
 
-UT_uint32 AD_Document::getHistoryNthTopXID(UT_sint32 i)const
+UT_uint32 AD_Document::getHistoryNthTopXID(UT_sint32 i) const
 {
-	if(!m_vHistory.getItemCount())
+	if(m_vHistory.empty())
 		return 0;
 
-	AD_VersionData * v = (AD_VersionData*)m_vHistory.getNthItem(i);
-
-	if(!v)
-		return 0;
-
-	return v->getTopXID();
+	const AD_VersionData& v = m_vHistory[i];
+	return v.getTopXID();
 }
 
 /*!
     Get time stamp for n-th record in version history
     NB: the time stamp represents the last save time
 */
-time_t AD_Document::getHistoryNthTime(UT_sint32 i)const
+time_t AD_Document::getHistoryNthTime(UT_sint32 i) const
 {
-	if(!m_vHistory.getItemCount())
+	if(m_vHistory.empty())
 		return 0;
 
-	AD_VersionData * v = (AD_VersionData*)m_vHistory.getNthItem(i);
-
-	if(!v)
-		return 0;
-
-	return v->getTime();
+	const AD_VersionData& v = m_vHistory[i];
+	return v.getTime();
 }
 
-time_t AD_Document::getHistoryNthTimeStarted(UT_sint32 i)const
+time_t AD_Document::getHistoryNthTimeStarted(UT_sint32 i) const
 {
-	if(!m_vHistory.getItemCount())
+	if(m_vHistory.empty())
 		return 0;
 
-	AD_VersionData * v = (AD_VersionData*)m_vHistory.getNthItem(i);
-
-	if(!v)
-		return 0;
-
-	return v->getStartTime();
+	const AD_VersionData& v = m_vHistory[i];
+	return v.getStartTime();
 }
 
-bool AD_Document::getHistoryNthAutoRevisioned(UT_sint32 i)const
+bool AD_Document::getHistoryNthAutoRevisioned(UT_sint32 i) const
 {
-	if(!m_vHistory.getItemCount())
-		return 0;
-
-	AD_VersionData * v = (AD_VersionData*)m_vHistory.getNthItem(i);
-
-	if(!v)
+	if(m_vHistory.empty())
 		return false;
 
-	return v->isAutoRevisioned();
+	const AD_VersionData& v = m_vHistory[i];
+	return v.isAutoRevisioned();
 }
 
 
 /*!
     Get get cumulative edit time for n-th record in version history
 */
-time_t AD_Document::getHistoryNthEditTime(UT_sint32 i)const
+time_t AD_Document::getHistoryNthEditTime(UT_sint32 i) const
 {
-	if(!m_vHistory.getItemCount() || !m_pUUID)
+	if(m_vHistory.empty() || !m_pUUID)
 		return 0;
 
-	AD_VersionData * v = (AD_VersionData*)m_vHistory.getNthItem(i);
+	const AD_VersionData& v = m_vHistory[i];
 
-	if(!v)
-		return 0;
-
-	time_t t0 = v->getStartTime();
-	time_t t1 = v->getTime();
+	time_t t0 = v.getStartTime();
+	time_t t1 = v.getTime();
 
 	UT_ASSERT( t1 >= t0 );
 	return t1-t0;
@@ -358,15 +327,11 @@ time_t AD_Document::getHistoryNthEditTime(UT_sint32 i)const
 */
 const UT_UUID & AD_Document::getHistoryNthUID(UT_sint32 i) const
 {
-	if(!m_vHistory.getItemCount())
+	if(m_vHistory.empty())
 		return UT_UUID::getNull();
 
-	AD_VersionData * v = (AD_VersionData*)m_vHistory.getNthItem(i);
-
-	if(!v)
-		return UT_UUID::getNull();
-
-	return v->getUID();
+	const AD_VersionData& v = m_vHistory[i];
+	return v.getUID();
 }
 
 
@@ -389,7 +354,7 @@ bool AD_Document::areDocumentsRelated(const AD_Document & d) const
 bool AD_Document::areDocumentHistoriesEqual(const AD_Document & d, UT_uint32 &iVersion) const
 {
 	iVersion = 0;
-
+	
 	if((!m_pUUID && d.getDocUUID()) || (m_pUUID && !d.getDocUUID()))
 		return false;
 
@@ -398,22 +363,22 @@ bool AD_Document::areDocumentHistoriesEqual(const AD_Document & d, UT_uint32 &iV
 
 	UT_uint32 iCount = UT_MIN(getHistoryCount(), d.getHistoryCount());
 	UT_uint32 iMaxCount = UT_MAX(getHistoryCount(), d.getHistoryCount());
-
+	
 	for(UT_uint32 i = 0; i < iCount; ++i)
 	{
-		AD_VersionData * v1 = (AD_VersionData*)m_vHistory.getNthItem(i);
-		AD_VersionData * v2 = (AD_VersionData*)d.m_vHistory.getNthItem(i);
-
-		if(!(*v1 == *v2))
+		const AD_VersionData& v1 = m_vHistory[i];
+		const AD_VersionData& v2 = d.m_vHistory[i];
+	
+		if(!(v1 == v2))
 			return false;
 
-		iVersion = v1->getId();
+		iVersion = v1.getId();
 	}
 
 	if(iMaxCount != iCount)
 		return false;
-
-	return true;
+	
+	return true;		
 }
 
 /*!
@@ -421,7 +386,7 @@ bool AD_Document::areDocumentHistoriesEqual(const AD_Document & d, UT_uint32 &iV
     the document
 
     \return: return value indicates whether full/partial/no restore is possible
-
+    
     \param UT_uint32 & iVersion: on entry contains the version number
                                  user wants to revert to; if return
                                  value indicates partial restore
@@ -431,48 +396,41 @@ bool AD_Document::areDocumentHistoriesEqual(const AD_Document & d, UT_uint32 &iV
 */
 AD_HISTORY_STATE AD_Document::verifyHistoryState(UT_uint32 &iVersion) const
 {
-	if(!m_vHistory.getItemCount())
+	if (m_vHistory.empty())
 		return ADHIST_NO_RESTORE;
-
+	
 	AD_HISTORY_STATE eRet = ADHIST_FULL_RESTORE; // be optimistic
 
-	const AD_VersionData * v = NULL;
-	UT_sint32 i;
+	UT_uint32 i;
 	bool bFullRestore = false;
 	bool bFound = false;
-
+	
 	// find the lowest autorevisioned record greater than iVersion and
 	// evaluate the state of history above iVersion
 	for(i = 0; i < getHistoryCount(); ++i)
 	{
-		v = (const AD_VersionData*)m_vHistory.getNthItem(i);
+		const auto v = m_vHistory[i];
 
-		if(!v)
-		{
-			UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
-			continue;
-		}
-
-		if(v->getId() < iVersion + 1)
+		if (v.getId() < iVersion + 1)
 			continue;
 
-		if(!v->isAutoRevisioned())
+		if (!v.isAutoRevisioned())
 			continue;
 
 		// if we got so far, we have an autorevisioned record greater
 		// than iVersion
-
+		
 		if(!bFound)
 		{
 			bFound = true;
 
-			if(v->getId() == iVersion + 1)
+			if (v.getId() == iVersion + 1)
 				bFullRestore = true;
-
+			
 			continue;
 		}
 
-		bFullRestore &= v->isAutoRevisioned();
+		bFullRestore &= v.isAutoRevisioned();
 	}
 
 	if(!bFound)
@@ -490,21 +448,15 @@ AD_HISTORY_STATE AD_Document::verifyHistoryState(UT_uint32 &iVersion) const
 		UT_uint32 iMinVersion = 0; // assume nothing
 		for(i = getHistoryCount(); i > 0; --i)
 		{
-			v = (const AD_VersionData*)m_vHistory.getNthItem(i-1);
+			const auto v = m_vHistory[i - 1];
 
-			if(!v)
-			{
-				UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
-				continue;
-			}
-
-			if(v->getId() <= iVersion) // too far down the table
+			if (v.getId() <= iVersion) // too far down the table
 				break;
 
-			if(!v->isAutoRevisioned()) // break in the history
+			if (!v.isAutoRevisioned()) // break in the history
 				break;
 
-			iMinVersion = v->getId();
+			iMinVersion = v.getId();
 		}
 
 		// iMinVersion now contains the lowest version with a full
@@ -517,15 +469,15 @@ AD_HISTORY_STATE AD_Document::verifyHistoryState(UT_uint32 &iVersion) const
 
 const AD_VersionData * AD_Document::findHistoryRecord(UT_uint32 iVersion) const
 {
-	for(UT_sint32 i = 0; i < getHistoryCount(); ++i)
+	for (UT_uint32 i = 0; i < getHistoryCount(); ++i)
 	{
-		const AD_VersionData * v = (const AD_VersionData*)m_vHistory.getNthItem(i);
+		const AD_VersionData& v = m_vHistory[i];
 
-		if(v->getId() == iVersion)
-			return v;
+		if (v.getId() == iVersion)
+			return &v;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -538,7 +490,7 @@ void AD_Document::setDocUUID(const char * s)
 	{
 		UT_return_if_fail(0);
 	}
-
+	
 	if(!m_pUUID->setUUID(s))
 	{
 		// string we were passed did not contain valid uuid
@@ -558,7 +510,7 @@ void AD_Document::setOrigUUID(const char * s)
 	{
 		UT_return_if_fail(0);
 	}
-
+	
 	if(!m_pOrigUUID->setUUID(s))
 	{
 		// string we were passed did not contain valid uuid
@@ -580,7 +532,7 @@ void AD_Document::setMyUUID(const char * s)
 	{
 		UT_return_if_fail(0);
 	}
-
+	
 	if(!m_pMyUUID->setUUID(s))
 	{
 		// string we were passed did not contain valid uuid
@@ -598,7 +550,7 @@ void AD_Document::setMyUUID(const char * s)
 */
 const char * AD_Document::getDocUUIDString() const
 {
-	UT_return_val_if_fail(m_pUUID, NULL);
+	UT_return_val_if_fail(m_pUUID, nullptr);
 	static std::string s;
 	s = m_pUUID->toString().unwrap_or("");
 	return s.c_str();
@@ -611,7 +563,7 @@ const char * AD_Document::getDocUUIDString() const
 */
 const char * AD_Document::getOrigDocUUIDString() const
 {
-	UT_return_val_if_fail(m_pOrigUUID, NULL);
+	UT_return_val_if_fail(m_pOrigUUID, nullptr);
 	return m_sOrigUUIDString.c_str();
 }
 
@@ -619,7 +571,7 @@ const char * AD_Document::getOrigDocUUIDString() const
 /*!
     Get the UID of the users of this document represented as a string (this
     function is primarily for exporters)
-
+	
 	NOTE: don't make this a static variable, as this value might change over
 	the life of the document
 */
@@ -639,9 +591,9 @@ std::string AD_Document::getMyUUIDString() const
 */
 UT_sint32 AD_Document::getRevisionIndxFromId(UT_uint32 iId) const
 {
-	for(UT_sint32 i = 0; i < m_vRevisions.getItemCount(); i++)
+	for (UT_uint32 i = 0; i < m_vRevisions.size(); i++)
 	{
-		if(m_vRevisions.getNthItem(i)->getId() == iId)
+		if (m_vRevisions[i].getId() == iId)
 			return i;
 	}
 
@@ -654,7 +606,7 @@ UT_sint32 AD_Document::getRevisionIndxFromId(UT_uint32 iId) const
 bool AD_Document::usingChangeTracking() const
 {
     bool ret = false;
-
+    
     ret |= isMarkRevisions();
     ret |= ( getHighestRevisionId() > 1 );
 
@@ -667,9 +619,9 @@ UT_uint32 AD_Document::getHighestRevisionId() const
 {
 	UT_uint32 iId = 0;
 
-	for(UT_sint32 i = 0; i < m_vRevisions.getItemCount(); i++)
+	for (UT_uint32 i = 0; i < m_vRevisions.size(); i++)
 	{
-		iId = UT_MAX(iId, m_vRevisions.getNthItem(i)->getId());
+		iId = std::max(iId, m_vRevisions[i].getId());
 	}
 
 	return iId;
@@ -678,17 +630,17 @@ UT_uint32 AD_Document::getHighestRevisionId() const
 const AD_Revision * AD_Document::getHighestRevision() const
 {
 	UT_uint32 iId = 0;
-	const AD_Revision * r = NULL;
+	const AD_Revision * r = nullptr;
 
-	for(UT_sint32 i = 0; i < m_vRevisions.getItemCount(); i++)
+	for (UT_uint32 i = 0; i < m_vRevisions.size(); i++)
 	{
-		const AD_Revision * t = m_vRevisions.getNthItem(i);
-		UT_uint32 t_id = t->getId();
+		const AD_Revision& t = m_vRevisions[i];
+		UT_uint32 t_id = t.getId();
 
 		if(t_id > iId)
 		{
 			iId = t_id;
-			r = t;
+			r = &t;
 		}
 	}
 
@@ -697,15 +649,14 @@ const AD_Revision * AD_Document::getHighestRevision() const
 
 bool AD_Document::addRevision(UT_uint32 iId, UT_UCS4Char * pDesc, time_t tStart, UT_uint32 iVer, bool bGenCR)
 {
-	for(UT_sint32 i = 0; i < m_vRevisions.getItemCount(); i++)
+	for (UT_uint32 i = 0; i < m_vRevisions.size(); i++)
 	{
-		const AD_Revision * r = m_vRevisions.getNthItem(i);
-		if(r->getId() == iId)
+		const AD_Revision& r = m_vRevisions[i];
+		if (r.getId() == iId)
 			return false;
 	}
 
-	AD_Revision * pRev = new AD_Revision(iId, pDesc, tStart, iVer);
-	addRevision(pRev, bGenCR);
+	addRevision(AD_Revision(iId, pDesc, tStart, iVer), bGenCR);
 	m_iRevisionID = iId;
 	return true;
 }
@@ -714,15 +665,15 @@ bool AD_Document::addRevision(UT_uint32 iId,
 							  const UT_UCS4Char * pDesc, UT_uint32 iLen,
 							  time_t tStart, UT_uint32 iVer,bool bGenCR)
 {
-	for(UT_sint32 i = 0; i < m_vRevisions.getItemCount(); i++)
+	for (UT_uint32 i = 0; i < m_vRevisions.size(); i++)
 	{
-		const AD_Revision * r = m_vRevisions.getNthItem(i);
-		if(r->getId() == iId)
+		const AD_Revision& r = m_vRevisions[i];
+		if (r.getId() == iId)
 			return false;
 	}
 
-	UT_UCS4Char * pD = NULL;
-
+	UT_UCS4Char * pD = nullptr;
+	
 	if(pDesc)
 	{
 		pD = new UT_UCS4Char [iLen + 1];
@@ -730,32 +681,29 @@ bool AD_Document::addRevision(UT_uint32 iId,
 		pD[iLen] = 0;
 	}
 
-	AD_Revision * pRev = new AD_Revision(iId, pD, tStart, iVer);
-	addRevision(pRev,bGenCR);
+	addRevision(AD_Revision(iId, pD, tStart, iVer), bGenCR);
 	m_iRevisionID = iId;
 	return true;
 }
 
-bool AD_Document::addRevision(AD_Revision * pRev, bool bGenCR)
+bool AD_Document::addRevision(AD_Revision&& rev, bool bGenCR)
 {
-	m_vRevisions.addItem(pRev);
-	if(bGenCR)
-	{
-		const gchar * szAtts[11]={"docprop","revision",
-							 "revision",NULL,
-							 "revision-desc",NULL,
-							 "revision-time",NULL,
-							 "revision-ver",NULL,NULL};
-		UT_UTF8String sID,sTime,sVer;
-		UT_UTF8String_sprintf(sID,"%d",pRev->getId());
-		UT_UTF8String_sprintf(sTime,"%d",pRev->getStartTime());
-		UT_UTF8String_sprintf(sVer,"%d",pRev->getVersion());
-		UT_UTF8String sDesc(pRev->getDescription());
-		szAtts[3]= sID.utf8_str();
-		szAtts[5] = sDesc.utf8_str();
-		szAtts[7] = sTime.utf8_str();
-		szAtts[9] = sVer.utf8_str();
-		createAndSendDocPropCR(szAtts,NULL);
+	std::string sID,sTime,sVer;
+	UT_UTF8String sDesc;
+	if (bGenCR) {
+		sID = UT_std_string_sprintf("%d", rev.getId());
+		sTime = UT_std_string_sprintf("%ld", rev.getStartTime());
+		sVer = UT_std_string_sprintf("%d", rev.getVersion());
+		sDesc = UT_UTF8String(rev.getDescription());
+	}
+	m_vRevisions.push_back(rev);
+	if (bGenCR) {
+		const char * szAtts[11]={"docprop","revision",
+							 "revision", sID.c_str(),
+							 "revision-desc", sDesc.utf8_str(),
+							 "revision-time", sTime.c_str(),
+							 "revision-ver", sVer.c_str(), nullptr};
+		createAndSendDocPropCR(szAtts, nullptr);
 	}
 	forceDirty();
 	return true;
@@ -763,7 +711,6 @@ bool AD_Document::addRevision(AD_Revision * pRev, bool bGenCR)
 
 void AD_Document::_purgeRevisionTable()
 {
-	UT_VECTOR_PURGEALL(AD_Revision*, m_vRevisions);
 	m_vRevisions.clear();
 }
 
@@ -822,16 +769,15 @@ void AD_Document::setAutoRevisioning(bool b)
 		// this will allow us to match autorevision id to a document
 		// version number. However, do not increase the version number,
 		// etc., if == 0 (we have a new, unsaved document)
-		time_t t = time(NULL);
-
+		time_t t = time(nullptr);
+		
 		if(m_bAfterFirstSave)
 		{
 			m_iVersion++;
 
-			AD_VersionData v(m_iVersion, t, b, getTopXID());
-			addRecordToHistory(v);
+			addRecordToHistory(AD_VersionData(m_iVersion, t, b, getTopXID()));
 		}
-
+		
 		m_bAutoRevisioning = b;
 
 		if(b)
@@ -841,7 +787,7 @@ void AD_Document::setAutoRevisioning(bool b)
 			// loaded and not saved, we do not want to adjust the
 			// revision number either
 			if(m_bAfterFirstSave)
-			{
+			{	
 				const XAP_StringSet * pSS = XAP_App::getApp()->getStringSet();
 				UT_return_if_fail(pSS);
 				UT_UCS4String ucs4(pSS->getValue(XAP_STRING_ID_MSG_AutoRevision));
@@ -862,8 +808,8 @@ void AD_Document::setAutoRevisioning(bool b)
 				UT_uint32 iId = getRevisionId();
 				addRevision(iId, ucs4.ucs4_str(),ucs4.length(),t, m_iVersion);
 			}
-
-
+			
+				
 			// collapse all revisions ...
 			setShowRevisionId(PD_MAX_REVISION);
 			setShowRevisions(false);
@@ -885,7 +831,7 @@ void AD_Document::setAutoRevisioning(bool b)
 				// we succeeded in restoring the document, so now clear the
 				// history record
 				_purgeRevisionTable();
-
+				
 				m_bDoNotAdjustHistory = true;
 				save();
 				m_bDoNotAdjustHistory = false;
@@ -896,7 +842,7 @@ void AD_Document::setAutoRevisioning(bool b)
 			_setMarkRevisions(true);
 
 		}
-
+		
 		setMarkRevisions(b);
 	}
 }
@@ -907,13 +853,11 @@ void AD_Document::setAutoRevisioning(bool b)
 */
 UT_uint32 AD_Document::findAutoRevisionId(UT_uint32 iVersion) const
 {
-	for(UT_sint32 i = 0; i < m_vRevisions.getItemCount(); i++)
+	for (UT_uint32 i = 0; i < m_vRevisions.size(); i++)
 	{
-		const AD_Revision *pRev= m_vRevisions.getNthItem(i);
-		UT_return_val_if_fail(pRev, 0);
-
-		if(pRev->getVersion() == iVersion)
-			return pRev->getId();
+		const AD_Revision& rev = m_vRevisions[i];
+		if (rev.getVersion() == iVersion)
+			return rev.getId();
 	}
 
 	UT_DEBUGMSG(("AD_Document::findAutoRevisionId: autorevision for version %d not found\n",
@@ -932,23 +876,22 @@ UT_uint32 AD_Document::findAutoRevisionId(UT_uint32 iVersion) const
 UT_uint32 AD_Document::findNearestAutoRevisionId(UT_uint32 iVersion, bool bLesser) const
 {
 	UT_uint32 iId = 0;
-
-	for(UT_sint32 i = 0; i < m_vRevisions.getItemCount(); i++)
+	
+	for (UT_uint32 i = 0; i < m_vRevisions.size(); i++)
 	{
-		const AD_Revision *pRev= m_vRevisions.getNthItem(i);
-		UT_return_val_if_fail(pRev, 0);
+		const AD_Revision& rev = m_vRevisions[i];
 
 		if(bLesser)
 		{
-			if(pRev->getVersion() < iVersion)
-				iId = pRev->getId();
+			if (rev.getVersion() < iVersion)
+				iId = rev.getId();
 			else
 				break;
 		}
 		else
 		{
-			if(pRev->getVersion() > iVersion)
-				return pRev->getId();
+			if (rev.getVersion() > iVersion)
+				return rev.getId();
 		}
 	}
 
@@ -971,36 +914,35 @@ void AD_Document::_adjustHistoryOnSave()
 {
 	if(m_bDoNotAdjustHistory)
 		return;
-
+	
 	// record this as the last time the document was saved + adjust
 	// the cumulative edit time
 	m_iVersion++;
-
+	
 	if(!m_bHistoryWasSaved || m_bAutoRevisioning)
 	{
 		// if this is the first save, we will record the time the doc
 		// was opened as the start time, otherwise, we will use the
 		// current time
-		time_t t = !m_bHistoryWasSaved ? m_lastOpenedTime : time(NULL);
-
+		time_t t = !m_bHistoryWasSaved ? m_lastOpenedTime : time(nullptr);
+		
 		AD_VersionData v(m_iVersion,t,m_bAutoRevisioning,getTopXID());
 		m_lastSavedTime = v.getTime(); // store the time of this save
-		addRecordToHistory(v);
+		addRecordToHistory(std::move(v));
 
 		m_bHistoryWasSaved = true;
 	}
 	else
 	{
-		UT_return_if_fail(m_vHistory.getItemCount() > 0);
+		UT_return_if_fail(!m_vHistory.empty());
 
 		// change the edit time of the last entry and create a new UID
 		// for the record
-		AD_VersionData * v = (AD_VersionData*)m_vHistory.getNthItem(m_vHistory.getItemCount()-1);
+		AD_VersionData& v = m_vHistory.back();
 
-		UT_return_if_fail(v);
-		v->setId(m_iVersion);
-		v->newUID();
-		m_lastSavedTime = v->getTime();
+		v.setId(m_iVersion);
+		v.newUID();
+		m_lastSavedTime = v.getTime();
 	}
 
 	if(m_bAutoRevisioning)
@@ -1012,14 +954,14 @@ void AD_Document::_adjustHistoryOnSave()
 
 		UT_uint32 iId = getRevisionId()+1;
 		setRevisionId(iId);
-		addRevision(iId, ucs4.ucs4_str(),ucs4.length(),time(NULL), m_iVersion);
+		addRevision(iId, ucs4.ucs4_str(),ucs4.length(),time(nullptr), m_iVersion);
 	}
 }
 
 bool AD_Document::_restoreVersion(XAP_Frame * pFrame, UT_uint32 iVersion)
 {
 	UT_return_val_if_fail(pFrame, false);
-
+	
 	if(isDirty())
 	{
 		if(pFrame->showMessageBox(XAP_STRING_ID_MSG_HistoryConfirmSave,
@@ -1080,32 +1022,26 @@ bool AD_Document::_restoreVersion(XAP_Frame * pFrame, UT_uint32 iVersion)
 	{
 		// we succeeded in restoring the document, so now clear the
 		// history record
-		UT_sint32 iCount = getHistoryCount();
-		const AD_VersionData * pVLast = NULL;
+		UT_uint32 iCount = getHistoryCount();
+		const AD_VersionData * pVLast = nullptr;
 		time_t iEditTime = 0;
 
-		for(UT_sint32 j = 0; j < iCount; ++j)
+		for(UT_uint32 j = 0; j < iCount; ++j)
 		{
-			AD_VersionData * v = (AD_VersionData *)m_vHistory.getNthItem(j);
-			if(!v)
+			const AD_VersionData& v = m_vHistory[j];
+
+			if (v.getId() == iVersion)
 			{
-				UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
+				pVLast = &v;
 				continue;
 			}
 
-			if(v->getId() == iVersion)
-			{
-				pVLast = v;
-				continue;
-			}
-
-			if(v->getId() > iVersion)
+			if (v.getId() > iVersion)
 			{
 				// remember the lenth of the session
-				iEditTime += (v->getTime() - v->getStartTime());
+				iEditTime += (v.getTime() - v.getStartTime());
 
-				delete v;
-				m_vHistory.deleteNthItem(j);
+				m_vHistory.erase(m_vHistory.begin() + j);
 				iCount--;
 				j--;
 			}
@@ -1116,11 +1052,11 @@ bool AD_Document::_restoreVersion(XAP_Frame * pFrame, UT_uint32 iVersion)
 		// set the document version correctly
 		setDocVersion(iVersion);
 		setLastSavedTime(pVLast->getTime());
-		setLastOpenedTime(time(NULL));
+		setLastOpenedTime(time(nullptr));
 
 		UT_ASSERT(m_iEditTime >= iEditTime);
 		m_iEditTime -= iEditTime;
-
+		
 		// now save me as I am
 		m_bDoNotAdjustHistory = true;
 		save();
@@ -1133,7 +1069,7 @@ bool AD_Document::_restoreVersion(XAP_Frame * pFrame, UT_uint32 iVersion)
 
 bool AD_Document::showHistory(AV_View * pView)
 {
-	XAP_Frame * pFrame = static_cast<XAP_Frame *> ( pView->getParentData());
+	XAP_Frame * pFrame = static_cast<XAP_Frame *> ( pView->getParentData());	
 	UT_return_val_if_fail(pFrame, false);
 
 	pFrame->raise();
@@ -1143,12 +1079,12 @@ bool AD_Document::showHistory(AV_View * pView)
 
 	XAP_Dialog_History * pDialog
 	  = static_cast<XAP_Dialog_History *>(pDialogFactory->requestDialog(XAP_DIALOG_ID_HISTORY));
-
+	
 	UT_return_val_if_fail(pDialog,false);
 
 	pDialog->setDocument(this);
 	pDialog->runModal(pFrame);
-
+	
 	bool bShow   = (pDialog->getAnswer() == XAP_Dialog_History::a_OK);
 	bool bRet = false;
 
@@ -1156,7 +1092,7 @@ bool AD_Document::showHistory(AV_View * pView)
 	{
 		UT_uint32 iVersion = pDialog->getSelectionId();
 		UT_uint32 iOrigVersion = iVersion;
-
+		
 		const XAP_StringSet * pSS = XAP_App::getApp()->getStringSet();
 
 		if(iVersion)
@@ -1170,7 +1106,7 @@ bool AD_Document::showHistory(AV_View * pView)
 						UT_return_val_if_fail(pSS,false);
 						UT_String s1, s2;
 						const char * msg1, * msg2, * msg3, * msg4;
-
+						
 						if(iVersion)
 						{
 							// full restore possible
@@ -1186,15 +1122,15 @@ bool AD_Document::showHistory(AV_View * pView)
 							s1 += msg4;
 
 							UT_String_sprintf(s2,s1.c_str(),iOrigVersion,iVersion,iOrigVersion);
-
-							switch(pFrame->showMessageBox(s2.c_str(),
-														  XAP_Dialog_MessageBox::b_YNC,
+						
+							switch(pFrame->showMessageBox(s2.c_str(), 
+														  XAP_Dialog_MessageBox::b_YNC, 
 														  XAP_Dialog_MessageBox::a_YES))
 							{
 								case XAP_Dialog_MessageBox::a_NO:
 									bRet = _restoreVersion(pFrame, iOrigVersion);
 									break;
-
+									
 								case XAP_Dialog_MessageBox::a_YES:
 									bRet = _restoreVersion(pFrame, iVersion);
 									break;
@@ -1205,7 +1141,7 @@ bool AD_Document::showHistory(AV_View * pView)
 								default:
 									UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
 							}
-
+							
 						}
 						else
 						{
@@ -1220,11 +1156,11 @@ bool AD_Document::showHistory(AV_View * pView)
 							s1 += msg3;
 							s1 += " ";
 							s1 += msg4;
-
+						
 							UT_String_sprintf(s2, s1.c_str(), iOrigVersion);
 
-							switch(pFrame->showMessageBox(s2.c_str(),
-														  XAP_Dialog_MessageBox::b_OC,
+							switch(pFrame->showMessageBox(s2.c_str(), 
+														  XAP_Dialog_MessageBox::b_OC, 
 														  XAP_Dialog_MessageBox::a_OK))
 							{
 								case XAP_Dialog_MessageBox::a_OK:
@@ -1237,34 +1173,34 @@ bool AD_Document::showHistory(AV_View * pView)
 								default:
 									UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
 							}
-
+							
 						}
 					}
 					break;
-
+					
 				case ADHIST_FULL_RESTORE:
 					bRet = _restoreVersion(pFrame, iVersion);
 					break;
-
+					
 				case ADHIST_NO_RESTORE:
 					// issue a warning message and quit
 					{
-
+						
 						UT_return_val_if_fail(pSS,false);
 						UT_String s2;
 						const char * msg1;
-
+						
 						msg1 = pSS->getValue(XAP_STRING_ID_MSG_HistoryNoRestore);
 						UT_return_val_if_fail(msg1,false);
-
+						
 						UT_String_sprintf(s2, msg1, iOrigVersion);
 
-						pFrame->showMessageBox(s2.c_str(),
-											   XAP_Dialog_MessageBox::b_O,
+						pFrame->showMessageBox(s2.c_str(), 
+											   XAP_Dialog_MessageBox::b_O, 
 											   XAP_Dialog_MessageBox::a_OK);
 					}
 					break;
-
+					
 				default:
 					UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
 			}
@@ -1279,7 +1215,7 @@ bool AD_Document::showHistory(AV_View * pView)
 UT_Error AD_Document::saveAs(const char * szFilename, int ieft, const char * props)
 {
 	UT_Error e = _saveAs(szFilename, ieft, props);
-
+	
 	m_bAfterFirstSave |= (UT_OK == e);
 	return e;
 }
@@ -1305,10 +1241,10 @@ UT_Error AD_Document::save(void)
 bool AD_Document::purgeAllRevisions(AV_View * pView)
 {
 	UT_return_val_if_fail( pView, false );
-
-	XAP_Frame * pFrame = static_cast<XAP_Frame *> ( pView->getParentData());
+	
+	XAP_Frame * pFrame = static_cast<XAP_Frame *> ( pView->getParentData());	
 	UT_return_val_if_fail( pFrame, false );
-
+	
 	if(pFrame->showMessageBox(XAP_STRING_ID_MSG_NoUndo,
 							  XAP_Dialog_MessageBox::b_YN,
 							  XAP_Dialog_MessageBox::a_YES,
@@ -1317,7 +1253,7 @@ bool AD_Document::purgeAllRevisions(AV_View * pView)
 	{
 		return false;
 	}
-
+	
 	setMarkRevisions(false);
 	bool bRet = acceptAllRevisions();
 	purgeRevisionTable(true);
@@ -1331,7 +1267,7 @@ bool AD_Document::purgeAllRevisions(AV_View * pView)
 //
 // constructor for new entries
 AD_VersionData::AD_VersionData(UT_uint32 v, time_t start, bool autorev, UT_uint32 xid)
-	:m_iId(v),m_pUUID(NULL),m_tStart(start),m_bAutoRevision(autorev),m_iTopXID(xid)
+	:m_iId(v),m_pUUID(nullptr),m_tStart(start),m_bAutoRevision(autorev),m_iTopXID(xid)
 {
 	// we do not create uuid's based on the main doc uuid as
 	// AD_Document::getNewUUID() does; this is because we need to be
@@ -1339,7 +1275,7 @@ AD_VersionData::AD_VersionData(UT_uint32 v, time_t start, bool autorev, UT_uint3
 	// different place at the same time.
 	UT_UUIDGenerator * pGen = XAP_App::getApp()->getUUIDGenerator();
 	UT_return_if_fail(pGen);
-
+	
 	m_pUUID = pGen->createUUID();
 	UT_return_if_fail(m_pUUID);
 	m_tStart = m_pUUID->getTime();
@@ -1348,7 +1284,7 @@ AD_VersionData::AD_VersionData(UT_uint32 v, time_t start, bool autorev, UT_uint3
 
 // constructors for importers
 AD_VersionData::AD_VersionData(UT_uint32 v, const std::string &uuid, time_t start, bool autorev, UT_uint32 iTopXID):
-	m_iId(v),m_pUUID(NULL),m_tStart(start),m_bAutoRevision(autorev),m_iTopXID(iTopXID)
+	m_iId(v),m_pUUID(nullptr),m_tStart(start),m_bAutoRevision(autorev),m_iTopXID(iTopXID)
 {
 	UT_UUIDGenerator * pGen = XAP_App::getApp()->getUUIDGenerator();
 	UT_return_if_fail(pGen);
@@ -1358,23 +1294,23 @@ AD_VersionData::AD_VersionData(UT_uint32 v, const std::string &uuid, time_t star
 }
 
 AD_VersionData::AD_VersionData(UT_uint32 v, const char *uuid, time_t start, bool autorev, UT_uint32 iTopXID):
-	m_iId(v),m_pUUID(NULL),m_tStart(start),m_bAutoRevision(autorev),m_iTopXID(iTopXID)
+	m_iId(v),m_pUUID(nullptr),m_tStart(start),m_bAutoRevision(autorev),m_iTopXID(iTopXID)
 {
 	UT_UUIDGenerator * pGen = XAP_App::getApp()->getUUIDGenerator();
 	UT_return_if_fail(pGen);
-
+	
 	m_pUUID = pGen->createUUID(uuid);
 	UT_ASSERT_HARMLESS(m_pUUID);
 }
 
 // copy constructor
 AD_VersionData::AD_VersionData(const AD_VersionData & v):
-	m_iId(v.m_iId), m_pUUID(NULL), m_bAutoRevision(v.m_bAutoRevision), m_iTopXID(v.m_iTopXID)
+	m_iId(v.m_iId), m_pUUID(nullptr), m_bAutoRevision(v.m_bAutoRevision), m_iTopXID(v.m_iTopXID)
 {
 	UT_return_if_fail(v.m_pUUID);
 	UT_UUIDGenerator * pGen = XAP_App::getApp()->getUUIDGenerator();
 	UT_return_if_fail(pGen);
-
+	
 	m_pUUID = pGen->createUUID(*(v.m_pUUID));
 	UT_ASSERT(m_pUUID);
 
@@ -1391,7 +1327,7 @@ AD_VersionData & AD_VersionData::operator = (const AD_VersionData &v)
 	return *this;
 }
 
-bool AD_VersionData::operator == (const AD_VersionData &v)
+bool AD_VersionData::operator==(const AD_VersionData &v) const
 {
 	return (m_iId == v.m_iId && m_tStart == v.m_tStart
 			&& *m_pUUID == *(v.m_pUUID) && m_bAutoRevision == v.m_bAutoRevision && m_iTopXID == v.m_iTopXID);

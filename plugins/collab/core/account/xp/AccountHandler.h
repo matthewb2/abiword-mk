@@ -30,7 +30,7 @@
 #include <packet/xp/AbiCollab_Packet.h>
 #include <account/xp/Buddy.h>
 #include <account/xp/EventListener.h>
-#ifdef WIN32
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
@@ -58,11 +58,11 @@ public:
 	ProtocolErrorPacket( UT_sint32 errorEnum );
 	DECLARE_PACKET(ProtocolErrorPacket);
 
-	virtual UT_sint32						getProtocolVersion() const
+	virtual UT_sint32 getProtocolVersion() const  override
 		{ return 0; } // not ABICOLLAB_PROTOCOL_VERSION!!
-	UT_sint32 								getErrorEnum() const
+	UT_sint32 getErrorEnum() const
 		{ return m_errorEnum; }
-	UT_sint32								getRemoteVersion() const
+	UT_sint32 getRemoteVersion() const
 		{ return m_remoteVersion; }
 protected:
 	UT_sint32		m_errorEnum;
@@ -100,7 +100,7 @@ public:
 	virtual void							loadProperties() = 0;
 	virtual void							storeProperties() = 0;
 
-	#ifdef WIN32
+	#ifdef _WIN32
 	virtual BOOL							_onCommand(HWND hWnd, WPARAM wParam, LPARAM lParam) = 0;
 	virtual bool							shouldProcessFocus() = 0;
 	#endif
@@ -155,7 +155,7 @@ public:
 	virtual bool							setAcl(AbiCollab* /*pSession*/, const std::vector<std::string>& /*vAcl*/)
 		{ return true; }
 	virtual void							joinSessionAsync(BuddyPtr pBuddy, DocHandle& docHandle);
-	virtual bool							hasSession(const UT_UTF8String& sSessionId);
+	virtual bool							hasSession(const std::string& sSessionId);
 	virtual bool							allowsSessionTakeover() = 0;
 	bool									getCanOffer()
 		{ return m_bCanOffer; }
@@ -168,7 +168,7 @@ public:
 	virtual void							handleMessage(Packet* pPacket, BuddyPtr pBuddy);
 
 	// signal management
-	virtual void							signal(const Event& event, BuddyPtr pSource);
+	virtual void signal(const Event& event, BuddyPtr pSource) override;
 
 	// protocol error management
 	enum

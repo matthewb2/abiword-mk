@@ -1,5 +1,4 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
-
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiSource
  *
  * Copyright (C) 2008 Firat Kiyak <firatkiyak@gmail.com>
@@ -23,16 +22,13 @@
 #ifndef _OXML_ELEMENT_ROW_H_
 #define _OXML_ELEMENT_ROW_H_
 
-// Internal includes
-#include <OXML_Element.h>
-#include <OXML_Element_Table.h>
-#include <OXML_Element_Cell.h>
-#include <ie_exp_OpenXML.h>
-
-// AbiWord includes
-#include <ut_types.h>
-#include <ut_string.h>
-#include <pd_Document.h>
+#include "ut_types.h"
+#include "ut_string.h"
+#include "pd_Document.h"
+#include "OXML_Element.h"
+#include "OXML_Element_Table.h"
+#include "OXML_Element_Cell.h"
+#include "ie_exp_OpenXML.h"
 
 class OXML_Element_Table;
 
@@ -42,8 +38,8 @@ public:
 	OXML_Element_Row(const std::string & id, OXML_Element_Table* table);
 	virtual ~OXML_Element_Row();
 
-	virtual UT_Error serialize(IE_Exp_OpenXML* exporter);
-	virtual UT_Error addToPT(PD_Document * pDocument);
+	virtual UT_Error serialize(IE_Exp_OpenXML* exporter) override;
+	virtual UT_Error addToPT(PD_Document * pDocument) override;
 	UT_Error addChildrenToPT(PD_Document * pDocument);
 	virtual void setNumCols(UT_sint32 numCols);
 
@@ -57,21 +53,21 @@ public:
             return m_currentColumnNumber;
         }
 
-	void addCell(OXML_Element_Cell* cell);
+	void addCell(const OXML_SharedElement_Cell& cell);
 
 	//this method increments the vertical merge start cell's bottom by one.
 	//It traverses the cells in the row and finds the vertical merge starting cell
 	//and increments its bottom value by one. Should be called for the vertMerge=continue cells.
 	//return true if successful
-	bool incrementBottomVerticalMergeStart(OXML_Element_Cell* cell);
+	bool incrementBottomVerticalMergeStart(const OXML_SharedElement_Cell& cell);
 
 	//this method increments the horizontal merge start cell's right by one.
 	//It traverses the cells in the row and finds the horizontal merge starting cell
 	//and increments its right value by one. Should be called for the hMerge=continue cells.
 	//return true if successful
-	bool incrementRightHorizontalMergeStart(OXML_Element_Cell* cell);
+	bool incrementRightHorizontalMergeStart(const OXML_SharedElement_Cell& cell);
 
-	void addMissingCell(OXML_Element_Cell* cell);
+	void addMissingCell(const OXML_SharedElement_Cell& cell);
 
 protected:
 	UT_Error serializeChildren(IE_Exp_OpenXML* exporter);
@@ -80,10 +76,10 @@ private:
 	virtual UT_Error serializeProperties(IE_Exp_OpenXML* exporter);
 	UT_sint32 numCols;
 	OXML_Element_Table* table;
-	std::vector<OXML_Element_Cell*> m_cells;
+	std::vector<OXML_SharedElement_Cell> m_cells;
 	int m_rowNumber;
 	int m_currentColumnNumber;
-	std::vector<OXML_Element_Cell*> m_missingCells;
+	std::vector<OXML_SharedElement_Cell> m_missingCells;
 };
 
 #endif //_OXML_ELEMENT_ROW_H_

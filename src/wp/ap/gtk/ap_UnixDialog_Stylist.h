@@ -20,20 +20,23 @@
 #ifndef AP_UNIXDIALOG_STYLIST_H
 #define AP_UNIXDIALOG_STYLIST_H
 
+#include "xap_UnixDialog.h"
 #include "ap_Dialog_Stylist.h"
 
 class XAP_UnixFrame;
 
 /*****************************************************************/
 
-class AP_UnixDialog_Stylist: public AP_Dialog_Stylist
+class AP_UnixDialog_Stylist
+  : public AP_Dialog_Stylist
+  , public XAP_UnixDialog
 {
 public:
 	AP_UnixDialog_Stylist(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_UnixDialog_Stylist(void);
 
-	virtual void			runModeless(XAP_Frame * pFrame);
-	virtual void			runModal(XAP_Frame * pFrame);
+	virtual void runModeless(XAP_Frame * pFrame) override;
+	virtual void runModal(XAP_Frame * pFrame) override;
 
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 
@@ -41,17 +44,16 @@ public:
 	void			event_Close(void);
 	void            event_Apply(void);
 	void            styleClicked(UT_sint32 row, UT_sint32 col);
-	virtual void            destroy(void);
-	virtual void            activate(void);
-	virtual void            notifyActiveFrame(XAP_Frame * pFrame);
-	virtual void            setStyleInGUI(void);
+	virtual void destroy(void) override;
+	virtual void activate(void) override;
+	virtual void notifyActiveFrame(XAP_Frame * pFrame) override;
+	virtual void setStyleInGUI(void) override;
 private:
 	GtkWidget *		_constructWindow(void);
 	void			_populateWindowData(void);
 	void            _connectSignals(void);
 	void            _fillTree(void);
 
-	GtkWidget * m_windowMain;
 	GtkWidget * m_wStyleList;
 	GtkCellRenderer * m_wRenderer;
 	GtkTreeStore * m_wModel;

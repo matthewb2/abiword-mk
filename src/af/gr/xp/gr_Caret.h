@@ -56,7 +56,7 @@ public:
 	// and the timer restarts from 0 for the next 500ms cycle.
 	void							setCoords(UT_sint32 x, UT_sint32 y, UT_uint32 h,
 										   UT_sint32 x2 = 0, UT_sint32 y2 = 0, UT_uint32 h2 = 0,
-				 						  bool bPointDirection = false, const UT_RGBColor * pClr = NULL);
+										  bool bPointDirection = false, const UT_RGBColor * pClr = nullptr);
 
 	// The caret needs to know about this to clip the save/restore rects.
 	void setWindowSize(UT_uint32 width, UT_uint32 height);
@@ -66,7 +66,7 @@ public:
 	std::string						getID(void) const { return m_sID; }
 	void                            setRemoteColor(UT_RGBColor clrRemote);
 
-	//pascal void							resetBlinkTimeout(void);
+	void							resetBlinkTimeout(void);
 	void                            setPendingBlink(void);
 	bool                            doBlinkIfNeeded(void);
 private:
@@ -76,10 +76,10 @@ private:
 
 	static void						s_work(UT_Worker * w);
 	static void						s_enable(UT_Worker * w);
-	//pascal static void						s_blink_timeout(UT_Worker * w);
+	static void						s_blink_timeout(UT_Worker * w);
 
 	UT_uint32						_getCursorBlinkTime() const;
-	//pascal UT_uint32						_getCursorBlinkTimeout() const;
+	UT_uint32						_getCursorBlinkTimeout() const;
 	bool							_getCanCursorBlink() const;
 
 	void							_erase();
@@ -101,7 +101,7 @@ private:
 
 	UT_Timer *						m_worker;
 	UT_Timer *						m_enabler;
-	//pascal UT_Timer *						m_blinkTimeout;
+	UT_Timer *						m_blinkTimeout;
 
 	// m_nDisableCount > 0 implies a disabled cursor.
 	// m_nDisableCount should never be negative.

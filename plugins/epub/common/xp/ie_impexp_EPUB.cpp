@@ -18,10 +18,11 @@
  * 02110-1301 USA.
  */
 
-#include <gsf/gsf-utils.h>
+#include <gsf/gsf.h>
+
 #include "xap_Module.h"
 #include "ie_impexp_EPUB.h"
-#ifdef WIN32
+#ifdef _WIN32
 #include "ap_Win32Dialog_EpubExportOptions.h"
 #endif
 
@@ -39,8 +40,8 @@ ABI_PLUGIN_DECLARE("EPUB")
 /*****************************************************************************/
 /*****************************************************************************/
 
-static IE_Imp_EPUB_Sniffer * m_imp_sniffer = 0;
-static IE_Exp_EPUB_Sniffer * m_exp_sniffer = 0;
+static IE_Imp_EPUB_Sniffer * m_imp_sniffer = nullptr;
+static IE_Exp_EPUB_Sniffer * m_exp_sniffer = nullptr;
 
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_register(XAP_ModuleInfo * mi)
@@ -53,7 +54,7 @@ int abi_plugin_register(XAP_ModuleInfo * mi)
         m_exp_sniffer = new IE_Exp_EPUB_Sniffer();
     IE_Exp::registerExporter(m_exp_sniffer);
 
-#ifdef WIN32
+#ifdef _WIN32
 	AP_Win32Dialog_EpubExportOptions::setInstance((HINSTANCE)s_hModule);
 #endif
 
@@ -69,19 +70,19 @@ int abi_plugin_register(XAP_ModuleInfo * mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister(XAP_ModuleInfo * mi)
 {
-    mi->name = 0;
-    mi->desc = 0;
-    mi->version = 0;
-    mi->author = 0;
-    mi->usage = 0;
+    mi->name = nullptr;
+    mi->desc = nullptr;
+    mi->version = nullptr;
+    mi->author = nullptr;
+    mi->usage = nullptr;
 
     IE_Imp::unregisterImporter(m_imp_sniffer);
     delete m_imp_sniffer;
-    m_imp_sniffer = 0;
+    m_imp_sniffer = nullptr;
 
     IE_Exp::unregisterExporter(m_exp_sniffer);
     delete m_exp_sniffer;
-    m_exp_sniffer = 0;
+    m_exp_sniffer = nullptr;
 
     return 1;
 }

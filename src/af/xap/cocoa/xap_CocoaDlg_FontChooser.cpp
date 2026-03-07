@@ -31,10 +31,9 @@
 #include "xap_CocoaDialog_Utilities.h"
 #include "xap_CocoaDlg_FontChooser.h"
 #include "xap_CocoaApp.h"
-#include "xap_CocoaCompat.h"
 
 #include "xap_EncodingManager.h"
-#include "gr_CocoaCairoGraphics.h"
+#include "gr_CocoaGraphics.h"
 
 // your typographer's standard nonsense latin font phrase
 #define PREVIEW_ENTRY_DEFAULT_STRING	"Lorem ipsum dolor sit amet, consectetaur adipisicing..."
@@ -52,7 +51,7 @@ XAP_CocoaDialog_FontChooser::XAP_CocoaDialog_FontChooser(XAP_DialogFactory * pDl
 	XAP_Dialog_FontChooser(pDlgFactory,dlgid),
 	m_bSuperScriptInitialValue(false),
 	m_bSubScriptInitialValue(false),
-	m_currentFamily(NULL),
+	m_currentFamily(nullptr),
 	m_dlg(nil)
 {
 	// 
@@ -198,13 +197,13 @@ void XAP_CocoaDialog_FontChooser::sizeRowChanged(void)
  */
 void XAP_CocoaDialog_FontChooser::_colorChanged(NSColor * color, const gchar * attr, char * buf)
 {
-	XAP_CGFloat r,g,b,a;
+	CGFloat r,g,b,a;
 	color = [color colorUsingColorSpaceName:NSDeviceRGBColorSpace];
 	[color getRed:&r green:&g blue:&b alpha:&a];
 	snprintf(buf, 7, "%02x%02x%02x",
-			(unsigned int) (r 	* (float) 255.0),
-			(unsigned int) (g	* (float) 255.0),
-			(unsigned int) (b * (float) 255.0));
+			(unsigned int) (r * 255.0),
+			(unsigned int) (g * 255.0),
+			(unsigned int) (b * 255.0));
 	addOrReplaceVecProp(attr,(gchar *)buf);
 	updatePreview();
 }
@@ -257,7 +256,7 @@ void XAP_CocoaDialog_FontChooser::runModal(XAP_Frame * /*pFrame*/)
 		UT_RGBColor c;
 		UT_parseColor(sColor.c_str(), c);
 
-		NSColor *color = GR_CocoaCairoGraphics::_utRGBColorToNSColor(c);
+		NSColor *color = GR_CocoaGraphics::_utRGBColorToNSColor(c);
 		[m_dlg setTextColor:color];
 	}
 	else {
@@ -271,7 +270,7 @@ void XAP_CocoaDialog_FontChooser::runModal(XAP_Frame * /*pFrame*/)
 		UT_RGBColor c;
 		UT_parseColor(sBGCol.c_str(), c);
 
-		NSColor *color = GR_CocoaCairoGraphics::_utRGBColorToNSColor(c);
+		NSColor *color = GR_CocoaGraphics::_utRGBColorToNSColor(c);
 		[m_dlg setBgColor:color];
 	}
 	else
@@ -330,16 +329,13 @@ void XAP_CocoaDialog_FontChooser::updatePreview(void)
 	}
 	
 	// if a font has been set since this dialog was launched, draw things with it
-	const char * entryString;
+	const UT_UCSChar*  entryString = getDrawString();
 
-	if (!getEntryString(&entryString)) {
+	if (!entryString) {
 		return;
 	}
 
-	UT_UCSChar * unicodeString = NULL;
-	UT_UCS4_cloneString_char(&unicodeString, entryString);
-	event_previewExposed(unicodeString);
-	FREEP(unicodeString);
+	event_previewInvalidate(entryString);
 }
 
 void XAP_CocoaDialog_FontChooser::_okAction(void)
@@ -359,17 +355,18 @@ void XAP_CocoaDialog_FontChooser::_cancelAction(void)
 void	XAP_CocoaDialog_FontChooser::_createGC(XAP_CocoaNSView* owner)
 {
 	NSSize  size;
-	GR_CocoaCairoAllocInfo ai(owner);
-	m_pGraphics = static_cast<GR_CocoaCairoGraphics*>(XAP_App::getApp()->newGraphics(ai));
+	GR_CocoaAllocInfo ai(owner);
+	m_pGraphics = static_cast<GR_CocoaGraphics*>(XAP_App::getApp()->newGraphics(ai));
 
 	size = [owner bounds].size;
 	_createFontPreviewFromGC(m_pGraphics, lrintf(size.width), lrintf(size.height));
+	owner.drawable = m_pFontPreview;
 }
 
 void XAP_CocoaDialog_FontChooser::_deleteGC(void)
 {
 	DELETEP(m_pGraphics);
-	m_pGraphics = NULL;
+	m_pGraphics = nullptr;
 }
 
 @implementation XAP_CocoaDialog_FontChooserController
@@ -383,7 +380,7 @@ void XAP_CocoaDialog_FontChooser::_deleteGC(void)
 {
 	if (_xap) {
 		_xap->_deleteGC();
-		_xap = NULL;
+		_xap = nullptr;
 	}
 }
 
@@ -452,7 +449,7 @@ void XAP_CocoaDialog_FontChooser::_deleteGC(void)
 					[m_sizeDataSource addString:[NSString stringWithUTF8String:str]];
 				}
 				else {
-					NSLog(@"attempting to add NULL to string data source (%s:%d)", __FILE__, __LINE__);
+					NSLog(@"attempting to add nullptr to string data source (%s:%d)", __FILE__, __LINE__);
 				}
 			}
 		}
@@ -498,37 +495,37 @@ void XAP_CocoaDialog_FontChooser::_deleteGC(void)
 -(IBAction)underlineAction:(id)sender
 {
 	static_cast<XAP_CocoaDialog_FontChooser*>(_xap)->underlineChanged
-				([(NSControl*)sender intValue] == NSOffState ? 0 : 1);
+				([(NSControl*)sender intValue] == NSControlStateValueOff ? 0 : 1);
 }
 
 -(IBAction)overlineAction:(id)sender
 {
 	static_cast<XAP_CocoaDialog_FontChooser*>(_xap)->overlineChanged
-			([(NSControl*)sender intValue] == NSOffState ? 0 : 1);
+			([(NSControl*)sender intValue] == NSControlStateValueOff ? 0 : 1);
 }
 
 -(IBAction)strikeoutAction:(id)sender
 {
 	static_cast<XAP_CocoaDialog_FontChooser*>(_xap)->strikeoutChanged
-			([(NSControl*)sender intValue] == NSOffState ? 0 : 1);
+			([(NSControl*)sender intValue] == NSControlStateValueOff ? 0 : 1);
 }
 
 -(IBAction)superscriptAction:(id)sender
 {
 	static_cast<XAP_CocoaDialog_FontChooser*>(_xap)->superscriptChanged
-			([(NSControl*)sender intValue] == NSOffState ? 0 : 1);
+			([(NSControl*)sender intValue] == NSControlStateValueOff ? 0 : 1);
 }
 
 -(IBAction)subscriptAction:(id)sender
 {
 	static_cast<XAP_CocoaDialog_FontChooser*>(_xap)->subscriptChanged
-			([(NSControl*)sender intValue] == NSOffState ? 0 : 1);
+			([(NSControl*)sender intValue] == NSControlStateValueOff ? 0 : 1);
 }
 
 -(IBAction)transparentAction:(id)sender
 {
 	static_cast<XAP_CocoaDialog_FontChooser*>(_xap)->transparencyChanged
-			([(NSControl*)sender intValue] == NSOffState ? 0 : 1);
+			([(NSControl*)sender intValue] == NSControlStateValueOff ? 0 : 1);
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
@@ -554,27 +551,27 @@ void XAP_CocoaDialog_FontChooser::_deleteGC(void)
 
 -(void)setStrikeout:(bool)value
 {
-	[_strikeButton setState:(value ? NSOnState : NSOffState)];
+	[_strikeButton setState:(value ? NSControlStateValueOn : NSControlStateValueOff)];
 }
 
 -(void)setUnderline:(bool)value
 {
-	[_underlineButton setState:(value ? NSOnState : NSOffState)];
+	[_underlineButton setState:(value ? NSControlStateValueOn : NSControlStateValueOff)];
 }
 
 -(void)setOverline:(bool)value
 {
-	[_overlineButton setState:(value ? NSOnState : NSOffState)];
+	[_overlineButton setState:(value ? NSControlStateValueOn : NSControlStateValueOff)];
 }
 
 -(void)setSuperscript:(bool)value
 {
-	[_superscriptButton setState:(value ? NSOnState : NSOffState)];
+	[_superscriptButton setState:(value ? NSControlStateValueOn : NSControlStateValueOff)];
 }
 
 -(void)setSubscript:(bool)value
 {
-	[_subscriptButton setState:(value ? NSOnState : NSOffState)];
+	[_subscriptButton setState:(value ? NSControlStateValueOn : NSControlStateValueOff)];
 }
 
 -(void)selectFont:(char*)value
@@ -587,7 +584,7 @@ void XAP_CocoaDialog_FontChooser::_deleteGC(void)
 		}
 	}
 	else {
-		UT_DEBUGMSG(("selectFont: called with NULL value\n"));
+		UT_DEBUGMSG(("selectFont: called with nullptr value\n"));
 		[_fontList setAllowsEmptySelection:YES];
 		[_fontList deselectAll:nil];
 		return;
@@ -608,8 +605,8 @@ void XAP_CocoaDialog_FontChooser::_deleteGC(void)
 	int idx;
 	char sizeString[60];
 
-	if (value == NULL) {
-		UT_DEBUGMSG(("selectSize: called with NULL value\n"));
+	if (value == nullptr) {
+		UT_DEBUGMSG(("selectSize: called with nullptr value\n"));
 		[_sizeList setAllowsEmptySelection:YES];
 		[_sizeList deselectAll:nil];
 		return;

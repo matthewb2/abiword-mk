@@ -64,7 +64,7 @@ bool ABI_Collab_Import::_isOverlapping(UT_sint32 pos1, UT_sint32 length1, UT_sin
 		return (pos2 + length2 - 1 >= pos1);
 }
 
-void ABI_Collab_Import::_calculateCollisionSeqence(UT_sint32 iIncomingRemoteRev, const UT_UTF8String& sIncomingDocUUID, UT_sint32& iStart, UT_sint32& iEnd)
+void ABI_Collab_Import::_calculateCollisionSeqence(UT_sint32 iIncomingRemoteRev, const std::string& sIncomingDocUUID, UT_sint32& iStart, UT_sint32& iEnd)
 {
 	UT_DEBUGMSG(("ABI_Collab_Import::_calculateCollisionSeqence() - iIncomingRemoteRev: %d\n", iIncomingRemoteRev));
 
@@ -90,8 +90,8 @@ void ABI_Collab_Import::_calculateCollisionSeqence(UT_sint32 iIncomingRemoteRev,
 	    ChangeAdjust * pChange = pExpAdjusts->getNthItem(i);
 		if (pChange)
 		{
-		    UT_DEBUGMSG(("Looking at exported changerecord - rev: %d, pos: %d, length: %d adjust %d, queue pos: %d, orig uuid: %s\n", 
-						pChange->getLocalRev(), pChange->getLocalPos(), pChange->getLocalLength(), pChange->getLocalAdjust(), i, pChange->getRemoteDocUUID().utf8_str()));
+		    UT_DEBUGMSG(("Looking at exported changerecord - rev: %d, pos: %d, length: %d adjust %d, queue pos: %d, orig uuid: %s\n",
+						pChange->getLocalRev(), pChange->getLocalPos(), pChange->getLocalLength(), pChange->getLocalAdjust(), i, pChange->getRemoteDocUUID().c_str()));
 
 		    if (iIncomingRemoteRev >= pChange->getLocalRev())
 		    {
@@ -125,7 +125,7 @@ void ABI_Collab_Import::_calculateCollisionSeqence(UT_sint32 iIncomingRemoteRev,
 	}
 }
 
-UT_sint32 ABI_Collab_Import::_getIncomingAdjustmentForState(const UT_GenericVector<ChangeAdjust *>* pExpAdjusts, UT_sint32 iStart, UT_sint32 iEnd, UT_sint32 iIncomingPos, UT_sint32 iIncomingLength, const UT_UTF8String& sIncomingUUID, std::deque<int>& incAdjs)
+UT_sint32 ABI_Collab_Import::_getIncomingAdjustmentForState(const UT_GenericVector<ChangeAdjust *>* pExpAdjusts, UT_sint32 iStart, UT_sint32 iEnd, UT_sint32 iIncomingPos, UT_sint32 iIncomingLength, const std::string& sIncomingUUID, std::deque<int>& incAdjs)
 {
 	UT_DEBUGMSG(("ABI_Collab_Import::_getIncomingAdjustmentForState()\n"));
 	UT_return_val_if_fail(pExpAdjusts, 0);
@@ -194,7 +194,7 @@ UT_sint32 ABI_Collab_Import::_getIncomingAdjustmentForState(const UT_GenericVect
 bool ABI_Collab_Import::_checkForCollision(const AbstractChangeRecordSessionPacket& acrsp, UT_sint32& iRev, UT_sint32& iImportAdjustment)
 {
 	UT_DEBUGMSG(("ABI_Collab_Import::_checkForCollision() - pos: %d, length: %d, UUID: %s, remoterev: %d\n", 
-				 acrsp.getPos(), acrsp.getLength(), acrsp.getDocUUID().utf8_str(), acrsp.getRemoteRev()));
+				 acrsp.getPos(), acrsp.getLength(), acrsp.getDocUUID().c_str(), acrsp.getRemoteRev()));
 
 	ABI_Collab_Export* pExport = m_pAbiCollab->getExport();
 	UT_return_val_if_fail(pExport, false);
@@ -227,7 +227,7 @@ bool ABI_Collab_Import::_checkForCollision(const AbstractChangeRecordSessionPack
 		ChangeAdjust* pChange = pExpAdjusts->getNthItem(i);
 		if (pChange)
 		{
-			UT_DEBUGMSG(("Looking at pChange->getRemoteDocUUID(): %s\n", pChange->getRemoteDocUUID().utf8_str()));
+			UT_DEBUGMSG(("Looking at pChange->getRemoteDocUUID(): %s\n", pChange->getRemoteDocUUID().c_str()));
 
 			if (pChange->getRemoteDocUUID() != acrsp.getDocUUID())
 			{
@@ -328,7 +328,7 @@ bool ABI_Collab_Import::_handleCollision(UT_sint32 iIncomingRev, UT_sint32 iLoca
 			{
 				if (pChange->getLocalRev() >= iLocalRev)
 				{
-					if (strcmp(m_pDoc->getOrigDocUUIDString(), pChange->getRemoteDocUUID().utf8_str()) == 0)
+					if (m_pDoc->getOrigDocUUIDString() == pChange->getRemoteDocUUID())
 					{
 						UT_DEBUGMSG(("UNDO-ING AND NUKING LOCAL CHANGE: EXPORT POSITION %d, pChange->m_iCRNumber: %d!\n", i, pChange->getLocalRev()));
 
@@ -514,9 +514,9 @@ bool ABI_Collab_Import::import(const SessionPacket& packet, BuddyPtr collaborato
 	// import will inherit this UUID
 
 
-	UT_UTF8String sRealDocname = m_pDoc->getOrigDocUUIDString();
-	UT_DEBUGMSG(("Temp. setting document UUID to %s\n", packet.getDocUUID().utf8_str()));
-	m_pDoc->setMyUUID(packet.getDocUUID().utf8_str());
+	std::string sRealDocname = m_pDoc->getOrigDocUUIDString();
+	UT_DEBUGMSG(("Temp. setting document UUID to %s\n", packet.getDocUUID().c_str()));
+	m_pDoc->setMyUUID(packet.getDocUUID().c_str());
 
 	// disable layout/view updates
 	UT_GenericVector<AV_View *> vecViews;
@@ -530,8 +530,8 @@ bool ABI_Collab_Import::import(const SessionPacket& packet, BuddyPtr collaborato
 	_enableUpdates(vecViews, packet.getClassType() == PCT_GlobSessionPacket);
 
 	// restore our own document UUID
-	m_pDoc->setMyUUID(sRealDocname.utf8_str());
-	
+	m_pDoc->setMyUUID(sRealDocname.c_str());
+
 	return bRes;
 }
 
@@ -648,8 +648,8 @@ bool ABI_Collab_Import::_import(const SessionPacket& packet, UT_sint32 iImportAd
 						const InsertSpan_ChangeRecordSessionPacket* icrsp = static_cast<const InsertSpan_ChangeRecordSessionPacket*>( crp );
 						UT_UCS4String UCSChars = const_cast<UT_UTF8String&>(icrsp->m_sText).ucs4_str();	// ugly, ucs4_str should be const func!
 						PP_AttrProp attrProp;
-						attrProp.setAttributes(const_cast<const gchar**>(icrsp->getAtts()));
-						attrProp.setProperties(const_cast<const gchar**>(icrsp->getProps()));
+						attrProp.setAttributes(PP_std_copyProps(const_cast<const gchar**>(icrsp->getAtts())));
+						attrProp.setProperties(PP_std_copyProps(const_cast<const gchar**>(icrsp->getProps())));
 						m_pDoc->insertSpan(pos,UCSChars.ucs4_str(),UCSChars.length(), &attrProp);
 						break;
 					}
@@ -689,12 +689,14 @@ bool ABI_Collab_Import::_import(const SessionPacket& packet, UT_sint32 iImportAd
 								return false;
 							}
 							const gchar * szName =  pStyle->getName();
-							const gchar * atts[3] = {PT_STYLE_ATTRIBUTE_NAME,szName,NULL};
-							m_pDoc->changeSpanFmt(PTC_SetExactly, pos, iPos2, atts, const_cast<const gchar**>( szProps ) );
+							const PP_PropertyVector atts = {
+								PT_STYLE_ATTRIBUTE_NAME, szName
+							};
+							m_pDoc->changeSpanFmt(PTC_SetExactly, pos, iPos2, atts, PP_std_copyProps(const_cast<const gchar**>(szProps)));
 						}
 						else
 						{
-							m_pDoc->changeSpanFmt(PTC_SetExactly, pos, iPos2, const_cast<const gchar**>(szAtts), const_cast<const gchar**>( szProps ) );
+							m_pDoc->changeSpanFmt(PTC_SetExactly, pos, iPos2, PP_std_copyProps(const_cast<const gchar**>(szAtts)), PP_std_copyProps(const_cast<const gchar**>(szProps)));
 						}
 						break;
 					}
@@ -707,7 +709,7 @@ bool ABI_Collab_Import::_import(const SessionPacket& packet, UT_sint32 iImportAd
 						
 						if((szProps != NULL) || (szAtts != NULL))
 						{
-							m_pDoc->insertStrux( pos, pts, const_cast<const gchar**>( szAtts ), const_cast<const gchar**>( szProps ) );
+							m_pDoc->insertStrux( pos, pts, PP_std_copyProps(const_cast<const gchar**>( szAtts )), PP_std_copyProps(const_cast<const gchar**>( szProps )) );
 						}
 						else
 						{
@@ -731,7 +733,7 @@ bool ABI_Collab_Import::_import(const SessionPacket& packet, UT_sint32 iImportAd
 						UT_return_val_if_fail(szProps != NULL || szAtts != NULL, false);
 
 						UT_DEBUGMSG(("Executing ChangeStrux pos= %d \n",pos));
-						m_pDoc->changeStruxFmt(PTC_SetExactly, pos, pos, const_cast<const gchar**>( szAtts ), const_cast<const gchar**>( szProps ), pts);
+						m_pDoc->changeStruxFmt(PTC_SetExactly, pos, pos, PP_std_copyProps(const_cast<const gchar**>( szAtts )), PP_std_copyProps(const_cast<const gchar**>( szProps )), pts);
 						
 						// TODO: this mask is waaaay to generic
 						XAP_Frame *pFrame = XAP_App::getApp()->getLastFocussedFrame();
@@ -747,15 +749,15 @@ bool ABI_Collab_Import::_import(const SessionPacket& packet, UT_sint32 iImportAd
 					{
 						const Object_ChangeRecordSessionPacket* ocrsp = static_cast<const Object_ChangeRecordSessionPacket*>( crp );
 						PTObjectType pto = ocrsp->getObjectType();
-						gchar** szAtts = ocrsp->getAtts();
-						gchar** szProps = ocrsp->getProps();
-						
+						const gchar** szAtts = const_cast<const gchar**>(ocrsp->getAtts());
+						const gchar** szProps = const_cast<const gchar**>(ocrsp->getProps());
 						if((szProps == NULL) && (szAtts == NULL))
 						{
 							UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
 							return false;
 						}
-						m_pDoc->insertObject(pos, pto, const_cast<const gchar**>( szAtts ), const_cast<const gchar**>( szProps ) );
+						m_pDoc->insertObject(pos, pto, PP_std_copyProps(szAtts),
+                                             PP_std_copyProps(szProps));
 						break;
 					}
 					case PX_ChangeRecord::PXT_DeleteObject:
@@ -778,7 +780,7 @@ bool ABI_Collab_Import::_import(const SessionPacket& packet, UT_sint32 iImportAd
 							UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
 							return false;
 						}
-						m_pDoc->changeSpanFmt(PTC_SetExactly, pos, pos + 1, const_cast<const gchar**>( szAtts ), const_cast<const gchar**>( szProps ));
+						m_pDoc->changeSpanFmt(PTC_SetExactly, pos, pos + 1, PP_std_copyProps(const_cast<const gchar**>( szAtts )), PP_std_copyProps(const_cast<const gchar**>( szProps )));
 						break;
 					}
                     case PX_ChangeRecord::PXT_ChangeDocRDF:
@@ -794,11 +796,10 @@ bool ABI_Collab_Import::_import(const SessionPacket& packet, UT_sint32 iImportAd
 							return false;
 						}
 
-                        {
-                            // update the local document RDF to remove
-                            // szAtts RDF and then add the szProps RDF
-                            m_pDoc->getDocumentRDF()->handleCollabEvent( szAtts, szProps );
-                        }                        
+                        // update the local document RDF to remove
+                        // szAtts RDF and then add the szProps RDF
+                        m_pDoc->getDocumentRDF()->handleCollabEvent(const_cast<const gchar**>(szAtts), const_cast<const gchar**>(szProps));
+
                         break;
                     }
 					case PX_ChangeRecord::PXT_InsertFmtMark:
@@ -816,7 +817,7 @@ bool ABI_Collab_Import::_import(const SessionPacket& packet, UT_sint32 iImportAd
 							UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
 							return false;
 						}
-						return m_pDoc->changeSpanFmt(PTC_SetExactly, pos, pos, const_cast<const gchar**>( szAtts ), const_cast<const gchar**>( szProps ));
+						return m_pDoc->changeSpanFmt(PTC_SetExactly, pos, pos, PP_std_copyProps(const_cast<const gchar**>( szAtts )), PP_std_copyProps(const_cast<const gchar**>( szProps )));
 					}
 					case PX_ChangeRecord::PXT_DeleteFmtMark:
 					{
@@ -833,7 +834,7 @@ bool ABI_Collab_Import::_import(const SessionPacket& packet, UT_sint32 iImportAd
 							UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
 							return false;
 						}
-						return m_pDoc->changeSpanFmt(PTC_SetExactly, pos, pos, const_cast<const gchar**>( szAtts ), const_cast<const gchar**>( szProps ));
+						return m_pDoc->changeSpanFmt(PTC_SetExactly, pos, pos, PP_std_copyProps(const_cast<const gchar**>( szAtts )), PP_std_copyProps(const_cast<const gchar**>( szProps )));
 					}
 					case PX_ChangeRecord::PXT_ChangePoint:
 					{
@@ -871,11 +872,10 @@ bool ABI_Collab_Import::_import(const SessionPacket& packet, UT_sint32 iImportAd
 						const char * szNameV = g_strdup(dp->getAttribute(PT_DATAITEM_ATTRIBUTE_NAME));
 						PD_DataItemHandle pHandle = NULL;
 						std::string sToken = dp->m_bTokenSet ? dp->m_sToken : "";
-						UT_ByteBuf * pBuf= new UT_ByteBuf();
+						UT_ByteBufPtr pBuf(new UT_ByteBuf);
 						UT_DEBUGMSG(("PXT_CreateDataItem: append image buffer @ 0x%p, %lu bytes, sToken %s\n", &dp->m_vecData[0], (long unsigned)dp->m_vecData.size(), sToken.c_str()));
 						pBuf->append(reinterpret_cast<const UT_Byte *>( &dp->m_vecData[0] ), dp->m_vecData.size() );
-						bool res = m_pDoc->createDataItem(szNameV,false,pBuf,sToken,&pHandle);
-						delete pBuf;
+						bool res = m_pDoc->createDataItem(szNameV, false, pBuf, sToken, &pHandle);
 						return res;
 					}
 					case PX_ChangeRecord::PXT_ChangeDocProp:
@@ -890,7 +890,7 @@ bool ABI_Collab_Import::_import(const SessionPacket& packet, UT_sint32 iImportAd
 						//
 						// Now direct the document to make the changes
 						//
-						return m_pDoc->changeDocPropeties(szAtts,szProps);
+						return m_pDoc->changeDocPropeties(PP_std_copyProps(szAtts), PP_std_copyProps(szProps));
 					}
 					default:
 					{

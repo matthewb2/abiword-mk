@@ -30,12 +30,10 @@
 #include <string>
 
 #include <glib.h>
-#include "ut_compiler.h"
-ABI_W_NO_CONST_QUAL
+
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gdk-pixbuf/gdk-pixbuf-loader.h>
 #include <gdk-pixbuf/gdk-pixbuf-io.h>
-ABI_W_POP
 
 #include "ut_debugmsg.h"
 #include "ut_types.h"
@@ -57,7 +55,7 @@ public:
 	IE_ImpGraphic_GdkPixbuf();
 	virtual ~IE_ImpGraphic_GdkPixbuf();
 
-	virtual UT_Error importGraphic(const UT_ConstByteBufPtr & pBB, FG_ConstGraphicPtr & pfg);
+	virtual UT_Error importGraphic(const UT_ConstByteBufPtr & pBB, FG_ConstGraphicPtr & pfg) override;
 
 private:
 
@@ -80,13 +78,13 @@ public:
 	IE_ImpGraphicGdkPixbuf_Sniffer();
 	virtual ~IE_ImpGraphicGdkPixbuf_Sniffer();
 
-	virtual const IE_SuffixConfidence * getSuffixConfidence ();
-	virtual const IE_MimeConfidence * getMimeConfidence ();
-	virtual UT_Confidence_t recognizeContents(const char * szBuf, UT_uint32 iNum);
+	virtual const IE_SuffixConfidence * getSuffixConfidence() override;
+	virtual const IE_MimeConfidence * getMimeConfidence() override;
+	virtual UT_Confidence_t recognizeContents(const char * szBuf, UT_uint32 iNum) override;
 	virtual bool getDlgLabels(const char ** pszDesc,
 							  const char ** pszSuffixList,
-							  IEGraphicFileType * ft);
-	virtual UT_Error constructImporter(IE_ImpGraphic **ppieg);
+							  IEGraphicFileType * ft) override;
+	virtual UT_Error constructImporter(IE_ImpGraphic **ppieg) override;
 };
 
 #endif // IE_IMPGRAPHIC_GDKPIXBUF_H

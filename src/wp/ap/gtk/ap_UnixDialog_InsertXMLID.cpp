@@ -52,9 +52,12 @@ static gboolean __onKeyPressed(G_GNUC_UNUSED GtkWidget* widget,
                                GdkEventKey* event,
                                G_GNUC_UNUSED gpointer user_data )
 {
-    guint32 uc = gdk_keyval_to_unicode(event->keyval);
+    guint ev_keyval = 0;
+    gdk_event_get_keyval((GdkEvent*)event, &ev_keyval);
+
+    guint32 uc = gdk_keyval_to_unicode(ev_keyval);
     xxx_UT_DEBUGMSG(("__onKeyPressed() uc: %u\n", uc));
-    
+
     if( uc >= 'A' && uc <= 'Z' )
     {
         return false;
@@ -67,17 +70,16 @@ static gboolean __onKeyPressed(G_GNUC_UNUSED GtkWidget* widget,
     {
         return false;
     }
-    if( event->keyval == GDK_KEY_Delete
-        || event->keyval == GDK_KEY_BackSpace
-        || event->keyval == GDK_KEY_Left
-        || event->keyval == GDK_KEY_Right )
+    if (ev_keyval == GDK_KEY_Delete
+        || ev_keyval == GDK_KEY_BackSpace
+        || ev_keyval == GDK_KEY_Left
+        || ev_keyval == GDK_KEY_Right)
     {
         return false;
     }
 
     // filter the rest
     return true;
-    
 }
 
 /*****************************************************************/
@@ -92,8 +94,8 @@ XAP_Dialog * AP_UnixDialog_InsertXMLID::static_constructor( XAP_DialogFactory * 
 AP_UnixDialog_InsertXMLID::AP_UnixDialog_InsertXMLID( XAP_DialogFactory * pDlgFactory,
                                                       XAP_Dialog_Id id )
 	: AP_Dialog_InsertXMLID(pDlgFactory,id)
-	, m_window(NULL)
-	, m_btInsert(NULL)
+	, m_window(nullptr)
+	, m_btInsert(nullptr)
 {
 }
 
@@ -231,7 +233,7 @@ AP_UnixDialog_InsertXMLID::_constructWindow(void)
     vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
     gtk_widget_show (vbox);
     gtk_container_add (GTK_CONTAINER (gtk_dialog_get_content_area(GTK_DIALOG (m_window))), vbox);
-    gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
+    XAP_gtk_widget_set_margin(vbox, 5);
 
     _constructWindowContents ( vbox );
 

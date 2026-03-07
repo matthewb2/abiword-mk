@@ -58,9 +58,8 @@
 
 IE_Exp_Text::IE_Exp_Text(PD_Document * pDocument, bool bEncoded)
 	: IE_Exp(pDocument),
-	  m_pListener(NULL),
+	  m_pListener(nullptr),
 	  m_bIsEncoded(false),
-	  m_szEncoding(0),
 	  m_bExplicitlySetEncoding(false),
 	  m_bIs16Bit(false),
 	  m_bUnicode(false),
@@ -71,7 +70,7 @@ IE_Exp_Text::IE_Exp_Text(PD_Document * pDocument, bool bEncoded)
 
 	// Get encoding dialog prefs setting
 	bool bAlwaysPrompt = false;
-	XAP_App::getApp()->getPrefsValueBool(AP_PREF_KEY_AlwaysPromptEncoding, &bAlwaysPrompt);
+	XAP_App::getApp()->getPrefsValueBool(AP_PREF_KEY_AlwaysPromptEncoding, bAlwaysPrompt);
 
 	m_bIsEncoded = bAlwaysPrompt | bEncoded;
 
@@ -84,9 +83,8 @@ IE_Exp_Text::IE_Exp_Text(PD_Document * pDocument, bool bEncoded)
 
 IE_Exp_Text::IE_Exp_Text(PD_Document * pDocument, const char * encoding)
   : IE_Exp(pDocument),
-    m_pListener(NULL),
+    m_pListener(nullptr),
     m_bIsEncoded(false),
-    m_szEncoding(0),
     m_bExplicitlySetEncoding(false),
     m_bIs16Bit(false),
     m_bUnicode(false),
@@ -95,7 +93,7 @@ IE_Exp_Text::IE_Exp_Text(PD_Document * pDocument, const char * encoding)
 {
   m_error = UT_OK;
   
-  m_bIsEncoded = ((encoding != NULL) && (strlen(encoding) > 0));
+  m_bIsEncoded = ((encoding != nullptr) && (strlen(encoding) > 0));
   
   if ( m_bIsEncoded )
     {
@@ -212,7 +210,7 @@ PL_Listener * IE_Exp_Text::_constructListener(void)
 		}
 	}
 
-	return new Text_Listener(getDoc(),this,(getDocRange()!=NULL),m_szEncoding,
+	return new Text_Listener(getDoc(),this,(getDocRange()!=nullptr), m_szEncoding.c_str(),
 							 m_bIs16Bit,m_bUnicode,m_bUseBOM,m_bBigEndian);
 }
 
@@ -228,7 +226,7 @@ PL_Listener * IE_Exp_Text::_constructListener(void)
 UT_Error IE_Exp_Text::_writeDocument(void)
 {
 	// Don't call base method if user cancels encoding dialog
-	if (!(!m_bIsEncoded || m_bExplicitlySetEncoding || _doEncodingDialog(m_szEncoding)))
+	if (!(!m_bIsEncoded || m_bExplicitlySetEncoding || _doEncodingDialog(m_szEncoding.c_str())))
 		return UT_SAVE_CANCELLED;
 
 	// TODO If we're going to the clipboard and the OS supports unicode, set encoding.
@@ -312,7 +310,7 @@ bool IE_Exp_Text::_doEncodingDialog(const char *szEncoding)
  */
 void IE_Exp_Text::_setEncoding(const char *szEncoding)
 {
-	m_szEncoding = szEncoding;
+	m_szEncoding = szEncoding ? szEncoding : "";
 
 	// TODO Should BOM use be a user pref?
 	// TODO Does Mac OSX prefer BOMs?
@@ -401,7 +399,7 @@ void Text_Listener::_genBOM(void)
 void Text_Listener::_genLineBreak(void)
 {
 	char *pMB = static_cast<char *>(m_mbLineBreak);
-	const UT_UCSChar *pWC = 0;
+	const UT_UCSChar *pWC = nullptr;
 	int mbLen = 0;
 
 	// TODO Old Mac should use "\r".  Mac OSX should Use U+2028 or U+2029.
@@ -499,10 +497,10 @@ void Text_Listener::_closeBlock(void)
 
 void Text_Listener::_handleDirMarker(PT_AttrPropIndex api)
 {
-	const PP_AttrProp * pAP = NULL;
+	const PP_AttrProp * pAP = nullptr;
 	bool bHaveProp = m_pDocument->getAttrProp (api, &pAP);
 	
-	UT_UCS4Char * pMarker = NULL;
+	UT_UCS4Char * pMarker = nullptr;
 		
 	if (bHaveProp && pAP)
 	{
@@ -510,7 +508,7 @@ void Text_Listener::_handleDirMarker(PT_AttrPropIndex api)
 		UT_UCS4Char cLRO = UCS_LRO;
 		UT_UCS4Char cPDF = UCS_PDF;
 
-		const gchar *szValue = NULL;
+		const gchar *szValue = nullptr;
 		if(pAP->getProperty("dir-override", szValue))
 		{
 			if(m_eDirOverride == DO_UNSET)
@@ -569,7 +567,7 @@ void Text_Listener::_handleDirMarker(PT_AttrPropIndex api)
 	else
 	{
 		UT_DEBUGMSG(("Text_Listener::_handleDirMarker: no props! (bHaveProp %d, pAP %p)\n",
-					 bHaveProp, pAP));
+					 bHaveProp, (void*)pAP));
 		UT_ASSERT_HARMLESS( UT_SHOULD_NOT_HAPPEN );
 	}
 
@@ -642,12 +640,12 @@ Text_Listener::Text_Listener(PD_Document * pDocument,
 	  m_eDocDir(DO_UNSET)
 {
 	PT_AttrPropIndex api = m_pDocument->getAttrPropIndex();
-	const PP_AttrProp * pAP = NULL;
+	const PP_AttrProp * pAP = nullptr;
 	bool bHaveProp = m_pDocument->getAttrProp (api, &pAP);
 
 	if (bHaveProp && pAP)
 	{
-		const gchar *szValue = NULL;
+		const gchar *szValue = nullptr;
 		if(pAP->getProperty("dom-dir", szValue))
 		{
 			if(!g_ascii_strcasecmp("rtl",szValue))
@@ -739,7 +737,7 @@ bool Text_Listener::populate(fl_ContainerLayout* /*sfh*/,
 				UT_return_val_if_fail(field, false);
 
 				m_pie->populateFields ();
-				if(field->getValue() != NULL) {
+				if(field->getValue() != nullptr) {
 					UT_UCS4String ws(field->getValue());
 					_outputData(ws.ucs4_str(),ws.length());
 				}
@@ -785,7 +783,7 @@ bool Text_Listener::populateStrux(pf_Frag_Strux* /*sdh*/,
 {
 	UT_return_val_if_fail(pcr->getType() == PX_ChangeRecord::PXT_InsertStrux, false);
 	const PX_ChangeRecord_Strux * pcrx = static_cast<const PX_ChangeRecord_Strux *>(pcr);
-	*psfh = 0;							// we don't need it.
+	*psfh = nullptr;						// we don't need it.
 
 	switch (pcrx->getStruxType())
 	{
@@ -795,12 +793,12 @@ bool Text_Listener::populateStrux(pf_Frag_Strux* /*sdh*/,
 		{
 			_closeBlock();
 			PT_AttrPropIndex api = pcr->getIndexAP();
-			const PP_AttrProp * pAP = NULL;
+			const PP_AttrProp * pAP = nullptr;
 			bool bHaveProp = m_pDocument->getAttrProp (api, &pAP);
 
 			if (bHaveProp && pAP)
 			{
-				const gchar *szValue = NULL;
+				const gchar *szValue = nullptr;
 				if(pAP->getProperty("dom-dir", szValue))
 				{
 					if(!g_ascii_strcasecmp("rtl",szValue))
@@ -826,24 +824,24 @@ bool Text_Listener::populateStrux(pf_Frag_Strux* /*sdh*/,
 			_closeBlock();
 			m_bInBlock = true;
 
-			const gchar * szValue = NULL;
+			const gchar * szValue = nullptr;
 
 			PT_AttrPropIndex api = pcr->getIndexAP();
-			const PP_AttrProp * pAP = NULL;
+			const PP_AttrProp * pAP = nullptr;
 			bool bHaveProp = m_pDocument->getAttrProp (api, &pAP);
 
 			m_bBreakExtra = false;
 
 			if (bHaveProp && pAP)
 			{
-				szValue = PP_evalProperty ("margin-top", 0, pAP, 0, m_pDocument, true);
+				szValue = PP_evalProperty("margin-top", nullptr, pAP, nullptr, m_pDocument, true);
 				if(szValue)
 				{
 					double inches = UT_convertToInches(szValue);
 					if (!m_bFirstWrite && (inches > 0.01))
 						m_pie->write(static_cast<const char *>(m_mbLineBreak),m_iLineBreakLen);
 				}
-				szValue = PP_evalProperty ("margin-bottom", 0, pAP, 0, m_pDocument, true);
+				szValue = PP_evalProperty("margin-bottom", nullptr, pAP, nullptr, m_pDocument, true);
 				if(szValue)
 				{
 					double inches = UT_convertToInches(szValue);
@@ -861,7 +859,7 @@ bool Text_Listener::populateStrux(pf_Frag_Strux* /*sdh*/,
 			{
 				if (bHaveProp && pAP)
 				{
-					szValue = NULL;
+					szValue = nullptr;
 					if(pAP->getProperty("dom-dir", szValue))
 					{
 						if(!g_ascii_strcasecmp("rtl",szValue))

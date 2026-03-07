@@ -1,9 +1,9 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t; -*- */
 
 /* AbiWord
  * Copyright (C) 1998-2000 AbiSource, Inc.
  * Copyright (C) 2002-2005 Francis James Franklin
- * Copyright (C) 2001-2005, 2009 Hubert Figuiere
+ * Copyright (C) 2001-2020 Hubert Figuière
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -40,6 +40,7 @@
 #include "ut_bytebuf.h"
 #include "ut_debugmsg.h"
 #include "ut_string.h"
+#include "ut_std_string.h"
 #include "ut_math.h"
 #include "ut_misc.h"
 #include "ut_png.h"
@@ -115,13 +116,13 @@ extern XAP_Dialog_MessageBox::tAnswer s_CouldNotLoadFileMessage(XAP_Frame * pFra
 */
 AP_CocoaApp::AP_CocoaApp(const char * szAppName)
     : AP_App(szAppName),
-	  m_pStringSet(0),
-	  m_pClipboard(0),
+	  m_pStringSet(nullptr),
+	  m_pClipboard(nullptr),
 	  m_bHasSelection(false),
 	  m_bSelectionInFlux(false),
-	  m_pViewSelection(0),
-	  m_cacheSelectionView(0),
-	  m_pFrameSelection(0)
+	  m_pViewSelection(nullptr),
+	  m_cacheSelectionView(nullptr),
+	  m_pFrameSelection(nullptr)
 {
 }
 
@@ -273,16 +274,13 @@ bool AP_CocoaApp::initialize(void)
 	    
 		// see if we should load an alternative set from the disk
 	    
-//		const char * szDirectory = NULL;
-		const char * szStringSet = NULL;
-	    
-		if (   (getPrefsValue(AP_PREF_KEY_StringSet,
-							  (const gchar**)&szStringSet))
-			   && (szStringSet)
-			   && (*szStringSet)
-			   && (strcmp(szStringSet,AP_PREF_DEFAULT_StringSet) != 0))
+//		const char * szDirectory = nullptr;
+		std::string sstringSet;
+
+		if (getPrefsValue(AP_PREF_KEY_StringSet, sstringSet)
+			&& !sstringSet.empty() && (sstringSet != AP_PREF_DEFAULT_StringSet))
 		{
-#if 0			
+#if 0
 			getPrefsValueDirectory(true,
 								   (const gchar*)AP_PREF_KEY_StringSetDirectory,
 								   (const gchar**)&szDirectory);
@@ -291,11 +289,11 @@ bool AP_CocoaApp::initialize(void)
 			std::string szPathname = szDirectory;
 			if (szDirectory[szPathname.size()-1]!='/')
 				szPathname += "/";
-			szPathname += szStringSet;
+			szPathname += sstringSet;
 			szPathname += ".strings";
 #endif
 
-			NSString* stringSet = [resources stringByAppendingPathComponent:[NSString stringWithFormat:@"AbiWord/strings/%s%@",szStringSet,@".strings"]];
+			NSString* stringSet = [resources stringByAppendingPathComponent:[NSString stringWithFormat:@"AbiWord/strings/%s%@", sstringSet.c_str(), @".strings"]];
 
 			AP_DiskStringSet * pDiskStringSet = new AP_DiskStringSet(this);
 			UT_ASSERT(pDiskStringSet);
@@ -323,7 +321,7 @@ bool AP_CocoaApp::initialize(void)
 		UT_DEBUGMSG(("Setting field type desc for type %d, desc=%s\n", fp_FieldTypes[i].m_Type, fp_FieldTypes[i].m_Desc));
     }
 
-    for (i = 0; fp_FieldFmts[i].m_Tag != NULL; i++)
+    for (i = 0; fp_FieldFmts[i].m_Tag != nullptr; i++)
     {
 		(&fp_FieldFmts[i])->m_Desc = m_pStringSet->getValue(fp_FieldFmts[i].m_DescId);
 		UT_DEBUGMSG(("Setting field desc for field %s, desc=%s\n", fp_FieldFmts[i].m_Tag, fp_FieldFmts[i].m_Desc));
@@ -333,32 +331,27 @@ bool AP_CocoaApp::initialize(void)
     /// Build a labelset so the plugins can add themselves to something ///
     ///////////////////////////////////////////////////////////////////////
 
-	const char * szMenuLabelSetName = NULL;
-	if (getPrefsValue( AP_PREF_KEY_StringSet, (const gchar**)&szMenuLabelSetName)
-		&& (szMenuLabelSetName) && (*szMenuLabelSetName))
-	{
+	std::string menuLabelSetName;
+	if (getPrefsValue(AP_PREF_KEY_StringSet, menuLabelSetName) && !menuLabelSetName.empty()) {
 		;
-	}
-	else {
-		szMenuLabelSetName = AP_PREF_DEFAULT_StringSet;
+	} else {
+		menuLabelSetName = AP_PREF_DEFAULT_StringSet;
 	}
 	FREEP(m_szMenuLabelSetName);
-	m_szMenuLabelSetName = g_strdup(szMenuLabelSetName);
+	m_szMenuLabelSetName = g_strdup(menuLabelSetName.c_str());
 	UT_ASSERT(m_szMenuLabelSetName);
 	if (!m_szMenuLabelSetName)
 		return false;
 	
 	getMenuFactory()->buildMenuLabelSet(m_szMenuLabelSetName);
-	const char * szMenuLayoutName = NULL;
-	if ((getPrefsValue(AP_PREF_KEY_MenuLayout, static_cast<const gchar**>(&szMenuLayoutName))) &&
-	    (szMenuLayoutName) && (*szMenuLayoutName)) {
+	std::string menuLayoutName;
+	if (getPrefsValue(AP_PREF_KEY_MenuLayout, menuLayoutName) && !menuLayoutName.empty()) {
 		;
-	}
-	else {
-		szMenuLayoutName = AP_PREF_DEFAULT_MenuLayout;
+	} else {
+		menuLayoutName = AP_PREF_DEFAULT_MenuLayout;
 	}
 	FREEP(m_szMenuLayoutName);
-	m_szMenuLayoutName = g_strdup(szMenuLayoutName);
+	m_szMenuLayoutName = g_strdup(menuLayoutName.c_str());
 	UT_ASSERT(m_szMenuLayoutName);
 	if (!m_szMenuLayoutName)
 		return false;
@@ -373,7 +366,7 @@ bool AP_CocoaApp::initialize(void)
 	abi_register_builtin_plugins();
 
 	bool bLoadPlugins = true;
-	bool bFound = getPrefsValueBool(XAP_PREF_KEY_AutoLoadPlugins,&bLoadPlugins);
+	bool bFound = getPrefsValueBool(XAP_PREF_KEY_AutoLoadPlugins, bLoadPlugins);
 	if(bLoadPlugins || !bFound)
 	{
 		XAP_CocoaAppController * pController = (XAP_CocoaAppController *) [NSApp delegate];
@@ -442,28 +435,22 @@ bool AP_CocoaApp::shutdown(void)
   \todo support meaningful return values.
 */
 bool AP_CocoaApp::getPrefsValueDirectory(bool bAppSpecific,
-										const gchar * szKey, const gchar ** pszValue) const
+										 const gchar * szKey, std::string& value) const
 {
     if (!m_prefs)
 		return false;
 
-    const gchar * psz = NULL;
-    if (!m_prefs->getPrefsValue(szKey,&psz))
-		return false;
+    if (!m_prefs->getPrefsValue(szKey, value)) {
+        return false;
+    }
 
-    if (*psz == '/')
-    {
-		*pszValue = psz;
-		return true;
+    if (value[0] == '/') {
+        return true;
     }
 
     const gchar * dir = ((bAppSpecific) ? getAbiSuiteAppDir() : getAbiSuiteLibDir());
 
-    static gchar buf[1024];
-    UT_ASSERT((strlen(dir) + strlen(psz) + 2) < sizeof(buf));
-	
-    snprintf(buf, 1024, "%s/%s",dir,psz);
-    *pszValue = buf;
+    value = UT_std_string_sprintf("%s/%s", dir, value.c_str());
     return true;
 }
 
@@ -557,7 +544,7 @@ static const char * aszFormatsAccepted[] = { XAP_CocoaClipboard::XAP_CLIPBOARD_R
 											 XAP_CocoaClipboard::XAP_CLIPBOARD_STRING,
 											 XAP_CocoaClipboard::XAP_CLIPBOARD_TEXTPLAIN_8BIT,
 											 XAP_CocoaClipboard::XAP_CLIPBOARD_IMAGE,
-											 0 /* must be last */ };
+											 nullptr /* must be last */ };
 
 /*!
   paste from the system clipboard using the best-for-us format
@@ -567,8 +554,8 @@ static const char * aszFormatsAccepted[] = { XAP_CocoaClipboard::XAP_CLIPBOARD_R
 void AP_CocoaApp::pasteFromClipboard(PD_DocumentRange * pDocRange, bool /*bUseClipboard*/,
 									bool bHonorFormatting)
 {
-    const char * szFormatFound = NULL;
-    unsigned char * pData = NULL;
+    const char * szFormatFound = nullptr;
+    unsigned char * pData = nullptr;
     UT_uint32 iLen = 0;
 
     bool bFoundOne = false;
@@ -578,9 +565,9 @@ void AP_CocoaApp::pasteFromClipboard(PD_DocumentRange * pDocRange, bool /*bUseCl
 	}
 	else {
 		const char * formats[] = {
-							XAP_CocoaClipboard::XAP_CLIPBOARD_TEXTPLAIN_8BIT, 
+							XAP_CocoaClipboard::XAP_CLIPBOARD_TEXTPLAIN_8BIT,
 							XAP_CocoaClipboard::XAP_CLIPBOARD_STRING,
-							NULL 
+							nullptr
 							};
 		bFoundOne = m_pClipboard->getClipboardData(formats,(void**)&pData,&iLen,&szFormatFound);
 	}
@@ -611,7 +598,7 @@ void AP_CocoaApp::pasteFromClipboard(PD_DocumentRange * pDocRange, bool /*bUseCl
 
     }
 	else if (strcmp(szFormatFound, XAP_CocoaClipboard::XAP_CLIPBOARD_IMAGE) == 0) {
-		  IE_ImpGraphic * pIEG = NULL;
+		  IE_ImpGraphic * pIEG = nullptr;
 		  FG_ConstGraphicPtr pFG;
 		  IEGraphicFileType iegft = IEGFT_Unknown;
 		  UT_Error error = UT_OK;
@@ -638,7 +625,7 @@ void AP_CocoaApp::pasteFromClipboard(PD_DocumentRange * pDocRange, bool /*bUseCl
 			  return;
 		  }
 		  
-		  bytes = NULL;
+		  bytes = nullptr;
 		  FV_View * pView = static_cast<FV_View*>(pFrame->getCurrentView());
 		  
 		  UT_UTF8String newName = UT_UTF8String_sprintf ( "paste_image_%d", UT_newNumber() ) ;
@@ -661,7 +648,7 @@ void AP_CocoaApp::pasteFromClipboard(PD_DocumentRange * pDocRange, bool /*bUseCl
   This should determine if we can paste from the
   cliboard. 
 */
-bool AP_CocoaApp::canPasteFromClipboard(void)
+bool AP_CocoaApp::canPasteFromClipboard(void) const
 {
     // first, try to see if we can paste from the clipboard
     bool bFoundOne = m_pClipboard->hasFormats(aszFormatsAccepted);
@@ -771,8 +758,8 @@ bool AP_CocoaApp::forgetFrame(XAP_Frame * pFrame)
     if (m_pFrameSelection && (pFrame==m_pFrameSelection))
     {
 		m_pClipboard->clearClipboard();
-		m_pFrameSelection = NULL;
-		m_pViewSelection = NULL;
+		m_pFrameSelection = nullptr;
+		m_pViewSelection = nullptr;
     }
 	
     return XAP_App::forgetFrame(pFrame);
@@ -828,7 +815,7 @@ void AP_CocoaApp::cacheCurrentSelection(AV_View * pView)
 
 		m_cacheSelectionView = pView;
 		UT_DEBUGMSG(("Clipboard::cacheCurrentSelection: [view %p][range %d %d]\n",
-					 pFVView,
+					 (void*)pFVView,
 					 m_cacheDocumentRangeOfSelection.m_pos1,
 					 m_cacheDocumentRangeOfSelection.m_pos2));
 		m_cacheDeferClear = false;
@@ -841,7 +828,7 @@ void AP_CocoaApp::cacheCurrentSelection(AV_View * pView)
 			m_bHasSelection = false;
 			m_pClipboard->clearClipboard();
 		}
-		m_cacheSelectionView = NULL;
+		m_cacheSelectionView = nullptr;
     }
 
     return;
@@ -864,9 +851,9 @@ bool AP_CocoaApp::getCurrentSelection(const char** formatList,
 {
     int j;
 	
-    *ppData = NULL;				// assume failure
+    *ppData = nullptr;				// assume failure
     *pLen = 0;
-    *pszFormatFound = NULL;
+    *pszFormatFound = nullptr;
 	
     if (!m_pViewSelection || !m_pFrameSelection || !m_bHasSelection)
 		return false;		// can't do it, give up.
@@ -885,7 +872,7 @@ bool AP_CocoaApp::getCurrentSelection(const char** formatList,
 		FV_View * pFVView = static_cast<FV_View *>(m_pViewSelection);
 	
 		pFVView->getDocumentRangeOfCurrentSelection(&dr);
-		UT_DEBUGMSG(("Clipboard::getCurrentSelection: [view %p][range %d %d]\n",pFVView,dr.m_pos1,dr.m_pos2));
+		UT_DEBUGMSG(("Clipboard::getCurrentSelection: [view %p][range %d %d]\n", (void*)pFVView, dr.m_pos1, dr.m_pos2));
     }
 	
     m_selectionByteBuf.truncate(0);
@@ -939,8 +926,9 @@ int AP_CocoaApp::main(const char * szAppName, int argc, char ** argv)
     // This is a static function.	
 
 #if !GLIB_CHECK_VERSION(2,32,0)
-    if (!g_thread_supported ())
-        g_thread_init (NULL);	
+    if (!g_thread_supported ()) {
+        g_thread_init(nullptr);
+    }
 #endif
     
     UT_DEBUGMSG(("Build ID:\t%s\n", XAP_App::s_szBuild_ID));
@@ -995,11 +983,11 @@ int AP_CocoaApp::main(const char * szAppName, int argc, char ** argv)
 		sa.sa_flags = 0;
 #endif
 		
-		sigaction(SIGSEGV, &sa, NULL);
-		sigaction(SIGBUS, &sa, NULL);
-		sigaction(SIGILL, &sa, NULL);
-		sigaction(SIGQUIT, &sa, NULL);
-		sigaction(SIGFPE, &sa, NULL);
+		sigaction(SIGSEGV, &sa, nullptr);
+		sigaction(SIGBUS, &sa, nullptr);
+		sigaction(SIGILL, &sa, nullptr);
+		sigaction(SIGQUIT, &sa, nullptr);
+		sigaction(SIGFPE, &sa, nullptr);
 		// TODO: handle SIGABRT
 		
 		// this function takes care of all the command line args.
@@ -1035,12 +1023,6 @@ int AP_CocoaApp::main(const char * szAppName, int argc, char ** argv)
 		[pool release];
 	}
     return 0;
-}
-
-void AP_CocoaApp::errorMsgBadArg(const char *msg)
-{
-	printf ("%s.\nRun '%s --help' to see a full list of available command line options.\n",
-			msg, g_get_prgname());
 }
 
 void AP_CocoaApp::errorMsgBadFile(XAP_Frame * pFrame, const char * file, 

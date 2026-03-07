@@ -54,12 +54,11 @@ struct FvTextHandlePrivate
   gulong draw_signal_id;
   gulong event_signal_id;
   gulong style_updated_id;
-  gulong composited_changed_id;
   guint realized : 1;
   guint mode : 2;
 };
 
-G_DEFINE_TYPE (FvTextHandle, _fv_text_handle, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE(FvTextHandle, _fv_text_handle, G_TYPE_OBJECT)
 
 static guint signals[LAST_SIGNAL] = { 0 };
 
@@ -73,16 +72,10 @@ _fv_text_handle_get_size (FvTextHandle *handle,
 
   priv = handle->priv;
 
-#if GTK_CHECK_VERSION (3, 6, 0)
   gtk_widget_style_get (priv->parent,
                         "text-handle-width", &w,
                         "text-handle-height", &h,
-                        NULL);
-#else
-  /* Hardcode default values from GTK+ 3.6 */
-  w = 16;
-  h = 20;
-#endif
+                        nullptr);
 
   if (width)
     *width = w;
@@ -134,12 +127,9 @@ _fv_text_handle_update_shape (FvTextHandle         *handle,
                               GdkWindow            *window,
                               FvTextHandlePosition  pos)
 {
-  FvTextHandlePrivate *priv;
   cairo_surface_t *surface;
   cairo_region_t *region;
   cairo_t *cr;
-
-  priv = handle->priv;
 
   surface =
     gdk_window_create_similar_surface (window,
@@ -153,8 +143,8 @@ _fv_text_handle_update_shape (FvTextHandle         *handle,
 
   region = gdk_cairo_region_create_from_surface (surface);
 
-  if (gtk_widget_is_composited (priv->parent))
-    gdk_window_shape_combine_region (window, NULL, 0, 0);
+  if (gdk_screen_is_composited(gdk_window_get_screen(window)))
+    gdk_window_shape_combine_region (window, nullptr, 0, 0);
   else
     gdk_window_shape_combine_region (window, region, 0, 0);
 
@@ -169,7 +159,6 @@ _fv_text_handle_create_window (FvTextHandle         *handle,
                                FvTextHandlePosition  pos)
 {
   FvTextHandlePrivate *priv;
-  GdkRGBA bg = { 0, 0, 0, 0 };
   GdkWindowAttr attributes;
   GdkWindow *window;
   GdkVisual *visual;
@@ -180,7 +169,7 @@ _fv_text_handle_create_window (FvTextHandle         *handle,
   attributes.x = 0;
   attributes.y = 0;
   _fv_text_handle_get_size (handle, &attributes.width, &attributes.height);
-  attributes.window_type = GDK_WINDOW_TEMP;
+  attributes.window_type = GDK_WINDOW_CHILD;
   attributes.wclass = GDK_INPUT_OUTPUT;
   attributes.event_mask = (GDK_EXPOSURE_MASK |
                            GDK_BUTTON_PRESS_MASK |
@@ -197,9 +186,8 @@ _fv_text_handle_create_window (FvTextHandle         *handle,
       mask |= GDK_WA_VISUAL;
     }
 
-  window = gdk_window_new (NULL, &attributes, mask);
+  window = gdk_window_new (gtk_widget_get_window(priv->parent), &attributes, mask);
   gdk_window_set_user_data (window, priv->parent);
-  gdk_window_set_background_rgba (window, &bg);
 
   _fv_text_handle_update_shape (handle, window, pos);
 
@@ -240,34 +228,42 @@ fv_text_handle_widget_event (GtkWidget    * /*widget*/,
 
   priv = handle->priv;
 
-  if (event->any.window == priv->windows[FV_TEXT_HANDLE_POSITION_SELECTION_START].window)
+  auto window = gdk_event_get_window(event);
+  if (window == priv->windows[FV_TEXT_HANDLE_POSITION_SELECTION_START].window)
     pos = FV_TEXT_HANDLE_POSITION_SELECTION_START;
-  else if (event->any.window == priv->windows[FV_TEXT_HANDLE_POSITION_SELECTION_END].window)
+  else if (window == priv->windows[FV_TEXT_HANDLE_POSITION_SELECTION_END].window)
     pos = FV_TEXT_HANDLE_POSITION_SELECTION_END;
   else
     return FALSE;
 
-  if (event->type == GDK_BUTTON_PRESS)
+  gdouble ev_x, ev_y;
+  ev_x = ev_y = 0.0f;
+  gdk_event_get_coords(event, &ev_x, &ev_y);
+  GdkEventType ev_type = gdk_event_get_event_type(event);
+  if (ev_type == GDK_BUTTON_PRESS)
     {
-      priv->windows[pos].dx = event->button.x;
-      priv->windows[pos].dy = event->button.y;
+      priv->windows[pos].dx = ev_x;
+      priv->windows[pos].dy = ev_y;
       priv->windows[pos].dragged = TRUE;
     }
-  else if (event->type == GDK_BUTTON_RELEASE)
+  else if (ev_type == GDK_BUTTON_RELEASE)
     {
       g_signal_emit (handle, signals[DRAG_FINISHED], 0, pos);
       priv->windows[pos].dx =  priv->windows[pos].dy = 0;
       priv->windows[pos].dragged = FALSE;
     }
-  else if (event->type == GDK_MOTION_NOTIFY && priv->windows[pos].dragged)
+  else if (ev_type == GDK_MOTION_NOTIFY && priv->windows[pos].dragged)
     {
       gint x, y, width, height;
 
       _fv_text_handle_get_size (handle, &width, &height);
       gdk_window_get_origin (priv->relative_to, &x, &y);
 
-      x = event->motion.x_root - priv->windows[pos].dx + (width / 2) - x;
-      y = event->motion.y_root - priv->windows[pos].dy - y;
+      gdouble ev_x_root, ev_y_root;
+      ev_x_root = ev_y_root = 0;
+      gdk_event_get_root_coords(event, &ev_x_root, &ev_y_root);
+      x = ev_x_root - priv->windows[pos].dx + (width / 2) - x;
+      y = ev_y_root - priv->windows[pos].dy - y;
 
       if (pos == FV_TEXT_HANDLE_POSITION_SELECTION_START)
         y += height;
@@ -316,8 +312,7 @@ _fv_text_handle_update_window_state (FvTextHandle         *handle,
 
 static void
 _fv_text_handle_update_window (FvTextHandle         *handle,
-                               FvTextHandlePosition  pos,
-                               gboolean              recreate)
+                               FvTextHandlePosition  pos)
 {
   FvTextHandlePrivate *priv;
   HandleWindow *handle_window;
@@ -328,27 +323,14 @@ _fv_text_handle_update_window (FvTextHandle         *handle,
   if (!handle_window->window)
     return;
 
-  if (recreate)
-    {
-      gdk_window_destroy (handle_window->window);
-      handle_window->window = _fv_text_handle_create_window (handle, pos);
-    }
-
   _fv_text_handle_update_window_state (handle, pos);
 }
 
 static void
 _fv_text_handle_update_windows (FvTextHandle *handle)
 {
-  _fv_text_handle_update_window (handle, FV_TEXT_HANDLE_POSITION_SELECTION_START, FALSE);
-  _fv_text_handle_update_window (handle, FV_TEXT_HANDLE_POSITION_SELECTION_END, FALSE);
-}
-
-static void
-_fv_text_handle_composited_changed (FvTextHandle *handle)
-{
-  _fv_text_handle_update_window (handle, FV_TEXT_HANDLE_POSITION_SELECTION_START, TRUE);
-  _fv_text_handle_update_window (handle, FV_TEXT_HANDLE_POSITION_SELECTION_END, TRUE);
+  _fv_text_handle_update_window (handle, FV_TEXT_HANDLE_POSITION_SELECTION_START);
+  _fv_text_handle_update_window (handle, FV_TEXT_HANDLE_POSITION_SELECTION_END);
 }
 
 static void
@@ -357,7 +339,7 @@ fv_text_handle_constructed (GObject *object)
   FvTextHandlePrivate *priv;
 
   priv = FV_TEXT_HANDLE (object)->priv;
-  g_assert (priv->parent != NULL);
+  g_assert (priv->parent != nullptr);
 
   priv->draw_signal_id =
     g_signal_connect (priv->parent, "draw",
@@ -367,10 +349,6 @@ fv_text_handle_constructed (GObject *object)
     g_signal_connect (priv->parent, "event",
                       G_CALLBACK (fv_text_handle_widget_event),
                       object);
-  priv->composited_changed_id =
-    g_signal_connect_swapped (priv->parent, "composited-changed",
-                              G_CALLBACK (_fv_text_handle_composited_changed),
-                              object);
   priv->style_updated_id =
     g_signal_connect_swapped (priv->parent, "style-updated",
                               G_CALLBACK (_fv_text_handle_update_windows),
@@ -398,9 +376,6 @@ fv_text_handle_finalize (GObject *object)
 
   if (g_signal_handler_is_connected (priv->parent, priv->event_signal_id))
     g_signal_handler_disconnect (priv->parent, priv->event_signal_id);
-
-  if (g_signal_handler_is_connected (priv->parent, priv->composited_changed_id))
-    g_signal_handler_disconnect (priv->parent, priv->composited_changed_id);
 
   if (g_signal_handler_is_connected (priv->parent, priv->style_updated_id))
     g_signal_handler_disconnect (priv->parent, priv->style_updated_id);
@@ -475,7 +450,7 @@ _fv_text_handle_class_init (FvTextHandleClass *klass)
 		  G_OBJECT_CLASS_TYPE (object_class),
 		  G_SIGNAL_RUN_LAST,
 		  G_STRUCT_OFFSET (FvTextHandleClass, handle_dragged),
-		  NULL, NULL,
+		  nullptr, nullptr,
                   g_cclosure_marshal_generic,
 		  G_TYPE_NONE, 3,
                   G_TYPE_INT, G_TYPE_INT, G_TYPE_INT);
@@ -483,7 +458,7 @@ _fv_text_handle_class_init (FvTextHandleClass *klass)
     g_signal_new ("drag-finished",
 		  G_OBJECT_CLASS_TYPE (object_class),
 		  G_SIGNAL_RUN_LAST, 0,
-		  NULL, NULL,
+		  nullptr, nullptr,
                   g_cclosure_marshal_VOID__INT,
                   G_TYPE_NONE, 1, G_TYPE_INT);
 
@@ -502,8 +477,6 @@ _fv_text_handle_class_init (FvTextHandleClass *klass)
                                                         "Window the coordinates are based upon",
                                                         GDK_TYPE_WINDOW,
                                                         (GParamFlags)G_PARAM_READWRITE));
-
-  g_type_class_add_private (object_class, sizeof (FvTextHandlePrivate));
 }
 
 static void
@@ -512,9 +485,7 @@ _fv_text_handle_init (FvTextHandle *handle)
   FvTextHandlePrivate *priv;
   GtkWidgetPath *path;
 
-  handle->priv = priv = G_TYPE_INSTANCE_GET_PRIVATE (handle,
-                                                     FV_TYPE_TEXT_HANDLE,
-                                                     FvTextHandlePrivate);
+  handle->priv = priv = (FvTextHandlePrivate*)_fv_text_handle_get_instance_private(handle);
 
   path = gtk_widget_path_new ();
   gtk_widget_path_append_type (path, FV_TYPE_TEXT_HANDLE);
@@ -529,7 +500,7 @@ _fv_text_handle_new (GtkWidget *parent)
 {
 	return (FvTextHandle *)g_object_new (FV_TYPE_TEXT_HANDLE,
                        "parent", parent,
-                       NULL);
+                       nullptr);
 }
 
 void
@@ -561,9 +532,9 @@ _fv_text_handle_set_relative_to (FvTextHandle *handle,
     }
   else
     {
-      priv->windows[FV_TEXT_HANDLE_POSITION_SELECTION_START].window = NULL;
-      priv->windows[FV_TEXT_HANDLE_POSITION_SELECTION_END].window = NULL;
-      priv->relative_to = NULL;
+      priv->windows[FV_TEXT_HANDLE_POSITION_SELECTION_START].window = nullptr;
+      priv->windows[FV_TEXT_HANDLE_POSITION_SELECTION_END].window = nullptr;
+      priv->relative_to = nullptr;
       priv->realized = FALSE;
     }
 

@@ -1,4 +1,4 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 
 /* AbiWord
  * Copyright (C) 2001 AbiSource, Inc.
@@ -23,6 +23,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ut_std_string.h"
+
 #include "ie_imp_OPML.h"
 #include "ie_types.h"
 #include "xap_Module.h"
@@ -44,7 +46,7 @@ ABI_PLUGIN_DECLARE("OPML")
 
 #define PLUGIN_NAME "AbiOPML::OPML"
 
-static IE_Imp_OPML_Sniffer * m_sniffer = 0;
+static IE_Imp_OPML_Sniffer * m_sniffer = nullptr;
 
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_register (XAP_ModuleInfo * mi)
@@ -69,17 +71,17 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-	mi->name    = 0;
-	mi->desc    = 0;
-	mi->version = 0;
-	mi->author  = 0;
-	mi->usage   = 0;
+	mi->name = nullptr;
+	mi->desc = nullptr;
+	mi->version = nullptr;
+	mi->author = nullptr;
+	mi->usage = nullptr;
 
 	UT_return_val_if_fail(m_sniffer, 0);
 
 	IE_Imp::unregisterImporter (m_sniffer);
 	delete m_sniffer;
-	m_sniffer = 0;
+	m_sniffer = nullptr;
 
 	return 1;
 }
@@ -179,7 +181,7 @@ IE_Imp_OPML::IE_Imp_OPML(PD_Document * pDocument)
 	m_iOutlineDepth(0),
 	m_sMetaTag("")
 {
-	m_utvLists.addItem((fl_AutoNum *)NULL);
+	m_utvLists.push_back(fl_AutoNumConstPtr());
 }
 
 IE_Imp_OPML::~IE_Imp_OPML() 
@@ -265,7 +267,7 @@ void IE_Imp_OPML::startElement(const gchar *name, const gchar **atts)
 			m_parseState = _PS_Doc;
 			// append the section here (rather than the TT_SECTION case) in case
 			// the file is lacking a body element
-			X_CheckError(appendStrux(PTX_Section, NULL));
+			X_CheckError(appendStrux(PTX_Section, PP_NOPROPS));
 			return;
 		}
 
@@ -309,7 +311,7 @@ void IE_Imp_OPML::startElement(const gchar *name, const gchar **atts)
 			m_parseState = _PS_List;
 			m_iOutlineDepth++;
 
-			const gchar *text = NULL, *url = NULL;
+			const gchar *text = nullptr, *url = nullptr;
 
 			text = static_cast<const gchar*>(_getXMLPropValue("text", atts));
 			url = static_cast<const gchar*>(_getXMLPropValue("htmlUrl", atts));
@@ -326,11 +328,10 @@ void IE_Imp_OPML::startElement(const gchar *name, const gchar **atts)
 
 				if(url) // insert a hyperlink
 				{
-					const gchar *link[3];
-					link[0] = "xlink:href";
-					link[1] = url;
-					link[2] = NULL;
-					X_CheckError(appendObject(PTO_Hyperlink, const_cast<const gchar **>(link)));
+					PP_PropertyVector attr = {
+						"xlink:href", url
+					};
+					X_CheckError(appendObject(PTO_Hyperlink, attr));
 				}
 
 				UT_UCS4String span = text;
@@ -338,7 +339,7 @@ void IE_Imp_OPML::startElement(const gchar *name, const gchar **atts)
 
 				if(url)
 				{
-					X_CheckError(appendObject(PTO_Hyperlink, NULL));
+					X_CheckError(appendObject(PTO_Hyperlink, PP_NOPROPS));
 				}
 			}
 			return;
@@ -368,7 +369,7 @@ void IE_Imp_OPML::endElement(const gchar *name)
 			X_VerifyParseState(_PS_Doc);
 
 			if(!m_bOpenedBlock)
-				X_CheckError(appendStrux(PTX_Block, NULL));
+				X_CheckError(appendStrux(PTX_Block, PP_NOPROPS));
 
 			m_parseState = _PS_Init;
 			return;
@@ -431,71 +432,62 @@ void IE_Imp_OPML::_createBullet(void)
 
 	UT_return_if_fail(m_iOutlineDepth);
 
-	if(m_iOutlineDepth > m_utvLists.getItemCount())
-		m_utvLists.addItem((fl_AutoNum *)NULL);
+	if(m_iOutlineDepth > m_utvLists.size()) {
+		m_utvLists.push_back(fl_AutoNumConstPtr());
+	}
 
-	if(m_utvLists.getNthItem(m_iOutlineDepth - 1) == NULL)
-	{
+	if(!m_utvLists.at(m_iOutlineDepth - 1)) {
 		_createList();
 	}
 
-	const gchar *buf[11];
-	buf[0] = PT_STYLE_ATTRIBUTE_NAME;
-	buf[1] = "Bullet List";
-	buf[2] = PT_LEVEL_ATTRIBUTE_NAME;
-	buf[10] = NULL;
-
-	UT_String val;
+	std::string val;
 
 	if(m_utvLists[m_iOutlineDepth - 1])
-		UT_String_sprintf (val, "%d", m_utvLists[m_iOutlineDepth - 1]->getLevel());
+		val = UT_std_string_sprintf ("%d", m_utvLists[m_iOutlineDepth - 1]->getLevel());
 	else
 		val = "1";
 
-	buf[3] = (gchar *)g_strdup(val.c_str());
-	buf[4] = PT_LISTID_ATTRIBUTE_NAME;
+	PP_PropertyVector attr = {
+		PT_STYLE_ATTRIBUTE_NAME, "Bullet List",
+		PT_LEVEL_ATTRIBUTE_NAME, val,
+		PT_LISTID_ATTRIBUTE_NAME, "",
+		PT_PARENTID_ATTRIBUTE_NAME, "",
+		PT_PROPS_ATTRIBUTE_NAME, ""
+	};
 
 	if(m_utvLists[m_iOutlineDepth - 1])
-		UT_String_sprintf (val, "%d", m_utvLists[m_iOutlineDepth - 1]->getID());
+		val = UT_std_string_sprintf ("%d", m_utvLists[m_iOutlineDepth - 1]->getID());
 	else
-		UT_String_sprintf (val, "%d", ++m_iCurListID);
+		val = UT_std_string_sprintf ("%d", ++m_iCurListID);
 
-	buf[5] = (gchar *)g_strdup(val.c_str());
-	buf[6] = PT_PARENTID_ATTRIBUTE_NAME;
+	attr[5] = val;
 
 	if(m_utvLists[m_iOutlineDepth - 1])
-		UT_String_sprintf (val, "%d", m_utvLists[m_iOutlineDepth - 1]->getParentID());
+		val = UT_std_string_sprintf ("%d", m_utvLists[m_iOutlineDepth - 1]->getParentID());
 	else
 		val = "0";
 
-	buf[7] = (gchar *)g_strdup(val.c_str());
-	buf[8] = PT_PROPS_ATTRIBUTE_NAME;
+	attr[7] = val;
 
 	val = "start-value:0; list-style:Bullet List;";
-	val += UT_String_sprintf(" margin-left:%fin", (m_iOutlineDepth * 0.5)); //set the indent
+	val += UT_std_string_sprintf(" margin-left:%fin", (m_iOutlineDepth * 0.5)); //set the indent
 
-	buf[9] = (gchar *)g_strdup(val.c_str());
+	attr[9] = val;
 
-	X_CheckError(appendStrux(PTX_Block, const_cast<const gchar **>(buf)));
+	X_CheckError(appendStrux(PTX_Block, attr));
 	m_bOpenedBlock = true;
 
 	// add the list label
-	const gchar * buf2 [3];
-	buf2[0] = PT_TYPE_ATTRIBUTE_NAME;
-	buf2[1] = "list_label";
-	buf2[2] = NULL;
+	PP_PropertyVector attr2 = {
+		PT_TYPE_ATTRIBUTE_NAME, "list_label"
+	};
 
-	X_CheckError(appendObject (PTO_Field, const_cast<const gchar **>(buf2)));
-	X_CheckError(appendFmt (const_cast<const gchar **>(buf2)));
+	X_CheckError(appendObject (PTO_Field, attr2));
+	X_CheckError(appendFmt (attr2));
 	UT_UCSChar ucs = UCS_TAB;
 	appendSpan(&ucs,1);
 	_popInlineFmt();
-	X_CheckError(appendFmt (static_cast<const gchar **>(NULL)));
-
-	FREEP(buf[3]);
-	FREEP(buf[5]);
-	FREEP(buf[7]);
-	FREEP(buf[9]);
+	X_CheckError(appendFmt (PP_NOPROPS));
 }
 
 void IE_Imp_OPML::_createList(void)
@@ -520,22 +512,13 @@ void IE_Imp_OPML::_createList(void)
 	}
 
 	/* creates the new list */
-	fl_AutoNum *an = new fl_AutoNum (
-			m_iCurListID,
-			pid,
-			BULLETED_LIST,
-			0,
-			(const gchar *)"%L.",
-			(const gchar *)"",
-			getDoc(),
-			NULL
-		);
+	fl_AutoNumPtr an = std::make_shared<fl_AutoNum>(
+		m_iCurListID, pid, BULLETED_LIST, 0, "%L.", "", getDoc(), nullptr);
 	getDoc()->addList(an);
 	an->setLevel(m_iOutlineDepth);
 
 	/* register it in the vector */
-	if(m_utvLists.setNthItem((m_iOutlineDepth - 1), an, NULL) == -1)
-		UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
+	m_utvLists[m_iOutlineDepth - 1] = an;
 
 	/* increment the id counter, so that it is unique */
 	m_iCurListID++;

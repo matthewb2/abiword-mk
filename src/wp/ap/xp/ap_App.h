@@ -1,6 +1,7 @@
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t -*- */
 /* AbiWord
  * Copyright (C) 2002 Dom Lachowicz and others
- * Copyright (C) 2004, 2009 Hubert Figuiere
+ * Copyright (C) 2004, 2009, 2019 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -63,16 +64,19 @@ class ABI_EXPORT AP_App : public XAP_App_BaseClass
 	/* Command line stuff. */
 
 	/* Print an error message.  eg printf on UNIX, MessageBox on Windows. */
-	virtual void errorMsgBadArg (AP_Args *, int);
 	virtual void errorMsgBadFile(XAP_Frame *, const char *, UT_Error);
 
 	/* Allow additional platform-specific windowless args. */
 	virtual bool doWindowlessArgs (const AP_Args *, bool & bSuccess);
 
+	/** Open a single file from a URI. Called by openCmdLindFiles
+	 * @returns the new frame
+	 */
+	XAP_Frame* openFile(const char* uri, const char* file = nullptr);
 	bool openCmdLineFiles(const AP_Args * args);
 	bool openCmdLinePlugins(const AP_Args * args, bool & bSuccess);
 protected:
-	void saveRecoveryFiles();
+	virtual void saveRecoveryFiles() override;
  private:
 
 };

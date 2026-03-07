@@ -131,7 +131,7 @@ GtkWidget * XAP_UnixDialog_WindowMore::_constructWindow(void)
 	GtkTreeViewColumn *column;
 	
 	// load the dialog from the UI file
-	GtkBuilder* builder = newDialogBuilder("xap_UnixDlg_WindowMore.ui");
+	GtkBuilder* builder = newDialogBuilderFromResource("xap_UnixDlg_WindowMore.ui");
 	
 	// Update our member variables with the important widgets that 
 	// might need to be queried or altered later
@@ -151,7 +151,7 @@ GtkWidget * XAP_UnixDialog_WindowMore::_constructWindow(void)
 													   renderer,
 													   "text", 
 													   0,
-													   NULL);
+													   nullptr);
 	gtk_tree_view_append_column( GTK_TREE_VIEW(m_listWindows), column);
 	
 	// connect a dbl-clicked signal to the column
@@ -183,7 +183,7 @@ void XAP_UnixDialog_WindowMore::_populateWindowData(void)
 		// Add a new row to the model
 		gtk_list_store_append (model, &iter);		
 		gtk_list_store_set (model, &iter,
-							0, f->getTitle().utf8_str(),
+							0, f->getTitle().c_str(),
 							1, i,
 							-1);
     } 

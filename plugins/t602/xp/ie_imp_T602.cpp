@@ -30,6 +30,7 @@
 #include "ut_debugmsg.h"
 #include "pd_Document.h"
 #include "ut_string_class.h"
+#include "ut_std_string.h"
 #include "xap_Prefs.h"
 #include "ie_imp_T602.h"
 #include "xap_App.h"
@@ -53,7 +54,7 @@ ABI_PLUGIN_DECLARE("T602")
 
 // completely generic code to allow this to be a plugin
 
-static IE_Imp_T602_Sniffer * m_sniffer = 0;
+static IE_Imp_T602_Sniffer * m_sniffer = nullptr;
 
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_register (XAP_ModuleInfo * mi)
@@ -81,17 +82,17 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-	mi->name    = 0;
-	mi->desc    = 0;
-	mi->version = 0;
-	mi->author  = 0;
-	mi->usage   = 0;
+	mi->name = nullptr;
+	mi->desc = nullptr;
+	mi->version = nullptr;
+	mi->author = nullptr;
+	mi->usage = nullptr;
 
 	UT_ASSERT (m_sniffer);
 
 	IE_Imp::unregisterImporter (m_sniffer);
 	delete m_sniffer;
-	m_sniffer = 0;
+	m_sniffer = nullptr;
 
 	return 1;
 }
@@ -153,7 +154,7 @@ bool	IE_Imp_T602_Sniffer::getDlgLabels (const char ** pszDesc,
 /****************************************************************************/
 
 IE_Imp_T602::IE_Imp_T602(PD_Document * pDocument)
-  : IE_Imp (pDocument), m_importFile(NULL), m_charset(1), m_family("Courier"),
+  : IE_Imp (pDocument), m_importFile(nullptr), m_charset(1), m_family("Courier"),
     m_basefamily("Courier"), m_softcr(1), m_basesize( 10 ), 
     m_size(10), m_lmargin ( "1.0000in" ), m_rmargin ( "1.0000in" ), 
     m_bold(0), m_italic(0), m_underline(0),
@@ -302,7 +303,7 @@ UT_uint16 IE_Imp_T602::_conv(unsigned char c)
 bool IE_Imp_T602::_getbyte(unsigned char &c)
 {
 	UT_ASSERT(m_importFile);
-	return (gsf_input_read (m_importFile, 1, &c) != NULL);
+	return (gsf_input_read (m_importFile, 1, &c) != nullptr);
 }
 
 UT_Error IE_Imp_T602::_writeheader()
@@ -331,7 +332,7 @@ UT_Error IE_Imp_T602::_writeTP()
   UT_DEBUGMSG(("T602: text-prop:\"%s\"]\n",buff.c_str()));
   pps[0]="props";
   pps[1]=buff.c_str();
-  pps[2]=NULL;
+  pps[2]=nullptr;
   X_CheckDocError(appendFmt(pps))
   return UT_OK;
 }
@@ -339,36 +340,34 @@ UT_Error IE_Imp_T602::_writeTP()
 UT_Error IE_Imp_T602::_writePP()
 {
   UT_DEBUGMSG(("T602: Append paragraph properties\n"));
-  UT_String buff;
-  const gchar* pps[3];
+  std::string buff;
 
   // Don't put %1.1f here!! Locales could fuck it...
-  UT_String_sprintf(buff,"line-height: %d.%d",
-		    (m_lheight+1)/2,((m_lheight+1)%2)*5); 
-		  
-UT_DEBUGMSG(("T602: par-prop:\"%s\"]\n",buff.c_str()));
-  pps[0]="props";
-  pps[1]=buff.c_str();
-  pps[2]=NULL;
-  X_CheckDocError(appendStrux(PTX_Block,pps))
+  buff = UT_std_string_sprintf("line-height: %d.%d",
+                               (m_lheight+1)/2,((m_lheight+1)%2)*5);
+
+  UT_DEBUGMSG(("T602: par-prop:\"%s\"]\n",buff.c_str()));
+
+  const PP_PropertyVector pps = {
+      "props", buff
+  };
+  X_CheckDocError(appendStrux(PTX_Block, pps))
   return UT_OK;
 }
 
 UT_Error IE_Imp_T602::_writeSP()
 {
   UT_DEBUGMSG(("T602: Append section\n"));
-  const gchar* sps[7];
-  UT_String bf1, bf2, buff;
-  int i=2;
+  std::string bf1, bf2;
 
-  sps[0]="props";
-  UT_String_sprintf(buff,"page-margin-left: %s; page-margin-right: %s",
+  std::string buff = UT_std_string_sprintf("page-margin-left: %s; page-margin-right: %s",
 		  m_lmargin.c_str(),
 		  m_rmargin.c_str());
-  sps[1]=buff.c_str();
-  sps[i]=NULL;
-  
-  if (!m_footer && !m_header) 
+  PP_PropertyVector sps = {
+      "props", buff
+  };
+
+  if (!m_footer && !m_header)
     {
       X_CheckDocError(appendStrux(PTX_Section,sps))
     }
@@ -376,20 +375,17 @@ UT_Error IE_Imp_T602::_writeSP()
     {
   if (m_header)
   {
-    sps[i]="header";
-   UT_String_sprintf(bf1,"%d",m_header);
-   sps[i+1]=static_cast<const gchar *>(bf1.c_str());
-   i=2;
+      sps.push_back("header");
+      bf1 = UT_std_string_sprintf("%d", m_header);
+      sps.push_back(bf1);
   }
   if (m_footer)
   {
-   sps[i]="footer";
-   UT_String_sprintf(bf2,"%d",m_footer);
-   sps[i+1]=static_cast<const gchar *>(bf2.c_str());
-   i+=2;
+      sps.push_back("footer");
+      bf2 = UT_std_string_sprintf("%d", m_footer);
+      sps.push_back(bf2);
   }
-  sps[i]=NULL;
-  X_CheckDocError(appendStrux(PTX_Section,sps))
+  X_CheckDocError(appendStrux(PTX_Section, sps))
     }
   return UT_OK;
 }
@@ -397,25 +393,21 @@ UT_Error IE_Imp_T602::_writeSP()
 UT_Error IE_Imp_T602::_write_fh(UT_String & fh, UT_uint32 id, bool hea)
 {
   UT_DEBUGMSG(("T602: Append footer/header section\n"));
-  const gchar* fhps[5];
-  const gchar* fps[5];
-  UT_String bf1;
-  UT_String buff;
+  std::string bf1;
   int i = 0;
-  bool slash=false;
+  bool slash = false;
 
-  UT_String_sprintf(bf1,"%d",id);
-  fhps[0]="id";
-  fhps[1]=static_cast<const gchar *>(bf1.c_str());
-  fhps[2]="type";
-  fhps[3]=(hea?"header":"footer");
-  fhps[4]=NULL;
+  bf1 = UT_std_string_sprintf("%d", id);
+  const PP_PropertyVector fhps = {
+      "id", bf1,
+      "type", (hea ? "header" : "footer")
+  };
   X_CheckDocError(appendStrux(PTX_Section,fhps))
   X_CheckT602Error(_writePP())
   X_CheckT602Error(_writeTP())
-    
-    // Page-numbers: prepare text properties...
-  UT_String_sprintf(buff,"font-family: %s; font-size: %dpt; color:%s; font-weight: %s; "
+
+  // Page-numbers: prepare text properties...
+  std::string buff = UT_std_string_sprintf("font-family: %s; font-size: %dpt; color:%s; font-weight: %s; "
 		    "font-style: %s; text-decoration: %s; text-position: %s",
 		    m_family.c_str(), m_size, m_color.c_str(),
 		    m_bold ? "bold" : "normal",
@@ -426,12 +418,11 @@ UT_Error IE_Imp_T602::_write_fh(UT_String & fh, UT_uint32 id, bool hea)
   
   UT_DEBUGMSG(("T602: page-numbers: text-prop:\"%s\"\n",buff.c_str()));
 
-  fps[0]="type";
-  fps[1]="page_number";
-  fps[2]="props";
-  fps[3]=buff.c_str();
-  fps[4]=NULL;
-  
+  const PP_PropertyVector fps = {
+      "type", "page_number",
+      "props", buff
+  };
+
   for (i=0; fh[i]!='\0'; i++)
   {
      if ((fh[i]=='\\') && (!slash)) 
@@ -711,13 +702,13 @@ switch (c)
 //Line breaks (cr/soft-cr)
      case 0x0d:
 	m_eol=true;
-	X_CheckDocError(appendStrux(PTX_Block,NULL))
+	X_CheckDocError(appendStrux(PTX_Block, PP_NOPROPS))
 	break;
     case 0x8d:  // FIXME dat moznost volby ?
       if (m_softcr)
 	{
 	  m_eol=true;
-	  X_CheckDocError(appendStrux(PTX_Block,NULL))
+	  X_CheckDocError(appendStrux(PTX_Block, PP_NOPROPS))
 	    }
       else
 	X_CheckT602Error(_ins(_conv(' ')))

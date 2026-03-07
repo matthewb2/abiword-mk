@@ -25,9 +25,9 @@
 #include "xap_UnixDialogHelper.h"
 
 AP_UnixPreview_Annotation::AP_UnixPreview_Annotation(XAP_DialogFactory * pDlgFactory,XAP_Dialog_Id id) : AP_Preview_Annotation(pDlgFactory,id),
-  m_gc(NULL),
-  m_pPreviewWindow(NULL),
-  m_pDrawingArea(NULL)
+  m_gc(nullptr),
+  m_pPreviewWindow(nullptr),
+  m_pDrawingArea(nullptr)
 {
 	UT_DEBUGMSG(("AP_UnixPreview_Annotation: Preview annotation for Unix platform\n"));
 }
@@ -45,10 +45,11 @@ void AP_UnixPreview_Annotation::runModeless(XAP_Frame * pFrame)
 	if(m_pPreviewWindow)
 	{
 		DELETEP(m_gc);
-		gtk_widget_destroy(m_pDrawingArea);
-		gtk_widget_destroy(m_pPreviewWindow);
-		m_pPreviewWindow = NULL;
-		m_pDrawingArea = NULL;
+		gtk_container_remove(GTK_CONTAINER(gtk_widget_get_parent(m_pDrawingArea)),
+				     m_pDrawingArea);
+		gtk_widget_destroy(m_pPreviewWindow); // TOPLEVEL
+		m_pPreviewWindow = nullptr;
+		m_pDrawingArea = nullptr;
 	}
 	setSizeFromAnnotation();
 	_constructWindow();
@@ -72,7 +73,7 @@ void AP_UnixPreview_Annotation::runModeless(XAP_Frame * pFrame)
 void AP_UnixPreview_Annotation::activate(void)
 {
 	UT_return_if_fail(m_pPreviewWindow);
-	gdk_window_raise(gtk_widget_get_window(m_pPreviewWindow));
+	XAP_gtk_window_raise(m_pPreviewWindow);
 }
 
 XAP_Dialog * AP_UnixPreview_Annotation::static_constructor(XAP_DialogFactory * pFactory, XAP_Dialog_Id id)
@@ -104,10 +105,9 @@ void  AP_UnixPreview_Annotation::destroy(void)
 		return;
 	
 	DELETEP(m_gc);
-	gtk_widget_destroy(m_pDrawingArea);
-	gtk_widget_destroy(m_pPreviewWindow);
-	m_pPreviewWindow = NULL;
-	m_pDrawingArea = NULL;
+	gtk_widget_destroy(m_pPreviewWindow); // TOPLEVEL
+	m_pPreviewWindow = nullptr;
+	m_pDrawingArea = nullptr;
 }
 
 

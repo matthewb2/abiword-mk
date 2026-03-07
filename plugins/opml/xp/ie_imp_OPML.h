@@ -23,6 +23,8 @@
 #ifndef IE_IMP_OPML_H
 #define IE_IMP_OPML_H
 
+#include <vector>
+
 #include "ie_imp_XML.h"
 #include "fl_AutoNum.h"
 
@@ -35,11 +37,11 @@ public:
 	IE_Imp_OPML_Sniffer(const char *name);
 	virtual ~IE_Imp_OPML_Sniffer() {}
 
-	virtual const IE_SuffixConfidence * getSuffixConfidence ();
-	virtual const IE_MimeConfidence * getMimeConfidence () { return NULL; }
-	virtual			UT_Confidence_t recognizeContents (const char * szBuf, UT_uint32 iNumbytes);
-	virtual bool	getDlgLabels (const char ** szDesc, const char ** szSuffixList, IEFileType * ft);
-	virtual			UT_Error constructImporter (PD_Document * pDocument, IE_Imp ** ppie);
+	virtual const IE_SuffixConfidence * getSuffixConfidence() override;
+	virtual const IE_MimeConfidence * getMimeConfidence() override { return nullptr; }
+	virtual	UT_Confidence_t recognizeContents(const char * szBuf, UT_uint32 iNumbytes) override;
+	virtual bool getDlgLabels(const char ** szDesc, const char ** szSuffixList, IEFileType * ft) override;
+	virtual	UT_Error constructImporter (PD_Document * pDocument, IE_Imp ** ppie) override;
 };
 
 class IE_Imp_OPML : public IE_Imp_XML
@@ -48,9 +50,9 @@ public:
 	IE_Imp_OPML(PD_Document * pDocument);
 	~IE_Imp_OPML();
 
-	void			startElement(const gchar *name, const gchar **atts);
-	void			endElement(const gchar *name);
-	void			charData(const gchar *s, int len);
+	virtual void startElement(const gchar *name, const gchar **atts) override;
+	virtual void endElement(const gchar *name) override;
+	virtual void charData(const gchar *s, int len) override;
 
 private:
 
@@ -59,9 +61,9 @@ private:
 
 	bool			m_bOpenedBlock;
 	UT_uint32		m_iCurListID;
-	UT_sint32		m_iOutlineDepth;
+	UT_uint32		m_iOutlineDepth;
 	UT_UTF8String	m_sMetaTag;
-	UT_GenericVector<fl_AutoNum *> m_utvLists;
+	std::vector<fl_AutoNumConstPtr> m_utvLists;
 };
 
 #endif /* IE_IMP_OPML_H */

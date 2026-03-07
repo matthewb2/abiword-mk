@@ -50,7 +50,7 @@ XAP_Dictionary::XAP_Dictionary(const char * szFilename)
 	UT_ASSERT(szFilename && *szFilename);
 	m_szFilename = g_strdup(szFilename);
 
-	m_fp = 0;
+	m_fp = nullptr;
 	m_bDirty = false;
 }
 
@@ -76,7 +76,7 @@ XAP_Dictionary::~XAP_Dictionary()
 const char * XAP_Dictionary::getShortName(void) const
 {
 	// TODO: get just the filename (no path), for use in UI
-	return NULL;
+	return nullptr;
 }
 
 /*****************************************************************/
@@ -89,7 +89,7 @@ bool XAP_Dictionary::_openFile(const char * mode)
 	// TODO add code to make a backup of the original file, if it exists.
 	
 	m_fp = fopen(m_szFilename,mode);
-	return (m_fp != 0);
+	return (m_fp != nullptr);
 }
 
 UT_uint32 XAP_Dictionary::_writeBytes(const UT_Byte * pBytes, UT_uint32 length)
@@ -115,7 +115,7 @@ bool XAP_Dictionary::_closeFile(void)
 {
 	if (m_fp)
 		fclose(m_fp);
-	m_fp = 0;
+	m_fp = nullptr;
 	return true;
 }
 
@@ -349,7 +349,7 @@ void XAP_Dictionary::suggestWord(UT_GenericVector<UT_UCSChar *> * pVecSuggestion
   UT_uint32 i=0;
   UT_uint32 count = pVec->getItemCount();
   //
-  // Turn our word into a NULL teminated string
+  // Turn our word into a NUL teminated string
   //
   UT_UCSChar * pszWord = static_cast<UT_UCSChar*>(UT_calloc(len+1, sizeof(UT_UCSChar)));
   for(i=0; i< len; i++)
@@ -364,7 +364,7 @@ void XAP_Dictionary::suggestWord(UT_GenericVector<UT_UCSChar *> * pVecSuggestion
   for(i=0; i< count; i++)
   {
     UT_UCSChar * pszDict = pVec->getNthItem(i);
-    UT_UCSChar * pszReturn = NULL;
+    UT_UCSChar * pszReturn = nullptr;
     float lenDict = static_cast<float>(UT_UCS4_strlen(pszDict));
     UT_uint32 wordInDict = countCommonChars(pszDict,pszWord);
     UT_uint32 dictInWord = countCommonChars(pszWord,pszDict);
@@ -397,7 +397,7 @@ UT_uint32 XAP_Dictionary::countCommonChars( UT_UCSChar *pszHaystack,UT_UCSChar *
     for(i=0; i< lenNeedle; i++)
     {
       oneChar[0] = pszNeedle[i];
-      if(UT_UCS4_strstr(pszHaystack,oneChar) != 0)
+      if (UT_UCS4_strstr(pszHaystack,oneChar) != nullptr)
       {
 	  score++;
       }
@@ -424,7 +424,7 @@ bool XAP_Dictionary::isWord(const UT_UCSChar * pWord, UT_uint32 len) const
 	}
 	key[i] = 0;
 	char * key2 = g_strdup(key);
-	bool contains = m_hashWords.contains (key2, NULL);
+	bool contains = m_hashWords.contains (key2, nullptr);
 	FREEP(key);
 	FREEP(key2);
 	return contains;

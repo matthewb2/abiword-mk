@@ -46,7 +46,7 @@ AV_View::AV_View(XAP_App * pApp, void* pParentData)
 
 AV_View::~AV_View()
 {
-	UT_DEBUGMSG(("Deleting view %p \n",this));
+	UT_DEBUGMSG(("Deleting view %p \n", (void*)this));
 }
 
 void* AV_View::getParentData() const
@@ -63,9 +63,9 @@ bool AV_View::addListener(AV_Listener * pListener,
 	// see if we can recycle a cell in the vector.
 	
 	for (k=0; k<kLimit; k++)
-		if (m_vecListeners.getNthItem(k) == 0)
+		if (m_vecListeners.getNthItem(k) == nullptr)
 		{
-			static_cast<void>(m_vecListeners.setNthItem(k,pListener,NULL));
+			static_cast<void>(m_vecListeners.setNthItem(k,pListener,nullptr));
 			goto ClaimThisK;
 		}
 
@@ -82,7 +82,7 @@ bool AV_View::addListener(AV_Listener * pListener,
 	
 	*pListenerId = k;
 
-	UT_DEBUGMSG(("Adding listener %p type %d id %d \n",pListener,pListener->getType(),k));
+	UT_DEBUGMSG(("Adding listener %p type %d id %d \n", (void*)pListener, pListener->getType(), k));
 	return true;
 }
 
@@ -91,7 +91,7 @@ bool AV_View::removeListener(AV_ListenerId listenerId)
 	if (listenerId == (AV_ListenerId) -1)
 		return false;
 		
-	return (m_vecListeners.setNthItem(listenerId,NULL,NULL) == 0);
+	return (m_vecListeners.setNthItem(listenerId,nullptr,nullptr) == 0);
 }
 
 bool AV_View::notifyListeners(const AV_ChangeMask hint, void * pPrivateData)
@@ -216,7 +216,7 @@ void AV_View::removeScrollListener(AV_ScrollObj* pObj)
 
 		if (obj == pObj)
 		{
-		  UT_DEBUGMSG(("Removing scroll listener %p in av_view %p \n",obj,this));
+		  UT_DEBUGMSG(("Removing scroll listener %p in av_view %p \n", (void*)obj, (void*)this));
 			m_scrollListeners.deleteNthItem(i);
 		}
 	}

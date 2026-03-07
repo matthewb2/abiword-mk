@@ -1,3 +1,4 @@
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
 /* AbiSource
  * 
  * Copyright (C) 2005 Daniel d'Andrada T. de Carvalho
@@ -28,8 +29,8 @@
 #include "ODi_ListenerStateAction.h"
 
 // AbiWord includes
-#include <ut_misc.h>
-#include <pd_Document.h>
+#include "ut_misc.h"
+#include "pd_Document.h"
 
 /**
  * Constructor
@@ -41,7 +42,7 @@ ODi_TableOfContent_ListenerState::ODi_TableOfContent_ListenerState (
             : ODi_ListenerState("TableOfContent", rElementStack),
               m_pAbiDocument ( pDocument ),
               m_pStyles(pStyles),
-              m_pTOCStrux(NULL),
+              m_pTOCStrux(nullptr),
               m_acceptingText(false)
 {
 }
@@ -118,10 +119,10 @@ void ODi_TableOfContent_ListenerState::endElement (const gchar* pName,
 
     if (!strcmp(pName, "text:table-of-content")) {
 
-        m_pAbiDocument->appendStrux(PTX_SectionTOC, NULL, &m_pTOCStrux);
-        UT_ASSERT(m_pTOCStrux != NULL);
+        m_pAbiDocument->appendStrux(PTX_SectionTOC, PP_NOPROPS, &m_pTOCStrux);
+        UT_ASSERT(m_pTOCStrux != nullptr);
 
-        m_pAbiDocument->appendStrux(PTX_EndTOC, NULL);
+        m_pAbiDocument->appendStrux(PTX_EndTOC, PP_NOPROPS);
 
         rAction.popState();
 

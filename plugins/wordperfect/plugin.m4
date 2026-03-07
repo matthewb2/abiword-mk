@@ -1,6 +1,6 @@
 
-wordperfect_pkgs="libwpg-0.2 >= 0.2.0 libwpd-0.9 >= 0.9.0 libwpd-stream-0.9 >= 0.9.0 $gsf_req"
-wordperfect_wps_pkgs='libwps-0.2 >= 0.1.0'
+wordperfect_pkgs="libwpd-0.10 $gsf_req"
+wordperfect_wps_pkgs='libwps-0.4'
 wordperfect_deps="no"
 
 WORDPERFECT_CFLAGS=
@@ -29,7 +29,7 @@ wp_deps_pkgs="$wordperfect_pkgs"
 
 PKG_CHECK_EXISTS([ $wordperfect_wps_pkgs ],
 [
-	wp_deps_pkgs="$wp_deps_pkgs $wordperfect_wps_pkgs"
+	wp_deps_pkgs="$wordperfect_wps_pkgs $wp_deps_pkgs"
 	WPS_DEFINE=" -DHAVE_LIBWPS"
 ])
 

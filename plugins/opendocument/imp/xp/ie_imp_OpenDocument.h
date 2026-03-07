@@ -34,7 +34,7 @@
 #include "ODi_Abi_Data.h"
 
 // AbiWord inlcudes
-#include <ie_imp.h>
+#include "ie_imp.h"
 
 // External includes
 #include <gsf/gsf.h>
@@ -53,13 +53,13 @@ public:
 
     IE_Imp_OpenDocument (PD_Document * pDocument);
     virtual ~IE_Imp_OpenDocument ();
-   virtual bool   pasteFromBuffer(PD_DocumentRange * pDocRange,
+    virtual bool pasteFromBuffer(PD_DocumentRange * pDocRange,
 				const unsigned char * pData,
 				UT_uint32 lenData,
-				const char * szEncoding = 0);
+				const char * szEncoding = nullptr) override;
 
  protected:
-    virtual UT_Error _loadFile(GsfInput * input);
+    virtual UT_Error _loadFile(GsfInput * input) override;
 
 private:
 

@@ -19,6 +19,8 @@
 
 #include "ServiceUnixAccountHandler.h"
 
+#include "xap_GtkUtils.h"
+
 AccountHandlerConstructor ServiceAccountHandlerConstructor = &ServiceUnixAccountHandler::static_constructor;
 
 AccountHandler * ServiceUnixAccountHandler::static_constructor()
@@ -46,51 +48,63 @@ void ServiceUnixAccountHandler::embedDialogWidgets(void* pEmbeddingParent)
 	UT_DEBUGMSG(("ServiceUnixAccountHandler::embedDialogWidgets()\n"));
 	UT_return_if_fail(pEmbeddingParent);
 
-	table = gtk_table_new(2, 2, FALSE);
+	table = gtk_grid_new();
+	g_object_set(G_OBJECT(table),
+	             "row-spacing", 6,
+	             "column-spacing", 12,
+	             "hexpand", true,
+	             NULL);
 	GtkVBox* parent = (GtkVBox*)pEmbeddingParent;
 
-	// username	
-	GtkWidget* username_label = gtk_label_new("E-mail address:");
-	gtk_misc_set_alignment(GTK_MISC(username_label), 0, 0.5);
-	gtk_table_attach_defaults(GTK_TABLE(table), username_label, 0, 1, 0, 1);
+	// username
+	GtkWidget* username_label
+          = gtk_widget_new(GTK_TYPE_LABEL, "label", "E-mail address:",
+                           "xalign", 0.0, "yalign", 0.5,
+                           NULL);
+	gtk_grid_attach(GTK_GRID(table), username_label, 0, 0, 1, 1);
 	username_entry = gtk_entry_new();
-	gtk_table_attach_defaults(GTK_TABLE(table), username_entry, 1, 2, 0, 1);
+	gtk_grid_attach(GTK_GRID(table), username_entry, 1, 0, 1, 1);
 	gtk_entry_set_activates_default(GTK_ENTRY(username_entry), true);
 
 	// password
-	GtkWidget* password_label = gtk_label_new("Password:");
-	gtk_misc_set_alignment(GTK_MISC(password_label), 0, 0.5);
-	gtk_table_attach_defaults(GTK_TABLE(table), password_label, 0, 1, 1, 2);
+	GtkWidget* password_label
+          = gtk_widget_new(GTK_TYPE_LABEL, "label", "Password:",
+                           "xalign", 0.0, "yalign", 0.5,
+                           NULL);
+	gtk_grid_attach(GTK_GRID(table), password_label, 0, 1, 1, 1);
 	password_entry = gtk_entry_new();
 	gtk_entry_set_visibility(GTK_ENTRY(password_entry), false);
-	gtk_table_attach_defaults(GTK_TABLE(table), password_entry, 1, 2, 1, 2);
+	gtk_grid_attach(GTK_GRID(table), password_entry, 1, 1, 1, 1);
 	gtk_entry_set_activates_default(GTK_ENTRY(password_entry), true);
 
 	// autoconnect
 	autoconnect_button = gtk_check_button_new_with_label ("Connect on application startup");
-	gtk_table_attach_defaults(GTK_TABLE(table), autoconnect_button, 0, 2, 2, 3);
+	gtk_grid_attach(GTK_GRID(table), autoconnect_button, 0, 2, 2, 1);
 
 	// register
 	register_button = gtk_link_button_new_with_label (SERVICE_REGISTRATION_URL, "Get a free abicollab.net account");
-	gtk_table_attach_defaults(GTK_TABLE(table), register_button, 0, 2, 3, 4);
-	
+	gtk_grid_attach(GTK_GRID(table), register_button, 0, 3, 2, 1);
+
 #ifdef DEBUG
-	// uri	
-	GtkWidget* uri_label = gtk_label_new("WebApp SOAP url:");
-	gtk_misc_set_alignment(GTK_MISC(uri_label), 0, 0.5);
-	gtk_table_attach_defaults(GTK_TABLE(table), uri_label, 0, 1, 4, 5);
+	// uri
+	GtkWidget* uri_label
+          = gtk_widget_new(GTK_TYPE_LABEL, "label", "WebApp SOAP url:",
+                           "xalign", 0.0, "yalign", 0.5,
+                           NULL);
+	gtk_grid_attach(GTK_GRID(table), uri_label, 0, 4, 1, 1);
 	uri_entry = gtk_entry_new();
-	gtk_table_attach_defaults(GTK_TABLE(table), uri_entry, 1, 2, 4, 5);
+	gtk_widget_set_hexpand(uri_entry, true);
+	gtk_grid_attach(GTK_GRID(table), uri_entry, 1, 4, 1, 1);
 
 	// check webapp hostname
 	verify_webapp_host_button = gtk_check_button_new_with_label ("Verify WebApp hostname");
-	gtk_table_attach_defaults(GTK_TABLE(table), verify_webapp_host_button, 0, 2, 5, 6);
+	gtk_grid_attach(GTK_GRID(table), verify_webapp_host_button, 0, 5, 2, 1);
 
 	// check realm hostname
 	verify_realm_host_button = gtk_check_button_new_with_label ("Verify Realm hostname");
-	gtk_table_attach_defaults(GTK_TABLE(table), verify_realm_host_button, 0, 2, 6, 7);
+	gtk_grid_attach(GTK_GRID(table), verify_realm_host_button, 0, 6, 2, 1);
 #endif
-	
+
 	gtk_box_pack_start(GTK_BOX(parent), table, FALSE, TRUE, 0);
 	gtk_widget_show_all(GTK_WIDGET(parent));
 }
@@ -101,8 +115,9 @@ void ServiceUnixAccountHandler::removeDialogWidgets(void* pEmbeddingParent)
 	UT_return_if_fail(pEmbeddingParent);
 	
 	// this will conveniently destroy all contained widgets as well
-	if (table && GTK_IS_WIDGET(table))
-		gtk_widget_destroy(table);
+	if (table && GTK_IS_WIDGET(table)) {
+		gtk_container_remove(GTK_CONTAINER(gtk_widget_get_parent(table)), table);
+	}
 }
 
 void ServiceUnixAccountHandler::loadProperties()
@@ -110,10 +125,10 @@ void ServiceUnixAccountHandler::loadProperties()
 	UT_DEBUGMSG(("ServiceUnixAccountHandler::loadProperties()\n"));
 
 	if (username_entry && GTK_IS_ENTRY(username_entry))
-		gtk_entry_set_text(GTK_ENTRY(username_entry), getProperty("email").c_str());
+		XAP_gtk_entry_set_text(GTK_ENTRY(username_entry), getProperty("email").c_str());
 
 	if (password_entry && GTK_IS_ENTRY(password_entry))
-		gtk_entry_set_text(GTK_ENTRY(password_entry), getProperty("password").c_str());
+		XAP_gtk_entry_set_text(GTK_ENTRY(password_entry), getProperty("password").c_str());
 
 	bool autoconnect = hasProperty("autoconnect") ? getProperty("autoconnect") == "true" : true;
 	if (autoconnect_button && GTK_IS_TOGGLE_BUTTON(autoconnect_button))
@@ -122,7 +137,7 @@ void ServiceUnixAccountHandler::loadProperties()
 #ifdef DEBUG
 	std::string uri = hasProperty("uri") ? getProperty("uri").c_str() : "https://abicollab.net/soap/";
 	if (uri_entry && GTK_IS_ENTRY(uri_entry))
-		gtk_entry_set_text(GTK_ENTRY(uri_entry), uri.c_str());
+		XAP_gtk_entry_set_text(GTK_ENTRY(uri_entry), uri.c_str());
 
 	bool verify_webapp_host = hasProperty("verify-webapp-host") ? getProperty("verify-webapp-host") == "true" : true;
 	if (verify_webapp_host_button && GTK_IS_TOGGLE_BUTTON(verify_webapp_host_button))
@@ -139,10 +154,10 @@ void ServiceUnixAccountHandler::storeProperties()
 	UT_DEBUGMSG(("ServiceUnixAccountHandler::storeProperties()\n"));
 
 	if (username_entry && GTK_IS_ENTRY(username_entry))
-		addProperty("email", gtk_entry_get_text(GTK_ENTRY(username_entry)));
+		addProperty("email", XAP_gtk_entry_get_text(GTK_ENTRY(username_entry)));
 
 	if (password_entry && GTK_IS_ENTRY(password_entry))
-		addProperty("password", gtk_entry_get_text(GTK_ENTRY(password_entry)));
+		addProperty("password", XAP_gtk_entry_get_text(GTK_ENTRY(password_entry)));
 	
 	if (autoconnect_button && GTK_IS_TOGGLE_BUTTON(autoconnect_button))
 	{
@@ -152,7 +167,7 @@ void ServiceUnixAccountHandler::storeProperties()
 
 #ifdef DEBUG
 	if (uri_entry && GTK_IS_ENTRY(uri_entry))
-		addProperty("uri", gtk_entry_get_text(GTK_ENTRY(uri_entry)));
+		addProperty("uri", XAP_gtk_entry_get_text(GTK_ENTRY(uri_entry)));
 
 	if (verify_webapp_host_button && GTK_IS_TOGGLE_BUTTON(verify_webapp_host_button))
 		addProperty("verify-webapp-host", gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(verify_webapp_host_button)) ? "true" : "false" );

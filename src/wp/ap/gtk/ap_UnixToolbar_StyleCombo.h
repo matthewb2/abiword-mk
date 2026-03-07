@@ -19,16 +19,12 @@
  * 02110-1301 USA.
  */
 
-#ifndef AP_UNIXTOOLBAR_STYLECOMBO_H
-#define AP_UNIXTOOLBAR_STYLECOMBO_H
+#pragma once
 
 #include <map>
 #include <string>
 
-#include "ut_compiler.h"
-ABI_W_NO_CONST_QUAL
 #include <gtk/gtk.h>
-ABI_W_POP
 
 #include "xap_Types.h"
 #include "ev_Toolbar_Control.h"
@@ -46,7 +42,7 @@ public:
 	AP_UnixToolbar_StyleCombo(EV_Toolbar * pToolbar, XAP_Toolbar_Id id);
 	virtual ~AP_UnixToolbar_StyleCombo(void);
 
-	virtual bool		populate(void);
+	virtual bool		populate(void) override;
 	bool                repopulate(void);
 	const PangoFontDescription* getStyle (const gchar *name);
 	static EV_Toolbar_Control *		static_constructor(EV_Toolbar *, XAP_Toolbar_Id id);
@@ -62,11 +58,3 @@ private:
 	std::map<std::string, PangoFontDescription*> 	m_mapStyles;
 	PangoFontDescription *m_pDefaultDesc;
 };
-
-#endif /* AP_UNIXTOOLBAR_STYLECOMBO_H */
-
-
-
-
-
-

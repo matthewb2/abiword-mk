@@ -1,3 +1,4 @@
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 2001 Sean Young <sean@mess.org>
  * Copyright (C) 2001 Hubert Figuiere
@@ -28,7 +29,8 @@
 #include <string.h>
 
 #include <glib.h>
-#include <gsf/gsf-input.h>
+
+#include <gsf/gsf.h>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -54,6 +56,7 @@ typedef unsigned __int32 uint32_t;
 #include "ut_debugmsg.h"
 #include "ut_locale.h"
 #include "ut_types.h"
+#include "ut_std_string.h"
 #include "xap_Module.h"
 
 #ifdef ABI_PLUGIN_BUILTIN
@@ -67,7 +70,7 @@ ABI_PLUGIN_DECLARE("MSWrite")
 #endif
 
 // we use a reference-counted sniffer
-static IE_Imp_MSWrite_Sniffer *m_sniffer = 0;
+static IE_Imp_MSWrite_Sniffer *m_sniffer = nullptr;
 
 /**********************************************************************
  * Plugin Registration                                                *
@@ -92,11 +95,11 @@ int abi_plugin_register (XAP_ModuleInfo *mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo *mi)
 {
-	mi->name = 0;
-	mi->desc = 0;
-	mi->version = 0;
-	mi->author = 0;
-	mi->usage = 0;
+	mi->name = nullptr;
+	mi->desc = nullptr;
+	mi->version = nullptr;
+	mi->author = nullptr;
+	mi->usage = nullptr;
 
 	UT_ASSERT(m_sniffer);
 
@@ -180,73 +183,73 @@ UT_Error IE_Imp_MSWrite_Sniffer::constructImporter (PD_Document *pDocument,
 static const wri_struct WRI_FILE_HEADER[] =
 {
 	/* value, data, size, type, name */      /* word no. */
-	{0, NULL, 2, CT_VALUE, "wIdent"},        // 0
-	{0, NULL, 2, CT_VALUE, "dty"},           // 1
-	{0, NULL, 2, CT_VALUE, "wTool"},         // 2
-	{0, NULL, 2, CT_VALUE, "reserved1"},     // 3
-	{0, NULL, 2, CT_VALUE, "reserved2"},     // 4
-	{0, NULL, 2, CT_VALUE, "reserved3"},     // 5
-	{0, NULL, 2, CT_VALUE, "reserved4"},     // 6
-	{0, NULL, 4, CT_VALUE, "fcMac"},         // 7-8
-	{0, NULL, 2, CT_VALUE, "pnPara"},        // 9
-	{0, NULL, 2, CT_VALUE, "pnFntb"},        // 10
-	{0, NULL, 2, CT_VALUE, "pnSep"},         // 11
-	{0, NULL, 2, CT_VALUE, "pnSetb"},        // 12
-	{0, NULL, 2, CT_VALUE, "pnPgtb"},        // 13
-	{0, NULL, 2, CT_VALUE, "pnFfntb"},       // 14
-	{0, NULL, 64, CT_IGNORE, "szSsht"},      // 15-47
-	{0, NULL, 2, CT_VALUE, "pnMac"},         // 48
-	{0, NULL, 0, CT_IGNORE, NULL}            // EOF
+	{0, nullptr, 2, CT_VALUE, "wIdent"},        // 0
+	{0, nullptr, 2, CT_VALUE, "dty"},           // 1
+	{0, nullptr, 2, CT_VALUE, "wTool"},         // 2
+	{0, nullptr, 2, CT_VALUE, "reserved1"},     // 3
+	{0, nullptr, 2, CT_VALUE, "reserved2"},     // 4
+	{0, nullptr, 2, CT_VALUE, "reserved3"},     // 5
+	{0, nullptr, 2, CT_VALUE, "reserved4"},     // 6
+	{0, nullptr, 4, CT_VALUE, "fcMac"},         // 7-8
+	{0, nullptr, 2, CT_VALUE, "pnPara"},        // 9
+	{0, nullptr, 2, CT_VALUE, "pnFntb"},        // 10
+	{0, nullptr, 2, CT_VALUE, "pnSep"},         // 11
+	{0, nullptr, 2, CT_VALUE, "pnSetb"},        // 12
+	{0, nullptr, 2, CT_VALUE, "pnPgtb"},        // 13
+	{0, nullptr, 2, CT_VALUE, "pnFfntb"},       // 14
+	{0, nullptr, 64, CT_IGNORE, "szSsht"},      // 15-47
+	{0, nullptr, 2, CT_VALUE, "pnMac"},         // 48
+	{0, nullptr, 0, CT_IGNORE, nullptr}            // EOF
 };
 
 static const wri_struct WRI_PICTURE_HEADER[] =
 {
 	/* value, data, size, type, name */         /* word no. */
 	// METAFILEPICT structure
-	{0, NULL, 2, CT_VALUE, "mm"},               // 0
-	{0, NULL, 2, CT_VALUE, "xExt"},             // 1
-	{0, NULL, 2, CT_VALUE, "yExt"},             // 2
-	{0, NULL, 2, CT_IGNORE, "hMF"},             // 3
+	{0, nullptr, 2, CT_VALUE, "mm"},               // 0
+	{0, nullptr, 2, CT_VALUE, "xExt"},             // 1
+	{0, nullptr, 2, CT_VALUE, "yExt"},             // 2
+	{0, nullptr, 2, CT_IGNORE, "hMF"},             // 3
 	// end of METAFILEPICT structure
-	{0, NULL, 2, CT_VALUE, "dxaOffset"},        // 4
-	{0, NULL, 2, CT_VALUE, "dxaSize"},          // 5
-	{0, NULL, 2, CT_VALUE, "dyaSize"},          // 6
-	{0, NULL, 2, CT_VALUE, "cbOldSize"},        // 7
+	{0, nullptr, 2, CT_VALUE, "dxaOffset"},        // 4
+	{0, nullptr, 2, CT_VALUE, "dxaSize"},          // 5
+	{0, nullptr, 2, CT_VALUE, "dyaSize"},          // 6
+	{0, nullptr, 2, CT_VALUE, "cbOldSize"},        // 7
 	// BITMAP structure
-	{0, NULL, 2, CT_VALUE, "bmType"},           // 8
-	{0, NULL, 2, CT_VALUE, "bmWidth"},          // 9
-	{0, NULL, 2, CT_VALUE, "bmHeight"},         // 10
-	{0, NULL, 2, CT_VALUE, "bmWidthBytes"},     // 11
-	{0, NULL, 1, CT_VALUE, "bmPlanes"},         // 12
-	{0, NULL, 1, CT_VALUE, "bmBitsPixel"},      // 12.5
-	{0, NULL, 4, CT_VALUE, "bmBits"},           // 13-14
+	{0, nullptr, 2, CT_VALUE, "bmType"},           // 8
+	{0, nullptr, 2, CT_VALUE, "bmWidth"},          // 9
+	{0, nullptr, 2, CT_VALUE, "bmHeight"},         // 10
+	{0, nullptr, 2, CT_VALUE, "bmWidthBytes"},     // 11
+	{0, nullptr, 1, CT_VALUE, "bmPlanes"},         // 12
+	{0, nullptr, 1, CT_VALUE, "bmBitsPixel"},      // 12.5
+	{0, nullptr, 4, CT_VALUE, "bmBits"},           // 13-14
 	// end of BITMAP structure
-	{0, NULL, 2, CT_VALUE, "cbHeader"},         // 15
-	{0, NULL, 4, CT_VALUE, "cbSize"},           // 16-17
-	{0, NULL, 2, CT_VALUE, "mx"},               // 18
-	{0, NULL, 2, CT_VALUE, "my"},               // 19
-	{0, NULL, 0, CT_IGNORE, NULL}               // EOF
+	{0, nullptr, 2, CT_VALUE, "cbHeader"},         // 15
+	{0, nullptr, 4, CT_VALUE, "cbSize"},           // 16-17
+	{0, nullptr, 2, CT_VALUE, "mx"},               // 18
+	{0, nullptr, 2, CT_VALUE, "my"},               // 19
+	{0, nullptr, 0, CT_IGNORE, nullptr}               // EOF
 };
 
 static const wri_struct WRI_OLE_HEADER[] =
 {
 	/* value, data, size, type, name */       /* word no. */
-	{0, NULL, 2, CT_VALUE, "mm"},             // 0
-	{0, NULL, 4, CT_IGNORE, "not_used"},      // 1-2
-	{0, NULL, 2, CT_VALUE, "objectType"},     // 3
-	{0, NULL, 2, CT_VALUE, "dxaOffset"},      // 4
-	{0, NULL, 2, CT_VALUE, "dxaSize"},        // 5
-	{0, NULL, 2, CT_VALUE, "dyaSize"},        // 6
-	{0, NULL, 2, CT_IGNORE, "not_used2"},     // 7
-	{0, NULL, 4, CT_VALUE, "dwDataSize"},     // 8-9
-	{0, NULL, 4, CT_IGNORE, "not_used3"},     // 10-11
-	{0, NULL, 4, CT_VALUE, "dwObjNum"},       // 12-13
-	{0, NULL, 2, CT_VALUE, "not_used4"},      // 14
-	{0, NULL, 2, CT_VALUE, "cbHeader"},       // 15
-	{0, NULL, 4, CT_IGNORE, "not_used5"},     // 16-17
-	{0, NULL, 2, CT_VALUE, "mx"},             // 18
-	{0, NULL, 2, CT_VALUE, "my"},             // 19
-	{0, NULL, 0, CT_IGNORE, NULL}             // EOF
+	{0, nullptr, 2, CT_VALUE, "mm"},             // 0
+	{0, nullptr, 4, CT_IGNORE, "not_used"},      // 1-2
+	{0, nullptr, 2, CT_VALUE, "objectType"},     // 3
+	{0, nullptr, 2, CT_VALUE, "dxaOffset"},      // 4
+	{0, nullptr, 2, CT_VALUE, "dxaSize"},        // 5
+	{0, nullptr, 2, CT_VALUE, "dyaSize"},        // 6
+	{0, nullptr, 2, CT_IGNORE, "not_used2"},     // 7
+	{0, nullptr, 4, CT_VALUE, "dwDataSize"},     // 8-9
+	{0, nullptr, 4, CT_IGNORE, "not_used3"},     // 10-11
+	{0, nullptr, 4, CT_VALUE, "dwObjNum"},       // 12-13
+	{0, nullptr, 2, CT_VALUE, "not_used4"},      // 14
+	{0, nullptr, 2, CT_VALUE, "cbHeader"},       // 15
+	{0, nullptr, 4, CT_IGNORE, "not_used5"},     // 16-17
+	{0, nullptr, 2, CT_VALUE, "mx"},             // 18
+	{0, nullptr, 2, CT_VALUE, "my"},             // 19
+	{0, nullptr, 0, CT_IGNORE, nullptr}             // EOF
 };
 
 #define PIC_OR_OLE_HEADER_SIZE 40   // common size of both header types
@@ -283,10 +286,11 @@ static const wri_struct WRI_OLE_HEADER[] =
 
 IE_Imp_MSWrite::IE_Imp_MSWrite (PD_Document *pDocument)
 	: IE_Imp(pDocument),
+	  mData(new UT_ByteBuf),
 	  mDefaultCodepage("CP1252"),
 	  hasHeader(false),
 	  hasFooter(false),
-	  wri_fonts(0),
+	  wri_fonts(nullptr),
 	  wri_fonts_count(0),
 	  pic_nr(0),
 	  lf(false)
@@ -375,6 +379,7 @@ UT_Error IE_Imp_MSWrite::parse_file ()
 	if (gsf_input_seek(mFile, 0x80, G_SEEK_SET))
 	{
 		UT_WARNINGMSG(("parse_file: Can't seek data!\n"));
+		free(thetext);
 		return UT_ERROR;
 	}
 
@@ -386,8 +391,8 @@ UT_Error IE_Imp_MSWrite::parse_file ()
 		return UT_ERROR;
 	}
 
-	mData.truncate(0);
-	mData.append(thetext, size);
+	mData->truncate(0);
+	mData->append(thetext, size);
 	free(thetext);
 
 	read_sep();
@@ -555,11 +560,11 @@ void IE_Imp_MSWrite::free_ffntb ()
 	for (int i = 0; i < wri_fonts_count; i++)
 	{
 		free((void *) wri_fonts[i].name);
-		wri_fonts[i].name = NULL;
+		wri_fonts[i].name = nullptr;
 	}
 
 	free(wri_fonts);
-	wri_fonts = NULL;
+	wri_fonts = nullptr;
 }
 
 /**********************************************************************
@@ -647,20 +652,13 @@ bool IE_Imp_MSWrite::read_sep ()
 		properties += tmp;
 	}
 
-	const gchar *attributes[11];
-
-	attributes[0] = PT_PROPS_ATTRIBUTE_NAME;
-	attributes[1] = properties.c_str();
-	attributes[2] = PT_HEADERFIRST_ATTRIBUTE_NAME;
-	attributes[3] = "0";
-	attributes[4] = PT_HEADER_ATTRIBUTE_NAME;
-	attributes[5] = "1";
-	attributes[6] = PT_FOOTERFIRST_ATTRIBUTE_NAME;
-	attributes[7] = "2";
-	attributes[8] = PT_FOOTER_ATTRIBUTE_NAME;
-	attributes[9] = "3";
-	attributes[10] = NULL;
-
+	const PP_PropertyVector attributes = {
+		PT_PROPS_ATTRIBUTE_NAME, properties.c_str(),
+		PT_HEADERFIRST_ATTRIBUTE_NAME, "0",
+		PT_HEADER_ATTRIBUTE_NAME, "1",
+		PT_FOOTERFIRST_ATTRIBUTE_NAME, "2",
+		PT_FOOTER_ATTRIBUTE_NAME, "3"
+	};
 	appendStrux(PTX_Section, attributes);
 
 	return true;
@@ -851,12 +849,9 @@ bool IE_Imp_MSWrite::read_pap (pap_t process)
 				// new attributes, only if there was a line feed or FPROPs have changed
 				if (lf || strcmp(properties.c_str(), lastprops.c_str()) != 0)
 				{
-					const gchar *attributes[3];
-
-					attributes[0] = PT_PROPS_ATTRIBUTE_NAME;
-					attributes[1] = properties.c_str();
-					attributes[2] = NULL;
-
+					const PP_PropertyVector attributes = {
+						PT_PROPS_ATTRIBUTE_NAME, properties.c_str()
+					};
 					appendStrux(PTX_Block, attributes);
 
 					lastprops = properties;
@@ -887,7 +882,7 @@ bool IE_Imp_MSWrite::read_txt (int from, int to)
 	int fcMac, pnChar, fcFirst, cfod, fc, fcLim;
 	unsigned char page[0x80];
 	UT_String properties, tmp;
-	int dataLen = static_cast<UT_sint32>(mData.getLength());
+	int dataLen = static_cast<UT_sint32>(mData->getLength());
 
 	UT_DEBUGMSG(("    TXT:\n"));
 	UT_DEBUGMSG(("     from = %d\n", from));
@@ -995,23 +990,21 @@ bool IE_Imp_MSWrite::read_txt (int from, int to)
 				UT_DEBUGMSG(("         Text: "));
 
 				while (fcFirst <= from && from < fcLim && from <= to && from - 0x80 < dataLen)
-					translate_char(*mData.getPointer(from++ - 0x80), mText);
+					translate_char(*mData->getPointer(from++ - 0x80), mText);
 
 				UT_DEBUGMSG(("\n"));
 
 				// new attributes, only if there was text
 				if (mText.size() > 0)
 				{
-					const gchar *attributes[5];
 					const UT_UCS4Char *text = mText.ucs4_str(), *p = text;
 					size_t txtLen;
 
 					UT_DEBUGMSG(("         Conv: %s\n", mText.utf8_str()));
 
-					attributes[0] = PT_PROPS_ATTRIBUTE_NAME;
-					attributes[1] = properties.c_str();
-					attributes[2] = NULL;
-
+					PP_PropertyVector attributes = {
+						PT_PROPS_ATTRIBUTE_NAME, properties.c_str()
+					};
 					appendFmt(attributes);
 
 					// check for page number (should only be in header or footer)
@@ -1021,10 +1014,8 @@ bool IE_Imp_MSWrite::read_txt (int from, int to)
 					{
 						if (p - text) appendSpan(text, p - text);
 
-						attributes[2] = PT_TYPE_ATTRIBUTE_NAME;
-						attributes[3] = "page_number";
-						attributes[4] = NULL;
-
+						attributes.push_back(PT_TYPE_ATTRIBUTE_NAME);
+						attributes.push_back("page_number");
 						appendObject(PTO_Field, attributes);
 
 						txtLen = mText.size() - (p - text) - 1;
@@ -1069,7 +1060,7 @@ const ffn_suff_cp_tbl[] =
 	{"\x09 (Hebrew)", "CP1255"},
 	{"\x09 (Arabic)", "CP1256"},
 	{"\x07 Baltic", "CP1257"},
-	{NULL, NULL}
+	{nullptr, nullptr}
 };
 
 const char *IE_Imp_MSWrite::get_codepage (const char *facename, int *facelen) const
@@ -1435,11 +1426,10 @@ bool IE_Imp_MSWrite::read_pic (int from, int size)
 	int mm, cbHeader, cbSize, bmBitsPixel, objectType;
 	int colorPaletteLen = 0, bmW = 0, bmH = 0;
 	int chunk, filler, written, ole_offset, formatID, objLen, bhSize, bppOff;
-	wri_struct *write_pic = NULL;
-	UT_ByteBuf pic;
+	wri_struct *write_pic = nullptr;
+	UT_ByteBufPtr pic(new UT_ByteBuf);
 	IEGraphicFileType iegft = IEGFT_Unknown;
-	const char *msg = NULL, *className = "";
-	FG_Graphic *graphic = NULL;
+	const char *msg = nullptr, *className = "";
 
 	if (size < PIC_OR_OLE_HEADER_SIZE + OLE_ClassNameString)
 	{
@@ -1493,7 +1483,7 @@ bool IE_Imp_MSWrite::read_pic (int from, int size)
 
 				WRITE_DWORD(bmpheader.bfOffBits, sizeof(bmpheader) + sizeof(bmpinfo) + colorPaletteLen);
 
-				pic.append(reinterpret_cast<UT_Byte *>(&bmpheader), sizeof(bmpheader));
+				pic->append(reinterpret_cast<UT_Byte *>(&bmpheader), sizeof(bmpheader));
 
 				bmW = wri_struct_value(write_pic, "bmWidth");
 				bmH = wri_struct_value(write_pic, "bmHeight");
@@ -1506,11 +1496,11 @@ bool IE_Imp_MSWrite::read_pic (int from, int size)
 				WRITE_WORD(bmpinfo.nplanes, wri_struct_value(write_pic, "bmPlanes"));
 				WRITE_WORD(bmpinfo.bitspp, bmBitsPixel);
 
-				pic.append(reinterpret_cast<UT_Byte *>(&bmpinfo), sizeof(bmpinfo));
+				pic->append(reinterpret_cast<UT_Byte *>(&bmpinfo), sizeof(bmpinfo));
 
 				// add monochrome colormap
-				pic.append(bgr_palette[0], colorPaletteLen >> 1);
-				pic.append(bgr_palette[255], colorPaletteLen >> 1);
+				pic->append(bgr_palette[0], colorPaletteLen >> 1);
+				pic->append(bgr_palette[255], colorPaletteLen >> 1);
 
 				chunk = wri_struct_value(write_pic, "bmWidthBytes");
 				filler = (4 - (chunk & 3)) & 3;
@@ -1527,10 +1517,10 @@ bool IE_Imp_MSWrite::read_pic (int from, int size)
 			while (written < cbSize)
 			{
 				// append data
-				pic.append(mData.getPointer(from - 0x80 + cbHeader + written), chunk);
+				pic->append(mData->getPointer(from - 0x80 + cbHeader + written), chunk);
 
 				for (int i = 0; i < filler; i++)
-					pic.append(reinterpret_cast<const UT_Byte *>("\x00"), 1);
+					pic->append(reinterpret_cast<const UT_Byte *>("\x00"), 1);
 
 				written += chunk;
 			}
@@ -1603,7 +1593,7 @@ bool IE_Imp_MSWrite::read_pic (int from, int size)
 					// make a bitmap file header
 					WRITE_DWORD(bmpheader.bfOffBits, sizeof(bmpheader) + bhSize + colorPaletteLen);
 
-					pic.append(reinterpret_cast<UT_Byte *>(&bmpheader), sizeof(bmpheader));
+					pic->append(reinterpret_cast<UT_Byte *>(&bmpheader), sizeof(bmpheader));
 
 					objectType = 2;   // we can go embedded now
 				}
@@ -1617,7 +1607,7 @@ bool IE_Imp_MSWrite::read_pic (int from, int size)
 
 					WRITE_DWORD(bmpheader.bfOffBits, sizeof(bmpheader) + sizeof(bmpinfo) + colorPaletteLen);
 
-					pic.append(reinterpret_cast<UT_Byte *>(&bmpheader), sizeof(bmpheader));
+					pic->append(reinterpret_cast<UT_Byte *>(&bmpheader), sizeof(bmpheader));
 
 					bmH = READ_WORD(page + cbHeader + OLE_Object + ole_offset + BM16_Height);
 
@@ -1629,22 +1619,24 @@ bool IE_Imp_MSWrite::read_pic (int from, int size)
 					WRITE_WORD(bmpinfo.nplanes, *(page + cbHeader + OLE_Object + ole_offset + BM16_Planes));
 					WRITE_WORD(bmpinfo.bitspp, bmBitsPixel);
 
-					pic.append(reinterpret_cast<UT_Byte *>(&bmpinfo), sizeof(bmpinfo));
+					pic->append(reinterpret_cast<UT_Byte *>(&bmpinfo), sizeof(bmpinfo));
 
 					// add corresponding colormap
 					switch (bmBitsPixel)
 					{
 						case 1:
-							pic.append(bgr_palette[0], colorPaletteLen >> 1);
-							pic.append(bgr_palette[255], colorPaletteLen >> 1);
+							pic->append(bgr_palette[0], colorPaletteLen >> 1);
+							pic->append(bgr_palette[255], colorPaletteLen >> 1);
 							break;
 
 						case 4:
-							for (int i = 0; i < 16; i++) pic.append(bgr_palette[c16idx[i]], 4);
+							for (int i = 0; i < 16; i++) {
+								pic->append(bgr_palette[c16idx[i]], 4);
+							}
 							break;
 
 						case 8:
-							pic.append(bgr_palette[0], colorPaletteLen);
+							pic->append(bgr_palette[0], colorPaletteLen);
 							break;
 					}
 
@@ -1655,22 +1647,24 @@ bool IE_Imp_MSWrite::read_pic (int from, int size)
 
 			// embedded
 			if (objectType == 2)
-				pic.append(mData.getPointer(from - 0x80 + cbHeader + OLE_Object + ole_offset), objLen);
+				pic->append(mData->getPointer(from - 0x80 + cbHeader + OLE_Object + ole_offset), objLen);
 
 			break;
 	}
 
 	// let's see...
-	if (pic.getLength())
+	if (pic->getLength())
 	{
 		// ...whether it's a picture
-		if (IE_ImpGraphic::loadGraphic(pic, iegft, &graphic) != UT_OK || !graphic)
+		FG_ConstGraphicPtr graphic;
+
+		if (IE_ImpGraphic::loadGraphic(pic, iegft, graphic) != UT_OK || !graphic) {
 			msg = "Picture load error or no picture";
+		}
 		else
 		{
 			int dxaOffset, dxaSize, dyaSize, mx, my;
-			const gchar *attributes[5];
-			UT_String properties, id;
+			std::string properties, id;
 			UT_LocaleTransactor lt(LC_NUMERIC, "C");
 
 			dxaOffset = wri_struct_value(write_pic, "dxaOffset");
@@ -1679,13 +1673,11 @@ bool IE_Imp_MSWrite::read_pic (int from, int size)
 
 			if (dxaOffset)
 			{
-				UT_String_sprintf(properties, "margin-left:%.4fin",
+				properties = UT_std_string_sprintf("margin-left:%.4fin",
 				                              static_cast<float>(dxaOffset) / 1440.0);
-
-				attributes[0] = PT_PROPS_ATTRIBUTE_NAME;
-				attributes[1] = properties.c_str();
-				attributes[2] = NULL;
-
+				const PP_PropertyVector attributes = {
+					PT_PROPS_ATTRIBUTE_NAME, properties
+				};
 				appendStrux(PTX_Block, attributes);
 			}
 
@@ -1709,27 +1701,25 @@ bool IE_Imp_MSWrite::read_pic (int from, int size)
 				dyaSize = (bmH < 0 ? -bmH : bmH) * 15;
 			}
 
-			UT_String_sprintf(properties, "width:%.4fin; height:%.4fin",
+			properties = UT_std_string_sprintf("width:%.4fin; height:%.4fin",
 			                              static_cast<float>(mx) / 1000.0 *
 			                              static_cast<float>(dxaSize) / 1440.0,
 			                              static_cast<float>(my) / 1000.0 *
 			                              static_cast<float>(dyaSize) / 1440.0);
 
-			UT_String_sprintf(id, "image%u", ++pic_nr);
+			id = UT_std_string_sprintf("image%u", ++pic_nr);
 			UT_DEBUGMSG(("    Image #%02d\n", pic_nr));
 
-			attributes[0] = PT_PROPS_ATTRIBUTE_NAME;
-			attributes[1] = properties.c_str();
-			attributes[2] = "dataid";
-			attributes[3] = id.c_str();
-			attributes[4] = NULL;
-
+			const PP_PropertyVector attributes = {
+				PT_PROPS_ATTRIBUTE_NAME, properties,
+				"dataid", id
+			};
 			appendObject(PTO_Image, attributes);
-			getDoc()->createDataItem(id.c_str(), false, graphic->getBuffer(), graphic->getMimeType(), NULL);
+
+			getDoc()->createDataItem(id.c_str(), false, graphic->getBuffer(), graphic->getMimeType(), nullptr);
 		}
 	}
 
-	DELETEP(graphic);
 
 	if (write_pic) free_wri_struct(write_pic);
 
@@ -1744,11 +1734,10 @@ bool IE_Imp_MSWrite::read_pic (int from, int size)
 
 void IE_Imp_MSWrite::_append_hdrftr (hdrftr_t which)
 {
-	const gchar *attributes[5];
-
-	attributes[0] = PT_ID_ATTRIBUTE_NAME;
-	attributes[2] = PT_TYPE_ATTRIBUTE_NAME;
-	attributes[4] = NULL;
+	PP_PropertyVector attributes = {
+		PT_ID_ATTRIBUTE_NAME, "",
+		PT_TYPE_ATTRIBUTE_NAME, ""
+	};
 
 	switch (which)
 	{

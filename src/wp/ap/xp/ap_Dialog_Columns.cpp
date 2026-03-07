@@ -40,15 +40,15 @@
 AP_Dialog_Columns::AP_Dialog_Columns(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id)
 	: XAP_Dialog_NonPersistent(pDlgFactory,id, "interface/dialogcolumns"),
 	m_answer(a_OK),
-	m_pColumnsPreview(NULL),
+	m_pColumnsPreview(nullptr),
 	m_previewDrawer(),
 	m_iColumns(0),
 	m_bLineBetween(false),
 	m_iColumnOrder (0),
 	m_HeightString("0.0in"),
 	m_SpaceAfterString("0pt"),
-	m_pDoc(NULL),
-	m_pView (NULL),
+	m_pDoc(nullptr),
+	m_pView (nullptr),
 	m_bSpaceAfterChanged(false),
 	m_bMaxHeightChanged(false),
 	m_dMarginTop(0.0),
@@ -372,12 +372,11 @@ void AP_Dialog_Columns::_drawColumnButton(GR_Graphics *gc, UT_Rect rect, UT_uint
 void AP_Dialog_Columns::_convertToPreferredUnits(XAP_Frame * /*pFrame*/,const char *sz, gchar * pRet)
 {
 	UT_Dimension PreferedUnits = DIM_none;
-	const gchar * pszRulerUnits = NULL;
+	std::string rulerUnits;
 
-	if (XAP_App::getApp()->getPrefsValue(AP_PREF_KEY_RulerUnits, &pszRulerUnits))
-	{
-		PreferedUnits = UT_determineDimension(static_cast<const char *>(pszRulerUnits));
-	};
+	if (XAP_App::getApp()->getPrefsValue(AP_PREF_KEY_RulerUnits, rulerUnits)) {
+		PreferedUnits = UT_determineDimension(rulerUnits.c_str());
+	}
 	strncpy(pRet, static_cast<const gchar *>(UT_reformatDimensionString(PreferedUnits,sz)), 25);
 }
 
@@ -398,7 +397,7 @@ AP_Columns_preview::~AP_Columns_preview()
 {
 }
 
-void AP_Columns_preview::draw(const UT_Rect *clip)
+void AP_Columns_preview::drawImmediate(const UT_Rect* clip)
 {
 	UT_UNUSED(clip);
 	GR_Painter painter(m_gc);

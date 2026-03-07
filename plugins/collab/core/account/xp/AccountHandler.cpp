@@ -139,7 +139,7 @@ void AccountHandler::joinSessionAsync(BuddyPtr pBuddy, DocHandle& docHandle)
 	send(&event, pBuddy);
 }
 
-bool AccountHandler::hasSession(const UT_UTF8String& sSessionId)
+bool AccountHandler::hasSession(const std::string& sSessionId)
 {
 	for (std::vector<BuddyPtr>::iterator it = m_vBuddies.begin(); it != m_vBuddies.end(); it++)
 	{
@@ -377,8 +377,8 @@ void AccountHandler::_handlePacket(Packet* packet, BuddyPtr buddy)
 				// set more document properties
 				jsre.m_iRev = pDoc->getCRNumber();
 				jsre.m_sDocumentId = pDoc->getDocUUIDString();
-				if (pDoc->getFilename())
-					jsre.m_sDocumentName = UT_go_basename_from_uri(pDoc->getFilename());
+				if (!pDoc->getFilename().empty())
+					jsre.m_sDocumentName = UT_go_basename_from_uri(pDoc->getFilename().c_str());
 				
 				// send to buddy!
 				send(&jsre, buddy);
@@ -392,7 +392,7 @@ void AccountHandler::_handlePacket(Packet* packet, BuddyPtr buddy)
 		case PCT_JoinSessionRequestResponseEvent:
 		{
 			JoinSessionRequestResponseEvent* jsre = static_cast<JoinSessionRequestResponseEvent*>( packet );
-			PD_Document* pDoc = 0;
+			PD_Document* pDoc = nullptr;
 			if (AbiCollabSessionManager::deserializeDocument(&pDoc, jsre->m_sZABW, false) == UT_OK)
 			{
 				if (pDoc)
@@ -431,7 +431,7 @@ void AccountHandler::_handlePacket(Packet* packet, BuddyPtr buddy)
                     // check if the buddy has access to this session
                     if (!hasAccess(pSession->getAcl(), buddy))
                     {
-                        UT_DEBUGMSG(("Buddy %s denied access to session %s by ALC\n", buddy->getDescriptor(true).utf8_str(), pSession->getSessionId().utf8_str()));
+                        UT_DEBUGMSG(("Buddy %s denied access to session %s by ALC\n", buddy->getDescriptor(true).utf8_str(), pSession->getSessionId().c_str()));
                         continue;
                     }
 
@@ -440,8 +440,8 @@ void AccountHandler::_handlePacket(Packet* packet, BuddyPtr buddy)
 
                     // determine name
 					UT_UTF8String documentBaseName;
-					if (pDoc->getFilename())
-						documentBaseName = UT_go_basename_from_uri(pDoc->getFilename());
+					if (!pDoc->getFilename().empty())
+						documentBaseName = UT_go_basename_from_uri(pDoc->getFilename().c_str());
 					// set session info
 					gsre.m_Sessions[ pSession->getSessionId() ] = documentBaseName;
 				}
@@ -454,7 +454,7 @@ void AccountHandler::_handlePacket(Packet* packet, BuddyPtr buddy)
 		{
 			GetSessionsResponseEvent* gsre = static_cast<GetSessionsResponseEvent*>( packet );
 			UT_GenericVector<DocHandle*> vDocHandles;
-			for (std::map<UT_UTF8String,UT_UTF8String>::iterator it=gsre->m_Sessions.begin(); it!=gsre->m_Sessions.end(); ++it) {
+			for (auto it = gsre->m_Sessions.cbegin(); it != gsre->m_Sessions.cend(); ++it) {
 				DocHandle* pDocHandle = new DocHandle((*it).first, (*it).second);
 				vDocHandles.addItem(pDocHandle);
 			}

@@ -65,7 +65,7 @@ EV_Toolbar_Label::EV_Toolbar_Label(XAP_Toolbar_Id id,
 	if(XAP_App::getApp()->theOSHasBidiSupport() == XAP_App::BIDI_SUPPORT_NONE)
 	{
         UT_uint32 iOldLen = 0;
-        UT_UCS4Char *fbdStr = 0, *fbdStr2 = 0;
+        UT_UCS4Char *fbdStr = nullptr, *fbdStr2 = nullptr;
 
 		const char * encoding = (XAP_EncodingManager::get_instance()->getNativeSystemEncodingName()) ?
 		  XAP_EncodingManager::get_instance()->getNativeSystemEncodingName() :
@@ -212,13 +212,13 @@ bool EV_Toolbar_LabelSet::setLabel(XAP_Toolbar_Id id,
 	UT_uint32 index = (id - m_first);
 	DELETEP(m_labelTable[index]);
 	m_labelTable[index] = new EV_Toolbar_Label(id,szToolbarLabel,szIconName,szToolTip,szStatusMsg);
-	return (m_labelTable[index] != NULL);
+	return (m_labelTable[index] != nullptr);
 }
 
 EV_Toolbar_Label * EV_Toolbar_LabelSet::getLabel(XAP_Toolbar_Id id)
 {
 	if ((id < m_first) || (id > m_last))
-		return NULL;
+		return nullptr;
 
 	UT_uint32 index = (id - m_first);
 

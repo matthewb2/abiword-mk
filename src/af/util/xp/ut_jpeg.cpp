@@ -163,7 +163,7 @@ bool UT_JPEG_getDimensions(const UT_ConstByteBufPtr & pBB, UT_sint32& iImageWidt
 	/* set the data source */
 	_JPEG_ByteBufSrc (&cinfo, pBB);
 
-	jpeg_read_header(&cinfo, TRUE);
+	jpeg_read_header(&cinfo, static_cast<boolean>(TRUE));
 	jpeg_start_decompress(&cinfo);
 	iImageWidth = cinfo.output_width;
 	iImageHeight = cinfo.output_height;
@@ -192,7 +192,7 @@ bool UT_JPEG_getRGBData(const UT_ConstByteBufPtr & pBB, UT_Byte* pDest,
 	/* set the data source */
 	_JPEG_ByteBufSrc (&cinfo, pBB);
 
-	jpeg_read_header(&cinfo, TRUE);
+	jpeg_read_header(&cinfo, static_cast<boolean>(TRUE));
 	jpeg_start_decompress(&cinfo);
 
 	int row_stride = cinfo.output_width * cinfo.output_components;
@@ -201,7 +201,7 @@ bool UT_JPEG_getRGBData(const UT_ConstByteBufPtr & pBB, UT_Byte* pDest,
 	(*cinfo.mem->alloc_sarray)
 			((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
 
-	UT_Byte* pCYMK = NULL;
+	UT_Byte* pCYMK = nullptr;
 	if (cinfo.output_components == 4)
 		pCYMK = reinterpret_cast<UT_Byte*>(g_malloc(row_stride));
 
@@ -294,7 +294,7 @@ static void _JPEG_ByteBufSrc (j_decompress_ptr cinfo, const UT_ConstByteBufPtr &
 	 * This makes it unsafe to use this manager and a different source
 	 * manager serially with the same JPEG object.  Caveat programmer.
 	 */
-	if (cinfo->src == NULL) {	/* first time for this JPEG object? */
+	if (cinfo->src == nullptr) {	/* first time for this JPEG object? */
 		cinfo->src = (jpeg_source_mgr *)
 			(*cinfo->mem->alloc_small) (reinterpret_cast<j_common_ptr>(cinfo),
 										JPOOL_PERMANENT,
@@ -311,6 +311,6 @@ static void _JPEG_ByteBufSrc (j_decompress_ptr cinfo, const UT_ConstByteBufPtr &
 	src->pub.term_source = _jpegTermSource;
 	src->sourceBuf = sourceBuf;
 	src->pub.bytes_in_buffer = 0; /* forces fill_input_buffer on first read */
-	src->pub.next_input_byte = NULL; /* until buffer loaded */
+	src->pub.next_input_byte = nullptr; /* until buffer loaded */
 }
 

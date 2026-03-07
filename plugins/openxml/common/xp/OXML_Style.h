@@ -24,16 +24,16 @@
 #define _OXML_STYLE_H_
 
 // Internal includes
-#include <OXML_Types.h>
-#include <OXML_ObjectWithAttrProp.h>
+#include "OXML_Types.h"
+#include "OXML_ObjectWithAttrProp.h"
 
 // AbiWord includes
-#include <ut_types.h>
-#include <pd_Document.h>
+#include "ut_types.h"
+#include "pd_Document.h"
 
 // External includes
+#include <memory>
 #include <string>
-#include <boost/shared_ptr.hpp>
 
 class IE_Exp_OpenXML;
 
@@ -73,7 +73,7 @@ private:
 	std::string m_followedby;
 };
 
-typedef boost::shared_ptr<OXML_Style> OXML_SharedStyle;
+typedef std::shared_ptr<OXML_Style> OXML_SharedStyle;
 
 #endif //_OXML_STYLE_H_
 

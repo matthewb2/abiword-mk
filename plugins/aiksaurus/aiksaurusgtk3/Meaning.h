@@ -1,7 +1,7 @@
-#ifndef INCLUDED_MEANING_H
-#define INCLUDED_MEANING_H
+#pragma once
 
 #include <gtk/gtk.h>
+
 #include <vector>
 #include <string>
 using namespace std;
@@ -25,19 +25,16 @@ namespace AiksaurusGTK_impl
             GtkWidget* d_label;
 
             static gint _wordclick(GtkTreeSelection *sel,
-                                   gpointer data) throw(std::bad_alloc);
+                                   gpointer data);
 
         public:
 
-            Meaning(const string& title, vector<string>& words, Display& display)
-                throw(std::bad_alloc);
+            Meaning(const string& title, vector<string>& words, Display& display);
 
-            ~Meaning() throw();
+            ~Meaning();
 
-            GtkWidget* getLayout() throw();
+            GtkWidget* getLayout() noexcept;
 
-            void unselectListsExcept(GtkWidget* me) throw();
+            void unselectListsExcept(GtkWidget* me) noexcept;
     };
 }
-
-#endif // INCLUDED_MEANING_H

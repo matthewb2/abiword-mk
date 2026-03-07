@@ -2,7 +2,7 @@
 
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2003, 2009 Hubert Figuiere
+ * Copyright (C) 2003, 2009-2021 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,7 +29,7 @@
 #include "ut_assert.h"
 #include "ut_debugmsg.h"
 
-#include "gr_CocoaCairoGraphics.h"
+#include "gr_CocoaGraphics.h"
 #include "xap_CocoaDialog_Utilities.h"
 
 #include "xap_App.h"
@@ -53,7 +53,7 @@ XAP_Dialog * AP_CocoaDialog_Columns::static_constructor(XAP_DialogFactory * pFac
 AP_CocoaDialog_Columns::AP_CocoaDialog_Columns(XAP_DialogFactory * pDlgFactory,
 										 XAP_Dialog_Id dlgid)
 	: AP_Dialog_Columns(pDlgFactory,dlgid),
-		m_pPreviewWidget(NULL),
+		m_pPreviewWidget(nullptr),
 		m_dlg(nil)
 {
 }
@@ -84,14 +84,15 @@ void AP_CocoaDialog_Columns::runModal(XAP_Frame * pFrame)
 	// make a new Cocoa GC
 	DELETEP (m_pPreviewWidget);
 	XAP_CocoaNSView *preview = [m_dlg preview];
-	GR_CocoaCairoAllocInfo ai(preview);
-	m_pPreviewWidget = (GR_CocoaCairoGraphics*)XAP_App::getApp()->newGraphics(ai);
+	GR_CocoaAllocInfo ai(preview);
+	m_pPreviewWidget = (GR_CocoaGraphics*)XAP_App::getApp()->newGraphics(ai);
 
 	NSSize size = [preview frame].size;
 
 	_createPreviewFromGC(m_pPreviewWidget,
 			     (UT_uint32) lrintf(size.width),
 			     (UT_uint32) lrintf(size.height));
+	m_dlg.preview.drawable = getColumnsPreview();
 
 //	setLineBetween(getLineBetween());  // isn't that a little useless ? Grafted from GTK...
 	[m_dlg setLineBetween:getLineBetween()];
@@ -132,7 +133,7 @@ void AP_CocoaDialog_Columns::event_Toggle( UT_uint32 icolumns)
 	[m_dlg setColNum:((int) icolumns)];
 	
 	setColumns(icolumns);
-	m_pColumnsPreview->draw();
+	getColumnsPreview()->queueDraw();
 }
 
 
@@ -216,7 +217,7 @@ void AP_CocoaDialog_Columns::enableLineBetweenControl(bool /*bState*/)
 
 -(void)discardXAP
 {
-	_xap = NULL; 
+	_xap = nullptr;
 }
 
 -(void)dealloc
@@ -227,6 +228,9 @@ void AP_CocoaDialog_Columns::enableLineBetweenControl(bool /*bState*/)
 - (void)setXAPOwner:(XAP_Dialog *)owner
 {
 	_xap = dynamic_cast<AP_CocoaDialog_Columns*>(owner);
+
+	// There is no guarantee this is not nullptr, but this makes it consistent.
+	self.preview.drawable = _xap->getColumnsPreview();
 }
 
 -(void)windowDidLoad
@@ -340,9 +344,9 @@ void AP_CocoaDialog_Columns::enableLineBetweenControl(bool /*bState*/)
 	[_numOfColumnData    setIntValue:num];
 	[_numOfColumnStepper setIntValue:num];
 
-	[  _oneBtn setState:((num == 1) ? NSOnState : NSOffState)];
-	[  _twoBtn setState:((num == 2) ? NSOnState : NSOffState)];
-	[_threeBtn setState:((num == 3) ? NSOnState : NSOffState)];
+	[  _oneBtn setState:((num == 1) ? NSControlStateValueOn : NSControlStateValueOff)];
+	[  _twoBtn setState:((num == 2) ? NSControlStateValueOn : NSControlStateValueOff)];
+	[_threeBtn setState:((num == 3) ? NSControlStateValueOn : NSControlStateValueOff)];
 }
 
 - (IBAction)spaceAfterColAction:(id)sender
@@ -378,12 +382,12 @@ void AP_CocoaDialog_Columns::enableLineBetweenControl(bool /*bState*/)
 
 - (bool)lineBetween
 {
-	return ([_lineBetweenBtn state] == NSOnState);
+	return ([_lineBetweenBtn state] == NSControlStateValueOn);
 }
 
 - (void)setLineBetween:(bool)b
 {
-	[_lineBetweenBtn setState:(b ? NSOnState : NSOffState)];
+	[_lineBetweenBtn setState:(b ? NSControlStateValueOn : NSControlStateValueOff)];
 }
 
 - (UT_uint32)columnRTLOrder
@@ -393,7 +397,7 @@ void AP_CocoaDialog_Columns::enableLineBetweenControl(bool /*bState*/)
 
 - (void)setColumnRTLOrder:(UT_uint32)val
 {
-	[_useRTLBtn setState:((val == 0) ? NSOffState : NSOnState)];
+	[_useRTLBtn setState:((val == 0) ? NSControlStateValueOff : NSControlStateValueOn)];
 }
 
 - (XAP_CocoaNSView *)preview

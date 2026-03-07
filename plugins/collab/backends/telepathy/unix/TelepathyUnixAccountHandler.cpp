@@ -28,6 +28,7 @@
 #include <fv_View.h>
 #include <xap_Frame.h>
 #include <xap_UnixApp.h>
+#include "xap_GtkUtils.h"
 
 #include <telepathy-glib/telepathy-glib.h>
 
@@ -304,20 +305,29 @@ void TelepathyAccountHandler::embedDialogWidgets(void* pEmbeddingParent)
 	UT_DEBUGMSG(("TelepathyAccountHandler::embedDialogWidgets()\n"));
 	UT_return_if_fail(pEmbeddingParent);
 
-	table = gtk_table_new(2, 2, FALSE);
-	GtkVBox* parent = (GtkVBox*)pEmbeddingParent;
+	table = gtk_grid_new();
+	g_object_set(G_OBJECT(table),
+	             "row-spacing", 6,
+	             "column-spacing", 12,
+	             "hexpand", true,
+	             NULL);
+	GtkBox* parent = (GtkBox*)pEmbeddingParent;
 
 	// Jabber conference server
-	GtkWidget* conference_label = gtk_label_new("Jabber conference server:");
-	gtk_misc_set_alignment(GTK_MISC(conference_label), 0, 0.5);
-	gtk_table_attach_defaults(GTK_TABLE(table), conference_label, 0, 1, 0, 1);
+	GtkWidget* conference_label
+          = gtk_widget_new(GTK_TYPE_LABEL,
+                           "label", "Jabber conference server:",
+                           "xalign", 0.0, "yalign", 0.5,
+                           NULL);
+	gtk_grid_attach(GTK_GRID(table), conference_label, 0, 0, 1, 1);
 	conference_entry = gtk_entry_new();
-	gtk_table_attach_defaults(GTK_TABLE(table), conference_entry, 1, 2, 0, 1);
+	gtk_widget_set_hexpand(conference_entry, true);
+	gtk_grid_attach(GTK_GRID(table), conference_entry, 1, 0, 1, 1);
 	gtk_entry_set_activates_default(GTK_ENTRY(conference_entry), true);
 
 	// autoconnect
 	autoconnect_button = gtk_check_button_new_with_label ("Connect on application startup");
-	gtk_table_attach_defaults(GTK_TABLE(table), autoconnect_button, 0, 2, 1, 2);
+	gtk_grid_attach(GTK_GRID(table), autoconnect_button, 0, 1, 2, 1);
 
 	gtk_box_pack_start(GTK_BOX(parent), table, FALSE, TRUE, 0);
 	gtk_widget_show_all(GTK_WIDGET(parent));
@@ -329,8 +339,9 @@ void TelepathyAccountHandler::removeDialogWidgets(void* pEmbeddingParent)
 	UT_return_if_fail(pEmbeddingParent);
 
 	// this will conveniently destroy all contained widgets as well
-	if (table && GTK_IS_WIDGET(table))
-		gtk_widget_destroy(table);
+	if (table && GTK_IS_WIDGET(table)) {
+		gtk_container_remove(GTK_CONTAINER(gtk_widget_get_parent(table)), table);
+        }
 }
 
 void TelepathyAccountHandler::loadProperties()
@@ -339,7 +350,7 @@ void TelepathyAccountHandler::loadProperties()
 
 	std::string conference_server = getProperty("conference_server");
 	if (conference_entry && GTK_IS_ENTRY(conference_entry))
-		gtk_entry_set_text(GTK_ENTRY(conference_entry), conference_server.c_str());
+		XAP_gtk_entry_set_text(GTK_ENTRY(conference_entry), conference_server.c_str());
 
 	bool autoconnect = hasProperty("autoconnect") ? getProperty("autoconnect") == "true" : true;
 	if (autoconnect_button && GTK_IS_TOGGLE_BUTTON(autoconnect_button))
@@ -351,7 +362,7 @@ void TelepathyAccountHandler::storeProperties()
 	UT_DEBUGMSG(("TelepathyAccountHandler::storeProperties()\n"));
 
 	if (conference_entry && GTK_IS_ENTRY(conference_entry))
-		addProperty("conference_server", gtk_entry_get_text(GTK_ENTRY(conference_entry)));
+		addProperty("conference_server", XAP_gtk_entry_get_text(GTK_ENTRY(conference_entry)));
 
 	if (autoconnect_button && GTK_IS_TOGGLE_BUTTON(autoconnect_button))
 		addProperty("autoconnect", gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(autoconnect_button)) ? "true" : "false" );
@@ -541,9 +552,9 @@ bool TelepathyAccountHandler::startSession(PD_Document* pDoc, const std::vector<
 	UT_return_val_if_fail(pManager, false);
 
 	// generate a unique session id to use
-	UT_UTF8String sSessionId;
+	std::string sSessionId;
 	UT_UUID* pUUID = XAP_App::getApp()->getUUIDGenerator()->createUUID();
-	pUUID->toString(sSessionId);
+	sSessionId = pUUID->toString().unwrap_or("");
 	DELETEP(pUUID);
 
 	// start the session already, while we'll continue to setup a
@@ -592,7 +603,7 @@ bool TelepathyAccountHandler::startSession(PD_Document* pDoc, const std::vector<
 	g_list_free(accounts);
 
 	// determine the room target id
-	std::string target_id = sSessionId.utf8_str();
+	std::string target_id = sSessionId;
 	std::string conference_server = getProperty("conference_server");
 	if (conference_server != "")
 		target_id += "@" + conference_server;
@@ -686,7 +697,7 @@ void TelepathyAccountHandler::signal(const Event& event, BuddyPtr pSource)
 				}
 				UT_return_if_fail(!pSource); // we shouldn't receive these events over the wire on this backend
 
-				UT_DEBUGMSG(("Disconnecting the tube for room with session id %s\n", cse.getSessionId().utf8_str()));
+				UT_DEBUGMSG(("Disconnecting the tube for room with session id %s\n", cse.getSessionId().c_str()));
 				TelepathyChatroomPtr pChatroom = _getChatroom(cse.getSessionId());
 				UT_return_if_fail(pChatroom);
 
@@ -705,7 +716,7 @@ void TelepathyAccountHandler::signal(const Event& event, BuddyPtr pSource)
 				}
 				UT_return_if_fail(!pSource); // we shouldn't receive these events over the wire on this backend
 
-				UT_DEBUGMSG(("Disconnecting the tube for room with session id %s\n", dse.getSessionId().utf8_str()));
+				UT_DEBUGMSG(("Disconnecting the tube for room with session id %s\n", dse.getSessionId().c_str()));
 				TelepathyChatroomPtr pChatroom = _getChatroom(dse.getSessionId());
 				UT_return_if_fail(pChatroom);
 
@@ -805,8 +816,9 @@ void TelepathyAccountHandler::handleMessage(DTubeBuddyPtr pBuddy, const std::str
 				send(&gsre, pBuddy);
 			}
 			else
-				UT_DEBUGMSG(("Ignoring GetSessionsEvent, we are not controlling session '%s'\n", pChatroom->getSessionId().utf8_str()));
-
+			{
+				UT_DEBUGMSG(("Ignoring GetSessionsEvent, we are not controlling session '%s'\n", pChatroom->getSessionId().c_str()));
+			}
 			break;
 		}
 		case PCT_GetSessionsResponseEvent:
@@ -816,14 +828,14 @@ void TelepathyAccountHandler::handleMessage(DTubeBuddyPtr pBuddy, const std::str
 
 			GetSessionsResponseEvent* gsre = static_cast<GetSessionsResponseEvent*>( pPacket );
 			UT_return_if_fail(gsre->m_Sessions.size() == 1);
-			std::map<UT_UTF8String,UT_UTF8String>::iterator it=gsre->m_Sessions.begin();
+			auto it = gsre->m_Sessions.cbegin();
 			DocHandle* pDocHandle = new DocHandle((*it).first, (*it).second);
 
 			// store the session id
 			pChatroom->setSessionId(pDocHandle->getSessionId());
 
 			// join the session
-			UT_DEBUGMSG(("Got a running session (%s - %s), let's join it immediately\n", pDocHandle->getSessionId().utf8_str(), pDocHandle->getName().utf8_str()));
+			UT_DEBUGMSG(("Got a running session (%s - %s), let's join it immediately\n", pDocHandle->getSessionId().c_str(), pDocHandle->getName().utf8_str()));
 			pManager->joinSessionInitiate(pBuddy, pDocHandle);
 			DELETEP(pDocHandle);
 			break;
@@ -882,9 +894,9 @@ TelepathyBuddyPtr TelepathyAccountHandler::_getBuddy(TelepathyBuddyPtr pBuddy)
 	return TelepathyBuddyPtr();
 }
 
-TelepathyChatroomPtr TelepathyAccountHandler::_getChatroom(const UT_UTF8String& sSessionId)
+TelepathyChatroomPtr TelepathyAccountHandler::_getChatroom(const std::string& sSessionId)
 {
-	for (std::vector<TelepathyChatroomPtr>::iterator it = m_chatrooms.begin(); it != m_chatrooms.end(); it++)
+	for (auto it = m_chatrooms.cbegin(); it != m_chatrooms.cend(); it++)
 	{
 		TelepathyChatroomPtr pChatroom = *it;
 		UT_continue_if_fail(pChatroom);

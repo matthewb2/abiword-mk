@@ -20,6 +20,8 @@
 #ifndef AP_DIALOG_STYLIST_H
 #define AP_DIALOG_STYLIST_H
 
+#include <vector>
+
 #include "ut_types.h"
 #include "xap_Frame.h"
 #include "xap_Dialog.h"
@@ -41,10 +43,11 @@ public:
 	void       setRowName(const std::string & sRowname);
 	void       getRowName(std::string & sRowname) const;
 	UT_sint32  getNumCols(void) const;
-	bool       findStyle(UT_UTF8String & sStyleName, UT_sint32 & col);
-	bool       getStyle(UT_UTF8String & sStyleName, UT_sint32 col);
+	bool       findStyle(const std::string & sStyleName, UT_sint32 & col);
+	bool       getStyle(std::string & sStyleName, UT_sint32 col);
 private:
-	UT_GenericVector<UT_UTF8String *> m_vecStyles;
+
+	std::vector<std::string> m_vecStyles;
 	std::string  m_sRowName;
 };
 
@@ -53,8 +56,8 @@ class ABI_EXPORT Stylist_tree
 public:
 	Stylist_tree(PD_Document * pDoc);
 	virtual ~Stylist_tree(void);
-	bool             findStyle(UT_UTF8String & sStyleName,UT_sint32 & row, UT_sint32 & col);
-	bool             getStyleAtRowCol(UT_UTF8String & sStyle, UT_sint32 row, UT_sint32 col);
+	bool             findStyle(const std::string & sStyleName,UT_sint32 & row, UT_sint32 & col);
+	bool             getStyleAtRowCol(std::string & sStyle, UT_sint32 row, UT_sint32 col);
 	UT_sint32        getNumRows(void) const;
 	UT_sint32        getNumCols(UT_sint32 row) const;
 	void             buildStyles(PD_Document * pDoc);
@@ -76,8 +79,8 @@ public:
 	AP_Dialog_Stylist(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_Dialog_Stylist(void);
 
-	virtual void runModeless(XAP_Frame * pFrame) = 0;
-	virtual void runModal(XAP_Frame * pFrame) = 0;
+	virtual void runModeless(XAP_Frame * pFrame) override = 0;
+	virtual void runModal(XAP_Frame * pFrame) override = 0;
 
 	bool              isStyleValid(void)
 		{ return  m_bStyleValid;}
@@ -85,16 +88,16 @@ public:
 	void              stopUpdater(void);
 	// I am gonna be nice and make this an empty implementation instead of pure virtual
 	virtual void      setSensitivity(bool /*bSens*/) {};
-    void              setActiveFrame(XAP_Frame *pFrame);
+	void              setActiveFrame(XAP_Frame *pFrame) override;
 	void              event_update(void);
 	void              finalize(void);
 	Stylist_tree *  getStyleTree(void) const
 		{ return m_pStyleTree;}
-	const UT_UTF8String *   getCurStyle(void) const
-		{ return &m_sCurStyle;}
-	UT_UTF8String     getSelectedStyle(void) const
+	const std::string & getCurStyle(void) const
 		{ return m_sCurStyle;}
-	void              setCurStyle(UT_UTF8String & sStyle)
+	const std::string & getSelectedStyle(void) const
+		{ return m_sCurStyle;}
+	void              setCurStyle(const std::string & sStyle)
 		{ m_sCurStyle = sStyle;}
 	void              Apply(void);
 	virtual void      setStyleInGUI(void) = 0;
@@ -119,7 +122,7 @@ private:
 	PD_Document *         m_pDoc;
 	UT_Timer *            m_pAutoUpdater;
 	UT_uint32             m_iTick;
-	UT_UTF8String         m_sCurStyle;
+	std::string           m_sCurStyle;
 	Stylist_tree *        m_pStyleTree;
 	bool                  m_bStyleTreeChanged;
 	bool                  m_bStyleChanged;

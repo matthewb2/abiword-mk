@@ -1,9 +1,8 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
-
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 1998-2000 AbiSource, Inc.
  * Copyright (C) 2001 Tomas Frydrych
- * Copyright (C) 2004 Hubert Figuière
+ * Copyright (C) 2004-2021 Hubert FiguiÃ¨re
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,8 +20,7 @@
  * 02110-1301 USA.
  */
 
-#ifndef AP_TOPRULER_H
-#define AP_TOPRULER_H
+#pragma once
 
 #include "xap_Features.h"
 // Class for dealing with the horizontal ruler at the top of
@@ -79,15 +77,15 @@ public:
 							m_xrFirstLineIndent(0),
 							m_xrRightIndent(0),
 							m_xrTabStop(0),
-							m_pfnEnumTabStops(NULL),
-							m_pVoidEnumTabStopsData(NULL),
+							m_pfnEnumTabStops(nullptr),
+							m_pVoidEnumTabStopsData(nullptr),
 							m_iTabStops(0),
 							m_iDefaultTabInterval(0),
-							m_pszTabStops(NULL),
+							m_pszTabStops(nullptr),
 							m_iCurrentColumn(0),
 							m_iNumColumns(0),
-							m_vecTableColInfo (NULL),
-							m_vecFullTable(NULL),
+							m_vecTableColInfo (nullptr),
+							m_vecFullTable(nullptr),
 							m_iTablePadding(0),
 							m_iCells(0),
 							m_iCurCell(0)
@@ -121,7 +119,7 @@ public:
 					delete m_vecFullTable->getNthItem(i);
 				}
 				delete m_vecFullTable;
-				m_vecFullTable = NULL;
+				m_vecFullTable = nullptr;
 			}
 		}
 
@@ -183,7 +181,7 @@ public:
 	} u;
 };
 
-class ABI_EXPORT AP_TopRuler : public AV_Listener, virtual public XAP_CustomWidgetLU
+class ABI_EXPORT AP_TopRuler : public AP_Ruler, public AV_Listener
 {
 public:
 	AP_TopRuler(XAP_Frame * pFrame);
@@ -195,24 +193,25 @@ public:
 	AV_View *       getView(void) const { return m_pView;}
 	void			setOffsetLeftRuler(UT_uint32 iLeftRulerWidth);
 	void            setZoom(UT_uint32 iZoom);
-	void			setHeight(UT_uint32 iHeight);
+	virtual void	setHeight(UT_uint32 iHeight) override;
 	UT_uint32		getHeight(void) const;
-	void			setWidth(UT_uint32 iWidth);
+	virtual void	setWidth(UT_uint32 iWidth) override;
 	UT_uint32		getWidth(void) const;
-	GR_Graphics *	getGraphics(void) const { return m_pG;}
+	virtual GR_Graphics*	getGraphics(void) const override { return m_pG; }
+	virtual XAP_Frame* getFrame() const override {  return m_pFrame; }
 	bool            isHidden(void) const
 		{ return m_bIsHidden;}
 	void			scrollRuler(UT_sint32 xoff, UT_sint32 xlimit);
 
 	UT_sint32       setTableLineDrag(PT_DocPosition pos, UT_sint32 x, UT_sint32 & iFixed);
-	void			mouseMotion(EV_EditModifierState ems, UT_sint32 x, UT_sint32 y);
-	void			mousePress(EV_EditModifierState ems, EV_EditMouseButton emb, UT_uint32 x, UT_uint32 y);
-	void			mouseRelease(EV_EditModifierState ems, EV_EditMouseButton emb, UT_sint32 x, UT_sint32 y);
+	virtual void	mouseMotion(EV_EditModifierState ems, UT_sint32 x, UT_sint32 y) override;
+	virtual void	mousePress(EV_EditModifierState ems, EV_EditMouseButton emb, UT_uint32 x, UT_uint32 y) override;
+	virtual void	mouseRelease(EV_EditModifierState ems, EV_EditMouseButton emb, UT_sint32 x, UT_sint32 y) override;
 
 	bool            isMouseOverTab(UT_uint32 x, UT_uint32 y);
 	/* used with AV_Listener */
-	virtual bool	notify(AV_View * pView, const AV_ChangeMask mask);
-    virtual  AV_ListenerType getType(void) { return AV_LISTENER_TOPRULER;}
+	virtual bool notify(AV_View * pView, const AV_ChangeMask mask) override;
+	virtual AV_ListenerType getType(void) const override { return AV_LISTENER_TOPRULER;}
 
 	/* used with AV_ScrollObj */
 	static void		_scrollFuncX(void * pData, UT_sint32 xoff, UT_sint32 xlimit);
@@ -227,8 +226,8 @@ public:
 	static UT_uint32 getFixedWidth(){return s_iFixedWidth;}
 
 protected:
-	/* implement XAP_CustomWidgetLU::drawLU */
-	virtual void drawLU(const UT_Rect *clip);
+	/* implement XAP_CustomWidgetLU::drawImmediateLU */
+	virtual void drawImmediateLU(const UT_Rect *clip) override;
 
 	void	_draw(const UT_Rect * pClipRect, AP_TopRulerInfo * pUseInfo);
 	void	_drawBar(const UT_Rect * pClipRect, AP_TopRulerInfo * pInfo,
@@ -309,11 +308,10 @@ protected:
 	void		_displayStatusMessage(XAP_String_Id FormatMessageID, UT_sint32 iCol, const char * format);
 	void		_displayStatusMessage(XAP_String_Id FormatMessageID);
 
-
-	void        _refreshView(void);
+	virtual void _refreshView(void) override;
 
 	// must be static so that I can pass as a functional arg - shack
-	static void _prefsListener( XAP_Prefs *pPrefs, UT_StringPtrMap *phChanges, void *data );
+	static void _prefsListener( XAP_Prefs *pPrefs, const XAP_PrefsChangeSet *phChanges, void *data );
 
 	// autoscroll stuff
 	static void			_autoScroll(UT_Worker * pTimer);
@@ -393,5 +391,3 @@ private:
 	GR_Image*			m_otherGuideCache;
 #endif
 };
-
-#endif /* AP_TOPRULER_H */

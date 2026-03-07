@@ -1,3 +1,4 @@
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
 /* AbiSource
  * 
  * Copyright (C) 2002 Dom Lachowicz <cinamod@hotmail.com>
@@ -33,10 +34,10 @@
 #include "ODi_Abi_Data.h"
 
 // AbiWord includes
-#include <pd_Document.h>
-#include <ut_math.h>
-#include <ut_locale.h>
-#include <ut_std_string.h>
+#include "pd_Document.h"
+#include "ut_math.h"
+#include "ut_locale.h"
+#include "ut_std_string.h"
 
 // External includes
 #include <ctype.h>
@@ -48,8 +49,8 @@
 ODi_Style_Style::ODi_Style_Style(ODi_ElementStack& rElementStack,
 				  ODi_Abi_Data & rAbiData) :
                        ODi_ListenerState("StyleStyle", rElementStack),
-                       m_pParentStyle(NULL),
-                       m_pNextStyle(NULL),
+                       m_pParentStyle(nullptr),
+                       m_pNextStyle(nullptr),
                        m_haveTopBorder(HAVE_BORDER_UNSPECIFIED),
                        m_haveBottomBorder(HAVE_BORDER_UNSPECIFIED),
                        m_haveLeftBorder(HAVE_BORDER_UNSPECIFIED),
@@ -256,7 +257,7 @@ void ODi_Style_Style::_parse_style_paragraphProperties(const gchar** ppProps) {
     
     pVal = UT_getAttribute ("fo:line-height", ppProps);
     if (pVal) {
-        if (strstr(pVal, "%") != NULL) {
+        if (strstr(pVal, "%") != nullptr) {
             int spacing;
 	    UT_LocaleTransactor lt(LC_NUMERIC, "C");            
 
@@ -450,7 +451,7 @@ void ODi_Style_Style::_parse_style_paragraphProperties(const gchar** ppProps) {
  */
 void ODi_Style_Style::_parse_style_tabStopProperties(const gchar** ppProps) {
     
-    const gchar* pVal = NULL;
+    const gchar* pVal = nullptr;
     std::string type;
     std::string position;
     std::string leaderStyle;
@@ -568,8 +569,8 @@ void ODi_Style_Style::_parse_style_tabStopProperties(const gchar** ppProps) {
  */
 void ODi_Style_Style::_parse_style_textProperties(const gchar** ppProps) {
     
-    const gchar* pVal = NULL;
-    const gchar* pVal2 = NULL;
+    const gchar* pVal = nullptr;
+    const gchar* pVal2 = nullptr;
     
     pVal = UT_getAttribute("fo:color", ppProps);
     if (pVal) {
@@ -970,42 +971,39 @@ void ODi_Style_Style::defineAbiStyle(PD_Document* pDocument) {
      *           a[4] = "props"
      *           a[5] = "text-indent:0in; margin-top:0pt; margin-left:0pt; ..."
      *           ...
-     *           a[n] = 0 (NULL character)
+     *           a[n] = 0 (nullptr character)
      */
-    const gchar* pAttr[11];
-    UT_uint32 i = 0;
     bool ok;
-    
-    pAttr[i++] = "type";
+
+    PP_PropertyVector pAttr;
+    pAttr.push_back("type");
     if (!strcmp("paragraph", m_family.c_str())) {
-        pAttr[i++] = "P";
+        pAttr.push_back("P");
     } else if (!strcmp("text", m_family.c_str())) {
-        pAttr[i++] = "C";
+        pAttr.push_back("C");
     } else {
         // Really shouldn't happen
         UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
     }
-    
+
     // AbiWord uses the display name
-    pAttr[i++] = "name";
-    pAttr[i++] = m_displayName.c_str();
-    
+    pAttr.push_back("name");
+    pAttr.push_back(m_displayName);
+
     if (m_pParentStyle) {
-        pAttr[i++] = "basedon";
-        pAttr[i++] = m_pParentStyle->getDisplayName().c_str();
+        pAttr.push_back("basedon");
+        pAttr.push_back(m_pParentStyle->getDisplayName());
     }
-    
+
     if (m_pNextStyle) {
-        pAttr[i++] = "followedby";
-        pAttr[i++] = m_pNextStyle->getDisplayName().c_str();
+        pAttr.push_back("followedby");
+        pAttr.push_back(m_pNextStyle->getDisplayName());
     }
 
 
-    pAttr[i++] = "props";
-    pAttr[i++] = m_abiPropsAttr.c_str();
-    
-    pAttr[i] = 0; // Signal the end of the array 
-    
+    pAttr.push_back("props");
+    pAttr.push_back(m_abiPropsAttr.c_str());
+
     ok = pDocument->appendStyle(pAttr);
     UT_ASSERT_HARMLESS(ok);
 }
@@ -1126,10 +1124,11 @@ void ODi_Style_Style::buildAbiPropsAttrString(ODi_FontFaceDecls& rFontFaceDecls)
     
     if (!m_fontName.empty()) {
         const std::string & fontFamily = rFontFaceDecls.getFontFamily(m_fontName.c_str());
-        
-        UT_ASSERT_HARMLESS(!fontFamily.empty());
+
         if (!fontFamily.empty()) {
             APPEND_STYLE("font-family: ", fontFamily);
+        } else {
+            UT_WARNINGMSG(("ODT: style font family is empty"));
         }
     }
     
@@ -1313,10 +1312,10 @@ void ODi_Style_Style::_stripColorLength(std::string& rColor,
 /**
  * This function shouldn't exist. The code should use
  * UT_isValidDimensionString instead. The problem with the UT function is
- * that it doesn't check the dimension specifier and only accepts NULL
+ * that it doesn't check the dimension specifier and only accepts nullptr
  * terminated strings.
  * 
- * @param length 0 for NULL terminated strings.
+ * @param length 0 for nullptr terminated strings.
  */
 bool ODi_Style_Style::_isValidDimensionString(const gchar* pString,
                                              UT_uint32 length) const {

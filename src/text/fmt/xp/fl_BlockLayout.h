@@ -20,8 +20,7 @@
  * 02110-1301 USA.
  */
 
-#ifndef FL_BLOCKLAYOUT_H
-#define FL_BLOCKLAYOUT_H
+#pragma once
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -139,7 +138,7 @@ public:
 	} eSpacingPolicy;
 
     void                formatAll(void);
-	virtual void        format(void);
+	virtual void        format(void) override;
 	void                formatWrappedFromHere(fp_Line * pLine,fp_Page * pPage);
 	fp_Line *           getNextWrappedLine(UT_sint32 iX,
 											  UT_sint32 iHeight,
@@ -149,13 +148,13 @@ public:
 												UT_sint32 & iMinLeft,
 												UT_sint32 & iMinRight,
 												UT_sint32 & iMinWidth);
-	virtual bool		recalculateFields(UT_uint32 iUpdateCount);
+	virtual bool		recalculateFields(UT_uint32 iUpdateCount) override;
 
-	virtual void		redrawUpdate();
-	virtual void        updateLayout(bool /*bDoAll*/) {}
-	virtual fp_Container * getNewContainer(fp_Container * pCon = NULL);
+	virtual void		redrawUpdate() override;
+	virtual void        updateLayout(bool /*bDoAll*/) override {}
+	virtual fp_Container* getNewContainer(const fp_Container* pCon = nullptr) override;
 	FV_View *		getView(void) const {
-		UT_return_val_if_fail( m_pLayout, NULL );
+		UT_return_val_if_fail( m_pLayout, nullptr );
 		return m_pLayout->getView();
 	}
 
@@ -177,14 +176,14 @@ public:
 	bool            getXYOffsetToLine(UT_sint32 & xoff, UT_sint32 & yoff, fp_Line * pLine) const;
 	bool            setFramesOnPage(fp_Line * pLastLine);
 	UT_sint32       getMinWrapWidth(void) const;
-	UT_sint32       getHeightOfBlock(bool b_withMargins = true);
+	UT_sint32       getHeightOfBlock(bool b_withMargins = true) const;
 	fp_Line *       findLineWithFootnotePID(UT_uint32 pid) const;
 	UT_sint32 getMaxNonBreakableRun(void) const;
 	fp_Line* findPrevLineInDocument(fp_Line*) const;
 	fp_Line* findNextLineInDocument(fp_Line*) const;
-	virtual void     appendTextToBuf(UT_GrowBuf & buf) const;
+	virtual void     appendTextToBuf(UT_GrowBuf & buf) const override;
 	void             appendUTF8String(UT_UTF8String & sText) const;
-	virtual fp_Run* getFirstRun(void) const { return m_pFirstRun; }
+	virtual fp_Run* getFirstRun(void) const override { return m_pFirstRun; }
 	inline void setFirstRun(fp_Run* pRun) { m_pFirstRun = pRun; }
 	void        clearPrint(void) const;
 	inline bool isListItem(void) const { return m_bListItem; }
@@ -195,7 +194,7 @@ public:
 	void  refreshRunProperties(void) const;
 	char *	getFormatFromListType(FL_ListType iListType) const;
 	void remItemFromList(void);
-	virtual void listUpdate(void);
+	virtual void listUpdate(void) override;
 	void resumeList( fl_BlockLayout * prevList);
 	void prependList( fl_BlockLayout * nextList);
 	FL_ListType decodeListType(char * listformat) const;
@@ -204,7 +203,7 @@ public:
 	FL_ListType getListTypeFromStyle( const gchar * style) const;
 	fl_BlockLayout * getNextList(UT_uint32 id) const;
 	bool isListLabelInBlock(void) const;
-	void StartList( const gchar * style, pf_Frag_Strux* prevSDH = NULL);
+	void StartList( const gchar * style, pf_Frag_Strux* prevSDH = nullptr);
 
 	void StartList( FL_ListType lType, UT_uint32 start,
 					const gchar * lDelim, const gchar * lDecimal,
@@ -231,7 +230,7 @@ public:
 
 	UT_uint32 canSlurp(fp_Line* pLine) const;
 
-	PT_DocPosition getPosition(bool bActualBlockPos=false) const;
+	PT_DocPosition getPosition(bool bActualBlockPos = false) const override;
 	fp_Run* findPointCoords(PT_DocPosition position, bool bEOL,
 							UT_sint32& x, UT_sint32& y, UT_sint32& x2,
 							UT_sint32& y2, UT_sint32& height, bool& bDirection) const;
@@ -250,9 +249,9 @@ public:
 	inline UT_sint32	getTopMargin(void) const { return m_iTopMargin; }
 	inline UT_sint32	getBottomMargin(void) const { return m_iBottomMargin; }
 	inline fb_Alignment *		getAlignment(void) const { return m_pAlignment; }
-	virtual FL_DocLayout*		getDocLayout(void) const { return m_pLayout; }
-	virtual fl_SectionLayout*	getSectionLayout(void) const { return m_pSectionLayout;}
-	fl_DocSectionLayout * getDocSectionLayout(void) const;
+	virtual FL_DocLayout*		getDocLayout(void) const override { return m_pLayout; }
+	virtual fl_SectionLayout*	getSectionLayout(void) const override { return m_pSectionLayout;}
+	fl_DocSectionLayout * getDocSectionLayout(void) const override;
 
 	void setSectionLayout(fl_SectionLayout* pSectionLayout);
 
@@ -286,7 +285,7 @@ public:
 	bool	findPrevTabStop(UT_sint32 iStartX, UT_sint32 iMaxX,
 							UT_sint32& iPosition, eTabType& iType,
 							eTabLeader &iLeader ) const;
-	bool    hasUpdatableField(void) { return m_bHasUpdatableField;}
+	bool    hasUpdatableField(void) const { return m_bHasUpdatableField;}
 	void    setUpdatableField(bool bValue) { m_bHasUpdatableField = bValue;}
 	inline UT_sint32 getDefaultTabInterval(void) const { return m_iDefaultTabInterval; }
 	inline UT_sint32 getTabsCount(void) const {
@@ -345,17 +344,17 @@ public:
 	bool doclistener_changeFmtMark(const PX_ChangeRecord_FmtMarkChange * pcrfmc);
 
 	void					purgeLayout(void);
-	virtual void			collapse(void);
-	virtual bool			isCollapsed(void) const
+	virtual void			collapse(void) override;
+	virtual bool			isCollapsed(void) const override
 		{return m_bIsCollapsed;}
 	void					coalesceRuns(void) const;
-	virtual void			setNeedsReformat(fl_ContainerLayout * pCL, UT_uint32 offset = 0);
-	inline bool 		    needsReformat(void) const
+	virtual void			setNeedsReformat(fl_ContainerLayout * pCL, UT_uint32 offset = 0) override;
+	inline bool 		    needsReformat(void) const override
 		{ return (m_iNeedsReformat >= 0); }
-	virtual void			setNeedsRedraw(void);
-	virtual bool 		    needsRedraw(void) const
+	virtual void			setNeedsRedraw(void) override;
+	virtual bool 		    needsRedraw(void) const override
 		{ return m_bNeedsRedraw; }
-	virtual void			markAllRunsDirty(void);
+	virtual void			markAllRunsDirty(void) override;
 	UT_sint32               findLineInBlock(fp_Line * pLine) const;
 
 	bool                    isWordDelimiter(UT_UCS4Char c, UT_UCS4Char next, UT_UCS4Char prev, UT_uint32 iBlockPos) const;
@@ -409,14 +408,14 @@ public:
 	void                   setLineHeightBlockWithBorders(int whichLine = 0);
 
 #ifdef ENABLE_SPELL
-	/** put in queue for spellchecking after prev. If prev == NULL is put at the head */
+	/** put in queue for spellchecking after prev. If prev == nullptr is put at the head */
 	void enqueueToSpellCheckAfter(fl_BlockLayout *prev);
 	/** remove from the spellchecking queue */
 	void dequeueFromSpellCheck(void);
 	/** call to clear the queue. Warning, you can mess up things */
 	void clearQueueing(void)
 	{
-		m_prevToSpell = m_nextToSpell = NULL;
+		m_prevToSpell = m_nextToSpell = nullptr;
 	}
 	fl_BlockLayout *nextToSpell(void) const
 	{
@@ -425,7 +424,7 @@ public:
 	/** return true if the block is queued */
 	bool isQueued(void) const
 	{
-		return (m_prevToSpell != NULL)
+		return (m_prevToSpell != nullptr)
 			|| (m_pLayout->spellQueueHead() == this);
 	}
 #endif
@@ -435,7 +434,7 @@ public:
 #endif
 
 private:
-	virtual bool            _canContainPoint() const;
+	virtual bool            _canContainPoint() const override;
 
 protected:
 
@@ -487,8 +486,8 @@ protected:
 	bool                    _doInsertDirectionMarkerRun(PT_BlockOffset blockOffset, UT_UCS4Char iM);
 	bool					_deleteFmtMark(PT_BlockOffset blockOffset);
 
-	virtual void			_lookupProperties(const PP_AttrProp* pAP);
-	virtual void			_lookupMarginProperties(const PP_AttrProp* pAP);
+	virtual void			_lookupProperties(const PP_AttrProp* pAP) override;
+	virtual void			_lookupMarginProperties(const PP_AttrProp* pAP) override;
 	void					_removeLine(fp_Line*, bool bRemoveFromContainer, bool bReCalc);
 	void                    _purgeLine(fp_Line*);
 	void					_removeAllEmptyLines(void);
@@ -497,7 +496,6 @@ protected:
 											UT_sint32 eor,
 											bool bToggleIP) const;
 
-	UT_uint32				_getLastChar();
 	void					_stuffAllRunsOnALine(void);
 	void					_insertEndOfParagraphRun(void);
 	void					_purgeEndOfParagraphRun(void);
@@ -656,4 +654,3 @@ public:
 };
 #endif
 
-#endif /* FL_BLOCKLAYOUT_H */

@@ -43,7 +43,7 @@ ABI_PLUGIN_DECLARE("BMP")
 /*******************************************************************/
 
 // we use a reference-counted sniffer
-static IE_ImpGraphicBMP_Sniffer * m_impSniffer = 0;
+static IE_ImpGraphicBMP_Sniffer * m_impSniffer = nullptr;
 
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_register (XAP_ModuleInfo * mi)
@@ -67,17 +67,17 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-	mi->name = 0;
-	mi->desc = 0;
-	mi->version = 0;
-	mi->author = 0;
-	mi->usage = 0;
+	mi->name = nullptr;
+	mi->desc = nullptr;
+	mi->version = nullptr;
+	mi->author = nullptr;
+	mi->usage = nullptr;
 
 	UT_ASSERT (m_impSniffer);
 
 	IE_ImpGraphic::unregisterImporter (m_impSniffer);
 	delete m_impSniffer;
-	m_impSniffer = 0;
+	m_impSniffer = nullptr;
 
 	return 1;
 }
@@ -133,19 +133,21 @@ bool IE_ImpGraphicBMP_Sniffer::getDlgLabels(const char ** pszDesc,
 UT_Error IE_ImpGraphicBMP_Sniffer::constructImporter(IE_ImpGraphic **ppieg)
 {
 	*ppieg = new IE_ImpGraphic_BMP();
-	if (*ppieg == NULL)
+	if (*ppieg == nullptr)
 	  return UT_IE_NOMEMORY;
 
 	return UT_OK;
 }
 
-UT_Error IE_ImpGraphic_BMP::_convertGraphic(UT_ByteBuf * pBB)
+UT_Error IE_ImpGraphic_BMP::_convertGraphic(const UT_ConstByteBufPtr & pBB)
 {
    	UT_Error err;
 	InitializePrivateClassData();
 
 	/* Read Header Data */
-	if ((err = Read_BMP_Header(pBB))) return err;
+	if ((err = Read_BMP_Header(pBB))) {
+		return err;
+	}
 	if ((err = Initialize_PNG()))     return err;
 
 	/* Read Palette, if no palette set Header accordingly */
@@ -192,7 +194,6 @@ UT_Error IE_ImpGraphic_BMP::_convertGraphic(UT_ByteBuf * pBB)
 	/* Clean Up Memory Used */
 		
 	// FREEP(m_pPNGInfo->palette);
-	DELETEP(pBB);
 	png_destroy_write_struct(&m_pPNG, &m_pPNGInfo);
    
    	return UT_OK;
@@ -200,30 +201,30 @@ UT_Error IE_ImpGraphic_BMP::_convertGraphic(UT_ByteBuf * pBB)
 
 
 //  This actually creates our FG_Graphic object for a PNG
-UT_Error IE_ImpGraphic_BMP::importGraphic(UT_ByteBuf* pBB, 
-					  FG_Graphic ** ppfg)
+UT_Error IE_ImpGraphic_BMP::importGraphic(const UT_ConstByteBufPtr & pBB,
+                                          FG_ConstGraphicPtr& pfg)
 {
-	UT_Error err = _convertGraphic(pBB); 
-   	if (err != UT_OK) return err;
-   
-   	/* Send Data back to AbiWord as PNG */
-	FG_GraphicRaster *pFGR;
-	pFGR = new FG_GraphicRaster();
+	UT_Error err = _convertGraphic(pBB);
+	if (err != UT_OK) {
+		return err;
+	}
 
-	if(pFGR == NULL)
+   	/* Send Data back to AbiWord as PNG */
+	FG_GraphicRasterPtr pFGR(new FG_GraphicRaster);
+
+	if(pFGR == nullptr)
 		return UT_IE_NOMEMORY;
 
 	if(!pFGR->setRaster_PNG(m_pBB)) {
-		DELETEP(pFGR);	
 		return UT_IE_FAKETYPE;
 	}
 
-	*ppfg = static_cast<FG_Graphic *>(pFGR);
+	pfg = std::move(pFGR);
 
 	return UT_OK;
 }
 
-UT_Error IE_ImpGraphic_BMP::Read_BMP_Header(UT_ByteBuf* pBB)
+UT_Error IE_ImpGraphic_BMP::Read_BMP_Header(const UT_ConstByteBufPtr & pBB)
 {
 	/* Stepping Through the Header Data first all the File Info
 	 * Then the Image Info until reached the end of the image Header Size
@@ -293,19 +294,17 @@ UT_Error IE_ImpGraphic_BMP::Read_BMP_Header(UT_ByteBuf* pBB)
 UT_Error IE_ImpGraphic_BMP::Initialize_PNG()
 {
 	/* Set up png structures for writing */
-	m_pPNG = png_create_write_struct( PNG_LIBPNG_VER_STRING, 
-		                              static_cast<void*>(NULL),
-									  NULL, 
-									  NULL );
-	if( m_pPNG == NULL )
+	m_pPNG = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+		                              nullptr, nullptr, nullptr);
+	if( m_pPNG == nullptr )
 	{
 		return UT_ERROR;
 	}
 
 	m_pPNGInfo = png_create_info_struct(m_pPNG);
-	if ( m_pPNGInfo == NULL )
+	if ( m_pPNGInfo == nullptr )
 	{
-		png_destroy_write_struct(&m_pPNG, static_cast<png_infopp>(NULL));
+		png_destroy_write_struct(&m_pPNG, static_cast<png_infopp>(nullptr));
 		return UT_ERROR;
 	}
 
@@ -321,15 +320,15 @@ UT_Error IE_ImpGraphic_BMP::Initialize_PNG()
 		/* If we get here, we had a problem reading the file */
 		return UT_ERROR;
 	}
-	m_pBB = new UT_ByteBuf;  /* Byte Buffer for Converted Data */
+	m_pBB.reset(new UT_ByteBuf);  /* Byte Buffer for Converted Data */
 
 	/* Setting up the Data Writing Function */
-		png_set_write_fn(m_pPNG, static_cast<void *>(m_pBB), static_cast<png_rw_ptr>(_write_png), static_cast<png_flush_ptr>(_write_flush));
+	png_set_write_fn(m_pPNG, const_cast<void *>(static_cast<const void*>(m_pBB.get())), static_cast<png_rw_ptr>(_write_png), static_cast<png_flush_ptr>(_write_flush));
 
-		return UT_OK;
-	}
+	return UT_OK;
+}
 
-	UT_Error IE_ImpGraphic_BMP::Convert_BMP_Pallet(UT_ByteBuf* pBB)
+	UT_Error IE_ImpGraphic_BMP::Convert_BMP_Pallet(const UT_ConstByteBufPtr & pBB)
 	{
 		/* Reset error handling for libpng */
 		if (setjmp(png_jmpbuf(m_pPNG)))
@@ -369,7 +368,7 @@ UT_Error IE_ImpGraphic_BMP::Initialize_PNG()
 	return UT_OK;
 }
 
-UT_Error IE_ImpGraphic_BMP::Convert_BMP(UT_ByteBuf* pBB)
+UT_Error IE_ImpGraphic_BMP::Convert_BMP(const UT_ConstByteBufPtr & pBB)
 {
 	/* Reset error handling for libpng */
 	if (setjmp(png_jmpbuf(m_pPNG)))
@@ -443,27 +442,27 @@ UT_Error IE_ImpGraphic_BMP::Convert_BMP(UT_ByteBuf* pBB)
 	return UT_OK;
 }
 
-UT_Byte IE_ImpGraphic_BMP::ReadByte  (UT_ByteBuf* pBB, 
+UT_Byte IE_ImpGraphic_BMP::ReadByte  (const UT_ConstByteBufPtr & pBB,
 									    UT_uint32 offset)
 {
-	return ( static_cast<const UT_Byte>(ReadBytes(pBB,offset,1) ));
+	return static_cast<UT_Byte>(ReadBytes(pBB, offset, 1));
 }
 
-UT_uint16 IE_ImpGraphic_BMP::Read2Bytes(UT_ByteBuf* pBB, 
+UT_uint16 IE_ImpGraphic_BMP::Read2Bytes(const UT_ConstByteBufPtr & pBB,
 									    UT_uint32 offset)
 {
-	return ( static_cast<const UT_uint16>(ReadBytes(pBB,offset,2) ));
+	return static_cast<UT_uint16>(ReadBytes(pBB, offset, 2));
 }
 
 
-UT_uint32 IE_ImpGraphic_BMP::Read4Bytes(UT_ByteBuf* pBB, 
+UT_uint32 IE_ImpGraphic_BMP::Read4Bytes(const UT_ConstByteBufPtr & pBB,
 									    UT_uint32 offset)
 {
 	return ( ReadBytes(pBB,offset,4) );
 }
 
 
-UT_uint32 IE_ImpGraphic_BMP::ReadBytes(UT_ByteBuf* pBB, 
+UT_uint32 IE_ImpGraphic_BMP::ReadBytes(const UT_ConstByteBufPtr & pBB,
 									   UT_uint32 offset,
 									   UT_uint32 num_bytes)
 {

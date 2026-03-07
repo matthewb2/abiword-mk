@@ -1,4 +1,4 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t; -*- */
 
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
@@ -50,6 +50,7 @@
 //#define BENCHLAYOUT 1
 #include <stdlib.h>
 #include <math.h>
+#include <limits>
 #include <string.h>
 #include <vector>
 #include <algorithm>
@@ -114,8 +115,8 @@ fp_CellContainer::fp_CellContainer(fl_SectionLayout* pSectionLayout)
 	  m_iRightPad(0),
 	  m_iTopPad(0),
 	  m_iBotPad(0),
-	  m_pNextInTable(NULL),
-	  m_pPrevInTable(NULL),
+	  m_pNextInTable(nullptr),
+	  m_pPrevInTable(nullptr),
 	  m_bXexpand(true),
 	  m_bYexpand(false),
 	  m_bXshrink(false),
@@ -149,8 +150,8 @@ fp_CellContainer::fp_CellContainer(fl_SectionLayout* pSectionLayout)
 fp_CellContainer::~fp_CellContainer()
 {
 	xxx_UT_DEBUGMSG(("Deleting Cell container %x \n",this));
-	setNext(NULL);
-	setPrev(NULL);
+	setNext(nullptr);
+	setPrev(nullptr);
 }
 
 bool fp_CellContainer::isRepeated(void) const
@@ -195,7 +196,7 @@ fp_TableContainer * fp_CellContainer::getBrokenTable(const fp_Container * pCon) 
 	fp_TableContainer * pMaster = static_cast<fp_TableContainer *>(getContainer());
 	if(!pMaster)
 	{
-		return NULL;
+		return nullptr;
 	}
 	fp_TableContainer * pBroke = pMaster->getFirstBrokenTable();
 	if (!pBroke)
@@ -218,23 +219,23 @@ fp_TableContainer * fp_CellContainer::getBrokenTable(const fp_Container * pCon) 
 fp_VerticalContainer * fp_CellContainer::getColumn(const fp_Container * _pCon) const
 {
 	fp_TableContainer * pBroke = getBrokenTable(_pCon);
-	if(pBroke == NULL)
+	if(pBroke == nullptr)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	bool bStop = false;
-	fp_CellContainer * pCell = NULL;
-	fp_Column * pCol = NULL;
+	fp_CellContainer * pCell = nullptr;
+	fp_Column * pCol = nullptr;
 	//
 	// Now FIXED for nested tables off first page
 	//
 	while(pBroke && pBroke->isThisBroken() && !bStop)
 	{
 		fp_Container * pCon = pBroke->getContainer();
-		if(pCon == NULL)
+		if(pCon == nullptr)
 		{
-			return NULL;
+			return nullptr;
 		}
 		if(pCon->isColumnType())
 		{
@@ -259,20 +260,20 @@ fp_VerticalContainer * fp_CellContainer::getColumn(const fp_Container * _pCon) c
 			pBroke = pCell->getBrokenTable(static_cast<fp_Container *>(pBroke));
 		}
 	}
-	if(pCell && (pBroke == NULL))
+	if(pCell && (pBroke == nullptr))
 	{
 		return static_cast<fp_Column *>(static_cast<fp_Container *>(pCell)->getColumn());
 	}
-	else if(pBroke == NULL)
+	else if(pBroke == nullptr)
 	{
-		return NULL;
+		return nullptr;
 	}
 	if(!bStop)
 	{
 		pCol = static_cast<fp_Column *>(pBroke->getContainer());
 		if (!pCol)
 		{
-			return NULL;
+			return nullptr;
 		}
 	}
 	//	UT_ASSERT(pCol->getContainerType() != FP_CONTAINER_CELL);
@@ -289,7 +290,7 @@ fp_VerticalContainer * fp_CellContainer::getColumn(const fp_Container * _pCon) c
 		}
 		else
 		{
-			pCol = NULL;
+			pCol = nullptr;
 		}
 	}
 
@@ -312,7 +313,7 @@ void fp_CellContainer::_getBrokenRect(fp_TableContainer * pBroke, fp_Page * &pPa
 	UT_ASSERT(getSectionLayout()->myContainingLayout() &&
 	static_cast<fl_TableLayout *>(getSectionLayout()->myContainingLayout())->getContainerType() == FL_CONTAINER_TABLE);
 
-	fp_Column * pCol = NULL;
+	fp_Column * pCol = nullptr;
 	UT_sint32 col_y =0;
 	UT_sint32 col_x =0;
 	UT_sint32 iLeft = m_iLeft;
@@ -539,7 +540,7 @@ void fp_CellContainer::_getBrokenRect(fp_TableContainer * pBroke, fp_Page * &pPa
  */
 bool fp_CellContainer::doesIntersectClip(fp_TableContainer * pBroke, const UT_Rect * rClip) const
 {
-	fp_Page * pPage = NULL;
+	fp_Page * pPage = nullptr;
 	UT_Rect CellRect;
 	_getBrokenRect(pBroke, pPage, CellRect,getGraphics());
 	return CellRect.intersectsRect(rClip);
@@ -554,7 +555,7 @@ void fp_CellContainer::clearScreen(void)
 void fp_CellContainer::clearScreen(bool bNoRecursive)
 {
 	fp_Container * pUpCon = getContainer();
-	if(pUpCon == NULL)
+	if(pUpCon == nullptr)
 	{
 		return;
 	}
@@ -562,7 +563,7 @@ void fp_CellContainer::clearScreen(bool bNoRecursive)
 	{
 		return;
 	}
-	if(getPage() == NULL)
+	if(getPage() == nullptr)
 	{
 		return;
 	}
@@ -572,7 +573,7 @@ void fp_CellContainer::clearScreen(bool bNoRecursive)
 // FIXME: should work, but doesn't??
 //	if (m_iBgStyle == FS_OFF)
 //	{
-		fp_Container * pCon = NULL;
+		fp_Container * pCon = nullptr;
 		UT_sint32 i = 0;
 		if(!bNoRecursive)
 		{
@@ -588,7 +589,7 @@ void fp_CellContainer::clearScreen(bool bNoRecursive)
 	if(pTab)
 	{
 		fp_TableContainer * pBroke = pTab->getFirstBrokenTable();
-		if(pBroke == NULL)
+		if(pBroke == nullptr)
 		{
 			_clear(pBroke);
 			return;
@@ -617,7 +618,7 @@ void fp_CellContainer::clearScreen(bool bNoRecursive)
 UT_sint32 fp_CellContainer::getSpannedHeight(void) const
 {
 	fp_TableContainer * pTab = static_cast<fp_TableContainer *>(getContainer());
-	if(pTab == NULL)
+	if(pTab == nullptr)
 	{
 		return 0;
 	}
@@ -631,7 +632,7 @@ UT_sint32 fp_CellContainer::getSpannedHeight(void) const
 	{
 		fp_CellContainer * pCell = pTab->getCellAtRowColumn(pTab->getNumRows() -1,0);
 		fp_CellContainer * pMaxH = pCell;
-		if(pMaxH == NULL)
+		if(pMaxH == nullptr)
 		{
 			return 0;
 		}
@@ -655,7 +656,7 @@ void fp_CellContainer::_clear(fp_TableContainer * pBroke)
 	fl_ContainerLayout * pLayout = getSectionLayout()->myContainingLayout ();
 	UT_return_if_fail(pLayout);
 
-	if(pBroke == NULL)
+	if(pBroke == nullptr)
 	{
 		return;
 	}
@@ -682,7 +683,7 @@ void fp_CellContainer::_clear(fp_TableContainer * pBroke)
 		xxx_UT_DEBUGMSG(("SEVIOR: Clearing nested cell lines \n"));
 	}
 	UT_Rect bRec;
-	fp_Page * pPage = NULL;
+	fp_Page * pPage = nullptr;
 	_getBrokenRect(pBroke, pPage, bRec,getGraphics());
 	UT_sint32 onePix = getGraphics()->tlu(1)+1;
 	
@@ -704,7 +705,7 @@ void fp_CellContainer::_clear(fp_TableContainer * pBroke)
 		pageCol = *pPage->getFillType().getColor();
 	}
 	markAsDirty();
-	if (pPage != NULL)
+	if (pPage != nullptr)
 	{
 		xxx_UT_DEBUGMSG(("_clear: top %d bot %d cell left %d top %d \n",bRec.top,bRec.top+bRec.height,m_iLeftAttach,m_iTopAttach));
 
@@ -828,7 +829,7 @@ void fp_CellContainer::setContainer(fp_Container * pContainer)
 		clearScreen();
 	}
 	fp_Container::setContainer(pContainer);
-	if(pContainer == NULL)
+	if(pContainer == nullptr)
 	{
 		return;
 	}
@@ -917,7 +918,8 @@ void s_cell_border_style (PP_PropertyMap::Line & line, const PP_PropertyMap::Lin
 PP_PropertyMap::Line fp_CellContainer::getBottomStyle (const fl_TableLayout * table) const
 {
 	PP_PropertyMap::Line line(m_lineBottom);
-	if (table == 0) return line;
+	if (table == nullptr)
+		return line;
 	const PP_PropertyMap::Line & table_line = table->getBottomStyle ();
 	s_cell_border_style (line, table_line, table);
 	return line;
@@ -926,7 +928,8 @@ PP_PropertyMap::Line fp_CellContainer::getBottomStyle (const fl_TableLayout * ta
 PP_PropertyMap::Line fp_CellContainer::getLeftStyle (const fl_TableLayout * table) const
 {
 	PP_PropertyMap::Line line(m_lineLeft);
-	if (table == 0) return line;
+	if (table == nullptr)
+		return line;
 	const PP_PropertyMap::Line & table_line = table->getLeftStyle ();
 	s_cell_border_style (line, table_line, table);
 	return line;
@@ -935,7 +938,8 @@ PP_PropertyMap::Line fp_CellContainer::getLeftStyle (const fl_TableLayout * tabl
 PP_PropertyMap::Line fp_CellContainer::getRightStyle (const fl_TableLayout * table) const
 {
 	PP_PropertyMap::Line line(m_lineRight);
-	if (table == 0) return line;
+	if (table == nullptr)
+		return line;
 	const PP_PropertyMap::Line & table_line = table->getRightStyle ();
 	s_cell_border_style (line, table_line, table);
 	return line;
@@ -944,7 +948,8 @@ PP_PropertyMap::Line fp_CellContainer::getRightStyle (const fl_TableLayout * tab
 PP_PropertyMap::Line fp_CellContainer::getTopStyle (const fl_TableLayout * table) const
 {
 	PP_PropertyMap::Line line(m_lineTop);
-	if (table == 0) return line;
+	if (table == nullptr)
+		return line;
 	const PP_PropertyMap::Line & table_line = table->getTopStyle ();
 	s_cell_border_style (line, table_line, table);
 	return line;
@@ -979,7 +984,7 @@ void fp_CellContainer::getScreenPositions(fp_TableContainer * pBroke,GR_Graphics
 	UT_return_if_fail(getPage());
 
 	bool bNested = false;
-	if(pBroke == NULL)
+	if(pBroke == nullptr)
 	{
 		pBroke = static_cast<fp_TableContainer *>(getContainer());
 	}
@@ -1001,7 +1006,7 @@ void fp_CellContainer::getScreenPositions(fp_TableContainer * pBroke,GR_Graphics
 	UT_sint32 offy =0;
 	UT_sint32 offx =0;
 	fp_Page * pPage = pBroke->getPage(); 
-	if(pPage == NULL)
+	if(pPage == nullptr)
 	{
 //
 // Can happen while loading.
@@ -1133,7 +1138,7 @@ bool fp_CellContainer::drawLines(fp_TableContainer * pBroke,GR_Graphics * pG, bo
 	xxx_UT_DEBUGMSG(("Doing drawlines for cell %x \n",this));
 	UT_return_val_if_fail(getPage(), false);
 
-	if(pBroke == NULL)
+	if(pBroke == nullptr)
 	{
 		pBroke = static_cast<fp_TableContainer *>(getContainer());
 	}
@@ -1164,8 +1169,8 @@ bool fp_CellContainer::drawLines(fp_TableContainer * pBroke,GR_Graphics * pG, bo
 	m_bLinesDrawn = true;
 	UT_sint32 iLeft,iRight,iTop,iBot = 0;
 	UT_sint32 col_y = 0;
-	fp_Column * pCol = NULL;
-	fp_ShadowContainer * pShadow = NULL;
+	fp_Column * pCol = nullptr;
+	fp_ShadowContainer * pShadow = nullptr;
 	bool doClear2 =false;
 	bool bTopScreen = false;
 	bool bBotScreen = false;
@@ -1185,7 +1190,7 @@ bool fp_CellContainer::drawLines(fp_TableContainer * pBroke,GR_Graphics * pG, bo
 		iTop = col_y;
 		bDrawTop = true;
 		bTopScreen = true;
-		if(pBroke != NULL)
+		if(pBroke != nullptr)
 		{
 			pBroke->setBrokenTop(true);
 		}
@@ -1324,7 +1329,7 @@ void  fp_CellContainer::extendLeftTop(PP_PropertyMap::Line & line,GR_Graphics * 
 		return;
 	}
 	fp_TableContainer * pTab = static_cast<fp_TableContainer *>(getContainer());
-	if(pTab == NULL)
+	if(pTab == nullptr)
 	{
 		return;
 	}
@@ -1350,7 +1355,7 @@ void  fp_CellContainer::extendLeftBot(PP_PropertyMap::Line & line,GR_Graphics * 
 {
 	iextBot = 0;
 	fp_TableContainer * pTab = static_cast<fp_TableContainer *>(getContainer());
-	if(pTab == NULL)
+	if(pTab == nullptr)
 	{
 		return;
 	}
@@ -1384,7 +1389,7 @@ void  fp_CellContainer::extendRightTop(PP_PropertyMap::Line & line,GR_Graphics *
 		return;
 	}
 	fp_TableContainer * pTab = static_cast<fp_TableContainer *>(getContainer());
-	if(pTab == NULL)
+	if(pTab == nullptr)
 	{
 		return;
 	}
@@ -1412,7 +1417,7 @@ void  fp_CellContainer::extendRightBot(PP_PropertyMap::Line & line,GR_Graphics *
 {
 	iextBot = 0;
 	fp_TableContainer * pTab = static_cast<fp_TableContainer *>(getContainer());
-	if(pTab == NULL)
+	if(pTab == nullptr)
 	{
 		return;
 	}
@@ -1443,7 +1448,7 @@ void  fp_CellContainer::extendTopLeft(PP_PropertyMap::Line & line,GR_Graphics * 
 {
 	iextLeft = 0;
 	fp_TableContainer * pTab = static_cast<fp_TableContainer *>(getContainer());
-	if(pTab == NULL)
+	if(pTab == nullptr)
 	{
 		return;
 	}
@@ -1475,7 +1480,7 @@ void  fp_CellContainer::extendTopRight(PP_PropertyMap::Line & line,GR_Graphics *
 {
 	iextRight = 0;
 	fp_TableContainer * pTab = static_cast<fp_TableContainer *>(getContainer());
-	if(pTab == NULL)
+	if(pTab == nullptr)
 	{
 		return;
 	}
@@ -1506,7 +1511,7 @@ void  fp_CellContainer::extendBotLeft(PP_PropertyMap::Line & line,GR_Graphics * 
 {
 	iextLeft = 0;
 	fp_TableContainer * pTab = static_cast<fp_TableContainer *>(getContainer());
-	if(pTab == NULL)
+	if(pTab == nullptr)
 	{
 		return;
 	}
@@ -1537,7 +1542,7 @@ void  fp_CellContainer::extendBotRight(PP_PropertyMap::Line & line,GR_Graphics *
 {
 	iextRight = 0;
 	fp_TableContainer * pTab = static_cast<fp_TableContainer *>(getContainer());
-	if(pTab == NULL)
+	if(pTab == nullptr)
 	{
 		return;
 	}
@@ -1567,7 +1572,7 @@ void fp_CellContainer::drawLinesAdjacent(void)
 	UT_sint32 col_right = getRightAttach();
 	UT_sint32 col_left = getLeftAttach();
 	fp_TableContainer * pTab = static_cast<fp_TableContainer *>(getContainer());
-	if(pTab == NULL)
+	if(pTab == nullptr)
 	{
 		return;
 	}
@@ -1632,7 +1637,7 @@ void fp_CellContainer::_drawBoundaries(dg_DrawArgs* pDA, fp_TableContainer * pBr
 {
 	UT_return_if_fail(getPage());
 
-	if(getPage()->getDocLayout()->getView() == NULL)
+	if(getPage()->getDocLayout()->getView() == nullptr)
 	{
 		return;
 	}
@@ -1684,7 +1689,7 @@ fp_TableContainer * fp_CellContainer::getTopmostTable() const
 		return static_cast<fp_TableContainer *>(pPrev);
 	}
 	UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
-	return NULL;
+	return nullptr;
 }
 /*!
  * Return true if the segment of the cell within a broken table pBroke contains a footnote references
@@ -1951,7 +1956,7 @@ void fp_CellContainer::draw(dg_DrawArgs* pDA)
 	const UT_Rect * pClipRect = pDA->pG->getClipRect();
 	UT_sint32 ytop,ybot;
 	UT_sint32 i;
-	UT_sint32 imax = static_cast<UT_sint32>((static_cast<UT_uint32>(1<<31)) - 1);
+	UT_sint32 imax = std::numeric_limits<UT_sint32>::max();
 	if(pClipRect)
 	{
 		ybot = UT_MAX(pClipRect->height,_getMaxContainerHeight());
@@ -2004,11 +2009,12 @@ void fp_CellContainer::draw(dg_DrawArgs* pDA)
 	{
 		m_bDirty = false;
 	}
-	if(pG->queryProperties(GR_Graphics::DGP_SCREEN))
-		drawLines(NULL,pG,true);
-	drawLines(NULL,pG,false);
+	if (pG->queryProperties(GR_Graphics::DGP_SCREEN)) {
+		drawLines(nullptr, pG, true);
+	}
+	drawLines(nullptr, pG, false);
 	pTab->setRedrawLines();
-    _drawBoundaries(pDA,NULL);
+	_drawBoundaries(pDA, nullptr);
 }
 
 
@@ -2023,13 +2029,13 @@ void fp_CellContainer::draw(fp_Line * pLine)
 	m_bDirty = false;
 	FV_View * pView = getView();
 	fp_TableContainer * pTab = static_cast<fp_TableContainer *>(getContainer());
-	if(pTab == NULL)
+	if(pTab == nullptr)
 	{
 		return;
 	}
 	UT_ASSERT(pTab->getContainerType() == FP_CONTAINER_TABLE);
 	fp_TableContainer * pBroke = pTab->getFirstBrokenTable();
-	if(pBroke == NULL)
+	if(pBroke == nullptr)
 	{
 		return;
 	}
@@ -2173,24 +2179,24 @@ void fp_CellContainer::deleteBrokenAfter(bool bClearFirst,UT_sint32 iOldBottom)
 
 /*!
  * Draw the whole cell with the selection colour background.
- * returns the last drawn cell in the container or NULL
+ * returns the last drawn cell in the container or nullptr
 \Param pLine pointer to the line contained within the cell the cell.
 */
 fp_Container * fp_CellContainer::drawSelectedCell(fp_Line * /*pLine*/)
 {
-	UT_return_val_if_fail(getPage(), NULL);
+	UT_return_val_if_fail(getPage(), nullptr);
 
 	FV_View * pView = getPage()->getDocLayout()->getView();
 	fp_TableContainer * pTab = static_cast<fp_TableContainer *>(getContainer());
-	if(pTab == NULL)
+	if(pTab == nullptr)
 	{
-		return NULL;
+		return nullptr;
 	}
 	UT_ASSERT(pTab->getContainerType() == FP_CONTAINER_TABLE);
 	fp_TableContainer * pBroke = pTab->getFirstBrokenTable();
-	if(pBroke == NULL)
+	if(pBroke == nullptr)
 	{
-		return NULL;
+		return nullptr;
 	}
 	bool bFound = false;
 	bool bEnd = false;
@@ -2250,7 +2256,7 @@ fp_Container * fp_CellContainer::drawSelectedCell(fp_Line * /*pLine*/)
 		iBroke++;
 		pBroke = static_cast<fp_TableContainer *>(pBroke->getNext());
 	}
-	fp_Container * pLast = NULL;
+	fp_Container * pLast = nullptr;
 	if(getNext())
 	{
 		pLast = static_cast<fp_Container *>(static_cast<fp_Container *>(getNext())->getNthCon(0));
@@ -2321,7 +2327,7 @@ void fp_CellContainer::drawBroken(dg_DrawArgs* pDA,
 	GR_Graphics * pG = pDA->pG;
 	m_bDrawLeft = false;
 	m_bDrawTop = false;
-	fp_TableContainer * pTab2 = NULL;
+	fp_TableContainer * pTab2 = nullptr;
 	if(pBroke && pBroke->isThisBroken())
 	{
 		pTab2 = pBroke->getMasterTable();
@@ -2332,11 +2338,11 @@ void fp_CellContainer::drawBroken(dg_DrawArgs* pDA,
 	}
 // draw bottom if this cell is the last of the table and fully contained on the page
 
-	m_bDrawBot = (pTab2->getCellAtRowColumn(getBottomAttach(),getLeftAttach()) == NULL);
+	m_bDrawBot = (pTab2->getCellAtRowColumn(getBottomAttach(),getLeftAttach()) == nullptr);
 
 // draw right if this cell is the rightmost of the table
 
-	m_bDrawRight = (pTab2->getCellAtRowColumn(getTopAttach(),getRightAttach()) == NULL);
+	m_bDrawRight = (pTab2->getCellAtRowColumn(getTopAttach(),getRightAttach()) == nullptr);
 	m_bDrawRight = true;
 	m_bDrawLeft = true;
    
@@ -2353,7 +2359,7 @@ void fp_CellContainer::drawBroken(dg_DrawArgs* pDA,
 		xxx_UT_DEBUGMSG(("brokenRect off page - bailing out \n"));
 		return;
 	}
-	if(getFillType().getFillType() == FG_FILL_IMAGE && (getContainer() != NULL))
+	if(getFillType().getFillType() == FG_FILL_IMAGE && (getContainer() != nullptr))
 	{
 		fl_DocSectionLayout * pDSL = getSectionLayout()->getDocSectionLayout();
 		if(pDSL && (bRec.height < pDSL->getActualColumnHeight()) && (bRec.height > pG->tlu(3)))
@@ -2479,7 +2485,7 @@ void fp_CellContainer::drawBroken(dg_DrawArgs* pDA,
 					else
 					{
 						fp_TableContainer * pT= pTab->getFirstBrokenTable();
-						if(pT == NULL)
+						if(pT == nullptr)
 						{
 							UT_DEBUGMSG(("No Broken Table in draw !! \n"));
 							UT_sint32 iY = pTab->getY();
@@ -2546,13 +2552,13 @@ fp_ContainerObject * fp_CellContainer::VBreakAt(UT_sint32 vpos)
 	xxx_UT_DEBUGMSG(("iBreakTick is %d \n",getBreakTick()));
 	if(!containsNestedTables())
 	{
-		return NULL;
+		return nullptr;
 	}
 	UT_sint32 count = countCons();
 	UT_DEBUGMSG(("vBREAK cell at  %d \n",vpos));
 	UT_sint32 i = 0;
 	fp_Container * pCon;
-	fp_TableContainer * pBroke = NULL;
+	fp_TableContainer * pBroke = nullptr;
 	UT_sint32 iY = 0;
 	for(i=0; (i < count) || (iY <= vpos); i++)
 	{
@@ -2586,8 +2592,8 @@ fp_ContainerObject * fp_CellContainer::VBreakAt(UT_sint32 vpos)
 							pCon = static_cast<fp_Container *>(pTab->VBreakAt(0));
 							fp_TableContainer * pBTab = static_cast<fp_TableContainer *>(pCon);
 							pBTab->setY(iY);
-							UT_DEBUGMSG(("Break Nested table Con %p at 0 y %d height %d \n",pCon,pCon->getY(),pCon->getHeight()));
-							UT_DEBUGMSG(("Break Nested table Table %p at 0 y %d height %d \n",pBTab,pBTab->getY(),pBTab->getHeight()));
+							UT_DEBUGMSG(("Break Nested table Con %p at 0 y %d height %d \n", (void*)pCon, pCon->getY(), pCon->getHeight()));
+							UT_DEBUGMSG(("Break Nested table Table %p at 0 y %d height %d \n", (void*)pBTab, pBTab->getY(), pBTab->getHeight()));
 						}
 					}
 				}
@@ -2611,7 +2617,7 @@ fp_ContainerObject * fp_CellContainer::VBreakAt(UT_sint32 vpos)
 					{
 						pBroke->setY(vpos);
 						static_cast<fp_TableContainer *>(pBroke)->setY(pBroke->getY());
-						UT_DEBUGMSG(("Made broken nested Table %p Y %d height %d \n",pBroke,pBroke->getY(),pBroke->getHeight()));
+						UT_DEBUGMSG(("Made broken nested Table %p Y %d height %d \n", (void*)pBroke, pBroke->getY(), pBroke->getHeight()));
 						UT_ASSERT(pBroke->getContainer() == this);
 					}
 					break;
@@ -2635,7 +2641,7 @@ UT_sint32 fp_CellContainer::wantCellVBreakAt(UT_sint32 vpos, UT_sint32 yCellMin)
 	UT_sint32 i =0;
 	UT_sint32 iYBreak = vpos;
 	fp_Container * pCon;
-	//fp_Line * pLine = NULL;
+	//fp_Line * pLine = nullptr;
 	UT_sint32 footHeight = 0;
 	fp_TableContainer * pTab = static_cast<fp_TableContainer *>(getContainer());
 	UT_return_val_if_fail(pTab,0);
@@ -2720,7 +2726,7 @@ fp_Container * fp_CellContainer::getNextContainerInSection() const
 	{
 		return pNext->getFirstContainer();
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -2740,25 +2746,25 @@ fp_Container * fp_CellContainer::getPrevContainerInSection() const
 	{
 		return pPrev->getLastContainer();
 	}
-	return NULL;
+	return nullptr;
 }
 
 
 /*
   This function returns the first container inside a cell that is also inside
-  a broken table. It returns NULL if no container is inside  the broken table
+  a broken table. It returns nullptr if no container is inside  the broken table
 */
 
 fp_Container * fp_CellContainer::getFirstContainerInBrokenTable(const fp_TableContainer * pBroke) const
 {
 	if (!pBroke->isThisBroken())
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	UT_sint32 count = countCons();
 	UT_sint32 k = 0;
-	fp_Container * pCon = NULL;
+	fp_Container * pCon = nullptr;
 	for (k = 0; k < count; k++)
 	{
 		pCon = static_cast<fp_Container *>(getNthCon(k));
@@ -2767,7 +2773,7 @@ fp_Container * fp_CellContainer::getFirstContainerInBrokenTable(const fp_TableCo
 			return pCon;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 void fp_CellContainer::sizeRequest(fp_Requisition * pRequest)
@@ -2866,7 +2872,7 @@ void fp_CellContainer::layout(void)
 {
 	_setMaxContainerHeight(0);
 	UT_sint32 iY = 0, iPrevY = 0;
-	fp_Container *pContainer, *pPrevContainer = NULL;
+	fp_Container *pContainer, *pPrevContainer = nullptr;
 	xxx_UT_DEBUGMSG(("Doing Cell layout %x \n",this));
 	if(countCons() == 0)
 	{
@@ -2881,7 +2887,7 @@ void fp_CellContainer::layout(void)
 		if(pContainer->getHeight() > _getMaxContainerHeight())
 			_setMaxContainerHeight(pContainer->getHeight());
 
-		fp_TableContainer * pTab = NULL;
+		fp_TableContainer * pTab = nullptr;
 		if(pContainer->getY() != iY)
 		{
 			pContainer->clearScreen();
@@ -2909,7 +2915,7 @@ void fp_CellContainer::layout(void)
 			pTab = static_cast<fp_TableContainer *>(pContainer);
 			if(!pTab->isThisBroken())
 			{
-				if(pTab->getFirstBrokenTable() == NULL)
+				if(pTab->getFirstBrokenTable() == nullptr)
 				{
 					static_cast<fp_TableContainer *>(pTab->VBreakAt(0));
 					pTab = pTab->getFirstBrokenTable();
@@ -3017,10 +3023,10 @@ fp_TableContainer::fp_TableContainer(fl_SectionLayout* pSectionLayout)
 	  m_bIsHomogeneous(true),
 	  m_iRowSpacing(0),
 	  m_iColSpacing(0),
-	  m_pFirstBrokenTable(NULL),
-	  m_pLastBrokenTable(NULL),
+	  m_pFirstBrokenTable(nullptr),
+	  m_pLastBrokenTable(nullptr),
 	  m_bIsBroken(false),
-	  m_pMasterTable(NULL),
+	  m_pMasterTable(nullptr),
 	  m_iYBreakHere(0),
 	  m_iYBottom(0),
 	  m_iAdditionalBottomSpace(0),
@@ -3032,7 +3038,7 @@ fp_TableContainer::fp_TableContainer(fl_SectionLayout* pSectionLayout)
 	  m_iRowHeight(0),
 	  m_iLastWantedVBreak(-1),
 	  m_iNextWantedVBreak(-1),
-	  m_pFirstBrokenCell(NULL),
+	  m_pFirstBrokenCell(nullptr),
 	  m_iAdditionalMarginAfter(0)
 {
 	if(getSectionLayout())
@@ -3057,8 +3063,8 @@ fp_TableContainer::fp_TableContainer(fl_SectionLayout* pSectionLayout, fp_TableC
 	  m_bIsHomogeneous(true),
 	  m_iRowSpacing(0),
 	  m_iColSpacing(0),
-	  m_pFirstBrokenTable(NULL),
-	  m_pLastBrokenTable(NULL),
+	  m_pFirstBrokenTable(nullptr),
+	  m_pLastBrokenTable(nullptr),
 	  m_bIsBroken(true),
 	  m_pMasterTable(pMaster),
 	  m_iYBreakHere(0),
@@ -3072,7 +3078,7 @@ fp_TableContainer::fp_TableContainer(fl_SectionLayout* pSectionLayout, fp_TableC
 	  m_iRowHeight(0),
 	  m_iLastWantedVBreak(-1),
 	  m_iNextWantedVBreak(-1),
-	  m_pFirstBrokenCell(NULL),
+	  m_pFirstBrokenCell(nullptr),
 	  m_iAdditionalMarginAfter(0)
 {
 }
@@ -3094,10 +3100,10 @@ fp_TableContainer::~fp_TableContainer()
 //
 // For debugging...
 //
-	setContainer(NULL);
-	setPrev(NULL);
-	setNext(NULL);
-	m_pMasterTable = NULL;
+	setContainer(nullptr);
+	setPrev(nullptr);
+	setNext(nullptr);
+	m_pMasterTable = nullptr;
 }
 
 fp_Column * fp_TableContainer::getBrokenColumn(void) const
@@ -3108,13 +3114,13 @@ fp_Column * fp_TableContainer::getBrokenColumn(void) const
 	}
 	const fp_TableContainer * pBroke = this;
 	bool bStop = false;
-	fp_Column * pCol = NULL;
+	fp_Column * pCol = nullptr;
 	while(pBroke && pBroke->isThisBroken() && !bStop)
 	{
 		fp_Container * pCon = pBroke->getContainer();
 		if (!pCon)
 		{
-			return NULL;
+			return nullptr;
 		}
 		if(pCon->isColumnType())
 		{
@@ -3153,7 +3159,7 @@ fp_Column * fp_TableContainer::getBrokenColumn(void) const
 		}
 		else
 		{
-			pCol = NULL;
+			pCol = nullptr;
 		}
 	}
 	return pCol;
@@ -3200,8 +3206,8 @@ void fp_TableContainer::drawLines(void)
 		}
 		else
 		{
-			pCell->drawLines(NULL,getGraphics(),true);
-			pCell->drawLines(NULL,getGraphics(),false);
+			pCell->drawLines(nullptr,getGraphics(),true);
+			pCell->drawLines(nullptr,getGraphics(),false);
 		}
 		pCell = static_cast<fp_CellContainer *>(pCell->getNext());
 	}
@@ -3307,7 +3313,7 @@ UT_sint32 fp_TableContainer::getYOfRow(UT_sint32 row, bool bBottomOffset) const
 	}
 
 	UT_sint32 iYRow = 0;
-	fp_TableRowColumn *pRow = NULL;
+	fp_TableRowColumn *pRow = nullptr;
 	if (row < numRows)
 	{
 		pRow = getNthRow(row);
@@ -3344,7 +3350,7 @@ UT_sint32 fp_TableContainer::getXOfColumn(UT_sint32 col) const
 	}
 
 	UT_sint32 iXCol = 0;
-	fp_TableRowColumn *pCol = NULL;
+	fp_TableRowColumn *pCol = nullptr;
 	if (col < numCols)
 	{
 		pCol = getNthCol(col);
@@ -3405,7 +3411,7 @@ static UT_sint32 compareCellPosBinary(const void * vX1, const void * vX2)
 fp_CellContainer * fp_TableContainer::getCellAtRowColumnLinear(UT_sint32 row, UT_sint32 col) const
 {
 	UT_sint32 i = 0;
-	fp_CellContainer * pCell = NULL;
+	fp_CellContainer * pCell = nullptr;
 	bool bFound = false;
 	for(i=0; (i<countCons()) && !bFound; i++)
 	{
@@ -3416,7 +3422,7 @@ fp_CellContainer * fp_TableContainer::getCellAtRowColumnLinear(UT_sint32 row, UT
 			return pCell;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 /*!
  * Return the cell container at the specified row and column
@@ -3428,11 +3434,11 @@ fp_CellContainer * fp_TableContainer::getCellAtRowColumn(UT_sint32 row, UT_sint3
 	pt.y = row;
 	if((row >= getNumRows()) || (row <0))
 	{
-		return NULL;
+		return nullptr;
 	}
 	if((col >= getNumCols()) || (col < 0))
 	{
-		return NULL;
+		return nullptr;
 	}
 	UT_sint32 u =-1;
 	u = binarysearchCons(&pt, compareCellPosBinary);
@@ -3583,7 +3589,7 @@ void fp_TableContainer::mapXYToPosition(UT_sint32 x, UT_sint32 y, PT_DocPosition
 		y = 1;
 	}
 
-	fp_TableContainer * pMaster = NULL;
+	fp_TableContainer * pMaster = nullptr;
 	if(isThisBroken())
 	{
 		pMaster = getMasterTable();
@@ -3732,7 +3738,7 @@ void fp_TableContainer::deleteBrokenTables(bool bClearFirst, bool bRecurseUp)
 		//
 		clearBrokenContainers();
 	}
-	if(getFirstBrokenTable() == NULL)
+	if(getFirstBrokenTable() == nullptr)
 	{
 		return;
 	}
@@ -3762,8 +3768,8 @@ void fp_TableContainer::deleteBrokenTables(bool bClearFirst, bool bRecurseUp)
 		}
 	}
 
-	fp_TableContainer * pBroke = NULL;
-	fp_TableContainer * pNext = NULL;
+	fp_TableContainer * pBroke = nullptr;
+	fp_TableContainer * pNext = nullptr;
 	pBroke = getFirstBrokenTable();
 	bool bDontRemove = false;
 	fl_ContainerLayout * pMyConL = getSectionLayout()->myContainingLayout();
@@ -3799,7 +3805,7 @@ void fp_TableContainer::deleteBrokenTables(bool bClearFirst, bool bRecurseUp)
 			if(i >=0)
 			{
 				fp_Container * pCon = pBroke->getContainer();
-				pBroke->setContainer(NULL);
+				pBroke->setContainer(nullptr);
 				pCon->deleteNthCon(i);
 				xxx_UT_DEBUGMSG(("Delete %x from column %x \n",pBroke,pCon));
 				//
@@ -3839,17 +3845,17 @@ void fp_TableContainer::deleteBrokenTables(bool bClearFirst, bool bRecurseUp)
 		delete pBroke;
 		if(pBroke == getLastBrokenTable())
 		{
-			pBroke = NULL;
+			pBroke = nullptr;
 		}
 		else
 		{
 			pBroke = pNext;
 		}
 	}
-	setFirstBrokenTable(NULL);
-	setLastBrokenTable(NULL);
-	setNext(NULL);
-	setPrev(NULL);
+	setFirstBrokenTable(nullptr);
+	setLastBrokenTable(nullptr);
+	setNext(nullptr);
+	setPrev(nullptr);
 //	if(bClearFirst)
 	{
 		fl_TableLayout * pTL = static_cast<fl_TableLayout *>(getSectionLayout());
@@ -3885,7 +3891,7 @@ void fp_TableContainer::deleteBrokenAfter(bool bClearFirst)
 	}
 
 	fp_TableContainer * pBroke = static_cast<fp_TableContainer *>(getNext());
-	fp_TableContainer * pNext = NULL;
+	fp_TableContainer * pNext = nullptr;
 	while(pBroke)
 	{
 		pNext = static_cast<fp_TableContainer *> (pBroke->getNext());
@@ -3895,17 +3901,17 @@ void fp_TableContainer::deleteBrokenAfter(bool bClearFirst)
 			if (i >= 0)
 			{
 				pBroke->getContainer()->deleteNthCon(i);
-				pBroke->setContainer(NULL);
+				pBroke->setContainer(nullptr);
 			}
 		}
 		delete pBroke;
 		pBroke = pNext;
 	}
 
-	setNext(NULL);
+	setNext(nullptr);
 	if (!getPrev())
 	{
-		getMasterTable()->setNext(NULL);
+		getMasterTable()->setNext(nullptr);
 	}
 	getMasterTable()->setLastBrokenTable(this);
 	UT_sint32 iOldYBottom = getYBottom();
@@ -3985,7 +3991,7 @@ void fp_TableContainer::breakCellsAt(UT_sint32 vpos)
 	{
 		return;
 	}
-	fp_TableContainer * pMaster = NULL;
+	fp_TableContainer * pMaster = nullptr;
 	if(isThisBroken())
 	{
 		pMaster = getMasterTable();
@@ -4035,10 +4041,10 @@ fp_ContainerObject * fp_TableContainer::VBreakAt(UT_sint32 vpos)
 //
 // Do the case of creating the first broken table from the master table.
 // 
-	fp_TableContainer * pBroke = NULL;
-	if(!isThisBroken() && getLastBrokenTable() == NULL)
+	fp_TableContainer * pBroke = nullptr;
+	if(!isThisBroken() && getLastBrokenTable() == nullptr)
 	{
-		UT_return_val_if_fail(getFirstBrokenTable() == NULL, NULL);
+		UT_return_val_if_fail(getFirstBrokenTable() == nullptr, nullptr);
 		pBroke = new fp_TableContainer(getSectionLayout(),this);
 		xxx_UT_DEBUGMSG(("SEVIOR:!!!!!!! First broken table %x \n",pBroke));
 		pBroke->setYBreakHere(vpos);
@@ -4054,8 +4060,8 @@ fp_ContainerObject * fp_TableContainer::VBreakAt(UT_sint32 vpos)
 //
 // Now do the case of breaking a Master table.
 //
-	UT_return_val_if_fail(vpos > 0, NULL);
-	if(getMasterTable() == NULL)
+	UT_return_val_if_fail(vpos > 0, nullptr);
+	if(getMasterTable() == nullptr)
 	{
 		return getLastBrokenTable()->VBreakAt(vpos);
 	}
@@ -4066,11 +4072,11 @@ fp_ContainerObject * fp_TableContainer::VBreakAt(UT_sint32 vpos)
 	{
 		if (m_iNextWantedVBreak <= 0)
 		{
-			return NULL;
+			return nullptr;
 		}
 		iNewYBreak = m_iNextWantedVBreak + getYBreak();
 	}
-	UT_return_val_if_fail(iNewYBreak < iTotalHeight, NULL);
+	UT_return_val_if_fail(iNewYBreak < iTotalHeight, nullptr);
 
 //
 // vpos is relative to the container that contains this height but we need
@@ -4085,9 +4091,9 @@ fp_ContainerObject * fp_TableContainer::VBreakAt(UT_sint32 vpos)
 
 //
 // The structure of table linked list is as follows.
-// NULL <= Master <==> Next <==> Next => NULL
+// nullptr <= Master <==> Next <==> Next => nullptr
 //          first 
-// ie terminated by NULL's in the getNext getPrev list. The second
+// ie terminated by nullptr's in the getNext getPrev list. The second
 // broken table points and is pointed to by the Master table
 // 
 
@@ -4099,7 +4105,7 @@ fp_ContainerObject * fp_TableContainer::VBreakAt(UT_sint32 vpos)
 	}
 	setNext(pBroke);
 	pBroke->setPrev(pThisTable);
-	pBroke->setNext(NULL);
+	pBroke->setNext(nullptr);
 	getMasterTable()->setLastBrokenTable(pBroke);
 
 	// TODO TODO TODO : This part should only be needed for nested tables as the insertion of
@@ -4154,7 +4160,7 @@ void fp_TableContainer::setY(UT_sint32 i)
 //
 // Create an initial broken table if none exists
 //
-	if(!bIsFirstBroken && (getFirstBrokenTable() == NULL))
+	if(!bIsFirstBroken && (getFirstBrokenTable() == nullptr))
 	{
 		VBreakAt(0);
 	}
@@ -4442,9 +4448,9 @@ UT_sint32 fp_TableContainer::getTotalTableHeight(void) const
  */
 fp_Line * fp_TableContainer::getFirstLineInColumn(fp_Column * pCol) const
 {
-	const fp_TableContainer * pTab = NULL;
-	const fp_TableContainer * pBroke = NULL;
-	fp_CellContainer * pCell = NULL;
+	const fp_TableContainer * pTab = nullptr;
+	const fp_TableContainer * pBroke = nullptr;
+	fp_CellContainer * pCell = nullptr;
 	if(!isThisBroken())
 	{
 		pTab = this;
@@ -4475,11 +4481,11 @@ fp_Line * fp_TableContainer::getFirstLineInColumn(fp_Column * pCol) const
 					return static_cast<fp_TableContainer *>(pFirst)->getFirstLineInColumn(pCol);
 				}
 				UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
-				return NULL;
+				return nullptr;
 			}
 			pCell = static_cast<fp_CellContainer *>(pCell->getNext());
 		}
-		return NULL;
+		return nullptr;
 	}
 	while(pCell)
 	{
@@ -4501,12 +4507,12 @@ fp_Line * fp_TableContainer::getFirstLineInColumn(fp_Column * pCol) const
 					return static_cast<fp_TableContainer *>(pFirst)->getFirstLineInColumn(pCol);
 				}
 				UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
-				return NULL;
+				return nullptr;
 			}
 		}
 		pCell =  static_cast<fp_CellContainer *>(pCell->getNext());
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -4516,9 +4522,9 @@ fp_Line * fp_TableContainer::getFirstLineInColumn(fp_Column * pCol) const
  */
 fp_Line * fp_TableContainer::getLastLineInColumn(fp_Column * pCol) const
 {
-	const fp_TableContainer * pTab = NULL;
-	const fp_TableContainer * pBroke = NULL;
-	fp_CellContainer * pCell = NULL;
+	const fp_TableContainer * pTab = nullptr;
+	const fp_TableContainer * pBroke = nullptr;
+	fp_CellContainer * pCell = nullptr;
 	if(!isThisBroken())
 	{
 		pTab = this;
@@ -4528,10 +4534,10 @@ fp_Line * fp_TableContainer::getLastLineInColumn(fp_Column * pCol) const
 		pBroke = this;
 		pTab = getMasterTable();
 	}
-	UT_return_val_if_fail(pTab,NULL);
+	UT_return_val_if_fail(pTab,nullptr);
 	if(pTab->countCons() == 0)
 	{
-		return NULL;
+		return nullptr;
 	}
 	pCell = static_cast<fp_CellContainer *>(pTab->getNthCon(pTab->countCons()-1));
 	if(!pBroke)
@@ -4546,7 +4552,7 @@ fp_Line * fp_TableContainer::getLastLineInColumn(fp_Column * pCol) const
 					pLast = static_cast<fp_Container *>(pLast->getPrev());
 				}
 				if(!pLast)
-					return NULL;
+					return nullptr;
 				if(pLast->getContainerType() == FP_CONTAINER_LINE)
 				{
 					return static_cast<fp_Line *>(pLast);
@@ -4556,11 +4562,11 @@ fp_Line * fp_TableContainer::getLastLineInColumn(fp_Column * pCol) const
 					return static_cast<fp_TableContainer *>(pLast)->getLastLineInColumn(pCol);
 				}
 				UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
-				return NULL;
+				return nullptr;
 			}
 			pCell = static_cast<fp_CellContainer *>(pCell->getPrev());
 		}
-		return NULL;
+		return nullptr;
 	}
 	while(pCell)
 	{
@@ -4582,12 +4588,12 @@ fp_Line * fp_TableContainer::getLastLineInColumn(fp_Column * pCol) const
 					return static_cast<fp_TableContainer *>(pLast)->getLastLineInColumn(pCol);
 				}
 				UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
-				return NULL;
+				return nullptr;
 			}
 		}
 		pCell =  static_cast<fp_CellContainer *>(pCell->getPrev());
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -4637,7 +4643,7 @@ fp_Container * fp_TableContainer::getNextContainerInSection() const
 	{
 		return pNext->getFirstContainer();
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -4676,7 +4682,7 @@ fp_Container * fp_TableContainer::getPrevContainerInSection() const
 		}
 		return pPrevCon;
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -4726,7 +4732,7 @@ void fp_TableContainer::setContainer(fp_Container * pContainer)
 		return;
 	}
 
-	if (getContainer() && (pContainer != NULL))
+	if (getContainer() && (pContainer != nullptr))
 	{
 		clearScreen();
 	}
@@ -4736,9 +4742,9 @@ void fp_TableContainer::setContainer(fp_Container * pContainer)
 	{
 		pBroke->setContainer(pContainer);
 	}
-	if(pContainer == NULL)
+	if(pContainer == nullptr)
 	{
-		xxx_UT_DEBUGMSG(("Set master table %x container to NULL \n",this));
+		xxx_UT_DEBUGMSG(("Set master table %x container to nullptr \n",this));
 		return;
 	}
 	setWidth(pContainer->getWidth());
@@ -4896,7 +4902,7 @@ void  fp_TableContainer::_size_request_init(void)
   while (pCell)
   {
 	  UT_ASSERT(pCell->getContainerType() == FP_CONTAINER_CELL);
-	  pCell->sizeRequest(NULL);
+	  pCell->sizeRequest(nullptr);
 	  pCell = static_cast<fp_CellContainer *>(pCell->getNext());
   }
 }
@@ -4904,11 +4910,11 @@ void  fp_TableContainer::_size_request_init(void)
 void  fp_TableContainer::_drawBoundaries(dg_DrawArgs* pDA)
 {
 	UT_ASSERT(getPage());
-	if(getPage() == NULL)
+	if(getPage() == nullptr)
 	{
 		return;
 	}
-	if(getPage()->getDocLayout()->getView() == NULL)
+	if(getPage()->getDocLayout()->getView() == nullptr)
 	{
 		return;
 	}
@@ -4996,7 +5002,7 @@ void  fp_TableContainer::clearScreen(void)
 	{
 		return;
 	}
-	if(getPage() == NULL)
+	if(getPage() == nullptr)
 	{
 		return;
 	}
@@ -5055,7 +5061,7 @@ void fp_TableContainer::draw(dg_DrawArgs* pDA)
 		_brokenDraw(pDA);
 		return;
 	}
-	else if(getFirstBrokenTable() != NULL)
+	else if(getFirstBrokenTable() != nullptr)
 	{
 		getFirstBrokenTable()->draw( pDA);
 		return;
@@ -5098,7 +5104,7 @@ UT_sint32 fp_TableContainer::getHeight(void) const
 // All other Y offsets from the broken tables are calculated relative to
 // it.
 //
-		if(getFirstBrokenTable() != NULL)
+		if(getFirstBrokenTable() != nullptr)
 		{
 			return getFirstBrokenTable()->getHeight();
 		}
@@ -5291,7 +5297,7 @@ void fp_TableContainer::_drawBrokenBoundaries(dg_DrawArgs* pDA)
 	{
 		return;
 	}
-	if(!getPage() || (getPage()->getDocLayout()->getView() == NULL))
+	if(!getPage() || (getPage()->getDocLayout()->getView() == nullptr))
 	{
 		return;
 	}

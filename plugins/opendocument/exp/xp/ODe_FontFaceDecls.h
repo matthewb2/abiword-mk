@@ -23,10 +23,7 @@
 #define ODE_FONTFACEDECLS_H_
 
 // AbiWord includes
-#include <ut_hash.h>
-
-// External includes
-#include <gsf/gsf-output.h>
+#include "ut_hash.h"
 
 // AbiWord classes
 class UT_UTF8String;

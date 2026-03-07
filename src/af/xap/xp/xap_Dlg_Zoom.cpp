@@ -42,8 +42,8 @@ XAP_Dialog_Zoom::XAP_Dialog_Zoom(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id 
 	// should always be called before the dialog is shown
 	m_zoomPercent = 100;
 
-	m_zoomPreview = NULL;
-	m_pFrame = 0 ;
+	m_zoomPreview = nullptr;
+	m_pFrame = nullptr;
 }
 
 XAP_Dialog_Zoom::~XAP_Dialog_Zoom(void)
@@ -110,7 +110,7 @@ void XAP_Dialog_Zoom::_updatePreviewZoomPercent(UT_uint32 percent)
 	if (m_zoomPreview)
 	{
 		m_zoomPreview->setZoomPercent(percent);
-		m_zoomPreview->draw();
+		m_zoomPreview->queueDraw();
 	}
 	if (m_pFrame)
 		m_pFrame->quickZoom(percent);

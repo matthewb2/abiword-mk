@@ -36,20 +36,16 @@
 
 XAP_Dialog::XAP_Dialog(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id,
 		       const char * helpUrl )
-  : m_pApp ( NULL ), m_pDlgFactory ( pDlgFactory ), m_id ( id ), 
-	m_helpUrl(NULL)
+  : m_pApp ( nullptr ), m_pDlgFactory ( pDlgFactory ), m_id ( id )
 {
   m_pApp = pDlgFactory->getApp();
 
   if (helpUrl)
-    m_helpUrl = new UT_String (helpUrl);
-  else
-    m_helpUrl = new UT_String (); // create an empty one
+    m_helpUrl = helpUrl;
 }
 
 XAP_Dialog::~XAP_Dialog(void)
 {
-	delete m_helpUrl;
 }
 
 
@@ -235,7 +231,7 @@ XAP_Frame *   XAP_Dialog_Modeless::getActiveFrame(void) const
 	// This function returns the frame currently connected to a modeless dialog
 
 	XAP_Frame * pFrame = m_pApp->getLastFocussedFrame();
-	if(pFrame == (XAP_Frame *) NULL)
+	if(pFrame == (XAP_Frame *) nullptr)
 	{
 		pFrame = m_pApp->getFrame(0);
 	}
@@ -267,7 +263,7 @@ XAP_Dialog_Modeless::BuildWindowName(char * pWindowName, const char * pDialogNam
 // This function constructs and returns the window name of a modeless dialog by
 // concatenating the active frame with the dialog name
 
-	*pWindowName = (char) NULL;
+	*pWindowName = '\0';
 	UT_UTF8String wn = UT_UTF8String(pDialogName);
 
 	XAP_Frame* pFrame = getActiveFrame();

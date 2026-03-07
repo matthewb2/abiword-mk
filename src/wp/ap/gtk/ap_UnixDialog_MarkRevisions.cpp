@@ -27,6 +27,7 @@
 // This header defines some functions for Unix dialogs,
 // like centering them, measuring them, etc.
 #include "xap_UnixDialogHelper.h"
+#include "xap_GtkUtils.h"
 
 #include "xap_App.h"
 #include "xap_UnixApp.h"
@@ -48,11 +49,11 @@ XAP_Dialog * AP_UnixDialog_MarkRevisions::static_constructor(XAP_DialogFactory *
 AP_UnixDialog_MarkRevisions::AP_UnixDialog_MarkRevisions(XAP_DialogFactory * pDlgFactory,
 										 XAP_Dialog_Id id)
 	: AP_Dialog_MarkRevisions(pDlgFactory,id)
-    , mRadio1(0)
-    , mRadio2(0)
-    , mEntryLbl(0)
-    , mComment(0)
-    , mButtonOK(0)
+    , mRadio1(nullptr)
+    , mRadio2(nullptr)
+    , mEntryLbl(nullptr)
+    , mComment(nullptr)
+    , mButtonOK(nullptr)
 {
 }
 
@@ -79,9 +80,7 @@ void AP_UnixDialog_MarkRevisions::runModal(XAP_Frame * pFrame)
 		default:
 			event_Cancel () ; break ;
 	}
-  
-  /*if(mainWindow && GTK_IS_WIDGET(mainWindow))
-    gtk_widget_destroy(mainWindow);*/
+
 	abiDestroyWidget ( mainWindow ) ;
 }
 
@@ -89,7 +88,7 @@ GtkWidget * AP_UnixDialog_MarkRevisions::constructWindow ()
 {
   const XAP_StringSet * pSS = XAP_App::getApp()->getStringSet();
 
-  GtkWidget* w = 0;
+  GtkWidget* w = nullptr;
   GtkWidget *dialog1;
   GtkWidget *dialog_vbox1;
   std::string s;
@@ -114,8 +113,8 @@ GtkWidget * AP_UnixDialog_MarkRevisions::constructWindow ()
 void AP_UnixDialog_MarkRevisions::constructWindowContents ( GtkWidget * container )
 {
    GtkWidget *vbox1;
-   GSList *vbox1_group = NULL;
-   GtkWidget *radiobutton1 = NULL;
+   GSList *vbox1_group = nullptr;
+   GtkWidget *radiobutton1 = nullptr;
    GtkWidget *lbl1;
    GtkWidget *radiobutton2;
    GtkWidget *lbl2;
@@ -124,9 +123,9 @@ void AP_UnixDialog_MarkRevisions::constructWindowContents ( GtkWidget * containe
    vbox1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
    gtk_widget_show (vbox1);
    gtk_box_pack_start (GTK_BOX (container), vbox1, TRUE, TRUE, 0);
-   gtk_container_set_border_width (GTK_CONTAINER (vbox1), 3);
+   XAP_gtk_widget_set_margin(vbox1, 3);
 
-   if(getRadio1Label() != NULL)
+   if(getRadio1Label() != nullptr)
      {
 		 if(isRev())
 		 {
@@ -168,7 +167,7 @@ void AP_UnixDialog_MarkRevisions::constructWindowContents ( GtkWidget * containe
 void AP_UnixDialog_MarkRevisions::event_OK ()
 {
   m_answer = AP_Dialog_MarkRevisions::a_OK ;
-  setComment2 ( gtk_entry_get_text ( GTK_ENTRY( mComment ) ) ) ;
+  setComment2 ( XAP_gtk_entry_get_text ( GTK_ENTRY( mComment ) ) ) ;
 }
 
 void AP_UnixDialog_MarkRevisions::event_Cancel ()
@@ -181,7 +180,7 @@ void AP_UnixDialog_MarkRevisions::event_FocusToggled ()
 	gboolean second_active = FALSE ;
 	
 	if ( ( mRadio2 && gtk_toggle_button_get_active ( GTK_TOGGLE_BUTTON(mRadio2) ) )
-		 || getRadio1Label() == NULL )
+		 || getRadio1Label() == nullptr )
 		second_active = TRUE ;
 	
 	if ( mEntryLbl )

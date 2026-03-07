@@ -88,10 +88,10 @@ static const char * s_strnstr (const char * haystack, UT_uint32 iNumbytes, const
 	UT_uint32 needle_length = static_cast<UT_uint32>(strlen (needle));
 	UT_uint32 i = 0;
 
-	if (needle_length > iNumbytes) return NULL;
+	if (needle_length > iNumbytes) return nullptr;
 
 	const char * ptr = haystack;
-	const char * match = NULL;
+	const char * match = nullptr;
 
 	while (i < (iNumbytes - needle_length))
 		{
@@ -242,7 +242,7 @@ UT_Error IE_Imp_MHT::importFile (const char * szFilename)
 	return import_status;
 }
 
-FG_Graphic * IE_Imp_MHT::importImage (const gchar * szSrc)
+FG_ConstGraphicPtr IE_Imp_MHT::importImage(const gchar * szSrc)
 {
 	bool bContentID = (strncmp ((const char *) szSrc, "cid:", 4) == 0);
 
@@ -279,8 +279,8 @@ FG_Graphic * IE_Imp_MHT::importImage (const gchar * szSrc)
 			return 0;
 		}
 
-	const UT_ByteBuf * pBB = part->getBuffer ();
-	if (pBB == 0)
+	const UT_ConstByteBufPtr & pBB = part->getBuffer();
+	if (!pBB)
 		{
 			UT_DEBUGMSG(("Multipart HTML: importImage: `%s' - image in archive but not (or no longer?) loaded!\n",szSrc));
 			return 0;
@@ -301,8 +301,8 @@ FG_Graphic * IE_Imp_MHT::importImage (const gchar * szSrc)
 
 	UT_Multipart * vol_part = const_cast<UT_Multipart *>(part);
 
-	FG_Graphic * pfg = 0;
-	UT_Error import_status = pieg->importGraphic (vol_part->detachBuffer (), &pfg);
+	FG_ConstGraphicPtr pfg;
+	UT_Error import_status = pieg->importGraphic (vol_part->detachBuffer (), pfg);
 	delete pieg;
 	if (import_status != UT_OK)
 		{
@@ -406,7 +406,6 @@ UT_Multipart::~UT_Multipart ()
 	clear ();
 
 	DELETEP(m_map);
-	DELETEP(m_buf);
 }
 
 bool UT_Multipart::insert (const char * name, const char * value)
@@ -576,11 +575,9 @@ bool UT_Multipart::append_Quoted (const char * buffer, UT_uint32 length)
 	return success;
 }
 
-UT_ByteBuf * UT_Multipart::detachBuffer ()
+UT_ByteBufPtr && UT_Multipart::detachBuffer ()
 {
-	UT_ByteBuf * bufret = m_buf;
-	m_buf = 0;
-	return bufret;
+    return std::move(m_buf);
 }
 
 void UT_Multipart::clear ()

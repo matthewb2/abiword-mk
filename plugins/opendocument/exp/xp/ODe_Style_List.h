@@ -23,11 +23,8 @@
 #define ODE_STYLE_LIST_H_
 
 // AbiWord includes
-#include <ut_hash.h>
-#include <ut_string_class.h>
-
-// External includes
-#include <gsf/gsf-output.h>
+#include "ut_hash.h"
+#include "ut_string_class.h"
 
 // Internal classes
 class ODe_ListLevelStyle;
@@ -61,7 +58,7 @@ private:
     UT_UTF8String m_name;
 
     // text:consecutive-numbering attribute
-    bool m_bConsecutiveNumbering;
+    //bool m_bConsecutiveNumbering;
 
     UT_GenericStringMap<ODe_ListLevelStyle*> m_levelStyles;
 };

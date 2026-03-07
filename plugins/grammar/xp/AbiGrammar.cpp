@@ -65,11 +65,10 @@
 class AbiGrammar : public AV_ListenerExtra
 {
 public:
-AbiGrammar(XAP_App * pApp):
-	m_pApp(pApp),
-	m_pView(NULL),
-	m_pDoc(NULL),
-	m_pBlock(NULL)
+AbiGrammar():
+	m_pView(nullptr),
+	m_pDoc(nullptr),
+	m_pBlock(nullptr)
 		{
 		}
 
@@ -81,18 +80,18 @@ void setID(AV_ListenerId id)
 			m_lid = id;
 		}
 
-virtual  AV_ListenerType getType(void) { return AV_LISTENER_PLUGIN_EXTRA;}
+virtual  AV_ListenerType getType(void) const override { return AV_LISTENER_PLUGIN_EXTRA;}
 
-AV_ListenerId	getID(void)
+AV_ListenerId	getID(void) const
 		{
 			return m_lid;
 		}
-virtual bool notify(AV_View * , const AV_ChangeMask )
+virtual bool notify(AV_View * , const AV_ChangeMask ) override
 		{
 		  return false;
 		}
 
-virtual bool notify(AV_View * pAView, const AV_ChangeMask mask, void * pPrivateData)
+virtual bool notify(AV_View * pAView, const AV_ChangeMask mask, void * pPrivateData) override
 		{
 		  if(mask != AV_CHG_BLOCKCHECK)
 		  {
@@ -103,18 +102,15 @@ virtual bool notify(AV_View * pAView, const AV_ChangeMask mask, void * pPrivateD
 		  m_pBlock = reinterpret_cast<fl_BlockLayout *>(pPrivateData);
 		  m_pDoc = m_pView->getDocument();
 		  UT_UTF8String sText;
-		  const char * pText = NULL;
 		  m_pBlock->appendUTF8String(sText);
-		  if (sText.byteLength()==0) 
+		  if (sText.byteLength() == 0) {
 		    return true;
-		  pText =  sText.utf8_str();
-		  //printf("I've been notified!! Text is |%s|\n", pText );
+		  }
 		  m_GrammarCheck.CheckBlock(m_pBlock);
 		  return true;
 		}
 
 private:
-	XAP_App *        m_pApp;
 	FV_View *        m_pView;
 	PD_Document *    m_pDoc;
 	fl_BlockLayout * m_pBlock;
@@ -124,7 +120,7 @@ private:
 
 
 static AV_ListenerId listenerID = 0; 
-static AbiGrammar * pAbiGrammar = NULL;
+static AbiGrammar * pAbiGrammar = nullptr;
 
 ABI_PLUGIN_DECLARE(AbiGrammar)
 
@@ -156,7 +152,7 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
     }
 #endif
 
-    pAbiGrammar = new AbiGrammar(pApp);
+    pAbiGrammar = new AbiGrammar();
     pApp->addListener(pAbiGrammar, &listenerID);
     pAbiGrammar->setID(listenerID);
     UT_DEBUGMSG(("Class AbiGrammar %p created! Listener Id %d \n",pAbiGrammar,listenerID));
@@ -168,11 +164,11 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-    mi->name = 0;
-    mi->desc = 0;
-    mi->version = 0;
-    mi->author = 0;
-    mi->usage = 0;
+    mi->name = nullptr;
+    mi->desc = nullptr;
+    mi->version = nullptr;
+    mi->author = nullptr;
+    mi->usage = nullptr;
 
     XAP_App * pApp = XAP_App::getApp();
     pApp->removeListener(listenerID);

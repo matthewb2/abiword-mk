@@ -21,13 +21,13 @@
  */
 
 // Class definition include
-#include <OXML_Element_Image.h>
+#include "OXML_Element_Image.h"
 
 // AbiWord includes
-#include <ut_std_string.h>
-#include <ut_types.h>
-#include <ut_string.h>
-#include <pd_Document.h>
+#include "ut_std_string.h"
+#include "ut_types.h"
+#include "ut_string.h"
+#include "pd_Document.h"
 
 OXML_Element_Image::OXML_Element_Image(const std::string & id) : 
 	OXML_Element(id, IMG_TAG, IMAGE)
@@ -47,7 +47,7 @@ UT_Error OXML_Element_Image::serialize(IE_Exp_OpenXML* exporter)
 	const gchar* width = "1.0in";
 	const gchar* xpos = "0.0in";
 	const gchar* ypos = "0.0in";
-	const gchar* wrapMode = NULL;
+	const gchar* wrapMode = nullptr;
 	bool bPositionedImage = false;
 
 	bPositionedImage = (getAttribute("strux-image-dataid", szValue) == UT_OK);
@@ -108,13 +108,13 @@ UT_Error OXML_Element_Image::addToPT(PD_Document * pDocument)
 	OXML_SharedImage sImage = doc->getImageById(getId());
 	if(!sImage)
 	{
-		UT_DEBUGMSG(("SERHAT: Skipping image element in import, since fail occured in import of image data previously\n"));
+		UT_DEBUGMSG(("SERHAT: Skipping image element in import, since fail occurred in import of image data previously\n"));
 		return UT_OK;
 	}
 
 	UT_Error ret = UT_OK;
 	bool bInline = false;
-	const gchar* szValue = NULL;
+	const gchar* szValue = nullptr;
 
 	ret = getProperty("height", szValue);
 	if(ret == UT_OK && szValue)
@@ -147,7 +147,7 @@ UT_Error OXML_Element_Image::addToPT(PD_Document * pDocument)
 			return ret;
 	}
 
-	const gchar ** atts = getAttributesWithProps();
+	const PP_PropertyVector atts = getAttributesWithProps();
 
 	if(bInline)
 	{
@@ -164,7 +164,7 @@ UT_Error OXML_Element_Image::addToPT(PD_Document * pDocument)
 		if(ret != UT_OK)
 			return ret;
 
-		ret = pDocument->appendStrux(PTX_EndFrame, NULL) ? UT_OK : UT_ERROR;
+		ret = pDocument->appendStrux(PTX_EndFrame, PP_NOPROPS) ? UT_OK : UT_ERROR;
 		if(ret != UT_OK)
 			return ret;
 	}

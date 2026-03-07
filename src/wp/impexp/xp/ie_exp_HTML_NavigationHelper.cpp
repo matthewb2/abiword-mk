@@ -38,7 +38,7 @@ bool IE_Exp_HTML_BookmarkListener::populate(fl_ContainerLayout* /*sfh*/,
     {
     case PX_ChangeRecord::PXT_InsertObject:
     {
-        const PX_ChangeRecord_Object * pcro = 0;
+        const PX_ChangeRecord_Object * pcro = nullptr;
         pcro = static_cast<const PX_ChangeRecord_Object *> (pcr);
         PT_AttrPropIndex api = pcr->getIndexAP();
 
@@ -46,21 +46,21 @@ bool IE_Exp_HTML_BookmarkListener::populate(fl_ContainerLayout* /*sfh*/,
         {
         case PTO_Bookmark:
         {
-            const PP_AttrProp * pAP = 0;
+            const PP_AttrProp * pAP = nullptr;
             bool bHaveProp = (api ? (m_pDoc->getAttrProp(api, &pAP)) : false);
 
-            if (!bHaveProp || (pAP == 0))
+            if (!bHaveProp || (pAP == nullptr))
                 return true;
 
-            const gchar * szType = 0;
+            const gchar * szType = nullptr;
             pAP->getAttribute("type", szType);
 
-            if (szType == 0)
+            if (szType == nullptr)
                 return true; // ??
 
             if (g_ascii_strcasecmp(szType, "start") == 0)
             {
-                const gchar * szName = 0;
+                const gchar * szName = nullptr;
                 pAP->getAttribute("name", szName);
 
                 if (szName)
@@ -92,6 +92,8 @@ IE_Exp_HTML_NavigationHelper::IE_Exp_HTML_NavigationHelper(
   m_minTOCIndex(0),
   m_baseName(UT_go_basename_from_uri(baseName.utf8_str()))
 {
+    UT_ASSERT(m_baseName);
+
     m_suffix = strchr(m_baseName, '.');
     m_minTOCLevel = 10;
     for (int i = 0; i < getNumTOCEntries(); i++)
@@ -154,7 +156,7 @@ UT_UTF8String IE_Exp_HTML_NavigationHelper::getFilenameByPosition(
 				{
 					if (posCurrent <= position)
 					{
-						chapterFile = ConvertToClean(getNthTOCEntry(i, NULL)) + m_suffix;
+						chapterFile = ConvertToClean(getNthTOCEntry(i, nullptr)) + m_suffix;
 						break;
 					}
 				}

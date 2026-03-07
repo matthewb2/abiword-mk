@@ -1,3 +1,4 @@
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 2005 Martin Sevior
  *
@@ -20,22 +21,25 @@
 #ifndef AP_UNIXDIALOG_LATEX_H
 #define AP_UNIXDIALOG_LATEX_H
 
+#include "xap_UnixDialog.h"
 #include "ap_Dialog_Latex.h"
 
 class XAP_UnixFrame;
 
 /*****************************************************************/
 
-class AP_UnixDialog_Latex: public AP_Dialog_Latex
+class AP_UnixDialog_Latex
+	: public AP_Dialog_Latex
+	, public XAP_UnixDialog
 {
 public:
 	AP_UnixDialog_Latex(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_UnixDialog_Latex(void);
 
-	virtual void			runModeless(XAP_Frame * pFrame);
-	virtual void			destroy(void);
-	virtual void			activate(void);
-	virtual void			notifyActiveFrame(XAP_Frame *pFrame);
+	virtual void runModeless(XAP_Frame * pFrame) override;
+	virtual void destroy(void) override;
+	virtual void activate(void) override;
+	virtual void notifyActiveFrame(XAP_Frame *pFrame) override;
 
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 
@@ -44,18 +48,17 @@ public:
 	void			event_Insert(void);
 	void			event_Close(void);
 	void			event_WindowDelete(void);
-	virtual void            setLatexInGUI(void);
-	virtual bool            getLatexFromGUI(void);
+	virtual void setLatexInGUI(void) override;
+	virtual bool getLatexFromGUI(void) override;
 
 protected:
-	virtual void constructDialog(void);
+	virtual void constructDialog(void) override;
 
 	// pointers to widgets we need
 
 	GtkWidget * m_wClose;
 	GtkWidget * m_wInsert;
 	GtkWidget * m_wText;
-	GtkWidget * m_windowMain;
 };
 
 #endif /* AP_UNIXDIALOG_Latex_H */

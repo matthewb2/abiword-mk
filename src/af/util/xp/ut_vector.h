@@ -19,18 +19,13 @@
  * 02110-1301 USA.
  */
 
-#ifndef UTVECTOR_H
-#define UTVECTOR_H
+#pragma once
 
-/* pre-emptive dismissal; ut_types.h is needed by just about everything,
- * so even if it's commented out in-file that's still a lot of work for
- * the preprocessor to do...
- */
-#ifndef UT_TYPES_H
 #include "ut_types.h"
-#endif
 #include "ut_assert.h"
 #include "ut_debugmsg.h"
+#include "ut_null.h"
+
 // ----------------------------------------------------------------
 
 #define UT_VECTOR_CLEANUP(d, v, r) \
@@ -103,7 +98,7 @@ public:
 	    UT_ASSERT_HARMLESS(n<m_iCount);
 
 	    if(n >= m_iCount || !m_pEntries) {
-			return 0;
+			return UT_null<T>::value;
 		}
 	    return m_pEntries[n];
 	}
@@ -166,10 +161,9 @@ public:
     bPrealoc: if true, we immediately allocate storage of at least sizehint (otherwise the
               space will be allocated when first item is inserted to baseincr)
  */
-
 template <class T>
 UT_GenericVector<T>::UT_GenericVector(UT_sint32 sizehint, UT_sint32 baseincr, bool bPrealoc)
-  : m_pEntries(NULL), m_iCount(0), m_iSpace(0),
+  : m_pEntries(nullptr), m_iCount(0), m_iSpace(0),
     m_iCutoffDouble(sizehint), m_iPostCutoffIncrement(baseincr)
 {
 	if(bPrealoc)
@@ -178,7 +172,7 @@ UT_GenericVector<T>::UT_GenericVector(UT_sint32 sizehint, UT_sint32 baseincr, bo
 
 template <class T>
 UT_GenericVector<T>::UT_GenericVector(const UT_GenericVector<T>& utv)
-  : m_pEntries(NULL), m_iCount(0), m_iSpace(0),
+  : m_pEntries(nullptr), m_iCount(0), m_iSpace(0),
   m_iCutoffDouble(utv.m_iCutoffDouble),
   m_iPostCutoffIncrement(utv.m_iPostCutoffIncrement)
 {
@@ -349,7 +343,7 @@ UT_sint32 UT_GenericVector<T>::setNthItem(UT_sint32 ndx, T pNew, T* ppOld)
 
 	if (ppOld)
 	{
-		*ppOld = (ndx < old_iSpace) ? m_pEntries[ndx] : 0;
+		*ppOld = (ndx < old_iSpace) ? m_pEntries[ndx] : UT_null<T>::value;
 	}
 
 	m_pEntries[ndx] = pNew;
@@ -388,7 +382,7 @@ void UT_GenericVector<T>::deleteNthItem(UT_sint32 n)
 
 	memmove(&m_pEntries[n], &m_pEntries[n+1], (m_iCount - (n + 1)) * sizeof(T));
 
-	m_pEntries[m_iCount-1] = 0;
+	m_pEntries[m_iCount-1] = UT_null<T>::value;
 	m_iCount--;
 
 	return;
@@ -477,6 +471,3 @@ const T UT_GenericVector<T>::operator[](UT_sint32 i) const
 {
 	return this->getNthItem(i);
 }
-
-
-#endif /* UTVECTOR_H */

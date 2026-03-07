@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 3.16)
+cmake_policy(SET CMP0167 OLD)
 
 project(AbiWord
     VERSION 3.0
     LANGUAGES C CXX
 )
-
-set(CMAKE_CXX_STANDARD 17)
+set(PACKAGE "abiword")
+set(ABIWORD_SERIES "3.0")
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #
@@ -22,22 +24,17 @@ option(ABIWORD_WIN32_UI "Use Win32 UI" ON)
 if(WIN32)
 
 add_compile_definitions(
-
     _WIN32
     WIN32
-    UNICODE
-    _UNICODE
-
     ABIWORD_TARGET_WIN32
     TOOLKIT_WIN
     XP_WIN
     UT_PLATFORM_WIN32
-
     UT_COMPILER_GCC
     HAVE_GCC_INLINE_ASM
-
     HAVE_STDINT_H
     HAVE_STRING_H
+    WITH_ENCHANT
 )
 
 endif()
@@ -51,18 +48,24 @@ configure_file(
     ${CMAKE_BINARY_DIR}/config.h
 )
 
-include_directories(${CMAKE_BINARY_DIR})
+include_directories(
+    ${CMAKE_BINARY_DIR}
+    ${CMAKE_SOURCE_DIR}/src/text/fmt/xp
+)
 
 #
 # pkg-config
 #
 
 find_package(PkgConfig REQUIRED)
-
+find_package(Boost REQUIRED)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(FRIBIDI REQUIRED fribidi)
 pkg_check_modules(LIBXML2 REQUIRED libxml-2.0)
 pkg_check_modules(GSF REQUIRED libgsf-1)
+pkg_check_modules(CAIRO cairo)
+pkg_check_modules(PANGO pango)
+pkg_check_modules(ENCHANT enchant-2)
 
 #
 # Global include paths
@@ -74,8 +77,12 @@ include_directories(
     ${FRIBIDI_INCLUDE_DIRS}
     ${LIBXML2_INCLUDE_DIRS}
     ${GSF_INCLUDE_DIRS}
-
+    ${CAIRO_INCLUDE_DIRS}
+    ${PANGO_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIRS}
+    ${ENCHANT_INCLUDE_DIRS}
     src
+    src/plugins      # ← 이 줄 추가
     src/af
     src/af/util
     src/af/util/xp
@@ -125,8 +132,14 @@ add_compile_options(
     ${FRIBIDI_CFLAGS_OTHER}
     ${LIBXML2_CFLAGS_OTHER}
     ${GSF_CFLAGS_OTHER}
+    ${CAIRO_CFLAGS_OTHER}
+    ${PANGO_CFLAGS_OTHER}
 
-    -Wall
+    -Wno-overloaded-virtual    
+    -Wno-deprecated
+    -Wno-deprecated-declarations
+    -Wno-unused-parameter
+    -Wno-mismatched-new-delete
 )
 
 #

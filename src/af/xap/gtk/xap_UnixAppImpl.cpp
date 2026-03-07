@@ -27,7 +27,7 @@
 #include "ut_files.h"
 #include "ut_go_file.h"
 
-UT_String XAP_UnixAppImpl::localizeHelpUrl (const char * pathBefore, 
+std::string XAP_UnixAppImpl::localizeHelpUrl(const char * pathBefore,
 											const char * pathAfter,
 											const char * remoteURLbase)
 {
@@ -44,7 +44,7 @@ bool XAP_UnixAppImpl::openURL(const char * url)
 	// Need this to make AbiGimp Load!!!!!
 	if (progExists("foo")) {}
 
-	GError * err = NULL;
+	GError * err = nullptr;
 	err = UT_go_url_show (url);
 	if (err) {
 		g_warning ("%s", err->message);

@@ -24,14 +24,14 @@
 #define _OXML_ELEMENT_FIELD_H_
 
 // Internal includes
-#include <OXML_Element.h>
-#include <ie_exp_OpenXML.h>
-#include <fd_Field.h>
+#include "OXML_Element.h"
+#include "ie_exp_OpenXML.h"
+#include "fd_Field.h"
 
 // AbiWord includes
-#include <ut_types.h>
-#include <ut_string.h>
-#include <pd_Document.h>
+#include "ut_types.h"
+#include "ut_string.h"
+#include "pd_Document.h"
 
 class OXML_Element_Field: public OXML_Element
 {
@@ -40,8 +40,8 @@ public:
 	OXML_Element_Field(const std::string & id, const std::string & type, const gchar* value);
 	virtual ~OXML_Element_Field();
 
-	virtual UT_Error serialize(IE_Exp_OpenXML* exporter);
-	virtual UT_Error addToPT(PD_Document * pDocument);
+	virtual UT_Error serialize(IE_Exp_OpenXML* exporter) override;
+	virtual UT_Error addToPT(PD_Document * pDocument) override;
 	void setFieldType(const std::string & type);
 
 private:

@@ -18,12 +18,13 @@
  * 02111-1307, USA.
  */
 
-#ifndef INCLUDED_AIKSAURUS_GTK_TOOLBAR_H
-#define INCLUDED_AIKSAURUS_GTK_TOOLBAR_H
+#pragma once
 
 #include "AiksaurusGTK_history.h"
 #include "AiksaurusGTK_histlist.h"
+
 #include <gtk/gtk.h>
+
 #include <new>
 
 class AiksaurusGTK_picbutton;
@@ -55,35 +56,33 @@ namespace AiksaurusGTK_impl
             GtkWidget* d_searchbar_ptr;
             GtkWidget* d_searchbar_label_ptr;
 
-            void _updateNavigation() throw(std::bad_alloc);
+            void _updateNavigation();
 
-            void _setTooltip(GtkWidget* w, const char* str) throw();
+            void _setTooltip(GtkWidget* w, const char* str) noexcept;
 
-            static void _backClicked(GtkWidget* w, gpointer data) throw();
-            static void _backMenuClicked(GList* element, gpointer data) throw();
+            static void _backClicked(GtkWidget* w, gpointer data) noexcept;
+            static void _backMenuClicked(GList* element, gpointer data) noexcept;
 
-            static void _forwardClicked(GtkWidget* w, gpointer data) throw();
-            static void _forwardMenuClicked(GList* element, gpointer data) throw();
+            static void _forwardClicked(GtkWidget* w, gpointer data) noexcept;
+            static void _forwardMenuClicked(GList* element, gpointer data) noexcept;
 
-            static void _searchBarChanged(GtkWidget* w, gpointer data) throw();
-            static void _searchBarShow(GtkWidget* w, gpointer data) throw();
-            static void _searchBarHide(GtkWidget* w, gpointer data) throw();
-            static void _searchBarActivate(GtkWidget* w, gpointer d) throw();
+            static void _searchBarChanged(GtkWidget* w, gpointer data) noexcept;
+            static void _searchBarShow(GtkWidget* w, gpointer data) noexcept;
+            static void _searchBarHide(GtkWidget* w, gpointer data) noexcept;
+            static void _searchBarActivate(GtkWidget* w, gpointer d) noexcept;
 
-            static void _searchClicked(GtkWidget* w, gpointer data) throw();
+            static void _searchClicked(GtkWidget* w, gpointer data) noexcept;
 
         public:
 
-            Toolbar(DialogMediator& mediator, GtkWidget* window) throw(std::bad_alloc);
-            ~Toolbar() throw();
+            Toolbar(DialogMediator& mediator, GtkWidget* window);
+            ~Toolbar();
 
-            GtkWidget* getToolbar() throw();
-            const char* getText() const throw();
-            void focus() throw();
+            GtkWidget* getToolbar() noexcept;
+            const char* getText() const noexcept;
+            void focus() noexcept;
 
-            void search(const char* str) throw(std::bad_alloc);
+            void search(const char* str);
     };
 
 }
-
-#endif // INCLUDED_AIKSAURUS_GTK_TOOLBAR_H

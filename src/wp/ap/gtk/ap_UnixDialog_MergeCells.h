@@ -1,5 +1,7 @@
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
+ * Copyright (C) 2019 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,28 +22,31 @@
 #ifndef AP_UNIXDIALOG_MERGECELLS_H
 #define AP_UNIXDIALOG_MERGECELLS_H
 
+#include "xap_UnixDialog.h"
 #include "ap_Dialog_MergeCells.h"
 
 class XAP_UnixFrame;
 
 /*****************************************************************/
 
-class AP_UnixDialog_MergeCells: public AP_Dialog_MergeCells
+class AP_UnixDialog_MergeCells
+  : public AP_Dialog_MergeCells
+  , public XAP_UnixDialog
 {
 public:
 	AP_UnixDialog_MergeCells(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_UnixDialog_MergeCells(void);
 
-	virtual void			runModeless(XAP_Frame * pFrame);
+	virtual void runModeless(XAP_Frame * pFrame) override;
 
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 
 	// callbacks can fire these events
 	virtual void			event_Close(void);
-	virtual void            setSensitivity(AP_Dialog_MergeCells::mergeWithCell mergeThis, bool bsens);
-	virtual void            destroy(void);
-	virtual void            activate(void);
-	virtual void            notifyActiveFrame(XAP_Frame * pFrame);
+	virtual void setSensitivity(AP_Dialog_MergeCells::mergeWithCell mergeThis, bool bsens) override;
+	virtual void destroy(void) override;
+	virtual void activate(void) override;
+	virtual void notifyActiveFrame(XAP_Frame * pFrame) override;
 protected:
 	typedef enum
 	{
@@ -55,7 +60,6 @@ protected:
 	void					_storeWindowData(void);
 	void                     _connectSignals(void);
 	// pointers to widgets we need to query/set
-	GtkWidget * m_windowMain;
 	GtkWidget * m_wContents;
 
 	GtkWidget * m_wMergeLeft;

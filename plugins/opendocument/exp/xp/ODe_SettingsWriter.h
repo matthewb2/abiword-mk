@@ -22,18 +22,12 @@
  * 02110-1301 USA.
  */
 
-#ifndef _ODE_SETTINGSWRITER_H_
-#define _ODE_SETTINGSWRITER_H_
+#pragma once
 
-
-// External includes
-#include <gsf/gsf-output-stdio.h>
-#include <gsf/gsf-outfile.h>
-
+#include <gsf/gsf.h>
 
 // Abiword classes
 class PD_Document;
-
 
 /**
  * Class holding 1 static member. Its sole duty is to write
@@ -49,5 +43,3 @@ public:
 private:
     ODe_SettingsWriter ();
 };
-
-#endif //_ODE_SETTINGSWRITER_H_

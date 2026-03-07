@@ -1,9 +1,18 @@
 
-SUBDIRS = xp
+AM_CPPFLAGS = \
+	$(AF_CPPFLAGS)
 
-noinst_LTLIBRARIES = libtf.la
+if TOOLKIT_COCOA
+# Do not install on macOS. XXX figure out how this can be run.
+noinst_LTLIBRARIES = libabiword-@ABIWORD_SERIES@-test.la
+else
+lib_LTLIBRARIES = libabiword-@ABIWORD_SERIES@-test.la
+endif
 
-libtf_la_LIBADD = xp/libxp.la
+libabiword_@ABIWORD_SERIES@_test_la_LDFLAGS = \
+	-no-undefined
 
-libtf_la_SOURCES = 
-
+libabiword_@ABIWORD_SERIES@_test_la_SOURCES = \
+	xp/tf_test.cpp \
+	xp/tf_test.h \
+	$(null)

@@ -25,30 +25,26 @@
 #include "ODe_Common.h"
 
 // Abiword includes
-#include <ut_types.h>
-#include <ut_string_class.h>
+#include "ut_types.h"
+#include "ut_string_class.h"
 #include "ut_std_string.h"
-#include <pd_Document.h>
-#include <xap_App.h>
-#include <xap_Frame.h>
-#include <fv_View.h>
-#include <gr_Graphics.h>
-#include <gr_Painter.h>
-
-// External includes
-#include <gsf/gsf-output-stdio.h>
-#include <gsf/gsf-outfile.h>
+#include "pd_Document.h"
+#include "xap_App.h"
+#include "xap_Frame.h"
+#include "fv_View.h"
+#include "gr_Graphics.h"
+#include "gr_Painter.h"
 
 bool ODe_ThumbnailsWriter::writeThumbnails(PD_Document* /*pDoc*/, GsfOutfile* oo) {
 
 	GsfOutput* thumbnailsDir = gsf_outfile_new_child (oo, "Thumbnails", TRUE);
-	if(thumbnailsDir == NULL){
+	if(thumbnailsDir == nullptr){
 		return false;
 	}
 
 	GsfOutput* thumbnail = gsf_outfile_new_child(GSF_OUTFILE(thumbnailsDir),
 			 "thumbnail.png", FALSE);
-	if(thumbnail == NULL){
+	if(thumbnail == nullptr){
 		return false;
 	}
 
@@ -73,19 +69,18 @@ bool ODe_ThumbnailsWriter::writeThumbnails(PD_Document* /*pDoc*/, GsfOutfile* oo
 	GR_Painter painter(pVG);
 	GR_Image * pImage = painter.genImageFromRectangle(rect);
 
-	if(pImage == NULL){
+	if(pImage == nullptr){
 		gsf_output_close(thumbnail);
 		gsf_output_close(thumbnailsDir);
 		return false;
 	}
 
-	UT_ByteBuf * pBuf = NULL;
-	pImage->convertToBuffer(&pBuf);
+	UT_ConstByteBufPtr pBuf;
+	pImage->convertToBuffer(pBuf);
 
 	gsf_output_write(thumbnail, pBuf->getLength(),
 			pBuf->getPointer(0));
 
-	DELETEP(pBuf);
 	DELETEP(pImage);
 
 	gsf_output_close(thumbnail);

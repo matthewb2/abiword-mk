@@ -1,5 +1,4 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
-
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiSource
  *
  * Copyright (C) 2009 Firat Kiyak <firatkiyak@gmail.com>
@@ -23,11 +22,10 @@
 #ifndef _OXMLI_LISTENERSTATE_TABLE_H_
 #define _OXMLI_LISTENERSTATE_TABLE_H_
 
-// Internal includes
-#include <OXMLi_ListenerState.h>
-#include <OXMLi_Types.h>
-#include <OXML_Types.h>
-#include <OXML_Element_Table.h>
+#include "OXMLi_ListenerState.h"
+#include "OXMLi_Types.h"
+#include "OXML_Types.h"
+#include "OXML_Element_Table.h"
 
 /* \class OXMLi_ListenerState_Table
  * \brief This ListenerState parses the Tables.
@@ -36,14 +34,14 @@ class OXMLi_ListenerState_Table : public OXMLi_ListenerState
 {
 public:
 	OXMLi_ListenerState_Table();
-	void startElement (OXMLi_StartElementRequest * rqst);
-	void endElement (OXMLi_EndElementRequest * rqst);
-	void charData (OXMLi_CharDataRequest * rqst);
+	virtual void startElement (OXMLi_StartElementRequest * rqst) override;
+	virtual void endElement (OXMLi_EndElementRequest * rqst) override;
+	virtual void charData (OXMLi_CharDataRequest * rqst) override;
 
 private:
-	std::stack<OXML_Element_Table*> m_tableStack;
+	std::stack<OXML_SharedElement_Table> m_tableStack;
 	std::stack<OXML_Element_Row*> m_rowStack;
-	std::stack<OXML_Element_Cell*> m_cellStack;
+	std::stack<OXML_SharedElement_Cell> m_cellStack;
 };
 
 #endif //_OXMLI_LISTENERSTATE_TABLE_H_

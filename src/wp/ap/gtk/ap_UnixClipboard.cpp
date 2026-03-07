@@ -73,12 +73,12 @@ static const char * rtfszFormatsAccepted[] = {
   AP_CLIPBOARD_TXT_RTF,
   AP_CLIPBOARD_APPLICATION_RTF,
   AP_CLIPBOARD_APPLICATION_ODT,
-  0 } ;
+  nullptr } ;
 
 static const char * htmlszFormatsAccepted[] = {
   AP_CLIPBOARD_TXT_HTML,
   AP_CLIPBOARD_APPLICATION_XHTML,
-  0 } ;
+  nullptr } ;
 
 static const char * imgszFormatsAccepted[] = {
   AP_CLIPBOARD_IMAGE_GOChart,
@@ -97,7 +97,7 @@ static const char * imgszFormatsAccepted[] = {
   AP_CLIPBOARD_IMAGE_WMF,
   AP_CLIPBOARD_IMAGE_SVG,
   AP_CLIPBOARD_IMAGE_SVG_XML,
-  0 } ;
+  nullptr } ;
 
 std::vector<const char*> vec_DynamicFormatsAccepted;
 
@@ -138,7 +138,7 @@ AP_UnixClipboard::AP_UnixClipboard(AP_UnixApp * pApp)
   // hypertext types
   AddFmt ( AP_CLIPBOARD_TXT_HTML ) ; // actually XHTML, but who's counting?
   AddFmt ( AP_CLIPBOARD_APPLICATION_XHTML ) ;
-  vec_DynamicFormatsAccepted.insert(vec_DynamicFormatsAccepted.begin(), NULL);
+  vec_DynamicFormatsAccepted.insert(vec_DynamicFormatsAccepted.begin(), nullptr);
 
   // O Dformat. This is provided by a plugin
 
@@ -287,7 +287,7 @@ bool AP_UnixClipboard::isDynamicTag ( const char * tag )
 
 	while (*i && strcmp (tag, *i))
 		i++;
-	return *i != NULL;
+	return *i != nullptr;
 }
 
 void AP_UnixClipboard::addFormat(const char * fmt)

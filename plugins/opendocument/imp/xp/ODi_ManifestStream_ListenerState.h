@@ -39,22 +39,19 @@ class PD_Document;
 class ODi_ManifestStream_ListenerState : public ODi_ListenerState {
 public:
 
-    ODi_ManifestStream_ListenerState(PD_Document* pDocument,
-                                ODi_ElementStack& rElementStack,
+    ODi_ManifestStream_ListenerState(ODi_ElementStack& rElementStack,
                                 std::map<std::string, ODc_CryptoInfo>& cryptoInfo);
 
     virtual ~ODi_ManifestStream_ListenerState();
 
-    void startElement (const gchar* pName, const gchar** ppAtts,
-                               ODi_ListenerStateAction& rAction);
+    void startElement(const gchar* pName, const gchar** ppAtts,
+                               ODi_ListenerStateAction& rAction) override;
 
-    void endElement (const gchar* pName, ODi_ListenerStateAction& rAction);
+    void endElement(const gchar* pName, ODi_ListenerStateAction& rAction) override;
 
-    void charData (const gchar* /*pBuffer*/, int /*length*/) {}
+    void charData(const gchar* /*pBuffer*/, int /*length*/) override {}
 
 private:
-
-    PD_Document* m_pDocument;
 
     std::string m_sFullPath;
 	UT_sint64 m_iSize;

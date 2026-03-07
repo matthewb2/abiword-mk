@@ -1,5 +1,7 @@
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
+ * Copyright (C) 2019 Hubert Figuière
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -90,7 +92,6 @@ AP_UnixDialog_MergeCells::AP_UnixDialog_MergeCells(XAP_DialogFactory * pDlgFacto
 										             XAP_Dialog_Id id)
 	: AP_Dialog_MergeCells(pDlgFactory,id)
 {
-	m_windowMain = NULL;
 }
 
 AP_UnixDialog_MergeCells::~AP_UnixDialog_MergeCells(void)
@@ -144,8 +145,8 @@ void AP_UnixDialog_MergeCells::event_Close(void)
 void AP_UnixDialog_MergeCells::destroy(void)
 {
 	finalize();
-	gtk_widget_destroy(m_windowMain);
-	m_windowMain = NULL;
+	gtk_widget_destroy(m_windowMain); // TOPLEVEL
+	m_windowMain = nullptr;
 }
 void AP_UnixDialog_MergeCells::activate(void)
 {
@@ -154,7 +155,7 @@ void AP_UnixDialog_MergeCells::activate(void)
 	ConstructWindowName();
 	gtk_window_set_title (GTK_WINDOW (m_windowMain), m_WindowName);
 	setAllSensitivities();
-	gdk_window_raise (gtk_widget_get_window(m_windowMain));
+	XAP_gtk_window_raise(m_windowMain);
 }
 
 void AP_UnixDialog_MergeCells::notifyActiveFrame(XAP_Frame * /*pFrame*/)
@@ -178,7 +179,7 @@ GtkWidget * AP_UnixDialog_MergeCells::_constructWindow(void)
 	gtk_window_set_position(GTK_WINDOW(windowMergeCells), GTK_WIN_POS_MOUSE);
 	gtk_window_set_resizable(GTK_WINDOW(windowMergeCells), false);
 	vboxMain = gtk_dialog_get_content_area(GTK_DIALOG(windowMergeCells));
-	gtk_container_set_border_width(GTK_CONTAINER (vboxMain), 10);
+	XAP_gtk_widget_set_margin(vboxMain, 10);
 	_constructWindowContents();
 	gtk_box_pack_start (GTK_BOX (vboxMain), m_wContents, FALSE, FALSE, 0);
 	abiAddButton(GTK_DIALOG(windowMergeCells),
@@ -211,10 +212,10 @@ GtkWidget * AP_UnixDialog_MergeCells::_constructWindowContents(void)
 	GtkWidget *wMergeBelow;
 	const XAP_StringSet * pSS = m_pApp->getStringSet();
 
-	frame1 = gtk_frame_new (NULL);
+	frame1 = gtk_frame_new (nullptr);
 	gtk_widget_show (frame1);
 	gtk_container_add (GTK_CONTAINER (wContents), frame1);
-	gtk_container_set_border_width (GTK_CONTAINER (frame1), 3);
+	XAP_gtk_widget_set_margin(frame1, 3);
 	gtk_frame_set_shadow_type(GTK_FRAME(frame1), GTK_SHADOW_NONE);
 
 	grid1 = gtk_grid_new();
@@ -223,29 +224,29 @@ GtkWidget * AP_UnixDialog_MergeCells::_constructWindowContents(void)
 	g_object_set(G_OBJECT(grid1),
 	             "row-spacing", 6,
 	             "column-spacing", 12,
-	             NULL);
+	             nullptr);
 
 	std::string s;
 	pSS->getValueUTF8(AP_STRING_ID_DLG_MergeCells_Left,s);
 	wlMergeLeft = gtk_widget_new(GTK_TYPE_LABEL, "label", s.c_str(),
-                                     "xalign", 0.0, "yalign", 0.5, NULL);
+                                     "xalign", 0.0, "yalign", 0.5, nullptr);
 	gtk_widget_show (wlMergeLeft);
 	gtk_grid_attach(GTK_GRID(grid1), wlMergeLeft, 0, 0, 1, 1);
 	pSS->getValueUTF8(AP_STRING_ID_DLG_MergeCells_Right,s);
 	wlMergeRight = gtk_widget_new(GTK_TYPE_LABEL, "label", s.c_str(),
-                                      "xalign", 0, "yalign", 0.5, NULL);
+                                      "xalign", 0, "yalign", 0.5, nullptr);
 	gtk_widget_show (wlMergeRight);
 	gtk_grid_attach(GTK_GRID(grid1), wlMergeRight, 0, 1, 1, 1);
 
 	pSS->getValueUTF8(AP_STRING_ID_DLG_MergeCells_Above,s);
 	wlMergeAbove = gtk_widget_new(GTK_TYPE_LABEL, "label", s.c_str(),
-                                      "xalign", 0.0, "yalign", 0.5, NULL);
+                                      "xalign", 0.0, "yalign", 0.5, nullptr);
 	gtk_widget_show (wlMergeAbove);
 	gtk_grid_attach(GTK_GRID(grid1), wlMergeAbove, 0, 2, 1, 1);
 
 	pSS->getValueUTF8(AP_STRING_ID_DLG_MergeCells_Below,s);
 	wlMergeBelow = gtk_widget_new(GTK_TYPE_LABEL, "label", s.c_str(),
-                                      "xalign", 0.0, "yalign", 0.5, NULL);
+                                      "xalign", 0.0, "yalign", 0.5, nullptr);
 	gtk_widget_show (wlMergeBelow);
 	gtk_grid_attach(GTK_GRID(grid1), wlMergeBelow, 0, 3, 1, 1);
 
@@ -296,16 +297,10 @@ static void s_destroy_clicked(GtkWidget * /* widget */,
 }
 
 
-static void s_delete_clicked(GtkWidget * widget,
-			     gpointer,
-			     gpointer * /*dlg*/)
-{
-	abiDestroyWidget(widget);
-}
-
 void AP_UnixDialog_MergeCells::_connectSignals(void)
 {
-  g_signal_connect(G_OBJECT(m_windowMain), "response", 
+	connectBasicSignals();
+	g_signal_connect(G_OBJECT(m_windowMain), "response",
 		   G_CALLBACK(s_response), this);
 
 	// the catch-alls
@@ -313,10 +308,6 @@ void AP_UnixDialog_MergeCells::_connectSignals(void)
 	g_signal_connect(G_OBJECT(m_windowMain),
 			   "destroy",
 			   G_CALLBACK(s_destroy_clicked),
-			   static_cast<gpointer>(this));
-	g_signal_connect(G_OBJECT(m_windowMain),
-			   "delete_event",
-			   G_CALLBACK(s_delete_clicked),
 			   static_cast<gpointer>(this));
 
 	g_signal_connect(G_OBJECT(m_wMergeLeft),

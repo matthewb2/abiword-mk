@@ -44,7 +44,7 @@
 #include <sys/types.h>  
 #include <sys/stat.h>
 #include <unistd.h>
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #else
 #include <sys/wait.h>
@@ -68,7 +68,7 @@ static bool AbiGimp_invoke(AV_View* v, EV_EditMethodCallData *d);
 static const char* AbiGimp_MenuLabel = "&Edit Image via GIMP";
 static const char* AbiGimp_MenuTooltip = "Opens the selected image in the GIMP for editing.";
 
-#ifdef WIN32
+#ifdef _WIN32
 static BOOL CreateChildProcess(char * appName, char *cmdline,
 				PROCESS_INFORMATION *procInfo,
 				STARTUPINFOA *startInfo);
@@ -121,12 +121,12 @@ AbiGimp_addToMenus()
 //
 // Put it in the context menu.
 //
-    XAP_Menu_Id newID = pFact->addNewMenuAfter("ContextImageT",NULL,"&Save Image As",EV_MLF_Normal);
-    pFact->addNewLabel(NULL,newID,AbiGimp_MenuLabel, AbiGimp_MenuTooltip);
+    XAP_Menu_Id newID = pFact->addNewMenuAfter("ContextImageT",nullptr,"&Save Image As",EV_MLF_Normal);
+    pFact->addNewLabel(nullptr,newID,AbiGimp_MenuLabel, AbiGimp_MenuTooltip);
 
 // Put it after Word Count in the Main menu
 
-    pFact->addNewMenuAfter("Main",NULL,"&Word Count",EV_MLF_Normal,newID);
+    pFact->addNewMenuAfter("Main",nullptr,"&Word Count",EV_MLF_Normal,newID);
 //
 // Also put it under word Count in the main menu,
 //
@@ -138,8 +138,8 @@ AbiGimp_addToMenus()
 	0,                      // no, we don't have a checkbox.
 	0,                      // no radio buttons for me, thank you
 	"AbiGimp_invoke",  // name of callback function to call.
-	NULL,                   // don't know/care what this is for
-	NULL                    // don't know/care what this is for
+	nullptr,                   // don't know/care what this is for
+	nullptr                    // don't know/care what this is for
         );
 
     // Now what we need to do is add this particular action to the ActionSet
@@ -173,8 +173,8 @@ AbiGimp_RemoveFromMenus ()
   int frameCount = pApp->getFrameCount();
   XAP_Menu_Factory * pFact = pApp->getMenuFactory();
 
-  pFact->removeMenuItem("Main",NULL,AbiGimp_MenuLabel);
-  pFact->removeMenuItem("ContextImageT",NULL,AbiGimp_MenuLabel);
+  pFact->removeMenuItem("Main",nullptr,AbiGimp_MenuLabel);
+  pFact->removeMenuItem("ContextImageT",nullptr,AbiGimp_MenuLabel);
   for(int i = 0;i < frameCount;++i)
   {
       // Get the current frame that we're iterating through.
@@ -214,11 +214,11 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-    mi->name = 0;
-    mi->desc = 0;
-    mi->version = 0;
-    mi->author = 0;
-    mi->usage = 0;
+    mi->name = nullptr;
+    mi->desc = nullptr;
+    mi->version = nullptr;
+    mi->author = nullptr;
+    mi->usage = nullptr;
 
     AbiGimp_RemoveFromMenus ();
 
@@ -254,12 +254,12 @@ AbiGimp_invoke(AV_View* /*v*/, EV_EditMethodCallData *d)
 //
 // generate a temp file name...
 //
-	char *szTempFileName = NULL;
-	GError *err = NULL;
+	char *szTempFileName = nullptr;
+	GError *err = nullptr;
 	gint fp = g_file_open_tmp ("XXXXXX", &szTempFileName, &err);
 	if (err) {
 		g_warning ("%s", err->message);
-		g_error_free (err); err = NULL;
+		g_error_free (err); err = nullptr;
 		return FALSE;
 	}
 	close(fp);
@@ -267,7 +267,7 @@ AbiGimp_invoke(AV_View* /*v*/, EV_EditMethodCallData *d)
 	UT_String szTmp = szTempFileName;
 	szTmp += ".png";
 	unlink(szTempFileName);	
-	g_free (szTempFileName); szTempFileName = NULL;
+	g_free (szTempFileName); szTempFileName = nullptr;
 	
 	PT_DocPosition pos = pView->saveSelectedImage(static_cast<const char *>(szTmp.c_str()));
 //
@@ -298,20 +298,20 @@ AbiGimp_invoke(AV_View* /*v*/, EV_EditMethodCallData *d)
 // Fire up the gimp...
 //
 
-#ifdef WIN32
+#ifdef _WIN32
 	UT_String cmdline = "gimp \"" + szTmp + "\"";
 
 	PROCESS_INFORMATION procInfo;
 	STARTUPINFOA startInfo;
-	if (!CreateChildProcess(NULL, const_cast<char *>(cmdline.c_str()), &procInfo, &startInfo))
+	if (!CreateChildProcess(nullptr, const_cast<char *>(cmdline.c_str()), &procInfo, &startInfo))
 	{
 		UT_String msg = "Unable to run program: ";  msg += cmdline;
 
 		// try again, but with default install locations in 'path' env var
 		char *pathEnvVar = getenv("PATH");
-		if (pathEnvVar == NULL) pathEnvVar = "C:\\Winnt;C:\\Winnt\\System32";
+		if (pathEnvVar == nullptr) pathEnvVar = "C:\\Winnt;C:\\Winnt\\System32";
 		char *pFiles = getenv("ProgramFiles");
-		if (pFiles == NULL) pFiles = "C:\\Program Files";
+		if (pFiles == nullptr) pFiles = "C:\\Program Files";
 
 		UT_String newPath = "PATH=";
 		newPath += pathEnvVar;
@@ -323,7 +323,7 @@ AbiGimp_invoke(AV_View* /*v*/, EV_EditMethodCallData *d)
 
 		putenv(newPath.c_str());
 
-		if (!CreateChildProcess(NULL, const_cast<char *>(cmdline.c_str()), &procInfo, &startInfo))
+		if (!CreateChildProcess(nullptr, const_cast<char *>(cmdline.c_str()), &procInfo, &startInfo))
 		{
 			pFrame->showMessageBox(msg.c_str(), XAP_Dialog_MessageBox::b_O,XAP_Dialog_MessageBox::a_OK);
 			UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
@@ -340,7 +340,7 @@ AbiGimp_invoke(AV_View* /*v*/, EV_EditMethodCallData *d)
 	// this is pretty ugly to const_cast. No choice.
 	gimpArgs[0] = const_cast<char *>("gimp");
 	gimpArgs[1] = const_cast<char *>(szTmp.c_str());
-	gimpArgs[2] = NULL;
+	gimpArgs[2] = nullptr;
 	UT_sint32 pid;
 	if((pid = fork())== 0)
 	{
@@ -350,6 +350,7 @@ AbiGimp_invoke(AV_View* /*v*/, EV_EditMethodCallData *d)
 #endif
 	off_t size;
 	struct stat myFileStat;
+	UT_uint32 icount = 0;
 	int ok = stat(szTmp.c_str(),&myFileStat);
 	time_t mod_time = myFileStat.st_mtime;
 	if(ok < 0)
@@ -361,9 +362,8 @@ AbiGimp_invoke(AV_View* /*v*/, EV_EditMethodCallData *d)
 // Lock out the GUI in AbiWord
 //
 	ev_EditMethod_invoke(lockGUI,d);
-	UT_uint32 icount;
 
-#ifndef WIN32
+#ifndef _WIN32
 	while (pid != waitpid (pid, &status, WNOHANG)) 
 #else
 	while ((GetExitCodeProcess(procInfo.hProcess, &status))?(status == STILL_ACTIVE):0)
@@ -383,7 +383,7 @@ AbiGimp_invoke(AV_View* /*v*/, EV_EditMethodCallData *d)
 					size = myFileStat.st_size;
 					UT_usleep(100000); // wait 100 milliseconds
 					ok = stat(szTmp.c_str(),&myFileStat);
-					while(size > 0 && size != myFileStat.st_size)
+					while((ok == 0) && (size > 0) && size != myFileStat.st_size)
 					{
 						size = myFileStat.st_size;
 						ok = stat(szTmp.c_str(),&myFileStat);
@@ -394,11 +394,11 @@ AbiGimp_invoke(AV_View* /*v*/, EV_EditMethodCallData *d)
 // OK replace the current image with this.
 //
 					IEGraphicFileType iegft = IEGFT_Unknown;
-					FG_Graphic* pFG;
-		
+					FG_ConstGraphicPtr pFG;
+
 					UT_Error errorCode;
-					
-					errorCode = IE_ImpGraphic::loadGraphic(szTmp.c_str(),iegft, &pFG);
+
+					errorCode = IE_ImpGraphic::loadGraphic(szTmp.c_str(),iegft, pFG);
 					if(errorCode)
 					{
 						UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
@@ -417,10 +417,8 @@ AbiGimp_invoke(AV_View* /*v*/, EV_EditMethodCallData *d)
 					{
 						pFrame->showMessageBox("Could not put image back into Abiword", XAP_Dialog_MessageBox::b_O,XAP_Dialog_MessageBox::a_OK);
 						UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
-						DELETEP(pFG);
 						goto Cleanup;
 					}
-					DELETEP(pFG);
 //
 // Reselect the image
 //
@@ -437,7 +435,7 @@ AbiGimp_invoke(AV_View* /*v*/, EV_EditMethodCallData *d)
 //
 // Now delete the tempfile
 //
-	ok = unlink(szTmp.c_str());
+	/*ok =*/ unlink(szTmp.c_str());
 //
 // UnLock the GUI in AbiWord
 //
@@ -450,7 +448,7 @@ AbiGimp_invoke(AV_View* /*v*/, EV_EditMethodCallData *d)
 // Something went wrong.
 //
  Cleanup: 
-	ok = unlink(szTmp.c_str());
+    /*ok =*/ unlink(szTmp.c_str());
 //
 // UnLock the GUI in AbiWord
 //
@@ -458,7 +456,7 @@ AbiGimp_invoke(AV_View* /*v*/, EV_EditMethodCallData *d)
 //
 // Kill the gimp.
 //
-#ifdef WIN32
+#ifdef _WIN32
 	if (procInfo.hProcess)
 		TerminateProcess(procInfo.hProcess, -1);
 #else
@@ -468,29 +466,29 @@ AbiGimp_invoke(AV_View* /*v*/, EV_EditMethodCallData *d)
 }
 
 
-#ifdef WIN32
+#ifdef _WIN32
 // our equivalent of fork()
 static BOOL CreateChildProcess(char * appName, char *cmdline,
 				PROCESS_INFORMATION *procInfo,
-				STARTUPINFOA *startInfo) 
+				STARTUPINFOA *startInfo)
 {
 	//initialize structures used to return info
-	ZeroMemory( procInfo, sizeof(PROCESS_INFORMATION) ); 
-	ZeroMemory( startInfo, sizeof(STARTUPINFOA) ); 
-	startInfo->cb = sizeof(STARTUPINFOA); 
+	ZeroMemory( procInfo, sizeof(PROCESS_INFORMATION) );
+	ZeroMemory( startInfo, sizeof(STARTUPINFOA) );
+	startInfo->cb = sizeof(STARTUPINFOA);
 
-	// Create the child process. 
+	// Create the child process.
 	return CreateProcessA(
 			appName,   // application module to execute
-			cmdline,   // command line 
-			NULL,      // process security attributes 
-			NULL,      // primary thread security attributes 
-			FALSE,     // handles not are inherited 
-			0,         // creation flags 
-			NULL,      // use parent's environment 
-			NULL,      // use parent's current directory 
-			startInfo, // STARTUPINFO pointer 
-			procInfo   // receives PROCESS_INFORMATION 
+			cmdline,   // command line
+			nullptr,      // process security attributes
+			nullptr,      // primary thread security attributes
+			FALSE,     // handles not are inherited
+			0,         // creation flags
+			nullptr,      // use parent's environment
+			nullptr,      // use parent's current directory
+			startInfo, // STARTUPINFO pointer
+			procInfo   // receives PROCESS_INFORMATION
 	);
-} 
+}
 #endif

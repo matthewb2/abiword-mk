@@ -46,7 +46,7 @@ public:
 	virtual ~AP_Lists_preview(void);
 
 	// data twiddlers
-	void				draw(const UT_Rect *clip=NULL);
+	void drawImmediate(const UT_Rect* clip = nullptr) override;
 	AP_Dialog_Lists*	getLists(void);
 	void				setData(const gchar * pszFont,float fAlign,float fIndent);
 	void				setData(const std::string & font, float fAlign,
@@ -69,11 +69,16 @@ protected:
 class ABI_EXPORT AP_Dialog_Lists : public AP_Dialog_Modeless
 {
   protected:
-    virtual XAP_String_Id getWindowTitleStringId();
+    virtual XAP_String_Id getWindowTitleStringId() override;
 
 public:
 	AP_Dialog_Lists(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_Dialog_Lists(void);
+
+    AP_Lists_preview* getListsPreview() const
+    {
+        return m_pListsPreview;
+    }
 
 	// these are used for the Modal version of the dialog called from the
     // styles dialog.
@@ -177,7 +182,7 @@ protected:
 	UT_sint32         getCurrentFold(void)
 		{ return m_iCurrentLevel;}
 	virtual void      setFoldLevelInGUI(void) = 0;
-	virtual bool      isPageLists(void) = 0;
+	virtual bool      isPageLists(void) const = 0;
 	void              setFoldingLevelChanged(bool b)
 	  { m_bFoldingLevelChanged = b;}
 private:

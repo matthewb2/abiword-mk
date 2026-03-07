@@ -22,6 +22,8 @@
  */
 
 
+#include <memory>
+
 // Class definition include
 #include "ie_imp_OpenDocument.h"
 
@@ -31,7 +33,7 @@
 #include "ODi_ManifestStream_ListenerState.h"
 
 // AbiWord includes
-#include <ut_types.h>
+#include "ut_types.h"
 #include "xap_App.h"
 #include "xap_Frame.h"
 #include "xap_DialogFactory.h"
@@ -40,14 +42,7 @@
 #include "ie_imp_PasteListener.h"
 #include "pd_DocumentRDF.h"
 
-// External includes
 #include <glib-object.h>
-#include <gsf/gsf-input-stdio.h>
-#include <gsf/gsf-infile.h>
-#include <gsf/gsf-infile-zip.h>
-#include <gsf/gsf-input-memory.h>
-
-#include <boost/shared_array.hpp>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -66,10 +61,10 @@
  */
 IE_Imp_OpenDocument::IE_Imp_OpenDocument (PD_Document * pDocument)
   : IE_Imp (pDocument),
-    m_pGsfInfile (0),
+    m_pGsfInfile(nullptr),
     m_sPassword (""),
-    m_pStreamListener(NULL),
-    m_pAbiData(NULL)
+    m_pStreamListener(nullptr),
+    m_pAbiData(nullptr)
 {
 }
 
@@ -135,9 +130,9 @@ bool IE_Imp_OpenDocument::pasteFromBuffer(PD_DocumentRange * pDocRange,
  */
 UT_Error IE_Imp_OpenDocument::_loadFile (GsfInput * oo_src)
 {
-    m_pGsfInfile = GSF_INFILE (gsf_infile_zip_new (oo_src, NULL));
+    m_pGsfInfile = GSF_INFILE (gsf_infile_zip_new (oo_src, nullptr));
     
-    if (m_pGsfInfile == NULL) {
+    if (m_pGsfInfile == nullptr) {
         return UT_ERROR;
     }
 
@@ -250,8 +245,7 @@ UT_Error IE_Imp_OpenDocument::_handleManifestStream() {
     m_sPassword = "";
 
 	GsfInput* pMetaInf = gsf_infile_child_by_name(m_pGsfInfile, "META-INF");
-    ODi_ManifestStream_ListenerState manifestListener(getDoc(),
-                                          *(m_pStreamListener->getElementStack()),
+    ODi_ManifestStream_ListenerState manifestListener(*(m_pStreamListener->getElementStack()),
                                            m_cryptoInfo);
 
 	m_pStreamListener->setState(&manifestListener, false);
@@ -293,7 +287,7 @@ UT_Error IE_Imp_OpenDocument::_handleMimetype ()
     
     if (gsf_input_size (pInput) > 0) {
         mimetype.append(
-            (const char *)gsf_input_read(pInput, gsf_input_size (pInput), NULL),
+            (const char *)gsf_input_read(pInput, gsf_input_size (pInput), nullptr),
             gsf_input_size (pInput));
     }
 
@@ -455,7 +449,7 @@ UT_Error IE_Imp_OpenDocument::_loadRDFFromFile ( GsfInput* pInput,
         // get a shared buffer back, but doing so seems to
         // return a non-null terminated buffer, so we make a
         // smart_ptr to an array an explicitly nul-terminate it.
-        boost::shared_array<char> data( new char[sz+1] );
+        std::unique_ptr<char[]> data( new char[sz+1] );
         data[sz] = '\0';
         gsf_input_read ( pInput, sz, (guint8*)data.get() );
         if( sz && !data )
@@ -463,7 +457,7 @@ UT_Error IE_Imp_OpenDocument::_loadRDFFromFile ( GsfInput* pInput,
             return UT_ERROR;
         }
 
-        // Note that although the API docs say you can use NULL for base_uri
+        // Note that although the API docs say you can use nullptr for base_uri
         // you will likely find it an error to try to call that way.
         librdf_uri* base_uri = librdf_new_uri( args->world,
                                                (const unsigned char*)pStream );
@@ -539,8 +533,8 @@ UT_Error IE_Imp_OpenDocument::_handleRDFStreams ()
         "  ?subj odfcommon:path ?fileName  \n"
         " } \n";
 
-    librdf_uri*   base_uri = 0;
-    librdf_query* query = librdf_new_query( args.world, "sparql", 0,
+    librdf_uri* base_uri = nullptr;
+    librdf_query* query = librdf_new_query(args.world, "sparql", nullptr,
                                             (unsigned char*)query_string,
                                             base_uri );
     librdf_query_results* results = librdf_query_execute( query, model );
@@ -684,7 +678,7 @@ UT_Error IE_Imp_OpenDocument::_handleStream ( GsfInfile* pGsfInfile,
         return UT_ERROR;
 #endif
         
-        GsfInput* pDecryptedInput = NULL;
+        GsfInput* pDecryptedInput = nullptr;
         UT_Error err = ODc_Crypto::decrypt(pInput, (*pos).second, m_sPassword.c_str(), &pDecryptedInput);
         g_object_unref (G_OBJECT (pInput));
 		
@@ -714,7 +708,7 @@ UT_Error IE_Imp_OpenDocument::_handleStream ( GsfInfile* pGsfInfile,
  */
 UT_Error IE_Imp_OpenDocument::_parseStream (GsfInput* pInput, UT_XML & parser)
 {
-    guint8 const *data = NULL;
+    guint8 const *data = nullptr;
     size_t len = 0;
     UT_Error ret = UT_OK;
 
@@ -725,7 +719,7 @@ UT_Error IE_Imp_OpenDocument::_parseStream (GsfInput* pInput, UT_XML & parser)
             // FIXME: we want to pass the stream in chunks, but libXML2 finds this disagreeable.
             // we probably need to pass some magic to our XML parser? 
             // len = UT_MIN (len, BUF_SZ);
-            if (NULL == (data = gsf_input_read (pInput, len, NULL))) {
+            if (nullptr == (data = gsf_input_read (pInput, len, nullptr))) {
                 g_object_unref (G_OBJECT (pInput));
                 return UT_ERROR;
             }
@@ -746,15 +740,11 @@ UT_Error IE_Imp_OpenDocument::_parseStream (GsfInput* pInput, UT_XML & parser)
  */
 void IE_Imp_OpenDocument::_setDocumentProperties() {
 
-    const gchar* ppProps[5];
-
-    // OpenDocument endnotes are, by definition, placed at the end of the document.    
-    ppProps[0] = "document-endnote-place-enddoc";
-    ppProps[1] = "1";
-    ppProps[2] = "document-endnote-place-endsection";
-    ppProps[3] = "0";
-    
-    ppProps[4] = 0;
+    // OpenDocument endnotes are, by definition, placed at the end of the document.
+    PP_PropertyVector ppProps = {
+      "document-endnote-place-enddoc", "1",
+      "document-endnote-place-endsection", "0"
+    };
 
     UT_DebugOnly<bool> ok = getDoc()->setProperties(ppProps);
     UT_ASSERT_HARMLESS(ok);

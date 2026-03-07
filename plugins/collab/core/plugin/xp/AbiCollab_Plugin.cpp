@@ -83,7 +83,7 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 	s_abicollab_add_menus();
 	
 	// On Windows, we must share our HMODULE/HINSTANCE so we can do gui
-	#ifdef WIN32
+	#ifdef _WIN32
 	AbiCollabSessionManager::getManager()->setInstance((HINSTANCE)s_hModule);
 	#endif
 	
@@ -108,11 +108,11 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-	mi->name = 0;
-	mi->desc = 0;
-	mi->version = 0;
-	mi->author = 0;
-	mi->usage = 0;
+	mi->name = nullptr;
+	mi->desc = nullptr;
+	mi->version = nullptr;
+	mi->author = nullptr;
+	mi->usage = nullptr;
 	
 	s_abicollab_remove_menus();
 	
@@ -765,12 +765,11 @@ bool s_abicollab_viewrecord(AV_View* /*v*/, EV_EditMethodCallData* /*d*/)
 
 	if (bOK)
 	{
-		const char * szResultPathname = pDialog->getPathname();
-		if (szResultPathname) 
+		const std::string & resultPathname = pDialog->getPathname();
+		if (!resultPathname.empty())
 		{
-			std::string filename = szResultPathname;
-			UT_DEBUGMSG(("filename = '%s'\n", filename.c_str()));
-			DiskSessionRecorder::dumpSession( filename );
+			UT_DEBUGMSG(("filename = '%s'\n", resultPathname.c_str()));
+			DiskSessionRecorder::dumpSession(resultPathname);
 		} 
 		else 
 		{
@@ -808,7 +807,7 @@ bool s_abicollab_command_invoke(AV_View* /*v*/, EV_EditMethodCallData *d)
 
 #if defined(ABICOLLAB_RECORD_ALWAYS) && defined(DEBUG)
 
-#ifndef WIN32
+#ifndef _WIN32
 
 #include <time.h>
 #include <dirent.h>

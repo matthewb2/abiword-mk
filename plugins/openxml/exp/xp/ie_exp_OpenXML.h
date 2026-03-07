@@ -25,22 +25,17 @@
 #define _IE_EXP_OPENXML_H_
 
 // AbiWord includes
-#include <ie_exp.h>
-#include <ut_debugmsg.h>
-#include <ut_types.h>
-#include <ut_misc.h>
-#include <ut_assert.h>
-#include <ut_string_class.h>
-#include <pp_Property.h>
+#include "ie_exp.h"
+#include "ut_debugmsg.h"
+#include "ut_types.h"
+#include "ut_misc.h"
+#include "ut_assert.h"
+#include "ut_string_class.h"
+#include "pp_Property.h"
 
-#include <OXML_Document.h>
-#include <ie_exp_OpenXML_Listener.h>
+#include "OXML_Document.h"
+#include "ie_exp_OpenXML_Listener.h"
 
-// External includes
-#include <gsf/gsf-outfile.h>
-#include <gsf/gsf-outfile-zip.h>
-#include <gsf/gsf-output-stdio.h>
-#include <gsf/gsf-output-memory.h>
 #include <string>
 #include <map>
 
@@ -178,7 +173,7 @@ public:
 	UT_Error setImage(const char* id, const char* relId, const char* filename, const char* width, const char* height);
 	UT_Error setPositionedImage(const char* id, const char* relId, const char* filename, const char* width, const char* height, const char* xpos, const char* ypos, const char* wrapMode);
 	UT_Error setImageRelation(const char* filename, const char* id);
-	UT_Error writeImage(const char* filename, const UT_ByteBuf* data);
+	UT_Error writeImage(const char* filename, const UT_ConstByteBufPtr & data);
 	UT_Error setSimpleField(int target, const char* instr, const char* value);
 	UT_Error setHeaderReference(const char* id, const char* type);
 	UT_Error setFooterReference(const char* id, const char* type);
@@ -204,7 +199,7 @@ public:
 	PD_Document* getDoc() {return m_pDoc;};
 
 protected:
-    virtual UT_Error _writeDocument(void);
+    virtual UT_Error _writeDocument(void) override;
 
 private:
 	PD_Document* m_pDoc;

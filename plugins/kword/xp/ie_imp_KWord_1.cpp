@@ -1,4 +1,4 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 
 /* AbiWord
  * Copyright (C) 2001 AbiSource, Inc.
@@ -88,7 +88,7 @@ UT_Confidence_t IE_Imp_KWord_1_Sniffer::recognizeContents(const char *szBuf, UT_
     return UT_CONFIDENCE_ZILCH;
 
   // now look for the KWord beginning tag <DOC
-  if(strstr(szBuf, "<DOC") == NULL)
+  if(strstr(szBuf, "<DOC") == nullptr)
     return UT_CONFIDENCE_ZILCH;
 
   return UT_CONFIDENCE_PERFECT;
@@ -353,7 +353,7 @@ void IE_Imp_KWord_1::startElement(const gchar *name, const gchar **atts)
 
   UT_uint32 tokenIndex = _mapNameToToken(name, s_Tokens, TokenTableSize);
 
-  const gchar *pVal = 0;
+  const gchar *pVal = nullptr;
 
   switch (tokenIndex)
   {
@@ -384,18 +384,18 @@ void IE_Imp_KWord_1::startElement(const gchar *name, const gchar **atts)
     case TT_COLOR:
       {
 
-        const gchar *p = NULL;
+        const gchar *p = nullptr;
 	int red, green, blue;
 	red = green = blue = 0;
 	p = _getXMLPropValue("red", atts);
-	if (p != NULL) {
+	if (p != nullptr) {
 	  red = atoi(p);
 	  if (red < 0)
 	    red = 0;
 	  else if (red > 255)
 	    red = 255;
 	}
-	if (p != NULL) {
+	if (p != nullptr) {
 	  p = _getXMLPropValue("green", atts);
 	  green = atoi(p);
 	  if (green < 0)
@@ -403,7 +403,7 @@ void IE_Imp_KWord_1::startElement(const gchar *name, const gchar **atts)
 	  else if (green > 255)
 	    green = 255;
 	}
-	if (p != NULL) {
+	if (p != nullptr) {
 	  p = _getXMLPropValue("blue", atts);
 	  blue = atoi(p);
 	  if (blue < 0)
@@ -431,33 +431,32 @@ void IE_Imp_KWord_1::startElement(const gchar *name, const gchar **atts)
         m_parseState = _PS_Doc;
         return;
       }
-      
+
     case TT_FOLLOWING:
       {
         xxx_UT_DEBUGMSG(("ABIDEBUG: begin FOLLOWING\n"));
         break;
       }
-      
-    case TT_FRAME:
-      {
-        xxx_UT_DEBUGMSG(("ABIDEBUG: begin FRAME\n"));
 
-	if(m_szSectProps.size() >= 2)
-		m_szSectProps[m_szSectProps.size() - 2] = 0; // knock off the final ';'
+	case TT_FRAME:
+	  {
+		xxx_UT_DEBUGMSG(("ABIDEBUG: begin FRAME\n"));
 
-	const gchar *propsArray[3];
-	propsArray[0] = static_cast<const gchar *>("props");
-	propsArray[1] = static_cast<const gchar *>(m_szSectProps.c_str());
-	propsArray[2] = 0;
+		if(m_szSectProps.size() >= 2)
+			m_szSectProps[m_szSectProps.size() - 2] = 0; // knock off the final ';'
 
-	X_CheckError(appendStrux(PTX_Section,static_cast<const gchar**>(&propsArray[0])));
-	m_szSectProps.clear(); //reset cached properties
+		const PP_PropertyVector propsArray = {
+			"props", m_szSectProps.c_str()
+		};
 
-	UT_DEBUGMSG(("DOM: CREATED SECTION\n"));
+		X_CheckError(appendStrux(PTX_Section, propsArray));
+		m_szSectProps.clear(); //reset cached properties
 
-        break;
-      }
-      
+		UT_DEBUGMSG(("DOM: CREATED SECTION\n"));
+
+		break;
+	  }
+
     case TT_FRAMESET:
       {
         xxx_UT_DEBUGMSG(("ABIDEBUG: begin FRAMESET\n"));
@@ -498,7 +497,7 @@ void IE_Imp_KWord_1::startElement(const gchar *name, const gchar **atts)
       {
         xxx_UT_DEBUGMSG(("ABIDEBUG: begin PAPER\n"));
 	
-	const gchar * pProp = NULL;
+	const gchar * pProp = nullptr;
 
 	pProp = _getXMLPropValue("format", atts);
 	if(pProp)
@@ -549,7 +548,7 @@ void IE_Imp_KWord_1::startElement(const gchar *name, const gchar **atts)
 
 	// margins
 
-	const gchar * pProp = NULL;
+	const gchar * pProp = nullptr;
 
 	pProp = _getXMLPropValue("right", atts);
 	if(pProp)
@@ -601,33 +600,32 @@ void IE_Imp_KWord_1::startElement(const gchar *name, const gchar **atts)
       
     case TT_PARAGRAPH:
       {
-        xxx_UT_DEBUGMSG(("ABIDEBUG: begin PARAGRPAH\n"));
+		xxx_UT_DEBUGMSG(("ABIDEBUG: begin PARAGRPAH\n"));
 
-        const gchar *pProp = NULL;
+		const gchar *pProp = nullptr;
 
-        pProp = _getXMLPropValue("value", atts);
-        if (pProp)
-        {
-          m_ParaProps += "text-align:";
-          m_ParaProps += numberToJustification(pProp);
-          m_ParaProps += "; ";
-        }
+		pProp = _getXMLPropValue("value", atts);
+		if (pProp)
+		{
+			m_ParaProps += "text-align:";
+			m_ParaProps += numberToJustification(pProp);
+			m_ParaProps += "; ";
+		}
 
-	if(m_ParaProps.size() >= 2)
-		m_ParaProps[m_ParaProps.size()-2] = 0;
-	
-	const gchar * props[3];
-	props[0] = "props";
-	props[1] = m_ParaProps.c_str();
-	props[2] = 0;
+		if(m_ParaProps.size() >= 2)
+			m_ParaProps[m_ParaProps.size()-2] = 0;
 
-	// TODO: handle more properties
-        X_CheckError(appendStrux(PTX_Block, props));
+		const PP_PropertyVector props = {
+			"props", m_ParaProps.c_str()
+		};
 
-	UT_DEBUGMSG(("DOM: CREATED PARAGRAPH\n"));
-        break;
-      }
-      
+		// TODO: handle more properties
+		X_CheckError(appendStrux(PTX_Block, props));
+
+		UT_DEBUGMSG(("DOM: CREATED PARAGRAPH\n"));
+		break;
+	  }
+
     case TT_RIGHTBORDER:
       {
         xxx_UT_DEBUGMSG(("ABIDEBUG: begin RIGHTBORDER\n"));
@@ -792,8 +790,6 @@ void IE_Imp_KWord_1::endElement(const gchar *name)
 
     case TT_FORMAT:
     {
-      const gchar *propsArray[3];
-
       if (m_szCharProps.size() == 0)
         {
           xxx_UT_DEBUGMSG(("ABIDEBUG: no properties\n"));
@@ -801,17 +797,17 @@ void IE_Imp_KWord_1::endElement(const gchar *name)
           break;
         }
 
-	if(m_szCharProps.size() >= 2)
-		m_szCharProps[m_szCharProps.size() - 2] = 0; // knock off the final ';'
+	  if(m_szCharProps.size() >= 2)
+		  m_szCharProps[m_szCharProps.size() - 2] = 0; // knock off the final ';'
 
-      propsArray[0] = static_cast<const gchar *>("props");
-      propsArray[1] = static_cast<const gchar *>(m_szCharProps.c_str());
-      propsArray[2] = 0;
+	  PP_PropertyVector propsArray = {
+		  "props", m_szCharProps.c_str()
+	  };
 
       xxx_UT_DEBUGMSG(("ABIDEBUG: formatting properties are: %s\n",propsArray[1]));
 
-      X_CheckError(_pushInlineFmt(propsArray));
-      X_CheckError(appendFmt(&m_vecInlineFmt));
+      _pushInlineFmt(propsArray);
+      X_CheckError(appendFmt(m_vecInlineFmt));
 
       UT_DEBUGMSG(("DOM: APPENDED FORMAT\n"));
 
@@ -819,7 +815,7 @@ void IE_Imp_KWord_1::endElement(const gchar *name)
       _appendText();
 
       _popInlineFmt();
-      X_CheckError(appendFmt(&m_vecInlineFmt));
+      X_CheckError(appendFmt(m_vecInlineFmt));
 
       break;
     }

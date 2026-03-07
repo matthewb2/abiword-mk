@@ -89,7 +89,7 @@ bool XAP_DialogFactory::_findDialogInTable(XAP_Dialog_Id id, UT_sint32 * pIndex)
 	return false;
 }
 
-XAP_Dialog_Id XAP_DialogFactory::getNextId(void)
+XAP_Dialog_Id XAP_DialogFactory::getNextId(void) const
 {
        UT_sint32 i = m_vec_dlg_table.getItemCount()-1;
 	UT_sint32 id = static_cast<UT_sint32>(m_vec_dlg_table.getNthItem(i)->m_id);
@@ -135,20 +135,20 @@ void XAP_DialogFactory::unregisterDialog(XAP_Dialog_Id id)
 XAP_Dialog * XAP_DialogFactory::justMakeTheDialog(XAP_Dialog_Id id)
 {
 	UT_sint32 index;
-	XAP_Dialog * pDialog = NULL;
+	XAP_Dialog * pDialog = nullptr;
 	
 	if(_findDialogInTable(id,&index))
 	{
 	  pDialog = (XAP_Dialog *)((m_vec_dlg_table.getNthItem(index)->m_pfnStaticConstructor)(this,id));
 		return pDialog;
 	}
-	return NULL;
+	return nullptr;
 }
 
 XAP_Dialog * XAP_DialogFactory::requestDialog(XAP_Dialog_Id id)
 {
-	const _dlg_table * dlg = NULL;
-	XAP_Dialog * pDialog = NULL;
+	const _dlg_table * dlg = nullptr;
+	XAP_Dialog * pDialog = nullptr;
 	UT_sint32 index;
 	
 	if(_findDialogInTable(id, &index))
@@ -183,7 +183,7 @@ XAP_Dialog * XAP_DialogFactory::requestDialog(XAP_Dialog_Id id)
 	}
 
 //	UT_ASSERT_NOT_REACHED();
-	return NULL;
+	return nullptr;
 
 CreateItSimple:
 	{
@@ -243,7 +243,7 @@ void XAP_DialogFactory::releaseDialog(XAP_Dialog * pDialog)
 	UT_return_if_fail(pDialog);
 	XAP_Dialog_Id id = pDialog->getDialogId();
 	
-	UT_sint32 index;
+	UT_sint32 index = 0;
 	_findDialogInTable(id,&index);
 
 	switch (m_vec_dlg_table.getNthItem(index)->m_type)
@@ -335,7 +335,7 @@ bool XAP_DialogFactory::unregisterNotebookPage(XAP_Dialog_Id dialog, const XAP_N
 /*!
  * Add registered pages to the dialog instance.
  */
-void XAP_DialogFactory::addPages(XAP_NotebookDialog * pDialog, XAP_Dialog_Id id)
+void XAP_DialogFactory::addPages(XAP_NotebookDialog* pDialog, XAP_Dialog_Id id)
 {
 	std::pair<NotebookPagesIter, NotebookPagesIter> bounds = s_mapNotebookPages.equal_range(id);
 	while (bounds.first != bounds.second)

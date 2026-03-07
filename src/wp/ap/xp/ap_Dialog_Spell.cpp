@@ -45,7 +45,7 @@ AP_Dialog_Spell::_getDict (void)
 {
 	if (m_pView)
 	  return m_pView->getDictForSelection ();
-	return NULL;
+	return nullptr;
 }
 
 bool
@@ -63,27 +63,27 @@ AP_Dialog_Spell::_spellCheckWord (const UT_UCSChar * word, UT_uint32 len)
 }
 
 AP_Dialog_Spell::AP_Dialog_Spell(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id)
-	: XAP_Dialog_NonPersistent(pDlgFactory,id, "interface/dialogspelling"), m_Suggestions(0)
+	: XAP_Dialog_NonPersistent(pDlgFactory,id, "interface/dialogspelling"), m_Suggestions(nullptr)
 {
    m_bIsSelection = false;
 
    m_iWordOffset = 0;
    m_iWordLength = -1;
-   m_pWord = NULL;
+   m_pWord = nullptr;
    m_bSkipWord = false;
   
-   m_pView = NULL;
-   m_pStartSection = NULL;
-   m_pStartBlock = NULL;
+   m_pView = nullptr;
+   m_pStartSection = nullptr;
+   m_pStartBlock = nullptr;
    m_iStartIndex = -1;
-   m_pEndSection = NULL;
-   m_pEndBlock = NULL;
+   m_pEndSection = nullptr;
+   m_pEndBlock = nullptr;
    m_iEndLength = 0;
-   m_pCurrSection = NULL;
-   m_pCurrBlock = NULL;
-   m_pChangeAll = NULL;
-   m_pIgnoreAll = NULL;
-   m_pPreserver = NULL;
+   m_pCurrSection = nullptr;
+   m_pCurrBlock = nullptr;
+   m_pChangeAll = nullptr;
+   m_pIgnoreAll = nullptr;
+   m_pPreserver = nullptr;
 
    m_bCancelled = false;
 }
@@ -180,13 +180,12 @@ bool AP_Dialog_Spell::nextMisspelledWord(void)
    UT_return_val_if_fail (pApp, false);
    XAP_Prefs * pPrefs = pApp->getPrefs();
    UT_return_val_if_fail (pPrefs, false);
-   
-   XAP_PrefsScheme *pPrefsScheme = pPrefs->getCurrentScheme();
-   UT_return_val_if_fail (pPrefsScheme, false);		  
-   
-   bool b = false;
-   pPrefs->getPrefsValueBool(static_cast<const gchar *>(AP_PREF_KEY_AutoSpellCheck), &b);
 
+   XAP_PrefsScheme *pPrefsScheme = pPrefs->getCurrentScheme();
+   UT_return_val_if_fail (pPrefsScheme, false);
+
+   bool b = false;
+   pPrefs->getPrefsValueBool(AP_PREF_KEY_AutoSpellCheck, b);
 
    // Yes, I know. This is a bit anal. But it works, and I'm too tired
    // to rethink the iterator behaviour to match the requirement right
@@ -251,20 +250,19 @@ bool AP_Dialog_Spell::nextMisspelledWord(void)
 					UT_return_val_if_fail (m_Suggestions, false);
 
 					// get suggestions from spelling engine
-					const UT_GenericVector<UT_UCSChar*> *cpvEngineSuggestions = nullptr;
 
 					if (checker->checkWord(m_pWord, m_iWordLength) == SpellChecker::LOOKUP_FAILED)
 					{
+						std::unique_ptr<std::vector<UT_UCSChar*>> cpvEngineSuggestions;
 						cpvEngineSuggestions = checker->suggestWord(m_pWord, m_iWordLength);
 
-				   		for (UT_sint32 i = 0; i < cpvEngineSuggestions->getItemCount(); ++i)
+						for (UT_uint32 i = 0; i < cpvEngineSuggestions->size(); ++i)
 						{
-							UT_UCS4Char *sug = cpvEngineSuggestions->getNthItem(i);
+							UT_UCS4Char *sug = cpvEngineSuggestions->at(i);
 							UT_return_val_if_fail (sug, false);
 							m_Suggestions->addItem(sug);
 						}
 					}
-					delete cpvEngineSuggestions;
 				   // add suggestions from user's AbiWord file
 				   pApp->suggestWord(m_Suggestions, m_pWord, m_iWordLength);
 
@@ -290,7 +288,7 @@ bool AP_Dialog_Spell::nextMisspelledWord(void)
 			   m_pWordIterator->updateBlock();
 
 			   // If this is the last block, adjust the end length
-			   // accordingly (seeing as the change must have occured
+			   // accordingly (seeing as the change must have occurred
 			   // before the end of the selection).
 			   if (m_bIsSelection && m_pEndBlock == m_pCurrBlock)
 				   m_iEndLength += (m_pWordIterator->getBlockLength() - iOldLength);
@@ -314,13 +312,13 @@ bool AP_Dialog_Spell::nextMisspelledWord(void)
 
 	   // no, so move on to the next block
 	   m_pCurrBlock = m_pCurrBlock->getNextBlockInDocument();
-	   
-	   if (m_pCurrBlock == NULL) 
+
+	   if (m_pCurrBlock == nullptr)
 	   {
 		   // end of document.
 		   return false;
 	   }
-	 
+
 	   // update the iterator with our new block
 	   m_pWordIterator = new fl_BlockSpellIterator(m_pCurrBlock, 0);
 	   UT_return_val_if_fail (m_pWordIterator, false);
@@ -334,7 +332,7 @@ bool AP_Dialog_Spell::makeWordVisible(void)
 
    m_pView->moveInsPtTo( (PT_DocPosition) (m_pCurrBlock->getPosition() + m_iWordOffset) );
    m_pView->extSelHorizontal(true, static_cast<UT_uint32>(m_iWordLength));
-   m_pView->updateScreen();
+   m_pView->updateScreen(true);
    
    return true;
 }
@@ -362,7 +360,7 @@ bool AP_Dialog_Spell::inChangeAll(void)
 	const UT_UCSChar * ent = m_pChangeAll->pick(bufferNormal);
 	FREEP(bufferNormal);
 
-	if (ent == NULL) 
+	if (ent == nullptr)
 		return false;
 	else {
 		makeWordVisible();
@@ -406,10 +404,10 @@ bool AP_Dialog_Spell::changeWordWith(const UT_UCSChar * newword)
    _getDict()->correctWord (oldWord, iOldLength, newword, iNewLength);
 
    result = m_pPreserver->cmdCharInsert(newword, iNewLength);
-   m_pView->updateScreen();
+   m_pView->updateScreen(true);
    
    // If this is the last block, adjust the end length accordingly
-   // (seeing as the change must have occured before the end of the
+   // (seeing as the change must have occurred before the end of the
    // selection).
    if (m_bIsSelection && m_pEndBlock == m_pCurrBlock)
 	   m_iEndLength += (iNewLength - m_iWordLength);

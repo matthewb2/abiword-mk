@@ -49,7 +49,7 @@ static gint s_preview_draw(GtkWidget * /*w*/,
 			   AP_UnixDialog_PageNumbers * dlg)
 {
 	UT_ASSERT(dlg);
-	dlg->event_PreviewExposed();
+	dlg->event_PreviewDraw();
 	return FALSE;
 }
 
@@ -78,7 +78,7 @@ AP_UnixDialog_PageNumbers::AP_UnixDialog_PageNumbers(XAP_DialogFactory * pDlgFac
 {
 	m_recentControl = m_control;
 	m_recentAlign   = m_align;
-	m_unixGraphics  = NULL;
+	m_unixGraphics  = nullptr;
 }
 
 AP_UnixDialog_PageNumbers::~AP_UnixDialog_PageNumbers(void)
@@ -86,10 +86,18 @@ AP_UnixDialog_PageNumbers::~AP_UnixDialog_PageNumbers(void)
 	DELETEP (m_unixGraphics);
 }
 
-void AP_UnixDialog_PageNumbers::event_PreviewExposed(void)
+void AP_UnixDialog_PageNumbers::event_PreviewInvalidate(void)
 {
-	if(m_preview)
-		m_preview->draw();
+	if (m_preview) {
+		m_preview->queueDraw();
+	}
+}
+
+void AP_UnixDialog_PageNumbers::event_PreviewDraw(void)
+{
+	if (m_preview) {
+		m_preview->drawImmediate();
+	}
 }
 
 void AP_UnixDialog_PageNumbers::event_AlignChanged(AP_Dialog_PageNumbers::tAlign align)
@@ -116,7 +124,7 @@ void AP_UnixDialog_PageNumbers::runModal(XAP_Frame * pFrame)
 	XAP_UnixApp * unixapp = static_cast<XAP_UnixApp *> (m_pApp);
 	
 	UT_return_if_fail(unixapp);
-	UT_return_if_fail(m_previewArea && gtk_widget_get_window(m_previewArea));
+	UT_return_if_fail(m_previewArea && XAP_HAS_NATIVE_WINDOW(m_previewArea));
 	DELETEP (m_unixGraphics);
 	
 	// make a new Unix GC
@@ -161,10 +169,10 @@ void AP_UnixDialog_PageNumbers::runModal(XAP_Frame * pFrame)
 
 GtkWidget * AP_UnixDialog_PageNumbers::_constructWindow (void)
 {
-	GtkWidget * window;	
+	GtkWidget * window = nullptr;
 	const XAP_StringSet * pSS = m_pApp->getStringSet();
 	
-	GtkBuilder * builder = newDialogBuilder("ap_UnixDialog_PageNumbers.ui");
+	GtkBuilder * builder = newDialogBuilderFromResource("ap_UnixDialog_PageNumbers.ui");
 
 	// Update our member variables with the important widgets that 
 	// might need to be queried or altered later

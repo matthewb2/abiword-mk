@@ -1,4 +1,4 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 
 /* AbiWord
  * Copyright (C) 2001 AbiSource, Inc.
@@ -26,6 +26,7 @@
 #include "ut_assert.h"
 #include "ut_debugmsg.h"
 #include "ut_locale.h"
+#include "ut_std_string.h"
 #include "ut_string.h"
 #include "ie_impexp_XSL-FO.h"
 #include "ie_imp_XSL-FO.h"
@@ -221,10 +222,10 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
     const gchar * buf[3];
     const gchar ** p_atts;
 	buf[0] = static_cast<const gchar *>("props");
-	buf[2] = NULL;
+	buf[2] = nullptr;
 	
 	UT_UTF8String sBuf;
-	const gchar * pVal = NULL;
+	const gchar * pVal = nullptr;
 	
 	bool used = false;
 
@@ -241,7 +242,7 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 		{
 			X_VerifyParseState(_PS_Doc);
 			m_parseState = _PS_Sec;
-			X_CheckError(appendStrux(PTX_Section,static_cast<const gchar **>(NULL)));
+			X_CheckError(appendStrux(PTX_Section, PP_NOPROPS));
 			break;
 		}
 
@@ -249,7 +250,7 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 		{
 			X_VerifyParseState(_PS_Doc);
 			m_parseState = _PS_Sec;
-			X_CheckError(appendStrux(PTX_Section,static_cast<const gchar **>(NULL)));
+			X_CheckError(appendStrux(PTX_Section, PP_NOPROPS));
 			break;
 		}
 
@@ -417,14 +418,14 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 			if(sBuf.length())
 				buf[1] = sBuf.utf8_str();
 			else
-				buf[0] = NULL;
+				buf[0] = nullptr;
 
 			xxx_UT_DEBUGMSG(("FO import: block props='%s'\n", sBuf.utf8_str()));
 
 			// append the atts/block to the document; if we're in a table, let
 			// charData() handle it instead (see Bug 10566)
 			if(m_iTableDepth == 0)
-				X_CheckError(appendStrux(PTX_Block, buf));
+				X_CheckError(appendStrux(PTX_Block, PP_std_copyProps(buf)));
 
 			break;
 		}
@@ -434,16 +435,13 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 			X_CheckError((m_parseState == _PS_Sec) || (m_parseState == _PS_Block) || (m_parseState == _PS_List));
 			UT_return_if_fail(m_bPendingFootnote == false);
 
-			UT_UTF8String id = UT_UTF8String_sprintf("%d", ++m_iFootnotes);
+			std::string id = UT_std_string_sprintf("%d", ++m_iFootnotes);
 
-			const gchar *fnbuf[7];
-			fnbuf[0] = PT_TYPE_ATTRIBUTE_NAME;
-			fnbuf[1] = "footnote_ref";
-			fnbuf[2] = "footnote-id";
-			fnbuf[3] = id.utf8_str();
-			fnbuf[4] = PT_PROPS_ATTRIBUTE_NAME;
-			fnbuf[5] = "text-position:superscript";
-			fnbuf[6] = NULL;
+			const PP_PropertyVector fnbuf = {
+				PT_TYPE_ATTRIBUTE_NAME, "footnote_ref",
+				"footnote-id", id,
+				PT_PROPS_ATTRIBUTE_NAME, "text-position:superscript"
+			};
 			X_CheckError(appendObject(PTO_Field,fnbuf));
 
 			m_bPendingFootnote = true;
@@ -457,27 +455,20 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 			X_CheckError(m_bPendingFootnote);
 			m_bPendingFootnote = false;
 
-			UT_UTF8String id = UT_UTF8String_sprintf("%d", m_iFootnotes);			
-			char * val = g_strdup(id.utf8_str());
-			X_CheckError(val);
+			std::string id = UT_std_string_sprintf("%d", m_iFootnotes);
 
-			const gchar *notebuf[3];
-			notebuf[0] = "footnote-id";
-			notebuf[1] = val;
-			notebuf[2] = NULL;
-			X_CheckError(appendStrux(PTX_SectionFootnote,notebuf));
+			const PP_PropertyVector notebuf = {
+				"footnote-id", id
+			};
+			X_CheckError(appendStrux(PTX_SectionFootnote, notebuf));
 
-			const gchar *anchorbuf[7];
-			anchorbuf[0] = PT_TYPE_ATTRIBUTE_NAME;
-			anchorbuf[1] = "footnote_anchor";
-			anchorbuf[2] = "footnote-id";
-			anchorbuf[3] = val;
-			anchorbuf[4] = PT_PROPS_ATTRIBUTE_NAME;
-			anchorbuf[5] = "text-position:superscript";
-			anchorbuf[6] = NULL;
+			const PP_PropertyVector anchorbuf = {
+				PT_TYPE_ATTRIBUTE_NAME, "footnote_anchor",
+				"footnote-id", id,
+				PT_PROPS_ATTRIBUTE_NAME, "text-position:superscript"
+			};
 			X_CheckError(appendObject(PTO_Field,anchorbuf));
 
-			FREEP(val);
 			m_bInFootnote = true;
 			m_bIgnoreFootnoteBlock = true;
 
@@ -600,18 +591,16 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 				xxx_UT_DEBUGMSG(("FO import: inline props='%s'\n", sBuf.utf8_str()));
 
 				p_atts = &buf[0];
-				X_CheckError(_pushInlineFmt(p_atts));
-				X_CheckError(appendFmt(&m_vecInlineFmt));
+				_pushInlineFmt(PP_std_copyProps(p_atts));
+				X_CheckError(appendFmt(m_vecInlineFmt));
 
 				pVal = static_cast<const gchar*>(_getXMLPropValue("id", atts));
 				if(pVal)
 				{
-					const gchar *buf2[5];
-					buf2[0] = PT_TYPE_ATTRIBUTE_NAME;
-					buf2[1] = "start";
-					buf2[2] = PT_NAME_ATTRIBUTE_NAME;
-					buf2[3] = pVal;
-					buf2[4] = NULL;
+					PP_PropertyVector buf2 = {
+						PT_TYPE_ATTRIBUTE_NAME, "start",
+						PT_NAME_ATTRIBUTE_NAME, pVal
+					};
 					X_CheckError(appendObject(PTO_Bookmark, buf2));
 					buf2[1] = "end";
 					X_CheckError(appendObject(PTO_Bookmark, buf2));
@@ -628,22 +617,20 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 				break;
 			}
 
-			const gchar *linkbuf[3];
-			linkbuf[2] = NULL;
-
-			gchar *p_val = NULL;
+			gchar *p_val = nullptr;
 			p_val = (gchar *)_getXMLPropValue("internal-destination", atts);
 
 			if(p_val) //internal
 			{
-				UT_UTF8String link = "#";
+				std::string link = "#";
 				// It looks like the spec allows for an 'empty string', so we will too
 				if(*p_val)
 					link += p_val;
 
-				linkbuf[0] = "xlink:href";
-				linkbuf[1] = link.utf8_str();
-				X_CheckError(appendObject(PTO_Hyperlink, const_cast<const gchar **>(linkbuf)));
+				const PP_PropertyVector linkbuf =  {
+					"xlink:href", link
+				};
+				X_CheckError(appendObject(PTO_Hyperlink, linkbuf));
 				m_bOpenedLink = true;
 				break;
 			}
@@ -658,8 +645,10 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 				{
 					p_val[len - 2] = '\0';
 					p_val = p_val + 5;
-					linkbuf[0] = "xlink:href";
-					linkbuf[1] = p_val;
+
+					const PP_PropertyVector linkbuf =  {
+						"xlink:href", p_val
+					};
 					X_CheckError(appendObject(PTO_Hyperlink, linkbuf));
 					m_bOpenedLink = true;
 				}
@@ -718,7 +707,7 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 		case TT_TABLE:
 		{
 			X_CheckError((m_parseState == _PS_Sec) || (m_parseState == _PS_Block) || (m_parseState == _PS_List));
-			X_CheckError(m_TableHelperStack->tableStart(getDoc(),NULL));
+			X_CheckError(m_TableHelperStack->tableStart(getDoc(),nullptr));
 			m_iTableDepth++;
 
 			m_parseState = _PS_Table;
@@ -728,7 +717,7 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 		case TT_TABLEROW:
 		{
 			X_VerifyParseState(_PS_Table);
-			X_CheckError(m_TableHelperStack->trStart(NULL));
+			X_CheckError(m_TableHelperStack->trStart(nullptr));
 			break;
 		}
 
@@ -763,7 +752,7 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 			}
 
 
-			X_CheckError(m_TableHelperStack->tdStart(rowspan, colspan, NULL));
+			X_CheckError(m_TableHelperStack->tdStart(rowspan, colspan, nullptr));
 			break;
 		}
 
@@ -783,7 +772,7 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 		{
 			X_CheckError((m_parseState == _PS_Block) || (m_parseState == _PS_List) || (m_parseState == _PS_Sec));
 
-			gchar *p_val = NULL;
+			gchar *p_val = nullptr;
 			p_val = (gchar *)_getXMLPropValue(static_cast<const gchar *>("src"), atts);
 
 			if(p_val)
@@ -898,7 +887,7 @@ void IE_Imp_XSL_FO::endElement(const gchar *name)
 		{
 			X_CheckError((m_parseState == _PS_Sec) || (m_parseState == _PS_Block) || (m_parseState == _PS_List));
 			X_CheckError(m_bInFootnote);
-			X_CheckError(appendStrux(PTX_EndFootnote,static_cast<const gchar **>(NULL)));
+			X_CheckError(appendStrux(PTX_EndFootnote, PP_NOPROPS));
 
 			if(m_bIgnoreFootnoteBlock) //there was no block in <fo:footnote-body> (invalid file?)
 			{
@@ -929,7 +918,7 @@ void IE_Imp_XSL_FO::endElement(const gchar *name)
 
 			X_CheckDocument(_getInlineDepth() > 0);
 			_popInlineFmt();
-			X_CheckError(appendFmt(&m_vecInlineFmt));
+			X_CheckError(appendFmt(m_vecInlineFmt));
 			break;
 		}
 
@@ -938,7 +927,7 @@ void IE_Imp_XSL_FO::endElement(const gchar *name)
 			X_VerifyParseState(_PS_Block);
 
 			if(m_bOpenedLink)
-				X_CheckError(appendObject(PTO_Hyperlink, NULL));
+				X_CheckError(appendObject(PTO_Hyperlink, PP_NOPROPS));
 
 			m_bOpenedLink = false;
 			break;
@@ -1085,28 +1074,21 @@ void IE_Imp_XSL_FO::createImage(const char *name, const gchar **atts)
 	UT_UTF8String filename(relative_file);
 	g_free(relative_file);
 
-	FG_Graphic * pfg = 0;
-	if (IE_ImpGraphic::loadGraphic (filename.utf8_str(), IEGFT_Unknown, &pfg) != UT_OK)
+	FG_ConstGraphicPtr pfg;
+	if (IE_ImpGraphic::loadGraphic (filename.utf8_str(), IEGFT_Unknown, pfg) != UT_OK)
 		return;
 
-	const UT_ByteBuf * pBB = pfg->getBuffer();
+	const UT_ConstByteBufPtr & pBB = pfg->getBuffer();
 	X_CheckError(pBB);
 
 	UT_UTF8String dataid;
 	UT_UTF8String_sprintf (dataid, "image%u", static_cast<unsigned int>(m_iImages++));
 
-	X_CheckError (getDoc()->createDataItem (dataid.utf8_str(), false, pBB, 
-                                            pfg->getMimeType(), NULL));
-
-	const gchar *buf[5];
-	buf[0] = "dataid";
-	buf[1] = dataid.utf8_str();
-	buf[2] = NULL;
-	buf[3] = NULL;
-	buf[4] = NULL;
+	X_CheckError (getDoc()->createDataItem (dataid.utf8_str(), false, pBB,
+                                            pfg->getMimeType(), nullptr));
 
 	UT_UTF8String props, dim;
-	const gchar *p_val = NULL;
+	const gchar *p_val = nullptr;
 
 	UT_LocaleTransactor t(LC_NUMERIC, "C");
 
@@ -1132,14 +1114,16 @@ void IE_Imp_XSL_FO::createImage(const char *name, const gchar **atts)
 		props+= dim.utf8_str();
 	}
 
+	PP_PropertyVector attr = {
+		"dataid", dataid.utf8_str()
+	};
 	if(props.length())
 	{
-		buf[2] = PT_PROPS_ATTRIBUTE_NAME;
-		buf[3] = (gchar*)props.utf8_str();
+		attr.push_back(PT_PROPS_ATTRIBUTE_NAME);
+		attr.push_back(props.utf8_str());
 	}
 
-	X_CheckError(appendObject(PTO_Image, const_cast<const gchar **>(buf)));
-	DELETEP(pfg);
+	X_CheckError(appendObject(PTO_Image, attr));
 }
 
 void IE_Imp_XSL_FO::charData(const gchar *s, int len)

@@ -1,22 +1,22 @@
 /* AbiSource Program Utilities
  * Copyright (C) 1998 AbiSource, Inc.
- *
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
-
+ 
 #include <windows.h>
 #include <winspool.h>
 #include "ut_debugmsg.h"
@@ -82,7 +82,7 @@ bool UT_IsWin95(void)
 /*****************************************************************/
 
 /*!
- This function loads and locks a dialog template resource.
+ This function loads and locks a dialog template resource. 
 
  \param hinst
  \param lpszResName Name of the resource
@@ -94,7 +94,7 @@ bool UT_IsWin95(void)
  */
 DLGTEMPLATE * WINAPI UT_LockDlgRes(HINSTANCE hinst, LPCWSTR lpszResName)
 {
-    HRSRC hrsrc = FindResourceW(NULL, lpszResName,  (LPWSTR)RT_DIALOG);
+    HRSRC hrsrc = FindResourceW(nullptr, lpszResName,  (LPWSTR)RT_DIALOG);
     HGLOBAL hglb = LoadResource(hinst, hrsrc);
     return (DLGTEMPLATE *) LockResource(hglb);
 }
@@ -115,7 +115,7 @@ DLGTEMPLATE * WINAPI UT_LockDlgRes(HINSTANCE hinst, LPCWSTR lpszResName)
 wchar_t * UT_GetDefaultPrinterName()
 {
 	UT_uint32 iBufferSize = 128; // will become 2x bigger immediately in the loop
-	wchar_t * pPrinterName = NULL;
+	wchar_t * pPrinterName = nullptr;
 	DWORD rc;
 
 	do
@@ -126,7 +126,7 @@ wchar_t * UT_GetDefaultPrinterName()
 			g_free(pPrinterName);
 
 		pPrinterName = (wchar_t *) UT_calloc(sizeof(wchar_t),iBufferSize);
-		UT_return_val_if_fail( pPrinterName, NULL );
+		UT_return_val_if_fail( pPrinterName, nullptr );
 
 		// the method of obtaining the name is version specific ...
 		OSVERSIONINFOW osvi;
@@ -140,23 +140,23 @@ wchar_t * UT_GetDefaultPrinterName()
 		if (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
 		{
 			// get size of the buffer needed to call enum printers
-			if (!EnumPrintersW(PRINTER_ENUM_DEFAULT,NULL,5,NULL,0,&iNeeded,&iReturned))
+			if (!EnumPrintersW(PRINTER_ENUM_DEFAULT,nullptr,5,nullptr,0,&iNeeded,&iReturned))
 			{
 				if ((rc = GetLastError()) != ERROR_INSUFFICIENT_BUFFER)
 				{
-					return NULL;
+					return nullptr;
 				}
 			}
 
 			// allocate the buffer
-			if ((pPrinterInfo = (LPPRINTER_INFO_5W)LocalAlloc(LPTR,iNeeded)) == NULL)
+			if ((pPrinterInfo = (LPPRINTER_INFO_5W)LocalAlloc(LPTR,iNeeded)) == nullptr)
 			{
 				rc = GetLastError();
 			}
 			else
 			{
 				// now get the default printer
-				if (!EnumPrintersW(PRINTER_ENUM_DEFAULT,NULL,5,
+				if (!EnumPrintersW(PRINTER_ENUM_DEFAULT,nullptr,5,
 								  (LPBYTE) pPrinterInfo,iNeeded,&iNeeded,&iReturned))
 				{
 					rc = GetLastError();
@@ -194,21 +194,21 @@ wchar_t * UT_GetDefaultPrinterName()
 
 				HMODULE hWinSpool = LoadLibraryW(L"winspool.drv");
 				if (!hWinSpool)
-					return NULL;
+					return nullptr;
 
 				HRESULT (WINAPI * fnGetDefaultPrinter)(LPWSTR, LPDWORD) =
 					(HRESULT (WINAPI * )(LPWSTR, LPDWORD)) GetProcAddress(hWinSpool, GETDEFAULTPRINTER);
-
+				
 				if (!fnGetDefaultPrinter)
 				{
 					FreeLibrary(hWinSpool);
-					return NULL;
+					return nullptr;
 				}
 
                 bool i =false;
 				if (!fnGetDefaultPrinter(pPrinterName,&iBuffSize))
                         i = true;
-
+                         
                 if(i)
 					rc = GetLastError();
 				else
@@ -235,7 +235,7 @@ wchar_t * UT_GetDefaultPrinterName()
 		}
 	}
 	while (rc == ERROR_INSUFFICIENT_BUFFER);
-
+	
 	return pPrinterName;
 }
 
@@ -248,14 +248,14 @@ HDC  UT_GetDefaultPrinterDC()
 	wchar_t * pPrinterName  = UT_GetDefaultPrinterName();
 
 	if(!pPrinterName || !*pPrinterName)
-		return NULL;
+		return nullptr;
 
 	//	HANDLE hPrinter;
-	//	if(!OpenPrinter(pPrinterName, &hPrinter, NULL))
-	//		return NULL;
+	//	if(!OpenPrinter(pPrinterName, &hPrinter, nullptr))
+	//		return nullptr;
 
-	const wchar_t * pDriver = UT_IsWinNT() ? L"WINSPOOL" : NULL;
-	HDC hdc = CreateDCW(pDriver, pPrinterName, NULL, NULL);
+	const wchar_t * pDriver = UT_IsWinNT() ? L"WINSPOOL" : nullptr;
+	HDC hdc = CreateDCW(pDriver, pPrinterName, nullptr, nullptr);
 	g_free(pPrinterName);
 	return hdc;
 }
@@ -265,7 +265,7 @@ HDC  UT_GetDefaultPrinterDC()
 ATOM UT_RegisterClassEx(UINT style, WNDPROC wndproc, HINSTANCE hInstance,
  						HICON hIcon, HCURSOR hCursor, HBRUSH hbrBackground, HICON hIconSm,
 						const wchar_t * menu, const wchar_t * name)
-
+ 
 {
     ATOM atom;
 	WNDCLASSEXW  wndclass;
@@ -282,8 +282,8 @@ ATOM UT_RegisterClassEx(UINT style, WNDPROC wndproc, HINSTANCE hInstance,
 	wndclass.lpszMenuName  = menu;
 	wndclass.lpszClassName = name;
 	wndclass.hIconSm       = hIconSm;
-
-	atom = RegisterClassExW (&wndclass);
+	
+	atom = RegisterClassExW (&wndclass);	
 	UT_ASSERT(atom);
 	return atom;
 }
@@ -291,7 +291,7 @@ ATOM UT_RegisterClassEx(UINT style, WNDPROC wndproc, HINSTANCE hInstance,
 
 LRESULT UT_DefWindowProc(HWND hWnd, UINT Msg, WPARAM wParam,LPARAM lParam)
 {
-	return DefWindowProcW(hWnd, Msg, wParam, lParam);
+	return DefWindowProcW(hWnd, Msg, wParam, lParam);	
 }
 
 
@@ -315,13 +315,11 @@ LRESULT UT_DispatchMessage(const MSG *lpmsg)
 HWND UT_CreateWindowEx(DWORD dwExStyle, const wchar_t * pszClassName, const wchar_t * pszWindowName, DWORD dwStyle,
  					   int x, int y, int nWidth, int nHeight,
 					   HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
-
- {
+					   
+ {	
 	HWND hwnd =  CreateWindowExW(dwExStyle, pszClassName, pszWindowName,
-		dwStyle, x, y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
-
-	//DWORD dw = GetLastError(); //pascal
-
+		dwStyle, x, y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);	
+			
 	UT_ASSERT(hwnd);
-	return hwnd;
+	return hwnd;	
  }

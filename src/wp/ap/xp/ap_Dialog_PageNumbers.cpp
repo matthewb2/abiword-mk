@@ -31,8 +31,8 @@ AP_Dialog_PageNumbers::AP_Dialog_PageNumbers (XAP_DialogFactory * pDlgFactory,
 	m_control = id_FTR;
 	
 	m_answer  = a_OK;
-	m_pFrame  = NULL;
-	m_preview = NULL;
+	m_pFrame  = nullptr;
+	m_preview = nullptr;
 }
 
 AP_Dialog_PageNumbers::~AP_Dialog_PageNumbers(void)
@@ -90,7 +90,7 @@ AP_Preview_PageNumbers::AP_Preview_PageNumbers (GR_Graphics * gc)
 	
 	GR_Font * found =  m_gc->findFont("Times New Roman", "normal",
 									  "", "normal", "", fontString,
-									  NULL);
+									  nullptr);
 	
 	m_gc->setFont(found);
 	
@@ -112,7 +112,7 @@ void AP_Preview_PageNumbers::setAlign(AP_Dialog_PageNumbers::tAlign align)
 	m_align = align;
 }
 
-void AP_Preview_PageNumbers::draw (const UT_Rect *clip)
+void AP_Preview_PageNumbers::drawImmediate(const UT_Rect* clip)
 {
 	UT_UNUSED(clip);
 	GR_Painter painter(m_gc);

@@ -18,8 +18,6 @@
  */
 
 #include <gsf/gsf.h>
-#include <gsf/gsf-input.h>
-#include <gsf/gsf-infile.h>
 
 #include <time.h> // for struct tm and asctime
 
@@ -38,7 +36,6 @@ SDWDocInfo::~SDWDocInfo() {}
 /** Reads a bytestring, followed by a padding. aMaxlen is the max. number of bytes to read. */
 static void readPaddedByteString(GsfInput* aStream, UT_UCS4String& aString,
                                  UT_iconv_t aConverter, UT_uint32 aMaxlen)
-    throw(UT_Error) 
 {
 	UT_UCS4Char* str;
 	readByteString(aStream, str, aConverter);
@@ -55,7 +52,7 @@ static void readPaddedByteString(GsfInput* aStream, UT_UCS4String& aString,
 
 class AutoGsfInput {
 	public:
-		AutoGsfInput(GsfInput* aStream = NULL) : mStream(aStream) {}
+		AutoGsfInput(GsfInput* aStream = nullptr) : mStream(aStream) {}
 		~AutoGsfInput() { close(); }
 		void close() { if (mStream) g_object_unref(G_OBJECT(mStream)); }
 
@@ -115,10 +112,9 @@ static inline void do_SetMetadata(PD_Document* aDoc, const std::string & aKey, U
 	aDoc->setMetaDataProp(aKey, str);
 }
 
-void SDWDocInfo::load(GsfInfile* aDoc, PD_Document* aPDDoc) 
-	throw(UT_Error)
+void SDWDocInfo::load(GsfInfile* aDoc, PD_Document* aPDDoc)
 {
-	char* headStr = NULL;
+	char* headStr = nullptr;
 
 	try {
 		UT_DEBUGMSG(("SDW: Loading Docinfo...\n"));

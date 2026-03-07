@@ -19,10 +19,6 @@
  * 02110-1301 USA.
  */
 
-#include <gsf/gsf-output-stdio.h>
-#include <gsf/gsf-outfile.h>
-#include <gsf/gsf-outfile-zip.h>
-
 #include <locale.h>
 
 #include "pd_Style.h"
@@ -198,7 +194,7 @@ OO_WriterImpl::OO_WriterImpl(GsfOutfile *pOutfile, OO_StylesContainer *pStylesCo
 	
 	writeUTF8String(m_pContentStream, "<office:automatic-styles>\n");
 	
-	int *styleNum = NULL;
+	int *styleNum = nullptr;
 	UT_String styleString;
 
 	// span styles
@@ -318,7 +314,7 @@ void OO_WriterImpl::openHyperlink(const PP_AttrProp* pAP)
 	UT_return_if_fail(pAP);
 
 	UT_UTF8String output = "<text:a ", escape;
-	const gchar* pValue = NULL;
+	const gchar* pValue = nullptr;
 
 	if(pAP->getAttribute("xlink:href",pValue) && pValue)
 	{
@@ -462,8 +458,8 @@ void OO_AccumulatorImpl::openBlock(const std::string & styleAtts, const std::str
 }
 
 
-OO_Listener::OO_Listener (PD_Document * pDocument, IE_Exp_OpenWriter * pie, OO_ListenerImpl *pListenerImpl)
-   : PL_Listener (), m_pDocument(pDocument), m_pie(pie), m_pListenerImpl(pListenerImpl), m_bInBlock(false), m_bInSpan(false), m_bInHyperlink(false)
+OO_Listener::OO_Listener (PD_Document * pDocument, OO_ListenerImpl *pListenerImpl)
+   : PL_Listener (), m_pDocument(pDocument), m_pListenerImpl(pListenerImpl), m_bInBlock(false), m_bInSpan(false), m_bInHyperlink(false)
 {
 }
 
@@ -497,9 +493,9 @@ bool OO_Listener::populate(fl_ContainerLayout* /*sfh*/,
 				case PTO_Hyperlink:
 				{
 					_closeSpan();
-					const PP_AttrProp* pAP = NULL;
+					const PP_AttrProp* pAP = nullptr;
 					m_pDocument->getAttrProp(api,&pAP);
-					const gchar* pValue = NULL;
+					const gchar* pValue = nullptr;
 
 					if(pAP && pAP->getAttribute("xlink:href",pValue) && pValue) {
 						_openHyperlink(pAP);
@@ -524,7 +520,7 @@ bool OO_Listener::populateStrux(pf_Frag_Strux* /*sdh*/,
 				fl_ContainerLayout* * psfh)
 {
    const PX_ChangeRecord_Strux * pcrx = static_cast<const PX_ChangeRecord_Strux *> (pcr);
-   *psfh = 0;							// we don't need it.
+   *psfh = nullptr;							// we don't need it.
     
    switch (pcrx->getStruxType())
    {
@@ -577,7 +573,7 @@ void OO_Listener::_openBlock (PT_AttrPropIndex api)
     if (m_bInBlock)
         _closeBlock();
 
-    const PP_AttrProp * pAP = NULL;
+    const PP_AttrProp * pAP = nullptr;
     bool bHaveProp = m_pDocument->getAttrProp(api, &pAP);
     bool bIsHeading = false;
     std::string styleAtts, propAtts, font;
@@ -587,7 +583,7 @@ void OO_Listener::_openBlock (PT_AttrPropIndex api)
 		UT_UTF8String sa, pa, f, escape;
 		OO_StylesWriter::map(pAP, sa, pa, f);
 
-		const gchar * szStyle = NULL;
+		const gchar * szStyle = nullptr;
 		pAP->getAttribute("style", szStyle);
 
 		if (szStyle && pa.size())
@@ -631,7 +627,7 @@ void OO_Listener::_openSpan(PT_AttrPropIndex api)
    {
       return;
    }
-   const PP_AttrProp * pAP = NULL;
+   const PP_AttrProp * pAP = nullptr;
    bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
    
    std::string propAtts, font;
@@ -785,12 +781,12 @@ public:
   {
     const char * szName;
     std::string mimeType;
-    const UT_ByteBuf * pByteBuf;
+    UT_ConstByteBufPtr pByteBuf;
 
     // create Pictures directory
     GsfOutput * pictures = gsf_outfile_new_child(oo, "Pictures", TRUE);
     
-    for (UT_uint32 k=0; (pDoc->enumDataItems(k,NULL,&szName,&pByteBuf,&mimeType)); k++)
+    for (UT_uint32 k=0; (pDoc->enumDataItems(k, nullptr, &szName, pByteBuf, &mimeType)); k++)
     {
         const char * extension = "png";
         // create individual pictures
@@ -854,8 +850,8 @@ public:
 
     const char * szName;
     std::string mimeType;
-    const UT_ByteBuf * pByteBuf;
-    for (UT_uint32 k = 0; (pDoc->enumDataItems(k,NULL,&szName,&pByteBuf, &mimeType)); k++)
+    UT_ConstByteBufPtr pByteBuf;
+    for (UT_uint32 k = 0; (pDoc->enumDataItems(k, nullptr, &szName, pByteBuf, &mimeType)); k++)
     {
         const char *extension = "png";
         if (mimeType == "image/jpeg") {
@@ -910,7 +906,7 @@ bool OO_StylesWriter::writeStyles(PD_Document * pDoc, GsfOutfile * oo, OO_Styles
     };
   
   UT_UTF8String styles;
-  const PD_Style * pStyle = NULL;
+  const PD_Style * pStyle = nullptr;
   UT_GenericVector<PD_Style *> vecStyles;
   pDoc->getAllUsedStyles(&vecStyles);
   UT_sint32 k = 0;
@@ -919,7 +915,7 @@ bool OO_StylesWriter::writeStyles(PD_Document * pDoc, GsfOutfile * oo, OO_Styles
   {
       pStyle = vecStyles.getNthItem(k);
       PT_AttrPropIndex api = pStyle->getIndexAP();
-      const PP_AttrProp * pAP = NULL;
+      const PP_AttrProp * pAP = nullptr;
       bool bHaveProp = pDoc->getAttrProp (api, &pAP);
       
       if (bHaveProp && pAP) 
@@ -1005,7 +1001,7 @@ void OO_StylesWriter::addFontDecls(UT_UTF8String & buffer, OO_StylesContainer & 
 void OO_StylesWriter::map(const PP_AttrProp * pAP, UT_UTF8String & styleAtts, UT_UTF8String & propAtts, UT_UTF8String & font) 
 {		
 	UT_UTF8String escape;
-	const gchar * szValue = NULL;
+	const gchar * szValue = nullptr;
 	styleAtts.clear();
 	propAtts.clear();
 
@@ -1176,7 +1172,7 @@ void OO_StylesWriter::map(const PP_AttrProp * pAP, UT_UTF8String & styleAtts, UT
 
 
 IE_Exp_OpenWriter::IE_Exp_OpenWriter (PD_Document * pDoc)
-  : IE_Exp (pDoc), m_oo(0)
+  : IE_Exp (pDoc), m_oo(nullptr)
 {
 }
 
@@ -1193,7 +1189,7 @@ IE_Exp_OpenWriter::~IE_Exp_OpenWriter()
 UT_Error IE_Exp_OpenWriter::_writeDocument(void)
 {
   UT_return_val_if_fail (getFp(), UT_ERROR);
-  m_oo = GSF_OUTFILE (gsf_outfile_zip_new (getFp(), NULL));
+  m_oo = GSF_OUTFILE (gsf_outfile_zip_new (getFp(), nullptr));
   UT_return_val_if_fail(m_oo, UT_ERROR);
 
   {
@@ -1234,7 +1230,7 @@ UT_Error IE_Exp_OpenWriter::_writeDocument(void)
 
   OO_StylesContainer stylesContainer;
   OO_AccumulatorImpl accumulatorImpl(&stylesContainer);
-  OO_Listener listener1(getDoc(), this, &accumulatorImpl);
+  OO_Listener listener1(getDoc(), &accumulatorImpl);
   if (!getDoc()->tellListener(static_cast<PL_Listener *>(&listener1)))
     {
       oo_gsf_output_close(GSF_OUTPUT(m_oo));
@@ -1249,7 +1245,7 @@ UT_Error IE_Exp_OpenWriter::_writeDocument(void)
 
   {
     OO_WriterImpl writerImpl(m_oo, &stylesContainer);
-    OO_Listener listener2(getDoc(), this, &writerImpl);
+    OO_Listener listener2(getDoc(), &writerImpl);
     if (!getDoc()->tellListener(static_cast<PL_Listener *>(&listener2)))
       {
 	oo_gsf_output_close(GSF_OUTPUT(m_oo));

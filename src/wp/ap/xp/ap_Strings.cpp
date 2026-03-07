@@ -47,9 +47,9 @@ AP_BuiltinStringSet::AP_BuiltinStringSet(XAP_App * pApp, const gchar * szLanguag
 
 	static const gchar * s_a[] =
 	{
-		dcl(__FIRST__,0)			// bogus entry for zero
+		dcl(__FIRST__, nullptr)			// bogus entry for zero
 #include "ap_String_Id.h"
-		dcl(__LAST__,0)				// bogus entry for end
+		dcl(__LAST__, nullptr)			// bogus entry for end
 	};
 
 	m_arrayAP = s_a;
@@ -114,7 +114,7 @@ bool AP_BuiltinStringSet::dumpBuiltinSet(const char * szFilename) const
 	// for the other language.
 	
 	bool bResult = false;			// assume failure
-	FILE * fp = NULL;
+	FILE * fp = nullptr;
 	fp = fopen(szFilename, "w");
 	if (!fp)
 	{
@@ -200,7 +200,7 @@ AP_DiskStringSet::AP_DiskStringSet(XAP_App * pApp)
 	: XAP_DiskStringSet(pApp),
 	  m_vecStringsAP(AP_STRING_ID__LAST__ - AP_STRING_ID__FIRST__ + 1, 4, true)
 {
-	setValue(AP_STRING_ID__FIRST__,0);			// bogus zero element
+	setValue(AP_STRING_ID__FIRST__, nullptr);		// bogus zero element
 }
 
 AP_DiskStringSet::~AP_DiskStringSet(void)
@@ -222,7 +222,7 @@ bool AP_DiskStringSet::setValue(XAP_String_Id id, const gchar * szString)
 		return XAP_DiskStringSet::setValue(id,szString);
 
 	bool bFoundMultiByte = false;
-	gchar * szDup = NULL;
+	gchar * szDup = nullptr;
 	if (szString && *szString)
 	{
 		UT_GrowBuf gb;
@@ -240,7 +240,7 @@ bool AP_DiskStringSet::setValue(XAP_String_Id id, const gchar * szString)
 		{
 			if (p && *p)
 			{
-				UT_UCS4Char  *fbdStr2 = 0;
+				UT_UCS4Char *fbdStr2 = nullptr;
 				fbdStr2  = new UT_UCS4Char [kLimit + 1];
 				UT_return_val_if_fail (fbdStr2, false);
 
@@ -279,9 +279,9 @@ bool AP_DiskStringSet::setValue(XAP_String_Id id, const gchar * szString)
 		szDup[length]='\0';
 	}
 
-	gchar * pOldValue = NULL;
+	gchar * pOldValue = nullptr;
 	bool bResult = (m_vecStringsAP.setNthItem(id-AP_STRING_ID__FIRST__,szDup,&pOldValue) == 0);
-	UT_ASSERT_HARMLESS(pOldValue == NULL);		// duplicate string for this id
+	UT_ASSERT_HARMLESS(pOldValue == nullptr);		// duplicate string for this id
 
 	if (bFoundMultiByte)
 	{
@@ -314,7 +314,7 @@ const gchar * AP_DiskStringSet::getValue(XAP_String_Id id) const
 	if (m_pFallbackStringSet)
 		return m_pFallbackStringSet->getValue(id);
 	
-	return NULL;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////

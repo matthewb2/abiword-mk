@@ -1,6 +1,8 @@
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
  * Copyright (C) 2007 Martin Sevior
+ * Copyright (C) 2021 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,7 +21,7 @@
  */
 
 
-#include "fp_Run.h"
+#include "fp_AnnotationRun.h"
 #include "fl_BlockLayout.h"
 #include "ut_debugmsg.h"
 #include "pd_Document.h"
@@ -121,7 +123,7 @@ void fp_AnnotationRun::_draw(dg_DrawArgs* pDA)
 	pG->setFont(_getFont());
 	pG->setColor(_getView()->getColorAnnotation(this));
 //	UT_DEBUGMSG(("Drawing string m_sValue %s \n",m_sValue.utf8_str()));
-	painter.drawChars(m_sValue.ucs4_str().ucs4_str(), 0,m_sValue.ucs4_str().size(), pDA->xoff,iYdraw, NULL);
+	painter.drawChars(m_sValue.ucs4_str().ucs4_str(), 0,m_sValue.ucs4_str().size(), pDA->xoff,iYdraw, nullptr);
 //
 // Draw underline/overline/strikethough
 //
@@ -139,7 +141,7 @@ void fp_AnnotationRun::_lookupProperties(const PP_AttrProp * pSpanAP,
 
 	FL_DocLayout * pLayout = getBlock()->getDocLayout();
 	const GR_Font * pFont = pLayout->findFont(pSpanAP,pBlockAP,pSectionAP,pG);
-	if(pFont == NULL)
+	if(pFont == nullptr)
 	{
 	    pFont = pLayout->findFont(pSpanAP,pBlockAP,pSectionAP,getGraphics());
 	    UT_ASSERT_HARMLESS(pFont);
@@ -241,13 +243,13 @@ UT_sint32 fp_AnnotationRun::calcWidth(void)
 	iNewWidth = getGraphics()->measureString(m_sValue.ucs4_str().ucs4_str(),
 						 0,
 						 m_sValue.ucs4_str().size(),
-						 NULL);
+						 nullptr);
     }
     UT_ASSERT(iNewWidth > 0);
     return iNewWidth;
 }
 
-const char * fp_AnnotationRun::getValue(void)
+const char* fp_AnnotationRun::getValue(void) const
 {
   return m_sValue.utf8_str();
 }

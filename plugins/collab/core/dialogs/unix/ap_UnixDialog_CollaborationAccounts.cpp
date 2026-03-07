@@ -65,7 +65,7 @@ static void s_online_toggled (GtkCellRendererToggle * /*cell*/,
 	GtkTreeIter iter;
 	
 	gboolean online = false;
-	gpointer handler = 0;	
+	gpointer handler = nullptr;
 
 	// get the toggled state
 	if (gtk_tree_model_get_iter(model, &iter, path))
@@ -138,11 +138,7 @@ GtkWidget * AP_UnixDialog_CollaborationAccounts::_constructWindow(void)
 	//const XAP_StringSet * pSS = XAP_App::getApp()->getStringSet();
 	
 	// load the dialog from the UI file
-#if GTK_CHECK_VERSION(3,0,0)
 	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_CollaborationAccounts.ui");
-#else
-	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_CollaborationAccounts-2.ui");
-#endif
 	
 	// Update our member variables with the important widgets that 
 	// might need to be queried or altered later
@@ -190,8 +186,6 @@ void AP_UnixDialog_CollaborationAccounts::_populateWindowData()
 	GtkTreeSelection *sel;
 	_setModel(_constructModel());
 	
-	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (m_wAccountsTree), true);
-
 	// get the current selection
 	sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (m_wAccountsTree));
 	gtk_tree_selection_set_mode (sel, GTK_SELECTION_BROWSE);
@@ -262,7 +256,7 @@ AccountHandler* AP_UnixDialog_CollaborationAccounts::_getSelectedAccountHandler(
 	GtkTreeIter iter;
 	GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_wAccountsTree));
 
-	bool hasSelection = gtk_tree_selection_get_selected (selection, 0, &iter);
+	bool hasSelection = gtk_tree_selection_get_selected (selection, nullptr, &iter);
 	if (!hasSelection)
 		return NULL;
 

@@ -23,7 +23,7 @@
 #define ODE_LISTENERACTION_H_
 
 // AbiWord includes
-#include <ut_types.h>
+#include "ut_types.h"
 
 // Internal classes
 class ODe_AbiDocListenerImpl;
@@ -64,7 +64,7 @@ public:
 
     void reset() {
         m_action = ACTION_NONE;
-        m_pListenerImpl = NULL;
+        m_pListenerImpl = nullptr;
     }
 
 private:

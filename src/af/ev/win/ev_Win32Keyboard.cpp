@@ -1,20 +1,20 @@
 /* AbiSource Program Utilities
  * Copyright (c) 2002 Jordi Mas i Hernàndez - jmas@softcatala.org
- * 			 (c) 1998-2000 AbiSource, Inc.
+ * 			 (c) 1998-2000 AbiSource, Inc.	
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
 
@@ -37,27 +37,27 @@
 
 /*
 	What are we doing here
-
-	Originally Abiword folks tried to handle the keyboard their "own
+	
+	Originally Abiword folks tried to handle the keyboard their "own 
 	way", that included not calling TranslateMessage() and trying to
-	interpret the keyboard thru WM_KEYDOWN ignoring most WM_CHAR. This
-	caused serval problems, including ALT+XXX not working and other
+	interpret the keyboard thru WM_KEYDOWN ignoring most WM_CHAR. This 
+	caused serval problems, including ALT+XXX not working and other 
 	keyboard related issues.
-
+	
 	What we do now is:
-
+	
 	- Keep this code as simple as possible
-
+	
 	- We always call TranslateMessage() and we let Windows do that job,
-	as all the applications do.
-
+	as all the applications do. 
+	
 	- We process all the WM_CHAR messages except the ones that were Abiword
-	command , and we pass those to Windows
-
+	command , and we pass those to Windows 
+	
 	- We process only the special keys thru WM_KEYDOWN message.
-
+	
 	Jordi 10/11/2002
-
+	
 */
 
 #define _WIN32KEY_DEBUG 1
@@ -75,7 +75,7 @@ static EV_EditBits s_mapVirtualKeyCodeToNVK(WPARAM nVirtKey);
 
 ev_Win32Keyboard::ev_Win32Keyboard(EV_EditEventMapper * pEEM)
 	: EV_Keyboard(pEEM),
-	  m_hKeyboardLayout(0),
+	  m_hKeyboardLayout(nullptr),
 	  m_iconv(UT_ICONV_INVALID),
 	  m_bIsUnicodeInput(false),
 	  m_bWasAnAbiCommand(false)
@@ -87,7 +87,7 @@ ev_Win32Keyboard::ev_Win32Keyboard(EV_EditEventMapper * pEEM)
 			(GetProcAddress(hInstUser, "ToUnicodeEx"));
 		FreeLibrary(hInstUser);
 	}
-
+	
 	remapKeyboard(GetKeyboardLayout(0));
 }
 
@@ -107,7 +107,7 @@ void ev_Win32Keyboard::remapKeyboard(HKL hKeyboardLayout)
 		UT_iconv_close( m_iconv );
 		m_iconv = UT_ICONV_INVALID;
 	}
-	if( hKeyboardLayout != 0 )
+	if( hKeyboardLayout != nullptr )
 	{
 		strcpy( szCodePage, "CP" );
 		if( GetLocaleInfoA( LOWORD( hKeyboardLayout ),
@@ -118,15 +118,15 @@ void ev_Win32Keyboard::remapKeyboard(HKL hKeyboardLayout)
 			// Unicode locale?
 			// NT-based systems (at least XP) always produce unicode input irrespective of
 			// the ANSI locale -- see WM_CHAR on MSDN and bug 9374
-			//
+			// 
 			// (It would be more efficient to do the NT test before calling
 			// GetLocaleInfo(), but for maintanence reasons it is better here.)
-
+			
 			if( UT_IsWinNT() || !strcmp( szCodePage, "CP0" ) )
 			{
 				const char *szUCS2Name
 					= XAP_EncodingManager::get_instance()->getNativeUnicodeEncodingName();
-
+				
 				UT_ASSERT(szUCS2Name);
 				m_bIsUnicodeInput = true;
 				strcpy( szCodePage, szUCS2Name );
@@ -134,7 +134,7 @@ void ev_Win32Keyboard::remapKeyboard(HKL hKeyboardLayout)
 			else
 				m_bIsUnicodeInput = false;
 
-			//UT_DEBUGMSG(("New keyboard codepage: %s\n",szCodePage));
+			UT_DEBUGMSG(("New keyboard codepage: %s\n",szCodePage));
 
 			m_iconv = UT_iconv_open( "UCS-4-INTERNAL", szCodePage );
 		}
@@ -146,24 +146,24 @@ void ev_Win32Keyboard::remapKeyboard(HKL hKeyboardLayout)
 /*
 
 	Processes WM_KEYDOWN messages related to special keys
-
+	
 */
 bool ev_Win32Keyboard::onKeyDown(AV_View * pView,
 				 HWND /*hWnd*/, UINT /*iMsg*/, WPARAM nVirtKey, LPARAM keyData)
 {
 
 	m_bWasAnAbiCommand = false;
-
+	
 	EV_EditMethod * pEM;
 
 	EV_EditModifierState ems = _getModifierState();
 	EV_EditBits nvk;
-
+	
 	int						charLen;
 	UT_UCSChar				charData[2];
 
 	UT_UNUSED(keyData);
-	//UT_DEBUGMSG(("WIN32KEY_DEBUG->onKeyDown %x, %x\n", nVirtKey, keyData));
+	UT_DEBUGMSG(("WIN32KEY_DEBUG->onKeyDown %x, %x\n", nVirtKey, keyData));
 
 	// ALT key for windows {menus, ... }, ALT+XXX for special chars, etc
 	if (((ems & EV_EMS_ALT) != 0) && ((ems & EV_EMS_CONTROL) == 0))
@@ -184,7 +184,7 @@ bool ev_Win32Keyboard::onKeyDown(AV_View * pView,
 		#endif
 		return true;
 	}
-
+	
 	// Get abiword keyid
 	nvk = s_mapVirtualKeyCodeToNVK(nVirtKey);
 
@@ -195,7 +195,7 @@ bool ev_Win32Keyboard::onKeyDown(AV_View * pView,
 		UT_DEBUGMSG(("WIN32KEY_DEBUG->onKeyDown return true (IGNORE)\n"));
 		#endif
 		return true;
-	}
+	}	  		
 
 	if (nvk != 0)
 	{	// Special key
@@ -203,7 +203,7 @@ bool ev_Win32Keyboard::onKeyDown(AV_View * pView,
 		charData[0] = nvk;
 	}
 	else
-	{	// Non-special key with CTRL
+	{	// Non-special key with CTRL 
 
 #if 0
 		// this causes bug 9618
@@ -220,7 +220,7 @@ bool ev_Win32Keyboard::onKeyDown(AV_View * pView,
 					  m_hKeyboardLayout)==0)
 			return true;
 		charLen		= 1;
-		charData[0]	= UT_UCSChar(char_value [0] & 0x000000FF);
+		charData[0]	= UT_UCSChar(char_value [0] & 0x000000FF);		
 		charData[1]	= 0;
 #else
 		charLen = 1;
@@ -228,7 +228,7 @@ bool ev_Win32Keyboard::onKeyDown(AV_View * pView,
 
 		if(!charData[0]) // no mapping
 			return true;
-
+		
 		charData[1]	= 0;
 
 		if((ems & EV_EMS_SHIFT) == 0)
@@ -237,25 +237,25 @@ bool ev_Win32Keyboard::onKeyDown(AV_View * pView,
 			// have to lowercase it
 			charData[0] = UT_UCS4_tolower(charData[0]);
 		}
-
+		
 #endif
 	}
-
+	
 
 	switch (m_pEEM->Keystroke(EV_EKP_PRESS | ems | charData[0], &pEM)) //#define EV_EKP_PRESS			((EV_EditKeyPress)		0x00800000)
 	{
-
+		
 	case EV_EEMR_BOGUS_START:
-	case EV_EEMR_BOGUS_CONT:
+	case EV_EEMR_BOGUS_CONT:			
 	case EV_EEMR_INCOMPLETE:		// a non-terminal node in state machine
-		return false;
-
-	case EV_EEMR_COMPLETE:			// a terminal node in state machine
-		UT_ASSERT(pEM);
+		return false;		
+		
+	case EV_EEMR_COMPLETE:			// a terminal node in state machine			
+		UT_ASSERT(pEM);			
 		invokeKeyboardMethod(pView, pEM, charData, charLen);
 		m_bWasAnAbiCommand = true;
 		return true;
-
+		
 	default:
 		UT_ASSERT(0);
 		return false;
@@ -272,7 +272,7 @@ bool ev_Win32Keyboard::onIMEChar(AV_View * pView,
 	// 2nd byte of MBCS is in high byte of word
 	if (!m_bIsUnicodeInput && (wParam & 0xff00))
 		b = ((BYTE)(wParam >> 8)) | ((BYTE)wParam << 8);
-
+	
 	_emitChar(pView,hWnd,iMsg,wParam,lParam,b,0);
 	return true;
 }
@@ -280,7 +280,6 @@ bool ev_Win32Keyboard::onIMEChar(AV_View * pView,
 void ev_Win32Keyboard::_emitChar(AV_View * pView,
 								 HWND /*hWnd*/, UINT iMsg, WPARAM nVirtKey, LPARAM /*keyData*/,
 								 UT_uint32 b, EV_EditModifierState ems)
-
 {
 	// do the dirty work of pumping this character thru the state machine.
 
@@ -301,7 +300,7 @@ void ev_Win32Keyboard::_emitChar(AV_View * pView,
 			len_in = 2;
 		else
 			len_in = 1;
-
+		
 		len_out = sizeof(charData);
 
 		if ((ret = UT_iconv( m_iconv, &In, &len_in, &Out, &len_out )) == -1)
@@ -311,7 +310,7 @@ void ev_Win32Keyboard::_emitChar(AV_View * pView,
 		if (Out == (char *)charData)
 		{
 			// m_iconv is waiting for a combination keystroke. Flush the buffer
-		    if ((ret = UT_iconv( m_iconv, NULL, &len_in, &Out, &len_out )) == -1)
+		    if ((ret = UT_iconv( m_iconv, nullptr, &len_in, &Out, &len_out )) == -1)
 			{
 			    UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
 			}
@@ -351,17 +350,17 @@ void ev_Win32Keyboard::_emitChar(AV_View * pView,
 	}
 
 	return;
-}
+}											
 
-/*
+/*	
 
 	Processes WM_CHAR messages
-
+	
 */
 bool ev_Win32Keyboard::onChar(AV_View * pView,
 								 HWND hWnd, UINT iMsg, WPARAM nVirtKey, LPARAM keyData)
 {
-	/*
+	/* 
 		If the key is NOT processed as an Abiword command
 		we follow their path and need to emit the char
 	*/
@@ -374,15 +373,15 @@ bool ev_Win32Keyboard::onChar(AV_View * pView,
 		// reset the command flag; see bug 8928
 		m_bWasAnAbiCommand = false;
 		return true;
-	}
-
+	} 
+	
 	// Process the key
 	_emitChar(pView,hWnd,iMsg,nVirtKey,keyData,nVirtKey,0);
 	return true;
 
 }
 
-/*
+/*	
 
 	Processes WM_UNICHAR messages
 	The nVirtKey already contains utf-32 char, so we do not need to do any iconv translation
@@ -392,8 +391,8 @@ bool ev_Win32Keyboard::onUniChar(AV_View * pView,
 {
 	// as WM_UNICHAR is not proceeded by WM_KEYDOWN message, we need to reset this flag here.
 	m_bWasAnAbiCommand = false;
-
-	EV_EditModifierState ems = _getModifierState();
+	
+	EV_EditModifierState ems = _getModifierState(); 		
 
 	EV_EditMethod * pEM;
 	EV_EditEventMapperResult result = m_pEEM->Keystroke(EV_EKP_PRESS|ems|nVirtKey,&pEM);
@@ -438,7 +437,7 @@ EV_EditBits ev_Win32Keyboard::_getModifierState(void)
 	if (GetKeyState(VK_CONTROL) & 0x8000)
 		eb |= EV_EMS_CONTROL;
 	if (GetKeyState(VK_MENU) & 0x8000)
-		eb |= EV_EMS_ALT;
+		eb |= EV_EMS_ALT;	
 
 	return eb;
 }
@@ -607,7 +606,7 @@ static EV_EditBits s_mapVirtualKeyCodeToNVK(WPARAM nVirtKey)
 	// map the given virtual key into a "named virtual key".
 	// these are referenced by NVK_ symbol so that the cross
 	// platform code can properly refer to them.
-
+	
 	UT_ASSERT(nVirtKey <= G_N_ELEMENTS(s_Table_NVK));
 
 	return s_Table_NVK[nVirtKey];

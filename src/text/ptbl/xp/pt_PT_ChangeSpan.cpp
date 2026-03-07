@@ -1,6 +1,7 @@
 /* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
+ * Copyright (C) 2021 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -58,7 +59,7 @@ bool pt_PieceTable::changeSpanFmt(PTChangeFmt ptc,
 	if(m_pDocument->isMarkRevisions() && dpos1 != dpos2)
 	{
 		const gchar name[] = "revision";
-		const gchar * pRevision = NULL;
+		const gchar * pRevision = nullptr;
 
 		// we cannot retrieve the start and end fragments here and
 		// then work between them in a loop using getNext() because
@@ -82,7 +83,7 @@ bool pt_PieceTable::changeSpanFmt(PTChangeFmt ptc,
 			
 			// get attributes for this fragement
 			const PP_AttrProp * pAP;
-			pRevision = NULL;
+			pRevision = nullptr;
 			
 			if(_getSpanAttrPropHelper(pf1, &pAP))
 			{
@@ -437,26 +438,16 @@ bool pt_PieceTable::_realChangeSpanFmt(PTChangeFmt ptc,
 //
 		const std::string & szStyle = PP_getAttribute(PT_STYLE_ATTRIBUTE_NAME,
 													  attributes);
-		PD_Style * pStyle = NULL;
+		PD_Style * pStyle = nullptr;
 		UT_return_val_if_fail (!szStyle.empty(),false);
 		getDocument()->getStyle(szStyle.c_str(),&pStyle);
 		UT_return_val_if_fail (pStyle,false);
-		UT_Vector vProps;
+		PP_PropertyVector vProps;
 //
 // Get the vector of properties
 //
-		pStyle->getAllProperties(&vProps,0);
-		PP_PropertyVector sProps;
-//
-// Finally make the PropertyVector
-//
-		UT_uint32 countp = vProps.getItemCount();
-		UT_uint32 i;
-		for(i=0; i<countp; i++)
-		{
-			sProps.push_back((const gchar *)vProps.getNthItem(i));
-		}
-		lProps = sProps;
+		pStyle->getAllProperties(vProps, 0);
+		lProps = vProps;
 	}
 	if (dpos1 == dpos2) 		// if length of change is zero, then we have a toggle format.
 	{
@@ -464,7 +455,7 @@ bool pt_PieceTable::_realChangeSpanFmt(PTChangeFmt ptc,
 		bool bRes = _insertFmtMarkFragWithNotify(ptc,dpos1,attributes,lProps);
 		UT_uint32 endUndoPos = m_history.getUndoPos();
 		// Won't be a persistant change if it's just a toggle
-		PX_ChangeRecord *pcr=0;
+		PX_ChangeRecord *pcr = nullptr;
 		m_history.getUndo(&pcr,true);
 		if (pcr && (startUndoPos != endUndoPos) )
 		{
@@ -519,7 +510,7 @@ bool pt_PieceTable::_realChangeSpanFmt(PTChangeFmt ptc,
 		beginMultiStepGlob();
     // UT_DEBUGMSG(("ODTCT: realChangeSpanFmt() bSimple:%d\n", bSimple ));
 
-	pf_Frag_Strux * pfsContainer = NULL;
+	pf_Frag_Strux * pfsContainer = nullptr;
 	pf_Frag * pfNewEnd;
 	UT_uint32 fragOffsetNewEnd;
 

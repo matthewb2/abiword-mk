@@ -23,7 +23,7 @@
 #define _ODI_XMLRECORDER_H_
 
 // AbiWord includes
-#include <ut_vector.h>
+#include "ut_vector.h"
 
 
 /**
@@ -68,7 +68,7 @@ public:
         {
             delete []m_pName;
             UT_uint32 i=0;
-            while (m_ppAtts[i]!=0) {
+            while (m_ppAtts[i] != nullptr) {
                 delete [](m_ppAtts[i]);
                 i++;
             }

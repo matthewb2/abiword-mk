@@ -21,23 +21,14 @@
  * 02110-1301 USA.
  */
 
-#ifndef UT_HASH_H
-#define UT_HASH_H
+#pragma once
 
 #include <string.h>
 
-/* pre-emptive dismissal; ut_types.h is needed by just about everything,
- * so even if it's commented out in-file that's still a lot of work for
- * the preprocessor to do...
- */
-#ifndef UT_TYPES_H
 #include "ut_types.h"
-#endif
-
-#ifndef UTVECTOR_H
 #include "ut_vector.h"
-#endif
 
+#include "ut_null.h"
 #include "ut_debugmsg.h"
 #include "ut_string_class.h"
 
@@ -309,7 +300,7 @@ template <class T> class hash_slot
 {
 public:
 	hash_slot()
-		: m_value(0) { }
+		: m_value(UT_null<T>::value) { }
 
 	void make_deleted()
 		{
@@ -318,7 +309,7 @@ public:
 			m_key.die();
 		}
 	void make_empty()
-		{ m_value = 0; }
+		{ m_value = UT_null<T>::value; }
 
 	const T value() const
 		{ return m_value; }
@@ -337,7 +328,7 @@ public:
 		}
 
 	bool empty() const
-		{ return (m_value == 0); }
+		{ return (m_value == UT_null<T>::value); }
 
 	bool deleted() const
 		{
@@ -380,7 +371,7 @@ UT_GenericStringMap<T>::UT_GenericStringMap(size_t expected_cardinality)
 	m_nSlots(_Recommended_hash_size(expected_cardinality)),
 	reorg_threshold(compute_reorg_threshold(m_nSlots)),
 	flags(0),
-	m_list(0)
+	m_list(nullptr)
 {
 	m_pMapping = new hash_slot<T>[m_nSlots];
 }
@@ -402,8 +393,8 @@ const gchar ** UT_GenericStringMap<T>::list()
 	if (!m_list)
 	{
 		m_list = reinterpret_cast<gchar **>(g_try_malloc (2 * (n_keys + 1) * sizeof (gchar *)));
-		if (m_list == 0)
-			return 0;
+		if (m_list == nullptr)
+			return nullptr;
 
 		UT_uint32 index = 0;
 
@@ -421,8 +412,8 @@ const gchar ** UT_GenericStringMap<T>::list()
 			m_list[index++] = static_cast<gchar *>(const_cast<char *>(key));
 			m_list[index++] = static_cast<gchar *>(const_cast<char *>(value));
 		}
-		m_list[index++] = NULL;
-		m_list[index  ] = NULL;
+		m_list[index++] = nullptr;
+		m_list[index  ] = nullptr;
 	}
 	return const_cast<const gchar **>(m_list);
 }
@@ -434,13 +425,13 @@ const gchar ** UT_GenericStringMap<T>::list()
 template <class T>
 T UT_GenericStringMap<T>::pick(const char* k) const
 {
-	hash_slot<T>*		sl = 0;
+	hash_slot<T>*		sl = nullptr;
 	bool			key_found = false;
 	size_t			slot;
 	size_t			hashval;
 
-	sl = find_slot(k, SM_LOOKUP, slot, key_found, hashval, 0, 0, 0, 0);
-	return key_found ? sl->value() : 0;
+	sl = find_slot(k, SM_LOOKUP, slot, key_found, hashval, nullptr, nullptr, nullptr, 0);
+	return key_found ? sl->value() : nullptr;
 }
 
 template <class T>
@@ -472,7 +463,7 @@ bool UT_GenericStringMap<T>::contains(const UT_String& k, T v) const
 
 	// DOM: TODO: make this call work
 	/*sl =*/ find_slot (k, SM_LOOKUP, slot, key_found,
-			hashval, v, &v_found, 0, 0);
+			hashval, v, &v_found, nullptr, 0);
 	return v_found;
 }
 
@@ -497,7 +488,7 @@ bool UT_GenericStringMap<T>::insert(const UT_String& key, T value)
 	size_t		hashval = 0;
 
 	hash_slot<T>* sl = find_slot(key, SM_INSERT, slot, key_found,
-				  hashval, 0, 0, 0, 0);
+				  hashval, nullptr, nullptr, nullptr, 0);
 
 	if(key_found)
 		return false;
@@ -541,7 +532,7 @@ void UT_GenericStringMap<T>::set(const UT_String& key, T value)
 	size_t		hashval = 0;
 
 	hash_slot<T>* sl = find_slot(key, SM_LOOKUP, slot, key_found,
-							  hashval, 0, 0, 0, 0);
+							  hashval, nullptr, nullptr, nullptr, 0);
 
 	if (!sl || !key_found) // TODO: should we insert or just return?
 	{
@@ -564,7 +555,7 @@ UT_GenericVector<T>* UT_GenericStringMap<T>::enumerate (bool strip_null_values) 
 
 	UT_Cursor cursor(this);
 
-	T val = NULL;
+	T val = nullptr;
 
 	for (val = cursor.first(); cursor.is_valid(); val = cursor.next ())
 	{
@@ -590,7 +581,7 @@ UT_GenericVector<const UT_String*>* UT_GenericStringMap<T>::keys (bool strip_nul
 
 	UT_Cursor cursor(this);
 
-	T val = NULL;
+	T val = nullptr;
 
 	for (val = cursor.first(); cursor.is_valid(); val = cursor.next ())
 	{
@@ -684,9 +675,9 @@ void UT_GenericStringMap<T>::assign_slots(hash_slot<T>* p, size_t old_num_slot)
 									  target_slot,
 									  kf,
 									  hv,
-									  0,
-									  0,
-									  NULL,
+									  nullptr,
+									  nullptr,
+									  nullptr,
 									  p->m_key.hashval());
 			sl->assign(p);
 		}
@@ -727,7 +718,7 @@ UT_GenericStringMap<T>::find_slot(const char *k,
 {
 	if ( m_nSlots == 0 )
 	  {
-	    key_found = false ; return NULL ;
+	    key_found = false ; return nullptr ;
 	  }
 
 	hashval = (hashval_in ? hashval_in : key_wrapper::compute_hash(k));
@@ -776,7 +767,7 @@ UT_GenericStringMap<T>::find_slot(const char *k,
 
 	int delta = (nSlot ? (m_nSlots - nSlot) : 1);
 	hash_slot<T>* tmp_sl = sl;
-	sl = 0;
+	sl = nullptr;
 	size_t s = 0;
 	key_found = false;
 
@@ -887,7 +878,7 @@ UT_GenericStringMap<T>::_first(UT_Cursor& c) const
 	}
 
 	c._set_index(-1);
-	return 0;
+	return UT_null<T>::value;
 }
 
 template <class T>
@@ -937,7 +928,7 @@ UT_GenericStringMap<T>::_next(UT_Cursor& c) const
 	}
 
 	c._set_index(-1);
-	return 0;
+	return UT_null<T>::value;
 }
 
 
@@ -960,8 +951,5 @@ UT_GenericStringMap<T>::_prev(UT_Cursor& c) const
 	}
 
 	c._set_index(-1);
-	return 0;
+	return UT_null<T>::value;
 }
-
-
-#endif /* UT_HASH_H */

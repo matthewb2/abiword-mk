@@ -26,8 +26,9 @@
 #include "ut_debugmsg.h"
 #include "ut_std_string.h"
 
+#include "xap_GtkUtils.h"
+
 #include <boost/function.hpp>
-#include <boost/bind.hpp>
 
 #include <sstream>
 
@@ -61,7 +62,7 @@ tostr( GtkEntry* e )
     if(!e)
         return "";
     std::string ret;
-    ret = gtk_entry_get_text (GTK_ENTRY (e));
+    ret = XAP_gtk_entry_get_text (GTK_ENTRY (e));
     return ret;
 }
 
@@ -71,7 +72,7 @@ getSelectedText( GtkTreeView* tv, int colnum )
 	std::string ret;
 
 	GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (tv));
-	UT_return_val_if_fail (model != NULL, ret);
+	UT_return_val_if_fail (model != nullptr, ret);
 
 	GtkTreeSelection *selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (tv));
 	GtkTreeIter iter;
@@ -79,7 +80,7 @@ getSelectedText( GtkTreeView* tv, int colnum )
 	if (!haveSelected)
 		return ret;
 
-	gchar *label = NULL;
+	gchar *label = nullptr;
 	gtk_tree_model_get (model, &iter, colnum, &label, -1);
     ret = label;
     g_free(label);
@@ -90,7 +91,7 @@ UT_uint32
 getSelectedUInt( GtkTreeView* tv, int colnum )
 {
 	GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (tv));
-	UT_return_val_if_fail (model != NULL, 0);
+	UT_return_val_if_fail (model != nullptr, 0);
 
 	GtkTreeSelection *selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (tv));
 	GtkTreeIter iter;
@@ -106,7 +107,7 @@ getSelectedUInt( GtkTreeView* tv, int colnum )
 void selectNext( GtkTreeView* tv )
 {
 	GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (tv));
-	UT_return_if_fail (model != NULL);
+	UT_return_if_fail (model != nullptr);
 
 	GtkTreeSelection *selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (tv));
 	GtkTreeIter iter;
@@ -151,7 +152,7 @@ void selectPrev( GtkTreeView* tv )
 {
     UT_DEBUGMSG(("selectPrev() tv:%p\n", tv ));
 	GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (tv));
-	UT_return_if_fail (model != NULL);
+	UT_return_if_fail (model != nullptr);
 
 	GtkTreeSelection *selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (tv));
 	GtkTreeIter iter;
@@ -191,7 +192,7 @@ std::string tostr( GtkComboBox* combo )
 {
     GtkEntry *entry = GTK_ENTRY(gtk_bin_get_child(GTK_BIN(combo)));
 	UT_ASSERT(entry);
-	const gchar *s = gtk_entry_get_text(entry);
+	const gchar *s = XAP_gtk_entry_get_text(entry);
 	if(s && *s)
 	{
         return s;
@@ -202,27 +203,27 @@ std::string tostr( GtkComboBox* combo )
 void setEntry( GtkWidget* w, const std::string& v )
 {
     if( v.empty() )
-        gtk_entry_set_text(GTK_ENTRY(w), "" );
+        XAP_gtk_entry_set_text(GTK_ENTRY(w), "" );
     else 
-        gtk_entry_set_text(GTK_ENTRY(w), v.c_str());
+        XAP_gtk_entry_set_text(GTK_ENTRY(w), v.c_str());
 }
 
 void setEntry( GtkEntry* w, const std::string& v )
 {
     if( v.empty() )
-        gtk_entry_set_text(GTK_ENTRY(w), "" );
+        XAP_gtk_entry_set_text(GTK_ENTRY(w), "" );
     else 
-        gtk_entry_set_text(GTK_ENTRY(w), v.c_str());
+        XAP_gtk_entry_set_text(GTK_ENTRY(w), v.c_str());
 }
 void setEntry( GtkEntry* w, time_t v )
 {
     UT_DEBUGMSG(("setEntry(time) v:%ld str:%s\n", v, toTimeString(v).c_str()));
-    gtk_entry_set_text(GTK_ENTRY(w), toTimeString(v).c_str());
+    XAP_gtk_entry_set_text(GTK_ENTRY(w), toTimeString(v).c_str());
 }
 void setEntry( GtkEntry* w, double v )
 {
     UT_DEBUGMSG(("setEntry(double) v:%f str:%s\n", v, tostr(v).c_str()));
-    gtk_entry_set_text(GTK_ENTRY(w), tostr(v).c_str());
+    XAP_gtk_entry_set_text(GTK_ENTRY(w), tostr(v).c_str());
 }
 
 
@@ -279,8 +280,8 @@ void selectIter( GtkTreeView* tv, GtkTreeIter* iter )
 void scrollToIter( GtkTreeView* tv, GtkTreeIter* iter, int colnum, gboolean start_editing )
 {
     GtkTreeModel*      model = gtk_tree_view_get_model( tv );
-    GtkTreePath*       path = 0;
-    GtkTreeViewColumn* focus_column = 0;
+    GtkTreePath* path = nullptr;
+    GtkTreeViewColumn* focus_column = nullptr;
     if( colnum >= 0 )
     {
         focus_column = gtk_tree_view_get_column( tv, colnum );
@@ -376,9 +377,9 @@ struct FileTypeArray
     
 public:
     FileTypeArray( int len )
-        : szDescList(0)
-        , szSuffixList(0)
-        , nTypeList(0)
+        : szDescList(nullptr)
+        , szSuffixList(nullptr)
+        , nTypeList(nullptr)
     {
         szDescList   = static_cast<const char **>(UT_calloc(len + 1, sizeof(char *)));
         szSuffixList = static_cast<const char **>(UT_calloc(len + 1, sizeof(char *)));
@@ -447,10 +448,10 @@ UT_runDialog_AskForPathname::run( XAP_Frame * pFrame )
     UT_return_val_if_fail (pDialog, false);
 
     pDialog->setAppendDefaultSuffixFunctor(
-        boost::bind(
-            &UT_runDialog_AskForPathname::appendDefaultSuffixFunctor,
-            this, _1, _2 ));
-    
+        [this] (std::string filename, UT_sint32 n) {
+            return this->UT_runDialog_AskForPathname::appendDefaultSuffixFunctor(filename, n);
+        });
+
     if (!m_suggestedName.empty())
     {
         // if caller wants to suggest a name, use it and seed the

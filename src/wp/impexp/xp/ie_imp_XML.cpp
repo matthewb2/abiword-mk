@@ -81,7 +81,7 @@ extern "C" { // for MRC compiler (Mac)
 int IE_Imp_XML::_mapNameToToken (const char * name,
 								 struct xmlToIdMapping * idlist, int len)
 {
-	xmlToIdMapping * id = NULL;
+	xmlToIdMapping * id = nullptr;
 
 	token_map_t::iterator i = m_tokens.find(name);
 
@@ -114,7 +114,7 @@ UT_Error IE_Imp_XML::_loadFile(GsfInput * input)
 
 	// hack!!!
 	size_t num_bytes = gsf_input_size(input);
-	char * bytes = (char *)gsf_input_read(input, num_bytes, NULL);
+	char * bytes = (char *)gsf_input_read(input, num_bytes, nullptr);
 
 	UT_Error err = parser->parse (bytes, num_bytes);
 	
@@ -125,7 +125,7 @@ UT_Error IE_Imp_XML::_loadFile(GsfInput * input)
 		{
 			UT_DEBUGMSG(("Problem reading document\n"));
 			if(m_error != UT_IE_SKIPINVALID)
-				m_szFileName = 0;
+				m_szFileName = nullptr;
 		}
 	
 	return m_error;
@@ -133,7 +133,7 @@ UT_Error IE_Imp_XML::_loadFile(GsfInput * input)
 
 UT_Error IE_Imp_XML::importFile(const char * data, UT_uint32 length)
 {
-	m_szFileName = 0;
+	m_szFileName = nullptr;
 
 	UT_XML default_xml;
 	UT_XML * parser = &default_xml;
@@ -151,7 +151,7 @@ UT_Error IE_Imp_XML::importFile(const char * data, UT_uint32 length)
 	{
 		UT_DEBUGMSG(("Problem reading document\n"));
 		if(m_error != UT_IE_SKIPINVALID)
-			m_szFileName = 0;
+			m_szFileName = nullptr;
 	}
 
 	return m_error;
@@ -199,7 +199,7 @@ IE_Imp_XML::~IE_Imp_XML()
 }
 
 IE_Imp_XML::IE_Imp_XML(PD_Document * pDocument, bool whiteSignificant)
-	: IE_Imp(pDocument), m_pReader(NULL), m_pParser(NULL), m_error(UT_OK),
+	: IE_Imp(pDocument), m_pReader(nullptr), m_pParser(nullptr), m_error(UT_OK),
           m_parseState(_PS_Init),
 	  m_lenCharDataSeen(0), m_lenCharDataExpected(0),
 	  m_iOperationCount(0), m_bSeenCR(false),
@@ -430,15 +430,13 @@ UT_uint32 IE_Imp_XML::_getInlineDepth(void) const
 	return m_nstackFmtStartIndex.getDepth();
 }
 
-bool IE_Imp_XML::_pushInlineFmt(const PP_PropertyVector & atts)
+void IE_Imp_XML::_pushInlineFmt(const PP_PropertyVector & atts)
 {
 	UT_uint32 start = m_vecInlineFmt.size() + 1;
 
 	m_vecInlineFmt.insert(m_vecInlineFmt.end(),
 						  atts.begin(), atts.end());
-	if (!m_nstackFmtStartIndex.push(start))
-		return false;
-	return true;
+	m_nstackFmtStartIndex.push(start);
 }
 
 void IE_Imp_XML::_popInlineFmt(void)

@@ -17,19 +17,16 @@
  * 02110-1301 USA.
  */
 
-#ifndef UT_DIALOGHELPER_H
-#define UT_DIALOGHELPER_H
+#pragma once
 
-#include "ut_compiler.h"
-ABI_W_NO_CONST_QUAL
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
-ABI_W_POP
 
 #include <functional>
 
 #include "ut_types.h"
 #include "xap_Strings.h"
+#include "xap_GtkUtils.h"
 
 class XAP_Frame;
 class XAP_FrameHelper;
@@ -38,7 +35,7 @@ class XAP_Dialog;
 
 // This macro sets up stack pointers to be used with the ConvertToUnixString
 // macro.
-#define SETUP_UNIX_STRING  	gchar * newstr = NULL;
+#define SETUP_UNIX_STRING  	gchar * newstr = nullptr;
 
 // This macro is for use in Unix dialogs where the strings are to
 // be stripped of ampersands (Windows accelerator characters).
@@ -61,13 +58,14 @@ class XAP_Dialog;
 
 /** load a GtkBuilder for a dialog using the standard path.
  * @param name the filename of the dialog (no path)
- * @return the GtkBuilder or NULL. The returned object my be freed as usual.
+ * @return the GtkBuilder or nullptr. The returned object my be freed as usual.
  */
 GtkBuilder * newDialogBuilder(const char * name);
+GtkBuilder* newDialogBuilderFromResource(const char* name);
 void connectFocus(GtkWidget *widget,const XAP_Frame *frame);
 void connectFocusModeless(GtkWidget *widget,const XAP_App *pApp);
 void connectFocusModelessOther(GtkWidget *widget, const XAP_App *pApp,
-	std::pointer_to_unary_function<int, gboolean> *other_function);
+                               std::function<gboolean(int)> *other_function);
 bool isTransientWindow(GtkWindow *window,GtkWindow *parent);
 
 // This is a very thin message box; only use it for startup errors
@@ -105,11 +103,5 @@ void localizeButtonMarkup(GtkWidget * widget, const XAP_StringSet * pSS, XAP_Str
 void localizeMenuItem(GtkWidget * widget, const XAP_StringSet * pSS, XAP_String_Id id);
 void setLabelMarkup(GtkWidget * widget, const gchar * str);
 
-
-// Returns the root window of the X display, useful for doing
-// pointer or coordinate measurement on an absolute scale.
-GdkWindow * getRootWindow(GtkWidget * widget);
-
 void abiSetActivateOnWidgetToActivateButton( GtkWidget* source, GtkWidget* button );
 
-#endif /* UT_DIALOGHELPER_H */

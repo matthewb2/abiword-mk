@@ -1,6 +1,6 @@
 /* AbiSource Application Framework
  * Copyright (C) 1998-2000 AbiSource, Inc.
- * Copyright (C) 2009 Hubert Figuiere
+ * Copyright (C) 2009-2021 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,7 +20,7 @@
 
 #include "ut_debugmsg.h"
 #include "ap_CocoaPreview_Annotation.h"
-#include "gr_CocoaCairoGraphics.h"
+#include "gr_CocoaGraphics.h"
 #include "xap_Frame.h"
 #include "xap_CocoaFrameImpl.h"
 #include "xap_CocoaFrame.h"
@@ -28,7 +28,7 @@
 
 AP_CocoaPreview_Annotation::AP_CocoaPreview_Annotation(XAP_DialogFactory * pDlgFactory,XAP_Dialog_Id dlgid) 
   : AP_Preview_Annotation(pDlgFactory,dlgid),
-  m_gc(NULL),
+  m_gc(nullptr),
   m_pPreviewWindow(nil),
   m_pDrawingArea(nil)
 {
@@ -37,13 +37,13 @@ AP_CocoaPreview_Annotation::AP_CocoaPreview_Annotation(XAP_DialogFactory * pDlgF
 
 AP_CocoaPreview_Annotation::~AP_CocoaPreview_Annotation(void)
 {
-  UT_DEBUGMSG(("Preview Annotation deleted %p \n",this));
+  UT_DEBUGMSG(("Preview Annotation deleted %p \n", (void*)this));
   destroy();
 }
 
 void AP_CocoaPreview_Annotation::runModeless(XAP_Frame * pFrame)
 {
-	UT_DEBUGMSG(("Preview Annotation runModeless %p \n",this));
+	UT_DEBUGMSG(("Preview Annotation runModeless %p \n", (void*)this));
 	setActiveFrame(pFrame);
 	if(m_pPreviewWindow)
 	{
@@ -61,8 +61,8 @@ void AP_CocoaPreview_Annotation::runModeless(XAP_Frame * pFrame)
 	DELETEP(m_gc);
 	
 	XAP_App *pApp = XAP_App::getApp();
-	GR_CocoaCairoAllocInfo ai(m_pDrawingArea);
-	m_gc = (GR_CairoGraphics*) pApp->newGraphics(ai);
+	GR_CocoaAllocInfo ai(m_pDrawingArea);
+	m_gc = (GR_Graphics*) pApp->newGraphics(ai);
 	
 	NSSize size = [m_pDrawingArea frame].size;
 	_createAnnotationPreviewFromGC(m_gc, size.width, size.height);
@@ -95,10 +95,10 @@ void  AP_CocoaPreview_Annotation::_constructWindow(void)
 	NSPoint pt = [NSEvent mouseLocation];
 	NSRect rect = NSMakeRect(pt.x, pt.y, m_width, m_height);
 	
-	m_pPreviewWindow = [[NSWindow alloc] initWithContentRect:rect styleMask:NSBorderlessWindowMask
-	                    backing:NSBackingStoreRetained defer:NO];
+	m_pPreviewWindow = [[NSWindow alloc] initWithContentRect:rect styleMask:NSWindowStyleMaskBorderless
+	                    backing:NSBackingStoreBuffered defer:NO];
 	
-	m_pDrawingArea = [[XAP_CocoaNSView alloc] initWith:NULL andFrame:[m_pPreviewWindow contentRectForFrameRect:rect]];
+	m_pDrawingArea = [[XAP_CocoaNSView alloc] initWith:nullptr andFrame:[m_pPreviewWindow contentRectForFrameRect:rect] andName:@"Annotation preview"];
 	
 	[m_pPreviewWindow setContentView:m_pDrawingArea];
 }

@@ -24,10 +24,11 @@
 #ifndef _OXML_IMAGE_H_
 #define _OXML_IMAGE_H_
 
+#include <memory>
 #include <string>
-#include <boost/shared_ptr.hpp>
 
 #include "ut_types.h"
+#include "fg_Graphic.h"
 #include "pd_Document.h"
 
 #include "OXML_Types.h"
@@ -35,7 +36,6 @@
 
 
 class IE_Exp_OpenXML;
-class FG_Graphic;
 
 class OXML_Image
     : public OXML_ObjectWithAttrProp
@@ -47,9 +47,8 @@ public:
 
 	void setId(const std::string & id);
 	void setMimeType(const std::string & mimeType);
-    // DOES NOT take ownership of the buffer
-	void setData(const UT_ByteBuf* data);
-	void setGraphic(const FG_Graphic * fg);
+	void setData(const UT_ConstByteBufPtr & data);
+	void setGraphic(FG_ConstGraphicPtr && fg);
 
 	const std::string & getId() const
         {
@@ -62,11 +61,11 @@ public:
 private:
 	std::string  m_id;
 	std::string m_mimeType;
-	const UT_ByteBuf* m_data;
-	const FG_Graphic * m_graphic;
+	UT_ConstByteBufPtr m_data;
+	FG_ConstGraphicPtr m_graphic;
 };
 
-typedef boost::shared_ptr<OXML_Image> OXML_SharedImage;
+typedef std::shared_ptr<OXML_Image> OXML_SharedImage;
 
 #endif //_OXML_IMAGE_H_
 

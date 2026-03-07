@@ -116,6 +116,10 @@ class ABI_EXPORT ie_Table
 	UT_sint32        getPrevNumRightMostVMerged(void) const;
 	UT_sint32        getCurRow(void) const;
 	void             incCurRow(void);
+
+	const std::stack<ie_PartTable*>& getLastTable() const {
+		return m_sLastTable;
+	}
  private:
 	void             _clearLastTables();
 	PD_Document *    m_pDoc;
@@ -310,7 +314,7 @@ public:
 	CellHelper *		m_next;
 	TableZone           m_tzone;
 	std::string           m_sCellProps;
-	bool	isVirtual () const { return (m_next != 0); }
+	bool isVirtual() const { return (m_next != nullptr); }
 };
 
 class ABI_EXPORT IE_Imp_TableHelper
@@ -324,7 +328,7 @@ public:
 	bool	           tableEnd ();
 	bool	           theadStart (const char * style);
 	bool	           tfootStart (const char * style);
-	bool	           tbodyStart (const char * style = 0);
+	bool tbodyStart(const char * _style = nullptr);
 
 	bool	           trStart (const char * style);
 	bool	           tdStart (UT_sint32 rowspan, UT_sint32 colspan, const char * style, pf_Frag_Strux * pfsThis);
@@ -408,7 +412,7 @@ public:
 
 	bool					theadStart (const char * style) const;
 	bool					tfootStart (const char * style) const;
-	bool					tbodyStart (const char * style = 0) const;
+	bool tbodyStart(const char * _style = nullptr) const;
 	bool					trStart (const char * style) const;
 	bool					tdStart (UT_sint32 rowspan, UT_sint32 colspan, const char * style) const;
 

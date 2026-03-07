@@ -17,9 +17,7 @@
  * 02110-1301 USA.
  */
 
-
-#ifndef PF_FRAGMENTS_H
-#define PF_FRAGMENTS_H
+#pragma once
 
 /*!
  pf_Fragments is a container for all of the pf_Frag
@@ -78,39 +76,39 @@ public:
 #endif
 	private:
 	  // prevent copy
-	  Node(const Node&);
-	  Node& operator=(const Node&);
+	  Node(const Node&) = delete;
+	  Node& operator=(const Node&) = delete;
 	};
 
 
 	class Iterator
 	{
 	public:
-		Iterator() : m_pOwner(NULL), m_pNode(NULL) {}
+		Iterator() : m_pOwner(nullptr), m_pNode(nullptr) {}
 
 		Iterator& operator++()
 		{
-			m_pNode = const_cast<Node*>(m_pOwner->_next(m_pNode));
+			m_pNode = m_pOwner->_next(m_pNode);
 			return *this;
 		}
 
 		Iterator operator++(int)
 		{
 			Iterator tmp(*this);
-			m_pNode = const_cast<Node*>(m_pOwner->_next(m_pNode));
+			m_pNode = m_pOwner->_next(m_pNode);
 			return tmp;
 		}
 
 		Iterator& operator--()
 		{
-			m_pNode = const_cast<Node*>(m_pOwner->_prev(m_pNode));
+			m_pNode = m_pOwner->_prev(m_pNode);
 			return *this;
 		}
 
 		Iterator operator--(int)
 		{
 			Iterator tmp(*this);
-			m_pNode = const_cast<Node*>(m_pOwner->_prev(m_pNode));
+			m_pNode = m_pOwner->_prev(m_pNode);
 			return tmp;
 		}
 
@@ -124,10 +122,10 @@ public:
 		pf_Frag* value();
 
 		bool is_valid() const
-		{ return m_pNode != 0; }
+		{ return m_pNode != nullptr; }
 
 	private:
-		Iterator(const pf_Fragments* owner, Node* node = 0) : m_pOwner(owner), m_pNode(node) {}
+		Iterator(const pf_Fragments* owner, Node* node = nullptr) : m_pOwner(owner), m_pNode(node) {}
 		const Node* getNode() const { return m_pNode; }
 		Node* getNode() { return m_pNode; }
 
@@ -177,15 +175,10 @@ private:
 	/** same as above BUT keep the fragments (as we don't own them */
 	void delete_tree(Node* node);
 
-	const Node* _next(const Node* pn) const;
-	const Node* _prev(const Node* pn) const;
-	const Node* _first() const;
-	const Node* _last() const;
-
-	Node* _next(Node* pn);
-	Node* _prev(Node* pn);
-	Node* _first();
-	Node* _last();
+	Node* _next(Node* pn) const;
+	Node* _prev(Node* pn) const;
+	Node* _first() const;
+	Node* _last() const;
 
 	Node* m_pLeaf;
 	Node* m_pRoot;
@@ -195,5 +188,3 @@ private:
 	friend class Iterator;
 
 };
-
-#endif /* PF_FRAGMENTS_H */

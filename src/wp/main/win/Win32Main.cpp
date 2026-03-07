@@ -1,19 +1,19 @@
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- *
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
 
@@ -44,7 +44,7 @@ int WINAPI wWinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		AttachConsole_t p_AttachConsole =
 			(AttachConsole_t) GetProcAddress (GetModuleHandleW(L"kernel32.dll"), "AttachConsole");
 
-		if (p_AttachConsole != NULL && p_AttachConsole (ATTACH_PARENT_PROCESS))
+		if (p_AttachConsole != nullptr && p_AttachConsole (ATTACH_PARENT_PROCESS))
 		{
 			_wfreopen (L"CONOUT$", L"w", stdout);
 			dup2 (fileno (stdout), 1);
@@ -56,7 +56,7 @@ int WINAPI wWinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #endif
 
 	// Dummy ANSI command line
-	return AP_Win32App::WinMain("Abiword", hInstance, hPrevInstance, "AbiwordPersonal.exe", iCmdShow);
+	return AP_Win32App::WinMain("AbiWord", hInstance, hPrevInstance, "abiword.exe", iCmdShow);
 }
 
 #if !defined (_MSC_VER) && !defined (UNICODE)
@@ -77,7 +77,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		AttachConsole_t p_AttachConsole =
 			(AttachConsole_t) GetProcAddress (GetModuleHandle ("kernel32.dll"), "AttachConsole");
 
-		if (p_AttachConsole != NULL && p_AttachConsole (ATTACH_PARENT_PROCESS))
+		if (p_AttachConsole != nullptr && p_AttachConsole (ATTACH_PARENT_PROCESS))
 		{
 			freopen ("CONOUT$", "w", stdout);
 			dup2 (fileno (stdout), 1);
@@ -88,7 +88,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	}
 #endif
 
-	return AP_Win32App::WinMain("Abiword", hInstance, hPrevInstance, szCmdLine, iCmdShow);
+	return AP_Win32App::WinMain("AbiWord", hInstance, hPrevInstance, szCmdLine, iCmdShow);
 }
 
 #endif

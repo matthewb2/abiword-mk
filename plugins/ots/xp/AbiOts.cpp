@@ -51,7 +51,6 @@
 #include <gtk/gtk.h>
 #include "xap_UnixApp.h"
 #include "xap_UnixDialogHelper.h"
-#include "xap_Gtk2Compat.h"
 #endif
 
 static const char* Ots_MenuLabel = "&Summarize";
@@ -61,17 +60,13 @@ static const char* Ots_MenuTooltip = "Summarize your document or selected text";
 static int getSummaryPercent(void)
 {
   // load the dialog from the UI file
-#if GTK_CHECK_VERSION(3,0,0)
-      GtkBuilder* builder = newDialogBuilder("ots.ui");
-#else
-      GtkBuilder* builder = newDialogBuilder("ots-2.ui");
-#endif
+  GtkBuilder* builder = newDialogBuilder("ots.ui");
   
   GtkWidget * window = GTK_WIDGET(gtk_builder_get_object(builder, "otsDlg"));
   GtkWidget * spin = GTK_WIDGET(gtk_builder_get_object(builder, "summarySpin"));
 
   abiRunModalDialog (GTK_DIALOG(window), XAP_App::getApp()->getLastFocussedFrame () , 
-		     NULL, GTK_RESPONSE_CLOSE, false);
+		     nullptr, GTK_RESPONSE_CLOSE, false);
 
   int value = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(spin));
   fprintf (stderr, "DOM: percentage is %d\n", value);
@@ -138,7 +133,7 @@ AbiOts_invoke(AV_View* /*v*/, EV_EditMethodCallData * /*d*/)
 
   if (ucs4_summary.size()) {
     XAP_Frame * newFrame = XAP_App::getApp()->newFrame();
-    newFrame->loadDocument((const char*)NULL, IEFT_Unknown);
+    newFrame->loadDocument((const char*)nullptr, IEFT_Unknown);
     newFrame->raise ();
     
     FV_View * newView = static_cast<FV_View*>(newFrame->getCurrentView());
@@ -164,8 +159,8 @@ Ots_removeFromMenus()
   int frameCount = pApp->getFrameCount();
   XAP_Menu_Factory * pFact = pApp->getMenuFactory();
 
-  pFact->removeMenuItem("Main",NULL,Ots_MenuLabel);
-  pFact->removeMenuItem("contextText",NULL,Ots_MenuLabel);
+  pFact->removeMenuItem("Main",nullptr,Ots_MenuLabel);
+  pFact->removeMenuItem("contextText",nullptr,Ots_MenuLabel);
   for(int i = 0;i < frameCount;++i)
     {
       XAP_Frame* pFrame = pApp->getFrame(i);
@@ -192,10 +187,10 @@ Ots_addToMenus()
   int frameCount = pApp->getFrameCount();
   XAP_Menu_Factory * pFact = pApp->getMenuFactory();
 
-  XAP_Menu_Id newID = pFact->addNewMenuAfter("contextText",NULL,"Bullets and &Numbering",EV_MLF_Normal);
-  pFact->addNewLabel(NULL,newID,Ots_MenuLabel, Ots_MenuTooltip);
+  XAP_Menu_Id newID = pFact->addNewMenuAfter("contextText",nullptr,"Bullets and &Numbering",EV_MLF_Normal);
+  pFact->addNewLabel(nullptr,newID,Ots_MenuLabel, Ots_MenuTooltip);
 
-  pFact->addNewMenuAfter("Main",NULL,"&Word Count",EV_MLF_Normal,newID);
+  pFact->addNewMenuAfter("Main",nullptr,"&Word Count",EV_MLF_Normal,newID);
   
   EV_Menu_Action* myAction = new EV_Menu_Action(newID,                     // id that the layout said we could use
 						0,                      // no, we don't have a sub menu.
@@ -207,8 +202,8 @@ Ots_addToMenus()
 						0,                      // no, we don't have a checkbox.
 						0,                      // not a radio button
 						"AbiOts_invoke",  // name of callback function to call.
-						NULL,                   // don't know/care what this is for
-						NULL                    // don't know/care what this is for
+						nullptr,                   // don't know/care what this is for
+						nullptr                    // don't know/care what this is for
 						);
   
   pActionSet->addAction(myAction);
@@ -246,11 +241,11 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-    mi->name = 0;
-    mi->desc = 0;
-    mi->version = 0;
-    mi->author = 0;
-    mi->usage = 0;
+    mi->name = nullptr;
+    mi->desc = nullptr;
+    mi->version = nullptr;
+    mi->author = nullptr;
+    mi->usage = nullptr;
 
     Ots_removeFromMenus() ;
 

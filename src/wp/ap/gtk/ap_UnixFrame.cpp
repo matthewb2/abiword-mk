@@ -23,10 +23,7 @@
 #include "config.h"
 #endif
 
-#include "ut_compiler.h"
-ABI_W_NO_CONST_QUAL
 #include <gtk/gtk.h>
-ABI_W_POP
 
 #include "ap_Features.h"
 
@@ -170,7 +167,7 @@ void AP_UnixFrame::setYScrollRange(void)
 AP_UnixFrame::AP_UnixFrame()
 : AP_Frame(new AP_UnixFrameImpl(this))
 {
-	m_pData = NULL;
+	m_pData = nullptr;
 	setFrameLocked(false);
 #ifdef LOGFILE
 	fprintf(getlogfile(),"New unix frame with app \n");
@@ -181,7 +178,7 @@ AP_UnixFrame::AP_UnixFrame()
 AP_UnixFrame::AP_UnixFrame(AP_UnixFrame * f)
 	: AP_Frame(static_cast<AP_Frame *>(f))
 {
-	m_pData = NULL;
+	m_pData = nullptr;
 #ifdef LOGFILE
 	fprintf(getlogfile(),"New unix frame with frame \n");
 #endif
@@ -205,7 +202,7 @@ XAP_Frame * AP_UnixFrame::cloneFrame()
 		XAP_App::getApp()->forgetFrame(pClone);
 		delete pClone;
 	}
-	return NULL;
+	return nullptr;
 }
 
 bool AP_UnixFrame::initialize(XAP_FrameMode frameMode)
@@ -372,7 +369,7 @@ void AP_UnixFrame::toggleTopRuler(bool bRulerOn)
 	UT_ASSERT(pFrameData);
 	AP_UnixFrameImpl * pFrameImpl = static_cast<AP_UnixFrameImpl *>(getFrameImpl());
 		
-	AP_UnixTopRuler * pUnixTopRuler = NULL;
+	AP_UnixTopRuler * pUnixTopRuler = nullptr;
 
 	UT_DEBUGMSG(("AP_UnixFrame::toggleTopRuler %d, %p\n", 
 		     bRulerOn, pFrameData->m_pTopRuler));
@@ -383,8 +380,11 @@ void AP_UnixFrame::toggleTopRuler(bool bRulerOn)
 		{
 			if(pFrameImpl->m_topRuler && GTK_IS_WIDGET(pFrameImpl->m_topRuler))
 			{
-				gtk_widget_destroy( GTK_WIDGET(pFrameImpl->m_topRuler) );
-			}			
+				gtk_container_remove(
+					GTK_CONTAINER(gtk_widget_get_parent(GTK_WIDGET(pFrameImpl->m_topRuler))),
+					GTK_WIDGET(pFrameImpl->m_topRuler));
+				pFrameImpl->m_topRuler = nullptr;
+			}
 			DELETEP(pFrameData->m_pTopRuler);
 		}
 		FV_View * pView = static_cast<FV_View *>(m_pView);
@@ -412,11 +412,14 @@ void AP_UnixFrame::toggleTopRuler(bool bRulerOn)
 		// delete the actual widgets
 		if(pFrameImpl->m_topRuler && GTK_IS_WIDGET(pFrameImpl->m_topRuler))
 		{
-			gtk_widget_destroy( GTK_WIDGET(pFrameImpl->m_topRuler) );
+			gtk_container_remove(
+				GTK_CONTAINER(gtk_widget_get_parent(GTK_WIDGET(pFrameImpl->m_topRuler))),
+				GTK_WIDGET(pFrameImpl->m_topRuler));
+			pFrameImpl->m_topRuler = nullptr;
 		}
 		DELETEP(pFrameData->m_pTopRuler);
-		pFrameImpl->m_topRuler = NULL;
-		static_cast<FV_View *>(m_pView)->setTopRuler(NULL);
+		pFrameImpl->m_topRuler = nullptr;
+		static_cast<FV_View *>(m_pView)->setTopRuler(nullptr);
 	}
 }
 
@@ -438,8 +441,11 @@ void AP_UnixFrame::toggleLeftRuler(bool bRulerOn)
 		{
 			if (pFrameImpl->m_leftRuler && GTK_IS_WIDGET(pFrameImpl->m_leftRuler))
 			{
-				gtk_widget_destroy(GTK_WIDGET(pFrameImpl->m_leftRuler) );
-			}		
+				gtk_container_remove(
+					GTK_CONTAINER(gtk_widget_get_parent(GTK_WIDGET(pFrameImpl->m_leftRuler))),
+					GTK_WIDGET(pFrameImpl->m_leftRuler));
+				pFrameImpl->m_leftRuler = nullptr;
+			}
 			DELETEP(pFrameData->m_pLeftRuler);
 		} 
 		FV_View * pView = static_cast<FV_View *>(m_pView);		
@@ -458,11 +464,14 @@ void AP_UnixFrame::toggleLeftRuler(bool bRulerOn)
 	{
 	    if (pFrameImpl->m_leftRuler && GTK_IS_WIDGET(pFrameImpl->m_leftRuler))
 		{
-			gtk_widget_destroy(GTK_WIDGET(pFrameImpl->m_leftRuler) );
+			gtk_container_remove(
+				GTK_CONTAINER(gtk_widget_get_parent(GTK_WIDGET(pFrameImpl->m_leftRuler))),
+				GTK_WIDGET(pFrameImpl->m_leftRuler));
+			pFrameImpl->m_leftRuler = nullptr;
 		}
 	    DELETEP(pFrameData->m_pLeftRuler);
-	    pFrameImpl->m_leftRuler = NULL;
-		static_cast<FV_View *>(m_pView)->setLeftRuler(NULL);
+	    pFrameImpl->m_leftRuler = nullptr;
+		static_cast<FV_View *>(m_pView)->setLeftRuler(nullptr);
 	}
 
 }
@@ -512,12 +521,11 @@ bool AP_UnixFrame::_createViewGraphics(GR_Graphics *& pG, UT_uint32 iZoom)
 	GR_UnixCairoAllocInfo ai(pImpl->m_dArea);
 	pG = (GR_CairoGraphics*) XAP_App::getApp()->newGraphics(ai);
 
-	GtkWidget *widget = GTK_WIDGET(static_cast<AP_UnixFrameImpl *>(getFrameImpl())->m_dArea);
 	GR_UnixCairoGraphics *pUnixGraphics = static_cast<GR_UnixCairoGraphics *>(pG);
 	GtkWidget * w = gtk_entry_new();
+	g_object_ref_sink(w);
 	pUnixGraphics->init3dColors(w);
-	gtk_widget_destroy(w);
-	pUnixGraphics->initWidget(widget);
+	g_object_unref(w);
 
 	ENSUREP_RF(pG);
 	pG->setZoomPercentage(iZoom);
@@ -530,7 +538,7 @@ void AP_UnixFrame::_setViewFocus(AV_View *pView)
 	AP_UnixFrameImpl * pFrameImpl = static_cast<AP_UnixFrameImpl *>(getFrameImpl());
 	bool bFocus=GPOINTER_TO_INT(g_object_get_data(G_OBJECT(pFrameImpl->getTopLevelWindow()),
 						 "toplevelWindowFocus"));
-	pView->setFocus(bFocus && (gtk_grab_get_current()==NULL || gtk_grab_get_current()==pFrameImpl->getTopLevelWindow()) ? AV_FOCUS_HERE : !bFocus && gtk_grab_get_current()!=NULL && isTransientWindow(GTK_WINDOW(gtk_grab_get_current()),GTK_WINDOW(pFrameImpl->getTopLevelWindow())) ?  AV_FOCUS_NEARBY : AV_FOCUS_NONE);
+	pView->setFocus(bFocus && (gtk_grab_get_current()==nullptr || gtk_grab_get_current()==pFrameImpl->getTopLevelWindow()) ? AV_FOCUS_HERE : !bFocus && gtk_grab_get_current()!=nullptr && isTransientWindow(GTK_WINDOW(gtk_grab_get_current()),GTK_WINDOW(pFrameImpl->getTopLevelWindow())) ?  AV_FOCUS_NEARBY : AV_FOCUS_NONE);
 }
 
 void AP_UnixFrame::_bindToolbars(AV_View *pView)

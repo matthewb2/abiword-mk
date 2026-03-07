@@ -36,7 +36,7 @@ public:
 
 	static XAP_Dialog *	static_constructor (XAP_DialogFactory *, XAP_Dialog_Id id);
 
-	virtual void runModal (XAP_Frame * pFrame);
+	virtual void runModal(XAP_Frame * pFrame) override;
 
 	// callbacks can fire these events
 	virtual void onChangeClicked	  (void);
@@ -68,7 +68,7 @@ private:
    GtkWidget * m_eChange;
    GtkWidget * m_lvSuggestions;
 
-   GdkColor m_highlight;
+   GdkRGBA m_highlight;
 
    guint m_listHandlerID;
    guint m_replaceHandlerID;

@@ -21,6 +21,7 @@
 #include "xap_UnixApp.h"
 #include "xap_Frame.h"
 #include "xap_UnixDialogHelper.h"
+#include "xap_GtkUtils.h"
 #include "ut_string_class.h"
 #include <session/xp/AbiCollabSessionManager.h>
 
@@ -80,11 +81,7 @@ GtkWidget * AP_UnixDialog_GenericInput::_constructWindow(void)
 	GtkWidget* window;
 	
 	// load the dialog from the UI file
-#if GTK_CHECK_VERSION(3,0,0)
 	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_GenericInput.ui");
-#else
-	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_GenericInput-2.ui");
-#endif
 	
 	// Update our member variables with the important widgets that 
 	// might need to be queried or altered later
@@ -126,7 +123,7 @@ void AP_UnixDialog_GenericInput::_populateWindowData()
 	gtk_entry_set_visibility(GTK_ENTRY(m_wInput), !isPassword());
 
 	// set the initial input
-	gtk_entry_set_text(GTK_ENTRY(m_wInput), getInput().utf8_str());
+	XAP_gtk_entry_set_text(GTK_ENTRY(m_wInput), getInput().utf8_str());
 
 	// force the initial sensitivy state of the buttons
 	eventTextChanged();
@@ -134,7 +131,7 @@ void AP_UnixDialog_GenericInput::_populateWindowData()
 
 void AP_UnixDialog_GenericInput::eventTextChanged()
 {
-	const gchar* szText = gtk_entry_get_text(GTK_ENTRY(m_wInput));
+	const gchar* szText = XAP_gtk_entry_get_text(GTK_ENTRY(m_wInput));
 	if (!szText || strlen(szText) < getMinLenght())
 		gtk_widget_set_sensitive(m_wOk, false);
 	else
@@ -143,6 +140,6 @@ void AP_UnixDialog_GenericInput::eventTextChanged()
 
 void AP_UnixDialog_GenericInput::eventOk()
 {
-	setInput(gtk_entry_get_text(GTK_ENTRY(m_wInput)));
+	setInput(XAP_gtk_entry_get_text(GTK_ENTRY(m_wInput)));
 }
 

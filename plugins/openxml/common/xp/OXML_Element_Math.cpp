@@ -42,7 +42,7 @@ void OXML_Element_Math::setMathML(const std::string & sMathML)
 
 const char * OXML_Element_Math::getMathML()
 {
-    UT_return_val_if_fail(!m_MathML.empty(), NULL);
+    UT_return_val_if_fail(!m_MathML.empty(), nullptr);
     return m_MathML.c_str();
 }
 
@@ -75,28 +75,27 @@ UT_Error OXML_Element_Math::addToPT(PD_Document * pDocument)
     std::string mID = UT_std_string_sprintf("MathLatex%d", id);
     std::string lID = UT_std_string_sprintf("LatexMath%d", id);
 
-    UT_ByteBuf mathBuf;
-    UT_ByteBuf latexBuf;
-    mathBuf.ins(0,reinterpret_cast<const UT_Byte *>(m_MathML.c_str()),static_cast<UT_uint32>(m_MathML.length()));
+    UT_ByteBufPtr mathBuf(new UT_ByteBuf);
+    UT_ByteBufPtr latexBuf(new UT_ByteBuf);
+    mathBuf->ins(0, reinterpret_cast<const UT_Byte *>(m_MathML.c_str()), static_cast<UT_uint32>(m_MathML.length()));
 
     UT_UTF8String sMathml; // TO DO : use std::string after enabling it in ie_math_convert
     UT_UTF8String sLatex,sitex;
     sMathml.assign(m_MathML.c_str());
-    
-    pDocument->createDataItem(mID.c_str(),false,&mathBuf, "", NULL);   
-  
+
+    pDocument->createDataItem(mID.c_str(), false, mathBuf, "", nullptr);
+
     if(convertMathMLtoLaTeX(sMathml, sLatex) && convertLaTeXtoEqn(sLatex,sitex))
-    {    
+    {
         // Conversion of MathML to LaTeX and the Equation Form suceeds
-        latexBuf.ins(0,reinterpret_cast<const UT_Byte *>(sitex.utf8_str()),static_cast<UT_uint32>(sitex.size()));
-        pDocument->createDataItem(lID.c_str(), false, &latexBuf, "", NULL);
+        latexBuf->ins(0, reinterpret_cast<const UT_Byte *>(sitex.utf8_str()), static_cast<UT_uint32>(sitex.size()));
+        pDocument->createDataItem(lID.c_str(), false, latexBuf, "", nullptr);
     }
-   
-    const gchar *atts[5] = { NULL, NULL, NULL, NULL, NULL };
-    atts[0] = PT_IMAGE_DATAID;
-    atts[1] = static_cast<const gchar *>(mID.c_str());
-    atts[2] = static_cast<const gchar *>("latexid");
-    atts[3] = static_cast<const gchar *>(lID.c_str());
+
+    const PP_PropertyVector atts = {
+      PT_IMAGE_DATAID, mID,
+      "latexid", lID
+    };
     if(!pDocument->appendObject(PTO_Math, atts))
         return UT_ERROR;
 

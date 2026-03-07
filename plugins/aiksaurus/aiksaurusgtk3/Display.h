@@ -1,8 +1,9 @@
-#ifndef INCLUDED_DISPLAY_H
-#define INCLUDED_DISPLAY_H
+#pragma once
 
 #include <Aiksaurus.h>
+
 #include <gtk/gtk.h>
+
 #include <vector>
 #include <string>
 #include <new>
@@ -28,32 +29,29 @@ namespace AiksaurusGTK_impl
             GtkWidget* d_layout;
             std::vector<Meaning*> d_meanings;
 
-            void _handleSelection(GtkWidget* list) throw();
-            void _handleClick(bool isDoubleClick, const char* text) throw(std::bad_alloc);
+            void _handleSelection(GtkWidget* list) noexcept;
+            void _handleClick(bool isDoubleClick, const char* text);
 
-            void _resetDisplay() throw();
+            void _resetDisplay() noexcept;
 
-            void _createMeaning(const std::string& title, std::vector<std::string>& words)
-                throw(std::bad_alloc);
+            void _createMeaning(const std::string& title, std::vector<std::string>& words);
 
-            void _displayResults(const char* word) throw(Exception, std::bad_alloc);
-            void _displayAlternatives() throw(Exception, std::bad_alloc);
+            void _displayResults(const char* word);
+            void _displayAlternatives();
 
-            void _checkThesaurus() throw(Exception);
+            void _checkThesaurus();
 
-//            static void _initResources() throw();
+//            static void _initResources() noexcept;
 
         public:
-            Display(DialogMediator& parent) throw();
-            ~Display() throw();
+            Display(DialogMediator& parent) noexcept;
+            ~Display();
 
-            const Aiksaurus& getThesaurus() const throw();
-            GtkWidget* getDisplay() throw();
+            const Aiksaurus& getThesaurus() const noexcept;
+            GtkWidget* getDisplay() noexcept;
 
-            void search(const char* word) throw(std::bad_alloc);
-            void showMessage(const char* message) throw();
+            void search(const char* word);
+            void showMessage(const char* message) noexcept;
     };
 
 }
-
-#endif // INCLUDED_DISPLAY_H

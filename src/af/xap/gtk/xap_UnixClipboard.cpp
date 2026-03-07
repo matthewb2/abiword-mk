@@ -25,20 +25,20 @@
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 
-GtkClipboard * XAP_UnixClipboard::gtkClipboardForTarget(XAP_UnixClipboard::_T_AllowGet get)
+GtkClipboard * XAP_UnixClipboard::gtkClipboardForTarget(XAP_UnixClipboard::_T_AllowGet get) const
 {
 	if (XAP_UnixClipboard::TAG_ClipboardOnly == get)
 		return m_clip;
 	else if (XAP_UnixClipboard::TAG_PrimaryOnly == get)
 		return m_primary;
-	return 0;
+	return nullptr;
 }
 
 static AV_View * viewFromApp(XAP_App * pApp)
 {
 	XAP_Frame * pFrame = pApp->getLastFocussedFrame();
 	if ( !pFrame ) 
-		return 0 ;
+		return nullptr ;
 	return pFrame->getCurrentView () ;
 }
 
@@ -46,7 +46,7 @@ static AV_View * viewFromApp(XAP_App * pApp)
 //////////////////////////////////////////////////////////////////
 
 XAP_UnixClipboard::XAP_UnixClipboard(XAP_UnixApp * pUnixApp)
-	: m_pUnixApp(pUnixApp), m_Targets(0), m_nTargets(0)
+	: m_pUnixApp(pUnixApp), m_Targets(nullptr), m_nTargets(0)
 {
 	m_clip = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
 	m_primary = gtk_clipboard_get(GDK_SELECTION_PRIMARY);
@@ -64,28 +64,33 @@ XAP_UnixClipboard::~XAP_UnixClipboard()
 void XAP_UnixClipboard::AddFmt(const char * szFormat)
 {
 	UT_return_if_fail(szFormat && strlen(szFormat));
-	m_vecFormat_AP_Name.addItem(szFormat);
-	m_vecFormat_GdkAtom.addItem(gdk_atom_intern(szFormat,FALSE));
+	m_vecFormat_AP_Name.push_back(szFormat);
+	m_vecFormat_GdkAtom.push_back(gdk_atom_intern(szFormat,FALSE));
 }
 
 void XAP_UnixClipboard::deleteFmt(const char * szFormat)
 {
 	UT_return_if_fail(szFormat && strlen(szFormat));
-	UT_sint32 item = m_vecFormat_AP_Name.findItem(szFormat);
-	m_vecFormat_AP_Name.deleteNthItem(item);
-	m_vecFormat_GdkAtom.findItem(gdk_atom_intern(szFormat,FALSE));
-	m_vecFormat_GdkAtom.deleteNthItem(item);
+	auto item = std::find(m_vecFormat_AP_Name.begin(), m_vecFormat_AP_Name.end(), szFormat);
+	if (item != m_vecFormat_AP_Name.end()) {
+		m_vecFormat_AP_Name.erase(item);
+	}
+	auto item2 = std::find(m_vecFormat_GdkAtom.begin(), m_vecFormat_GdkAtom.end(),
+						   gdk_atom_intern(szFormat, FALSE));
+	if (item2 != m_vecFormat_GdkAtom.end()) {
+		m_vecFormat_GdkAtom.erase(item2);
+	}
 }
 
 void XAP_UnixClipboard::initialize()
 {
-	m_nTargets = m_vecFormat_AP_Name.getItemCount();
+	m_nTargets = m_vecFormat_AP_Name.size();
 	m_Targets  = g_new0(GtkTargetEntry, m_nTargets);
 	
 	for (int k = 0, kLimit = m_nTargets; (k < kLimit); k++)
     {
 		GtkTargetEntry * target = &(m_Targets[k]);
-		target->target = (gchar*)m_vecFormat_AP_Name.getNthItem(k);
+		target->target = (gchar*)m_vecFormat_AP_Name[k];
 		target->info = k;
     }
 }
@@ -111,18 +116,18 @@ void XAP_UnixClipboard::common_get_func(GtkClipboard * /*clipboard*/,
 		pView->cmdCopy(false);
     }
 	
-	guint ntargets = m_vecFormat_GdkAtom.getItemCount();
+	guint ntargets = m_vecFormat_GdkAtom.size();
 	
 	GdkAtom needle = gtk_selection_data_get_target(selection_data);
 	for (guint i = 0 ; i < ntargets ; i++)
 	{
-		if (needle == m_vecFormat_GdkAtom.getNthItem(i))
+		if (needle == m_vecFormat_GdkAtom[i])
 		{
-			const gchar * format_name = m_vecFormat_AP_Name.getNthItem(i);
+			const gchar * format_name = m_vecFormat_AP_Name[i];
 			
 			if(which_clip.hasFormat(format_name))
             {
-				guchar * data = 0;
+				guchar * data = nullptr;
 				UT_uint32 data_len = 0;
 
 				guchar **pdata = &data;
@@ -215,8 +220,8 @@ bool XAP_UnixClipboard::getData(T_AllowGet tFrom, const char** formatList,
 {
 	// Fetch data from the clipboard (using the allowable source(s)) in one of
 	// the prioritized list of formats.  Return pointer to clipboard's buffer. 
-	*pszFormatFound = NULL;
-	*ppData = NULL;
+	*pszFormatFound = nullptr;
+	*ppData = nullptr;
 	*pLen = 0;
 	if (TAG_ClipboardOnly == tFrom)
 		return _getDataFromServer(tFrom,formatList,ppData,pLen,pszFormatFound);
@@ -230,7 +235,7 @@ bool XAP_UnixClipboard::getTextData(T_AllowGet tFrom, void ** ppData,
 									UT_uint32 * pLen)
 {
 	// start out pessimistic
-	*ppData = NULL;
+	*ppData = nullptr;
 	*pLen = 0;
 	
 	GtkClipboard * clippy = gtkClipboardForTarget (tFrom);
@@ -251,11 +256,11 @@ bool XAP_UnixClipboard::getTextData(T_AllowGet tFrom, void ** ppData,
 	g_free (txt);
 	
 	// ignored
-	const char * pszFormatFound = NULL;
+	const char * pszFormatFound = nullptr;
 	
 	static const char * txtFormatList [] = {
 		"text/plain",
-		0
+		nullptr
 	};
 	
 	return _getDataFromFakeClipboard(tFrom, txtFormatList, ppData, pLen, &pszFormatFound);
@@ -303,23 +308,23 @@ bool XAP_UnixClipboard::_getDataFromServer(T_AllowGet tFrom, const char** format
 										   const char **pszFormatFound)
 {
 	bool rval = false;
-	if(formatList == NULL)
+	if(formatList == nullptr)
 	  return false;
 
 	GtkClipboard * clipboard = gtkClipboardForTarget (tFrom);
 #if DEBUG
 	gtk_clipboard_request_targets(clipboard,( GtkClipboardTargetsReceivedFunc) allTargets, this);
 #endif
-	UT_GenericVector<GdkAtom> atoms ;
+	std::vector<GdkAtom> atoms ;
 	for(int atomCounter = 0; formatList[atomCounter]; atomCounter++)
-		atoms.addItem(gdk_atom_intern(formatList[atomCounter],FALSE));
+		atoms.push_back(gdk_atom_intern(formatList[atomCounter],FALSE));
 	
 	int len = atoms.size () ;	
 	
 	//	for(int i = 0; i < len && !rval; i++)
 	for(int i = 0; i < len; i++)
     {
-		GdkAtom atom = atoms.getNthItem(i);
+		GdkAtom atom = atoms[i];
 		GtkSelectionData * selection = gtk_clipboard_wait_for_contents (clipboard, atom);
 		UT_DEBUGMSG(("Looking for %s on clipbaord \n",formatList[i]));
 		if(selection)
@@ -348,7 +353,7 @@ bool XAP_UnixClipboard::_getDataFromServer(T_AllowGet tFrom, const char** format
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 
-bool XAP_UnixClipboard::canPaste(T_AllowGet tFrom)
+bool XAP_UnixClipboard::canPaste(T_AllowGet tFrom) const
 {
 #if 0
 	bool found = false;
@@ -357,7 +362,7 @@ bool XAP_UnixClipboard::canPaste(T_AllowGet tFrom)
 	
 	if (selection) 
     {
-		gint abi_targets = m_vecFormat_GdkAtom.getItemCount();
+		gint abi_targets = m_vecFormat_GdkAtom.size();
 		
 		GdkAtom *targets;
 		gint clipboard_targets;
@@ -366,7 +371,7 @@ bool XAP_UnixClipboard::canPaste(T_AllowGet tFrom)
 		{
 			for (gint i = 0; (i < abi_targets) && !found; i++)
 			{
-				GdkAtom needle = m_vecFormat_GdkAtom.getNthItem(i);
+				GdkAtom needle = m_vecFormat_GdkAtom[i];
 				for (gint j = 0; (j < clipboard_targets) && !found; j++)
 					if (targets[j] == needle)
 						found = true; 

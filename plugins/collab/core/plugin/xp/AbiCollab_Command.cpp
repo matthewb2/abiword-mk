@@ -29,7 +29,7 @@
 #include "xap_App.h"
 #include "xap_Frame.h"
 
-#ifndef WIN32
+#ifndef _WIN32
 #include "ap_UnixApp.h"
 #include "ap_UnixFrame.h"
 
@@ -51,7 +51,7 @@ AbiCollab_Command::AbiCollab_Command(const UT_UTF8String& argv)
 {
 	XAP_App* pApp = XAP_App::getApp ();
 	
-	#ifndef WIN32
+	#ifndef _WIN32
 	pApp->getGraphicsFactory()->registerAsDefault(GRID_CAIRO_NULL, true);
 	#else
 	pApp->getGraphicsFactory()->registerAsDefault(GRID_WIN32_UNISCRIBE, true);
@@ -151,7 +151,7 @@ bool AbiCollab_Command::_doCmdDebug(const UT_UTF8String& sServerSessionFile, con
 	UT_return_val_if_fail(pManager, false);	
 	UT_DEBUG_ONLY_ARG(bSingleStep);
 	
-#ifndef WIN32
+#ifndef _WIN32
 		// FIXME: this breaks on OSX
 		XAP_App::getApp()->getGraphicsFactory()->registerAsDefault(GRID_UNIX_PANGO, true);
 #else
@@ -162,15 +162,15 @@ bool AbiCollab_Command::_doCmdDebug(const UT_UTF8String& sServerSessionFile, con
 	char *client_uri = UT_go_filename_to_uri(sClientSessionFile.utf8_str());
 
 	UT_DEBUGMSG(("Creating server debug frame\n"));
-	UT_UTF8String sFakeServerSessionId("fake-server-session-id");
+	std::string sFakeServerSessionId("fake-server-session-id");
 	FakeAccountHandler* pServerHandler = new FakeAccountHandler(server_uri, XAP_App::getApp()->newFrame());
-	UT_return_val_if_fail(pServerHandler->initialize(&sFakeServerSessionId), false);
+	UT_return_val_if_fail(pServerHandler->initialize(sFakeServerSessionId), false);
 	pManager->addAccount(pServerHandler);
 
 	UT_DEBUGMSG(("Creating client debug frame\n"));
-	UT_UTF8String sFakeClientSessionId("fake-client-session-id");
+	std::string sFakeClientSessionId("fake-client-session-id");
 	FakeAccountHandler* pClientHandler = new FakeAccountHandler(client_uri, XAP_App::getApp()->newFrame());
-	UT_return_val_if_fail(pClientHandler->initialize(&sFakeClientSessionId), false);
+	UT_return_val_if_fail(pClientHandler->initialize(sFakeClientSessionId), false);
 	pManager->addAccount(pClientHandler);
 	
 	while (1)

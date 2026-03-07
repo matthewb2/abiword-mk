@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <gsf/gsf-input.h>
+#include <gsf/gsf.h>
 
 #include "ie_impexp_MSWrite.h"
 #include "ut_debugmsg.h"
@@ -37,8 +37,13 @@ bool read_wri_struct (wri_struct *w, GsfInput *f)
 	// first we need to calculate the size
 	i = size = 0;
 
-	while (w[i].name) size += w[i++].size;
+	while (w[i].name) {
+		size += w[i++].size;
+	}
 
+	if (size == 0) {
+		return false;
+	}
 	// got the size, read the blob
 	blob = static_cast<unsigned char *>(malloc(size));
 
@@ -72,7 +77,8 @@ bool read_wri_struct_mem (wri_struct *w, unsigned char *blob)
 				n = w[i].size;
 				w[i].value = 0;
 
-				while (n--) w[i].value = (w[i].value * 256) + blob[n];
+				while (n--)
+					w[i].value = (w[i].value * 256) + blob[n];
 
 				break;
 
@@ -101,7 +107,8 @@ bool read_wri_struct_mem (wri_struct *w, unsigned char *blob)
 int wri_struct_value (const wri_struct *w, const char *name)
 {
 	for (int i = 0; w[i].name; i++)
-		if (strcmp(w[i].name, name) == 0) return w[i].value;
+		if (strcmp(w[i].name, name) == 0)
+			return w[i].value;
 
 	/* This should never happen! */
 	UT_WARNINGMSG(("wri_struct_value: Internal error, '%s' not found!\n", name));
@@ -118,7 +125,7 @@ void free_wri_struct (wri_struct *w)
 		if (w[i].data)
 		{
 			free(w[i].data);
-			w[i].data = NULL;
+			w[i].data = nullptr;
 		}
 	}
 }
@@ -126,27 +133,27 @@ void free_wri_struct (wri_struct *w)
 void DEBUG_WRI_STRUCT (wri_struct *w, int spaces)
 {
 #ifdef DEBUG
-	char sp[16], format[48], x[8];
+	char sp[28], format[55], x[10];
 
-	sprintf(sp, "%%-%d.%ds", spaces, spaces);
+	snprintf(sp, 28, "%%-%d.%ds", spaces, spaces);
 
 	for (int i = 0; w[i].name; i++)
 	{
 		switch (w[i].type)
 		{
 			case CT_VALUE:
-				sprintf(x, "%%0%dX", w[i].size << 1);
-				sprintf(format, "%s%%-13.13s= 0x%s (%%d)\n", sp, x);
+				snprintf(x, 10, "%%0%dX", w[i].size << 1);
+				snprintf(format, 55, "%s%%-13.13s= 0x%s (%%d)\n", sp, x);
 				UT_DEBUGMSG((format, " ", w[i].name, w[i].value, w[i].value));
 				break;
 
 			case CT_BLOB:
-				sprintf(format, "%s%%-13.13s: tblob (%%d)\n", sp);
+				snprintf(format, 55, "%s%%-13.13s: tblob (%%d)\n", sp);
 				UT_DEBUGMSG((format, " ", w[i].name, w[i].size));
 				break;
 
 			case CT_IGNORE:
-				sprintf(format, "%s%%-13.13s  ignored\n", sp);
+				snprintf(format, 55, "%s%%-13.13s  ignored\n", sp);
 				UT_DEBUGMSG((format, " ", w[i].name));
 				break;
 		}

@@ -19,10 +19,7 @@
  * 02110-1301 USA.
  */
 
-
-
-#ifndef PP_PROPERTY_H
-#define PP_PROPERTY_H
+#pragma once
 
 #include <memory>
 #include <string>
@@ -81,7 +78,7 @@ class ABI_EXPORT PP_PropertyTypeBool : public PP_PropertyType
 public:
 	PP_PropertyTypeBool(const gchar *p_init);
 
-	tProperty_type getType() const {return Property_type_bool;}
+	tProperty_type getType() const override {return Property_type_bool;}
 
 	bool getState() const {return State;}
 
@@ -97,7 +94,7 @@ class ABI_EXPORT PP_PropertyTypeInt : public PP_PropertyType
 public:
 	PP_PropertyTypeInt(const gchar *p_init);
 
-	tProperty_type getType() const {return Property_type_int;}
+	tProperty_type getType() const override {return Property_type_int;}
 
 	int getValue() const {return Value;}
 
@@ -113,7 +110,7 @@ class ABI_EXPORT PP_PropertyTypeSize : public PP_PropertyType
 public:
 	PP_PropertyTypeSize(const gchar *p_init);
 
-	tProperty_type getType() const {return Property_type_size;}
+	tProperty_type getType() const override {return Property_type_size;}
 
 	double getValue() const {return Value;}
 	UT_Dimension getDim() const {return Dim;}
@@ -131,7 +128,7 @@ class ABI_EXPORT PP_PropertyTypeColor : public PP_PropertyType
 public:
 	PP_PropertyTypeColor(const gchar *p_init);
 
-	tProperty_type getType() const {return Property_type_color;}
+	tProperty_type getType() const override {return Property_type_color;}
 
 	const UT_RGBColor &getColor() const {return Color;}
 
@@ -192,10 +189,9 @@ ABI_EXPORT std::unique_ptr<PP_PropertyType> PP_evalPropertyType(const gchar * ps
 								 const PP_AttrProp * pBlockAttrProp,
 								 const PP_AttrProp * pSectionAttrProp,
 								 tProperty_type Type,
-								 const PD_Document * pDoc=NULL,
+								 const PD_Document* pDoc = nullptr,
 								 bool bExpandStyles=false);
 
 ABI_EXPORT UT_uint32        PP_getPropertyCount();
 ABI_EXPORT const gchar * PP_getNthPropertyName(UT_uint32 n);
 ABI_EXPORT tPropLevel       PP_getNthPropertyLevel(UT_uint32 n);
-#endif /* PP_PROPERTY_H */

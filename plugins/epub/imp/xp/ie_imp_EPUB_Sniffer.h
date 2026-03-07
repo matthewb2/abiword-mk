@@ -21,10 +21,6 @@
 #ifndef IE_IMP_EPUB_SNIFFER_H_
 #define IE_IMP_EPUB_SNIFFER_H_
 
-#include <gsf/gsf-infile-zip.h>
-#include <gsf/gsf-infile.h>
-#include <gsf/gsf-libxml.h>
-
 #include "ie_imp.h"
 #include "ie_imp_EPUB.h"
 
@@ -35,16 +31,16 @@ public:
 
     virtual ~IE_Imp_EPUB_Sniffer();
 
-    virtual const IE_SuffixConfidence * getSuffixConfidence();
+    virtual const IE_SuffixConfidence * getSuffixConfidence() override;
 
-    virtual const IE_MimeConfidence * getMimeConfidence();
+    virtual const IE_MimeConfidence * getMimeConfidence() override;
 
-    virtual UT_Confidence_t recognizeContents(GsfInput * input);
+    virtual UT_Confidence_t recognizeContents(GsfInput * input) override;
 
-    virtual UT_Error constructImporter(PD_Document * pDocument, IE_Imp ** ppie);
+    virtual UT_Error constructImporter(PD_Document * pDocument, IE_Imp ** ppie) override;
 
     virtual bool getDlgLabels(const char ** szDesc, const char ** szSuffixList,
-            IEFileType * ft);
+            IEFileType * ft) override;
 };
 
 #endif /* IE_IMP_EPUB_SNIFFER_H_ */

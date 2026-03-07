@@ -61,7 +61,7 @@ void AP_Frame::quickZoom(UT_uint32 iZoom)
 	FV_View * pView = static_cast<FV_View *>(getCurrentView());
 	if(!pView)
 		return;
-	if (bChanged)
+	if (bChanged) 
 	{
 		FL_DocLayout * pDocLayout = pView->getLayout();
 		pDocLayout->incrementGraphicTick();
@@ -126,7 +126,7 @@ void AP_Frame::quickZoom(UT_uint32 iZoom)
 //
 		pView->setPoint(pView->getPoint()); // place the cursor correctly
 		pView->ensureInsertionPointOnScreen(); // on the screen
-		pView->updateScreen(false);
+		pView->queueDraw();
 	}
 	else
 	{
@@ -144,7 +144,7 @@ void AP_Frame::quickZoom(UT_uint32 iZoom)
 
 UT_uint32 AP_Frame::getZoomPercentage(void)
 {
-	// !m_pData can happen when calling dlgZoom from AbiCommand;
+	// !m_pData can happen when calling dlgZoom from AbiCommand; 
 	// !m_pG can happen when called from an uninitialized abiwidget
 	if(m_pData && static_cast<AP_FrameData*>(m_pData)->m_pG)
 		return static_cast<AP_FrameData*>(m_pData)->m_pG->getZoomPercentage();
@@ -171,7 +171,7 @@ void AP_Frame::killFrameData()
 {
 	AP_FrameData* pData = static_cast<AP_FrameData*>(m_pData);
 	DELETEP(pData);
-	m_pData = NULL;
+	m_pData = nullptr;
 }
 
 UT_Error AP_Frame::_loadDocument(const char * szFilename, IEFileType ieft,
@@ -189,7 +189,7 @@ UT_Error AP_Frame::_loadDocument(const char * szFilename, IEFileType ieft,
 	// are we replacing another document?
 	if (m_pDoc)
 	{
-		// yep.  first make sure it's OK to discard it,
+		// yep.  first make sure it's OK to discard it, 
 		// TODO: query user if dirty...
 	}
 
@@ -222,7 +222,7 @@ UT_Error AP_Frame::_loadDocument(const char * szFilename, IEFileType ieft,
 	    // errorCode could also take several other values, indicating
 	    // that the document exists but for some reason we could not
 	    // open it. in those cases, we do not wish to overwrite the
-	    // existing documents, but instead open a new blank document.
+	    // existing documents, but instead open a new blank document. 
 	    // this fixes bug 1668 - DAL
 
 		UT_DEBUGMSG(("Could not open the document - create new istead error code is %d \n", errorCode));
@@ -242,7 +242,7 @@ UT_Error AP_Frame::_loadDocument(const char * szFilename, IEFileType ieft,
 	  }
 	if (!errorCode)
 	  goto ReplaceDocument;
-
+	
 	UT_DEBUGMSG(("ap_Frame: could not open the file [%s]\n",szFilename));
 	UNREFP(pNewDoc);
 	return errorCode;
@@ -250,7 +250,7 @@ UT_Error AP_Frame::_loadDocument(const char * szFilename, IEFileType ieft,
 ReplaceDocument:
 	XAP_App::getApp()->forgetClones(this);
 	UT_DEBUGMSG(("Doing replace document \n"));
-
+	
 	// NOTE: prior document is discarded in _showDocument()
 	m_pDoc = pNewDoc;
 	return errorCode;
@@ -258,12 +258,12 @@ ReplaceDocument:
 
 UT_Error AP_Frame::_loadDocument(GsfInput * input, IEFileType ieft)
 {
-	UT_return_val_if_fail (input != NULL, UT_ERROR);
+	UT_return_val_if_fail (input != nullptr, UT_ERROR);
 
 	// are we replacing another document?
 	if (m_pDoc)
 	{
-		// yep.  first make sure it's OK to discard it,
+		// yep.  first make sure it's OK to discard it, 
 		// TODO: query user if dirty...
 	}
 
@@ -275,7 +275,7 @@ UT_Error AP_Frame::_loadDocument(GsfInput * input, IEFileType ieft)
 	}
 	AD_Document * pNewDoc = new PD_Document();
 	UT_return_val_if_fail (pNewDoc, UT_ERROR);
-
+	
 	UT_Error errorCode;
 	errorCode = static_cast<PD_Document*>(pNewDoc)->readFromFile(input, ieft);
 	if (errorCode)
@@ -287,12 +287,12 @@ UT_Error AP_Frame::_loadDocument(GsfInput * input, IEFileType ieft)
 
 	XAP_App::getApp()->forgetClones(this);
 	UT_DEBUGMSG(("Doing replace document \n"));
-
+	
 	// NOTE: prior document is discarded in _showDocument()
 	m_pDoc = pNewDoc;
 	return UT_OK;
 }
-
+	
 UT_Error AP_Frame::_importDocument(const char * szFilename, int ieft,
 									  bool markClean)
 {
@@ -349,7 +349,7 @@ XAP_Frame * AP_Frame::buildFrame(XAP_Frame * pF)
 
 	// we remember the view of the parent frame ...
 	static_cast<AP_FrameData*>(pClone->m_pData)->m_pRootView = m_pView;
-
+	
 	error = pClone->_showDocument(iZoom);
 	if (error)
 		goto Cleanup;
@@ -364,7 +364,7 @@ XAP_Frame * AP_Frame::buildFrame(XAP_Frame * pF)
 		XAP_App::getApp()->forgetFrame(pClone);
 		delete pClone;
 	}
-	return NULL;
+	return nullptr;
 }
 
 UT_Error AP_Frame::loadDocument(AD_Document* pDoc) {
@@ -501,7 +501,7 @@ UT_Error AP_Frame::loadDocument(const char * szFilename, int ieft, bool createNe
 	}
 
 	UT_Error errorCode2 =  _showDocument(iZoom);
-    if((errorCode2 == UT_OK) && (errorCode == UT_IE_TRY_RECOVER))
+    if((errorCode2 == UT_OK) && (errorCode == UT_IE_TRY_RECOVER)) 
     {
         return errorCode;
     }
@@ -546,7 +546,7 @@ UT_Error AP_Frame::importDocument(const char * szFilename, int ieft, bool markCl
 	UT_uint32 iZoom = getNewZoom(&iZoomType);
 	setZoomType(iZoomType);
 	UT_Error errorCode2 =  _showDocument(iZoom);
-    if((errorCode2 == UT_OK) && (errorCode == UT_IE_TRY_RECOVER))
+    if((errorCode2 == UT_OK) && (errorCode == UT_IE_TRY_RECOVER)) 
     {
         return errorCode;
     }
@@ -556,21 +556,21 @@ UT_Error AP_Frame::importDocument(const char * szFilename, int ieft, bool markCl
 /*!
  * This method returns the zoomPercentage of the new frame.
  * Logic goes like this.
- * If there is a valid last focussed frame return the zoom and zoom type
+ * If there is a valid last focussed frame return the zoom and zoom type 
  * for that.
  * Otherwise use the preference value.
  */
 UT_uint32 AP_Frame::getNewZoom(XAP_Frame::tZoomType * tZoom)
 {
 	UT_GenericVector<XAP_Frame*> vecClones;
-	XAP_Frame *pF = NULL;
+	XAP_Frame *pF = nullptr;
 	XAP_App * pApp = XAP_App::getApp();
 	UT_return_val_if_fail (pApp, 0);
 	XAP_Frame * pLastFrame = pApp->getLastFocussedFrame();
 	UT_uint32 iZoom = 100;
-	if(pLastFrame == NULL)
+	if(pLastFrame == nullptr)
 	{
-		UT_String sZoom;
+		std::string sZoom;
 		pApp->getPrefsValue(XAP_PREF_KEY_ZoomType, sZoom);
 		*tZoom = getZoomType();
 		if( (g_ascii_strcasecmp( sZoom.c_str(), "Width" ) == 0 ) || (g_ascii_strcasecmp( sZoom.c_str(), "Page" ) == 0 ))
@@ -649,21 +649,21 @@ UT_Error AP_Frame::_showDocument(UT_uint32 iZoom)
 
 // 	static_cast<XAP_FrameImpl *>(m_pFrameImpl)->setShowDocLocked(true);
 
-	GR_Graphics * pG = NULL;
-	FL_DocLayout * pDocLayout = NULL;
-	AV_View * pView = NULL;
-	AV_ScrollObj * pScrollObj = NULL;
-	ap_ViewListener * pViewListener = NULL;
-	AD_Document * pOldDoc = NULL;
-	ap_Scrollbar_ViewListener * pScrollbarViewListener = NULL;
+	GR_Graphics * pG = nullptr;
+	FL_DocLayout * pDocLayout = nullptr;
+	AV_View * pView = nullptr;
+	AV_ScrollObj * pScrollObj = nullptr;
+	ap_ViewListener * pViewListener = nullptr;
+	AD_Document * pOldDoc = nullptr;
+	ap_Scrollbar_ViewListener * pScrollbarViewListener = nullptr;
 	AV_ListenerId lid;
 	AV_ListenerId lidScrollbarViewListener;
 
 	xxx_UT_DEBUGMSG(("_showDocument: Initial m_pView %x \n",m_pView));
 
-	if(iZoom < XAP_DLG_ZOOM_MINIMUM_ZOOM)
+	if(iZoom < XAP_DLG_ZOOM_MINIMUM_ZOOM) 
 		iZoom = 100;
-	else if (iZoom > XAP_DLG_ZOOM_MAXIMUM_ZOOM)
+	else if (iZoom > XAP_DLG_ZOOM_MAXIMUM_ZOOM) 
 		iZoom = 100;
 	UT_DEBUGMSG(("!!!!!!!!! _showdOCument: Initial izoom is %d \n",iZoom));
 
@@ -671,11 +671,11 @@ UT_Error AP_Frame::_showDocument(UT_uint32 iZoom)
 		goto Cleanup;
 
 	pDocLayout = new FL_DocLayout(static_cast<PD_Document *>(m_pDoc), pG);
-	ENSUREP_C(pDocLayout);
+	ENSUREP_C(pDocLayout);  
 
 	pView = new FV_View(XAP_App::getApp(), this, pDocLayout);
 	ENSUREP_C(pView);
-
+	
 	if(getZoomType() == XAP_Frame::z_PAGEWIDTH)
 	{
 		iZoom = pView->calculateZoomPercentForPageWidth();
@@ -695,17 +695,17 @@ UT_Error AP_Frame::_showDocument(UT_uint32 iZoom)
 		goto Cleanup;
 	if(getFrameMode() ==XAP_NormalFrame)
 	{
-		_bindToolbars(pView);
+		_bindToolbars(pView);	
 	}
-	_replaceView(pG, pDocLayout, pView, pScrollObj, pViewListener, pOldDoc,
+	_replaceView(pG, pDocLayout, pView, pScrollObj, pViewListener, pOldDoc, 
 		     pScrollbarViewListener, lid, lidScrollbarViewListener, iZoom);
 
 	setXScrollRange();
 	setYScrollRange();
 
-	m_pView->draw();
+	m_pView->queueDraw();
 
-	if ( static_cast<AP_FrameData*>(m_pData)->m_bShowRuler  )
+	if ( static_cast<AP_FrameData*>(m_pData)->m_bShowRuler  ) 
 	{
 		if ( static_cast<AP_FrameData*>(m_pData)->m_pTopRuler )
 		{
@@ -761,12 +761,12 @@ void AP_Frame::_replaceView(GR_Graphics * pG, FL_DocLayout *pDocLayout,
 
 	// we want to remember point/selection when that is appropriate, which is when the new view is a
 	// view of the same doc as the old view, or if this frame is being cloned from an existing frame
-
+	
 	// these are the view and doc from which this frame is being cloned
-	FV_View * pRootView = NULL; // this should really be const, but
+	FV_View * pRootView = nullptr; // this should really be const, but
 								// getDocumentRangeOfCurrentSelection() is not
-	const AD_Document * pRootDoc = NULL;
-
+	const AD_Document * pRootDoc = nullptr;
+	
 	if (m_pView && !m_pView->isSelectionEmpty ())
 	{
 		holdsSelection = true;
@@ -791,9 +791,9 @@ void AP_Frame::_replaceView(GR_Graphics * pG, FL_DocLayout *pDocLayout,
 		else
 			hadView = false;
 
-		// we want to set m_pData->m_pRootView to NULL, since it has fullfilled its function and we
+		// we want to set m_pData->m_pRootView to nullptr, since it has fullfilled its function and we
 		// do not want any dead pointers hanging around
-		static_cast<AP_FrameData*>(m_pData)->m_pRootView = NULL;
+		static_cast<AP_FrameData*>(m_pData)->m_pRootView = nullptr;
 	}
 	else
 		hadView = false;
@@ -806,7 +806,7 @@ void AP_Frame::_replaceView(GR_Graphics * pG, FL_DocLayout *pDocLayout,
 
 	REPLACEP(static_cast<AP_FrameData*>(m_pData)->m_pG, pG);
 	REPLACEP(static_cast<AP_FrameData*>(m_pData)->m_pDocLayout, pDocLayout);
-
+	
 	bool bSameDocument = false; // be cautious ...
 
 	if(!pOldDoc)
@@ -833,7 +833,7 @@ void AP_Frame::_replaceView(GR_Graphics * pG, FL_DocLayout *pDocLayout,
 	AV_View * pReplacedView = m_pView;
 	m_pView = pView;
 
-	XAP_App::getApp()->setViewSelection(NULL);
+	XAP_App::getApp()->setViewSelection(nullptr);
 
 	REPLACEP(m_pScrollObj, pScrollObj);
 	REPLACEP(m_pViewListener, pViewListener);
@@ -878,8 +878,7 @@ void AP_Frame::_replaceView(GR_Graphics * pG, FL_DocLayout *pDocLayout,
 	{
 		static_cast<PD_Document *>(m_pDoc)->disableListUpdates();
 	}
-
-	pDocLayout->fillLayouts();
+	pDocLayout->fillLayouts();      
 	if(bSameDocument)
 	{
 		static_cast<PD_Document *>(m_pDoc)->enableListUpdates();
@@ -901,7 +900,7 @@ void AP_Frame::_replaceView(GR_Graphics * pG, FL_DocLayout *pDocLayout,
 		pFrameImpl->notifyViewChanged(m_pView);
 	}
 	DELETEP(pReplacedView);
-
+	
 	// notify our listeners
 	_signal(APF_ReplaceView);
 }
@@ -916,8 +915,8 @@ UT_sint32 AP_Frame::registerListener(AP_FrameListener* pListener)
 void AP_Frame::unregisterListener(UT_sint32 iListenerId)
 {
 	UT_return_if_fail(iListenerId >= 0);
-	UT_return_if_fail(iListenerId >= static_cast<UT_sint32>(m_listeners.size()));
-	m_listeners[iListenerId] = NULL;
+	UT_return_if_fail(iListenerId >= static_cast<UT_sint32>(m_listeners.size()));	
+	m_listeners[iListenerId] = nullptr;
 }
 
 void AP_Frame::_signal(AP_FrameSignal sig)

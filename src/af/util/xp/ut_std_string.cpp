@@ -21,15 +21,19 @@
 
 #include <string.h>
 
+#include <algorithm>
+#include <iostream>
+#include <sstream>
+#include <list>
+
+#include <libxml/uri.h>
+#include <libxml/xmlmemory.h>
+
 #include "ut_assert.h"
 #include "ut_std_string.h"
 #include "ut_string.h"
 #include "ut_debugmsg.h"
 #include "ut_iconv.h"
-
-#include <iostream>
-#include <sstream>
-#include <list>
 
 std::string UT_escapeXML(const std::string &s)
 {
@@ -106,6 +110,20 @@ std::string UT_decodeXML(const std::string &s)
     return out;
 }
 
+std::string UT_escapeURL(const std::string &s)
+{
+    if (s.empty()) {
+        return s;
+    }
+
+    std::string rs;
+    xmlChar * uri = xmlURIEscape(BAD_CAST s.c_str());
+    if(uri) {
+        rs = (const char*)uri;
+        xmlFree(uri);
+    }
+    return rs;
+}
 
 std::string& UT_std_string_vprintf (std::string & inStr, const char *format,
                                     va_list      args1)
@@ -134,12 +152,12 @@ std::string UT_std_string_sprintf(const char * inFormat, ...)
 std::string UT_std_string_unicode(const UT_UCS4Char * unicode,
                                   UT_uint32 len)
 {
-    if (unicode == NULL || len == 0) {
+    if (unicode == nullptr || len == 0) {
         return std::string();
     }
 
-    GError *error = NULL;
-    gchar * utf8 = g_ucs4_to_utf8(unicode, len, NULL, NULL, &error);
+    GError *error = nullptr;
+    gchar * utf8 = g_ucs4_to_utf8(unicode, len, nullptr, nullptr, &error);
     if (!utf8) {
         UT_DEBUGMSG(("Error converting UCS4 to UTF8: %s\n", error->message));
         g_error_free(error);
@@ -229,7 +247,7 @@ std::string& UT_tolower(std::string& s)
 
 std::string UT_XML_cloneNoAmpersands( const std::string& src )
 {
-    gchar* rszDest = 0;
+    gchar* rszDest = nullptr;
 
     bool rc = UT_XML_cloneNoAmpersands( rszDest, src.c_str() );
     if( !rc )
@@ -288,7 +306,7 @@ UT_ellipsisPath(const std::string & path, size_t maxlen, size_t cut)
 
 /*!
  * Assuming a string of standard abiword properties eg. "fred:nerk; table-width:1.0in; table-height:10.in"
- * Return the value of the property sProp or NULL if it is not present.
+ * Return the value of the property sProp or nullptr if it is not present.
  */
 std::string UT_std_string_getPropVal(const std::string & sPropertyString, const std::string & sProp)
 {
@@ -298,7 +316,7 @@ std::string UT_std_string_getPropVal(const std::string & sPropertyString, const 
 	const char * szWork = sWork.c_str();
 	const char * szProps = sPropertyString.c_str();
 	const char * szLoc = strstr(szProps,szWork);
-	if(szLoc == NULL)
+	if(szLoc == nullptr)
 	{
 		return std::string();
 	}
@@ -306,7 +324,7 @@ std::string UT_std_string_getPropVal(const std::string & sPropertyString, const 
 // Look if this is the last property in the string.
 //
 	const char * szDelim = strchr(szLoc,';');
-	if(szDelim == NULL)
+	if(szDelim == nullptr)
 	{
 //
 // Remove trailing spaces
@@ -326,7 +344,7 @@ std::string UT_std_string_getPropVal(const std::string & sPropertyString, const 
 	else
 	{
 		szDelim = strchr(szLoc,';');
-		if(szDelim == NULL)
+		if(szDelim == nullptr)
 		{
 //
 // bad property string
@@ -364,8 +382,8 @@ void UT_std_string_addPropertyString(std::string & sPropertyString,
 	std::string sProp;
 	std::string sVal;
 	std::string sSubStr;
-	const char * szWork = NULL;
-	const char * szLoc = NULL;
+	const char * szWork = nullptr;
+	const char * szLoc = nullptr;
 	while(iBase < iSize)
 	{
 		bool bBreakAtEnd = false;
@@ -441,7 +459,7 @@ void UT_std_string_removeProperty(std::string & sPropertyString, const std::stri
 	const char * szWork = sWork.c_str();
 	const char * szProps = sPropertyString.c_str();
 	const char * szLoc = strstr(szProps,szWork);
-	if(szLoc == NULL)
+	if(szLoc == nullptr)
 	{
 	    //Not here, do nothing
 	    return ;
@@ -487,7 +505,7 @@ void UT_std_string_removeProperty(std::string & sPropertyString, const std::stri
 	// Look for ";" to get right part
 
 	const char * szDelim = strchr(szLoc,';');
-	if(szDelim == NULL)
+	if(szDelim == nullptr)
 	{
 		// No properties after this, just assign and return
 		sPropertyString = sNew;
@@ -526,7 +544,7 @@ std::string toTimeString( time_t TT )
 {
     const int bufmaxlen = 1025;
     char buf[bufmaxlen];
-    struct tm* TM = 0;
+    struct tm* TM = nullptr;
     std::string format = "%y %b %e %H:%M";
 
 //    TM = gmtime( &TT );

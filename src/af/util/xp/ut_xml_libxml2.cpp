@@ -25,9 +25,8 @@
 #include "ut_assert.h"
 #include "ut_debugmsg.h"
 #include "ut_string.h"
+#include "ut_std_string.h"
 #include "ut_xml.h"
-
-#include "ut_string_class.h"
 
 // Please keep the "/**/" to stop MSVC dependency generator complaining.
 #include <libxml/parser.h>
@@ -53,9 +52,10 @@ static void _startElement (void * userData, const gchar * name, const gchar ** a
 
   /* libxml2 can supply atts == 0, which is a little at variance to what is expected...
    */
-  static const gchar * ptr = 0;
+  static const gchar * ptr = nullptr;
   const gchar ** new_atts = atts;
-  if (atts == 0) new_atts = &ptr;
+  if (atts == nullptr)
+    new_atts = &ptr;
 
   pXML->startElement (reinterpret_cast<const char *>(name), reinterpret_cast<const char **>(new_atts));
 }
@@ -103,21 +103,21 @@ static void _errorSAXFunc(void *xmlp,
 {
   va_list args;
   va_start (args, msg);
-  UT_String errorMessage;
-  UT_String_vprintf (errorMessage,msg, args);
+  std::string errorMessage;
+  UT_std_string_vprintf(errorMessage, msg, args);
   va_end (args);
   // Handle 'nbsp' here
   UT_XML * pXML = reinterpret_cast<UT_XML *>(xmlp);
   pXML->incMinorErrors();
   char * szErr = g_strdup(errorMessage.c_str() );
-  if(strstr(szErr,"'nbsp' not defined") != NULL)
+  if(strstr(szErr,"'nbsp' not defined") != nullptr)
   {
     UT_DEBUGMSG(("nbsp found in stream errs %d \n",pXML->getNumMinorErrors()));
       pXML->incRecoveredErrors();
       const char buffer []= { (char)0xa0};
       pXML->charData(buffer,1); 
   }
-  else if(strstr(szErr,"not defined") != NULL)
+  else if(strstr(szErr,"not defined") != nullptr)
   {
       pXML->incRecoveredErrors();
   }
@@ -137,13 +137,14 @@ static void _fatalErrorSAXFunc(void *xmlp,
 {
   va_list args;
   va_start (args, msg);
-  UT_String errorMessage(UT_String_vprintf (msg, args));
+  std::string errorMessage;
+  UT_std_string_vprintf(errorMessage, msg, args);
   va_end (args);
   UT_DEBUGMSG((" fatal SAX function error here \n"));
 
   UT_DEBUGMSG(("%s", errorMessage.c_str()));
   UT_XML * pXML = reinterpret_cast<UT_XML *>(xmlp);
-  UT_DEBUGMSG((" userData pointer is %p \n",pXML));
+  UT_DEBUGMSG((" userData pointer is %p \n", (void*)pXML));
   UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
   pXML->stop();
 
@@ -155,7 +156,8 @@ UT_Error UT_XML::parse (const char * szFilename)
 	UT_ASSERT (m_pListener || m_pExpertListener);
 	UT_ASSERT (szFilename);
 	
-	if ((szFilename == 0) || ((m_pListener == 0) && (m_pExpertListener == 0))) return UT_ERROR;
+	if ((szFilename == nullptr) || ((m_pListener == nullptr) && (m_pExpertListener == nullptr)))
+		return UT_ERROR;
 	if (!reset_all ()) return UT_OUTOFMEM;
 	
 	UT_Error ret = UT_OK;
@@ -176,7 +178,7 @@ UT_Error UT_XML::parse (const char * szFilename)
 	m_bStopped = false;
 	
 	xmlSAXHandler hdl;
-	xmlParserCtxtPtr ctxt = 0;
+	xmlParserCtxtPtr ctxt = nullptr;
 	
 	memset(&hdl, 0, sizeof(hdl));
 	
@@ -196,7 +198,7 @@ UT_Error UT_XML::parse (const char * szFilename)
 	if (length != 0)
     {
 		ctxt = xmlCreatePushParserCtxt (&hdl, static_cast<void *>(this), buffer, static_cast<int>(length), szFilename);
-		if (ctxt == NULL)
+		if (ctxt == nullptr)
 		{
 			UT_DEBUGMSG (("Unable to create libxml2 push-parser context!\n"));
 			reader->closeFile ();
@@ -253,10 +255,12 @@ UT_Error UT_XML::parse (const char * buffer, UT_uint32 length)
   if (!m_bSniffing)
     {
       UT_ASSERT (m_pListener || m_pExpertListener);
-      if ((m_pListener == 0) && (m_pExpertListener == 0)) return UT_ERROR;
+      if ((m_pListener == nullptr) && (m_pExpertListener == nullptr))
+        return UT_ERROR;
     }
   UT_ASSERT (buffer);
-  if (buffer == 0 || length == 0) return UT_ERROR;
+  if (buffer == nullptr || length == 0)
+    return UT_ERROR;
 
   if (!reset_all ()) return UT_OUTOFMEM;
 
@@ -278,7 +282,7 @@ UT_Error UT_XML::parse (const char * buffer, UT_uint32 length)
   hdl.cdataBlock   = _cdata;
 
   ctxt = xmlCreateMemoryParserCtxt (buffer, static_cast<int>(length));
-  if (ctxt == NULL)
+  if (ctxt == nullptr)
     {
       UT_DEBUGMSG (("Unable to create libxml2 memory context!\n"));
       return UT_ERROR;

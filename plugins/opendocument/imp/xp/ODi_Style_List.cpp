@@ -30,7 +30,7 @@
 #include "ODi_ListenerStateAction.h"
 
 // AbiWord includes
-#include <pd_Document.h>
+#include "pd_Document.h"
 
 
 /**
@@ -48,8 +48,8 @@ ODi_Style_List::~ODi_Style_List()
 void ODi_Style_List::startElement (const gchar* pName, const gchar** ppAtts,
                                ODi_ListenerStateAction& rAction) 
 {
-    const gchar* pVal = NULL;
-    ODi_ListLevelStyle* pLevelStyle = NULL;
+    const gchar* pVal = nullptr;
+    ODi_ListLevelStyle* pLevelStyle = nullptr;
     if(m_bListStyle)
     {
       //

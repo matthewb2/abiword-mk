@@ -59,9 +59,9 @@
 
 XAP_Dialog_FileOpenSaveAs::XAP_Dialog_FileOpenSaveAs(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id)
 	: XAP_Dialog_AppPersistent(pDlgFactory,id, "interface/dialogopenlinux"),
-	  m_szDescriptions(NULL),
-	  m_szSuffixes(NULL),
-	  m_nTypeList(NULL),
+	  m_szDescriptions(nullptr),
+	  m_szSuffixes(nullptr),
+	  m_nTypeList(nullptr),
 	  m_nFileType(XAP_DIALOG_FILEOPENSAVEAS_FILE_TYPE_AUTO),
 	  m_nDefaultFileType(XAP_DIALOG_FILEOPENSAVEAS_FILE_TYPE_AUTO),
 	  m_bSuggestName(false),
@@ -69,8 +69,8 @@ XAP_Dialog_FileOpenSaveAs::XAP_Dialog_FileOpenSaveAs(XAP_DialogFactory * pDlgFac
       m_appendDefaultSuffixFunctor( getAppendDefaultSuffixFunctorUsing_IE_Exp_preferredSuffixForFileType() )
 
 {
-	const gchar * savedir = nullptr;
-	if (getApp()->getPrefsValue(XAP_PREF_KEY_DefaultSaveDirectory, &savedir) && strlen(savedir)) {
+	std::string savedir;
+	if (getApp()->getPrefsValue(XAP_PREF_KEY_DefaultSaveDirectory, savedir) && !savedir.empty()) {
 		m_persistPathname = savedir;
 	}
 }

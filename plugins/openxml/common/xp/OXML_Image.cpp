@@ -39,15 +39,12 @@
 
 
 OXML_Image::OXML_Image()
-	: m_data(NULL)
-	, m_graphic(NULL)
 {
 
 }
 
 OXML_Image::~OXML_Image()
 {
-	DELETEP(m_graphic);
 }
 
 void OXML_Image::setId(const std::string & imageId)
@@ -61,17 +58,16 @@ void OXML_Image::setMimeType(const std::string & imageMimeType)
 }
 
 
-void OXML_Image::setData(const UT_ByteBuf* imageData)
+void OXML_Image::setData(const UT_ConstByteBufPtr & imageData)
 {
-	DELETEP(m_graphic);
+	m_graphic.reset();
 	m_data = imageData;
 }
 
-void OXML_Image::setGraphic(const FG_Graphic * graphic)
+void OXML_Image::setGraphic(FG_ConstGraphicPtr && graphic)
 {
-	DELETEP(m_graphic);
-	m_data = NULL;
-	m_graphic = graphic;
+	m_data.reset();
+	m_graphic = std::move(graphic);
 }
 
 
@@ -110,7 +106,7 @@ UT_Error OXML_Image::addToPT(PD_Document * pDocument)
 {
 	if (!pDocument->createDataItem(m_id.c_str(), false, m_graphic ? m_graphic->getBuffer() : m_data, 
                                    m_graphic ? m_graphic->getMimeType().c_str() : m_mimeType, 
-                                   NULL))
+                                   nullptr))
 	{            
 		UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
 		return UT_ERROR;

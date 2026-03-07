@@ -57,7 +57,7 @@ bool UT_Xpm2Bmp(UT_uint32 maxWidth,
 	UT_uint32 cut_left, cut_top;
 	UT_DebugOnly<UT_uint32> n = sscanf(pIconData[0],"%lu %lu %lu %lu",
 						 &xpm_width,&xpm_height,&nrColors,&charsPerPixel);
-	UT_ASSERT(n == 4);
+	//UT_ASSERT(n == 4);
 	UT_ASSERT(xpm_width > 0);
 	UT_ASSERT(xpm_height > 0);
 
@@ -123,7 +123,9 @@ bool UT_Xpm2Bmp(UT_uint32 maxWidth,
 		UT_ASSERT(strlen(bufSymbol) == charsPerPixel);
 		
 		UT_DebugOnly<UT_uint32> nf = sscanf(&pIconDataPalette[k][charsPerPixel+1]," %s %s",&bufKey,&bufColorValue);
+		#ifdef DEBUG
 		UT_ASSERT(nf == 2);
+		#endif
 		UT_ASSERT(bufKey[0] == 'c' || bufKey[0] == 'g');
 
 		// make the ".." a hash key and store our color index as the data.
@@ -177,16 +179,11 @@ bool UT_Xpm2Bmp(UT_uint32 maxWidth,
 
 	UT_ASSERT(pPixel == (pInfo + sizeofStructure));
 	pPixel = (UT_Byte *)(pInfo + sizeof(BITMAPINFOHEADER) + sizeofColorData);
-	
+
 	HBITMAP hBitmap = CreateDIBitmap(hdc,pbmih,CBM_INIT,pPixel,pbmi,DIB_RGB_COLORS);
 	*pBitmap = hBitmap;
 
 	g_free(pInfo);
-	
-	return (hBitmap != 0);
-}
 
-		
-			
-		
-		
+	return (hBitmap != nullptr);
+}

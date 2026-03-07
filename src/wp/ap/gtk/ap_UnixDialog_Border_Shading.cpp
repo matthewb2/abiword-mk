@@ -1,6 +1,9 @@
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
  * Copyright (c) 2010 Maleesh Prasan
+ * Copyright (C) 2019 Hubert Figuière
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -17,12 +20,10 @@
  * 02110-1301 USA.
  */
 
-#include "ut_compiler.h"
-
 #include <stdlib.h>
-ABI_W_NO_CONST_QUAL
+
 #include <gdk/gdk.h>
-ABI_W_POP
+
 #include "ut_locale.h"
 
 #include "ut_std_string.h"
@@ -72,7 +73,7 @@ static void s_line_left(GtkWidget *widget, gpointer data )
 	AP_UnixDialog_Border_Shading * dlg = reinterpret_cast<AP_UnixDialog_Border_Shading *>(data);
 	UT_return_if_fail(widget && dlg);
 	dlg->toggleLineType(AP_Dialog_Border_Shading::toggle_left, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)));
-	dlg->event_previewExposed();
+	dlg->event_previewInvalidate();
 }
 
 static void s_line_right(GtkWidget *widget, gpointer data )
@@ -80,7 +81,7 @@ static void s_line_right(GtkWidget *widget, gpointer data )
 	AP_UnixDialog_Border_Shading * dlg = static_cast<AP_UnixDialog_Border_Shading *>(data);
 	UT_return_if_fail(widget && dlg);
 	dlg->toggleLineType(AP_Dialog_Border_Shading::toggle_right, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)));
-	dlg->event_previewExposed();
+	dlg->event_previewInvalidate();
 }
 
 static void s_line_top(GtkWidget *widget, gpointer data )
@@ -88,7 +89,7 @@ static void s_line_top(GtkWidget *widget, gpointer data )
 	AP_UnixDialog_Border_Shading * dlg = static_cast<AP_UnixDialog_Border_Shading *>(data);
 	UT_return_if_fail(widget && dlg);
 	dlg->toggleLineType(AP_Dialog_Border_Shading::toggle_top, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)));
-	dlg->event_previewExposed();
+	dlg->event_previewInvalidate();
 }
 
 static void s_line_bottom(GtkWidget *widget, gpointer data )
@@ -96,13 +97,13 @@ static void s_line_bottom(GtkWidget *widget, gpointer data )
 	AP_UnixDialog_Border_Shading * dlg = static_cast<AP_UnixDialog_Border_Shading *>(data);
 	UT_return_if_fail(widget && dlg);
 	dlg->toggleLineType(AP_Dialog_Border_Shading::toggle_bottom, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)));
-	dlg->event_previewExposed();
+	dlg->event_previewInvalidate();
 }
 
 static gboolean s_preview_draw(GtkWidget * widget, gpointer /* data */, AP_UnixDialog_Border_Shading * dlg)
 {
 	UT_return_val_if_fail(widget && dlg, FALSE);
-	dlg->event_previewExposed();
+	dlg->event_previewDraw();
 	return FALSE;
 }
 
@@ -124,7 +125,9 @@ static gboolean s_on_border_color_clicked (GtkWidget 		*button,
 								gpointer 		data)
 {
 	// only handle left clicks
-	if (event->button != 1) {
+	guint ev_button = 0;
+	gdk_event_get_button((GdkEvent*)event, &ev_button);
+	if (ev_button != 1) {
 		return FALSE;
 	}
 
@@ -137,7 +140,7 @@ static gboolean s_on_border_color_clicked (GtkWidget 		*button,
 
 	if (color.get()) {
 		dlg->setBorderColor (*color);
-		dlg->event_previewExposed ();
+		dlg->event_previewInvalidate();
 	}
 
 	return TRUE;
@@ -166,7 +169,9 @@ static gboolean s_on_shading_color_clicked (GtkWidget 		*button,
 										gpointer 		data)
 {
 	// only handle left clicks
-	if (event->button != 1) {
+	guint ev_button = 0;
+	gdk_event_get_button((GdkEvent*)event, &ev_button);
+	if (ev_button != 1) {
 		return FALSE;
 	}
 
@@ -179,7 +184,7 @@ static gboolean s_on_shading_color_clicked (GtkWidget 		*button,
 
 	if (color.get()) {
 		dlg->setShadingColor (*color);
-		dlg->event_previewExposed ();
+		dlg->event_previewInvalidate();
 	}
 
 	return TRUE;
@@ -209,28 +214,27 @@ XAP_Dialog * AP_UnixDialog_Border_Shading::static_constructor(XAP_DialogFactory 
 AP_UnixDialog_Border_Shading::AP_UnixDialog_Border_Shading(XAP_DialogFactory * pDlgFactory,
 										             XAP_Dialog_Id id)
 	: AP_Dialog_Border_Shading(pDlgFactory,id)
+	, m_wPreviewArea(nullptr)
+	, m_pPreviewWidget(nullptr)
+	, m_wApplyButton(nullptr)
+	, m_wBorderColorButton(nullptr)
+	, m_wLineLeft(nullptr)
+	, m_wLineRight(nullptr)
+	, m_wLineTop(nullptr)
+	, m_wLineBottom(nullptr)
+	, m_wBorderThickness(nullptr)
+	, m_wBorderStyle(nullptr)
+	, m_wShadingOffset(nullptr)
+	, m_wShadingEnable(nullptr)
+	, m_iBorderThicknessConnect(0)
+	, m_iBorderStyleConnect(0)
+	, m_iShadingOffsetConnect(0)
+	, m_iShadingEnableConnect(0)
+	, m_iLineLeftConnect(0)
+	, m_iLineRightConnect(0)
+	, m_iLineTopConnect(0)
+	, m_iLineBotConnect(0)
 {
-	m_windowMain = NULL;
-	m_wPreviewArea = NULL;
-	m_pPreviewWidget = NULL;
-	m_wApplyButton = NULL;
-	m_wBorderColorButton = NULL;
-	m_wLineLeft = NULL;
-	m_wLineRight = NULL;
-	m_wLineTop = NULL;
-	m_wLineBottom = NULL;
-	m_wBorderThickness = NULL;
-	m_wBorderStyle = NULL;
-	m_wShadingOffset = NULL;
-	m_wShadingEnable = NULL;
-	m_iBorderThicknessConnect = 0;
-	m_iBorderStyleConnect = 0;
-	m_iShadingOffsetConnect = 0;
-	m_iShadingEnableConnect = 0;
-	m_iLineLeftConnect = 0;
-	m_iLineRightConnect = 0;
-	m_iLineTopConnect = 0;
-	m_iLineBotConnect = 0;
 }
 
 AP_UnixDialog_Border_Shading::~AP_UnixDialog_Border_Shading(void)
@@ -252,7 +256,7 @@ void AP_UnixDialog_Border_Shading::runModeless(XAP_Frame * pFrame)
 	
 	// *** this is how we add the gc for Column Preview ***
 	// attach a new graphics context to the drawing area
-	UT_return_if_fail(m_wPreviewArea && gtk_widget_get_window(m_wPreviewArea));
+	UT_return_if_fail(m_wPreviewArea && XAP_HAS_NATIVE_WINDOW(m_wPreviewArea));
 
 	// make a new Unix GC
 	DELETEP (m_pPreviewWidget);
@@ -273,7 +277,7 @@ void AP_UnixDialog_Border_Shading::runModeless(XAP_Frame * pFrame)
 						 static_cast<UT_uint32>(alloc.width),
 						 static_cast<UT_uint32>(alloc.height));	
 	
-	m_pBorderShadingPreview->draw();
+	m_pBorderShadingPreview->queueDraw();
 
 	startUpdater();
 	UT_DEBUGMSG(("========================= End the unModeless \n"));
@@ -299,10 +303,18 @@ void AP_UnixDialog_Border_Shading::event_Close(void)
 	destroy();
 }
 
-void AP_UnixDialog_Border_Shading::event_previewExposed(void)
+void AP_UnixDialog_Border_Shading::event_previewInvalidate(void)
 {
-	if(m_pBorderShadingPreview)
-		m_pBorderShadingPreview->draw();
+	if(m_pBorderShadingPreview) {
+		m_pBorderShadingPreview->queueDraw();
+	}
+}
+
+void AP_UnixDialog_Border_Shading::event_previewDraw(void)
+{
+	if(m_pBorderShadingPreview) {
+		m_pBorderShadingPreview->drawImmediate();
+	}
 }
 
 void AP_UnixDialog_Border_Shading::_setShadingEnable(bool enable)
@@ -390,7 +402,7 @@ void AP_UnixDialog_Border_Shading::event_BorderThicknessChanged(void)
 			sThickness = UT_std_string_sprintf("%fin",thickness);
 		}
 		setBorderThickness(sThickness);
-		event_previewExposed();
+		event_previewInvalidate();
 	}
 }
 
@@ -399,11 +411,11 @@ void AP_UnixDialog_Border_Shading::event_BorderStyleChanged(void)
 	if(m_wBorderStyle)
 	{
 		gint index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_wBorderStyle));
-
+		UT_DEBUGMSG(("border index %d\n", index));
 		if (index >= 0 && index < BORDER_SHADING_NUMOFSTYLES)
 		{
 			setBorderStyle(sBorderStyle[index]);
-			event_previewExposed();
+			event_previewInvalidate();
 		}
 	}
 }
@@ -422,7 +434,7 @@ void AP_UnixDialog_Border_Shading::event_ShadingOffsetChanged(void)
 		}
 
 		setShadingOffset(sOffset);
-		event_previewExposed();
+		event_previewInvalidate();
 	}
 }
 
@@ -439,8 +451,8 @@ void AP_UnixDialog_Border_Shading::event_shadingPatternChange(void)
 void AP_UnixDialog_Border_Shading::destroy(void)
 {
 	finalize();
-	gtk_widget_destroy(m_windowMain);
-	m_windowMain = NULL;
+	gtk_widget_destroy(m_windowMain); // TOPLEVEL
+	m_windowMain = nullptr;
 }
 
 void AP_UnixDialog_Border_Shading::activate(void)
@@ -450,7 +462,7 @@ void AP_UnixDialog_Border_Shading::activate(void)
 	ConstructWindowName();
 	gtk_window_set_title (GTK_WINDOW (m_windowMain), m_WindowName);
 	setAllSensitivities();
-	gdk_window_raise (gtk_widget_get_window(m_windowMain));
+	XAP_gtk_window_raise(m_windowMain);
 }
 
 void AP_UnixDialog_Border_Shading::notifyActiveFrame(XAP_Frame */*pFrame*/)
@@ -471,7 +483,7 @@ GtkWidget * AP_UnixDialog_Border_Shading::_constructWindow(void)
 	const XAP_StringSet * pSS = m_pApp->getStringSet();
 	
 	// load the dialog from the UI file
-	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_Border_Shading.ui");
+	GtkBuilder* builder = newDialogBuilderFromResource("ap_UnixDialog_Border_Shading.ui");
 	
 	// Update our member variables with the important widgets that 
 	// might need to be queried or altered later
@@ -588,22 +600,12 @@ static void s_destroy_clicked(GtkWidget * /* widget */,
 	dlg->event_Close();
 }
 
-static void s_delete_clicked(GtkWidget * widget,
-			     gpointer,
-			     gpointer * /*dlg*/)
-{
-	abiDestroyWidget(widget);
-}
-
 void AP_UnixDialog_Border_Shading::_connectSignals(void)
 {
+	connectBasicSignals();
 	g_signal_connect(G_OBJECT(m_windowMain),
 							"destroy",
 							G_CALLBACK(s_destroy_clicked),
-							reinterpret_cast<gpointer>(this));
-	g_signal_connect(G_OBJECT(m_windowMain),
-							"delete_event",
-							G_CALLBACK(s_delete_clicked),
 							reinterpret_cast<gpointer>(this));
 
 	g_signal_connect(G_OBJECT(m_wApplyButton),

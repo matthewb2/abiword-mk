@@ -1,4 +1,4 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t; -*- */
 
 /* Abiword
  * Copyright (C) 2001 Christian Biesinger <cbiesinger@web.de>
@@ -20,19 +20,18 @@
  */
 
 #include <memory.h>
+#include "ut_compiler.h"
+
 #include <gsf/gsf.h>
-#include <gsf/gsf-input.h>
-#include <gsf/gsf-input-stdio.h>
-#include <gsf/gsf-utils.h>
-#include <gsf/gsf-infile.h>
-#include <gsf/gsf-infile-msole.h>
 
 #include "ut_types.h"
+#include "ut_std_string.h"
 #include "ut_string.h"
 #include "ut_iconv.h"
 #include "ut_vector.h"
 #include "ut_debugmsg.h"
 #include "ut_units.h"
+#include "ut_std_string.h"
 
 #include "pd_Document.h"
 
@@ -111,7 +110,7 @@ static const ColorData gColors[] =
 
 /** Given a data pointer, returns a color string (like cccccc for a medium gray).
  * throws BOGUS_DOCUMENT on error. */
-UT_String makeColor(UT_uint8* aData, UT_uint32 aDataLen) {
+std::string makeColor(UT_uint8* aData, UT_uint32 aDataLen) {
 	// from tools/source/generic/color.cxx line 183ff
 	#define COL_NAME_USER		(0x8000)
 	#define COL_RED_1B			(0x0001)
@@ -121,7 +120,6 @@ UT_String makeColor(UT_uint8* aData, UT_uint32 aDataLen) {
 	#define COL_BLUE_1B 		(0x0100)
 	#define COL_BLUE_2B 		(0x0200)
 
-	UT_String rv;
 	if (aDataLen < 2)
 		throw UT_IE_BOGUSDOCUMENT;
 	UT_uint16 colorName = GSF_LE_GET_GUINT16(aData);
@@ -131,15 +129,13 @@ UT_String makeColor(UT_uint8* aData, UT_uint32 aDataLen) {
 	}
 	else {
 		if (colorName < COLOR_SIZE) {
-			UT_String_sprintf(rv, "%02x%02x%02x", gColors[colorName].red,
-			                  gColors[colorName].green, gColors[colorName].blue);
-			return rv;
+			return UT_std_string_sprintf("%02x%02x%02x", gColors[colorName].red,
+										 gColors[colorName].green, gColors[colorName].blue);
 		}
 		else {
 			UT_DEBUGMSG(("SDW: COLOR OUT OF RANGE! has num %u\n", colorName));
 			return "000000";
 		}
-			
 	}
 }
 
@@ -148,7 +144,7 @@ static double twipsToPoints(UT_uint32 aTwips)
   return (double)aTwips/20;
 }
 
-static UT_String twipsToSizeString(UT_uint32 aTwips)
+static std::string twipsToSizeString(UT_uint32 aTwips)
 {
   return UT_formatDimensionString(DIM_PT, twipsToPoints(aTwips));
 }
@@ -183,7 +179,6 @@ static UT_uint16 lcl_sw3io__CompressWhich(UT_uint16 nWhich)
 #endif
 
 void streamRead(GsfInput* aStream, TextAttr& aAttr, gsf_off_t aEoa)
-    throw(UT_Error)
 {
 	UT_uint8 flags;
 	gsf_off_t newPos;
@@ -229,7 +224,7 @@ void streamRead(GsfInput* aStream, TextAttr& aAttr, gsf_off_t aEoa)
 			if (aAttr.dataLen < 3)
 				break;
 			// first byte is size of text % of normal size
-			UT_sint16 height = GSF_LE_GET_GINT16(aAttr.data + 1);	
+			UT_sint16 height = GSF_LE_GET_GINT16(aAttr.data + 1);
 			aAttr.attrName = "text-position";
 			if (height > 0)
 				aAttr.attrVal = "superscript";
@@ -245,8 +240,8 @@ void streamRead(GsfInput* aStream, TextAttr& aAttr, gsf_off_t aEoa)
 			aAttr.attrName = "font-family";
 			// XXX TODO This code here assumes that the font names are in latin1
 			UT_uint16 fontLen = GSF_LE_GET_GUINT16(aAttr.data + 3);
-			UT_String_sprintf(aAttr.attrVal, "%.*s", fontLen, (aAttr.data + 5));
-			
+			aAttr.attrVal = UT_std_string_sprintf("%.*s", fontLen, (aAttr.data + 5));
+
 		break; }
     case 0x1007: // font height
       // structure: | height (2 byte, twips) | prop (?) (2 byte) (if version >= 2, if ver=1 1 byte) | unit (if version>=2) |
@@ -289,7 +284,7 @@ void streamRead(GsfInput* aStream, TextAttr& aAttr, gsf_off_t aEoa)
         // (used for "exact" and "minimum" line spacing)
         // XXX inter-line spacing not supported by abiword (would be rule=0x00
         // interrule=0x02, value to use=inter space, unit twips)
-        UT_String lineHeight = twipsToSizeString(GSF_LE_GET_GINT16(aAttr.data + 3));
+        std::string lineHeight = twipsToSizeString(GSF_LE_GET_GINT16(aAttr.data + 3));
 
         // We'll turn the bytes at 5 and 6 into a single integer, for easier
         // evaluation
@@ -339,7 +334,7 @@ void streamRead(GsfInput* aStream, TextAttr& aAttr, gsf_off_t aEoa)
       for (UT_uint32 i = 1; (i + 6) < aAttr.dataLen; i += 7) {
         // Abiword wants: 12.3cm/L0, where 0 indicates what to fill with
         UT_uint16 posInTwips = GSF_LE_GET_GUINT32(aAttr.data + i);
-        UT_String pos = twipsToSizeString(posInTwips);
+        std::string pos = twipsToSizeString(posInTwips);
 
         aAttr.attrVal += pos;
         aAttr.attrVal += '/';
@@ -392,9 +387,9 @@ static void hexdump(void* aPtr, UT_uint32 aLen) {
 
 #define GetPassword() _getPassword ( XAP_App::getApp()->getLastFocussedFrame() )
 
-static UT_String _getPassword (XAP_Frame * pFrame)
+static std::string _getPassword (XAP_Frame * pFrame)
 {
-  UT_String password ( "" );
+  std::string password;
 
   if ( pFrame )
     {
@@ -422,11 +417,10 @@ static UT_String _getPassword (XAP_Frame * pFrame)
   return password;
 }
 
-void readByteString(GsfInput* stream, char*& str, UT_uint16* aLength) 
-    throw(UT_Error) 
+void readByteString(GsfInput* stream, char*& str, UT_uint16* aLength)
 {
 	UT_uint16 length;
-	str = NULL;
+	str = nullptr;
 	streamRead(stream, length);
 	str = new char[length + 1];
 	if (length)
@@ -436,17 +430,17 @@ void readByteString(GsfInput* stream, char*& str, UT_uint16* aLength)
 		*aLength = length;
 }
 
-void readByteString(GsfInput* stream, UT_UCS4Char*& str, UT_iconv_t converter, SDWCryptor* cryptor) throw(UT_Error) 
+void readByteString(GsfInput* stream, UT_UCS4Char*& str, UT_iconv_t converter, SDWCryptor* cryptor)
 {
 	UT_uint16 len;
 	char* rawString;
-	str = NULL;
+	str = nullptr;
 	readByteString(stream, rawString, &len);
 	// decrypt
 	if (cryptor)
 		cryptor->Decrypt(rawString, rawString, len);
 
-	str = reinterpret_cast<UT_UCS4Char*>(UT_convert_cd(rawString, len + 1, converter, NULL, NULL));
+	str = reinterpret_cast<UT_UCS4Char*>(UT_convert_cd(rawString, len + 1, converter, nullptr, nullptr));
 #ifdef DEBUG
 	if (!str) {
 		UT_DEBUGMSG(("SDW: UT_convert_cd returned %d (%s)\n", errno, strerror(errno)));
@@ -493,17 +487,17 @@ const IE_MimeConfidence * IE_Imp_StarOffice_Sniffer::getMimeConfidence ()
 	return IE_Imp_StarOffice_Sniffer__MimeConfidence;
 }
 
-static const UT_Byte sdwSignature[] = {0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1};
+//static const UT_Byte sdwSignature[] = {0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1};
 
 UT_Confidence_t IE_Imp_StarOffice_Sniffer::recognizeContents(GsfInput * input) {
 	GsfInfile * ole;
 	UT_Confidence_t confidence = UT_CONFIDENCE_ZILCH;
 
-	ole = gsf_infile_msole_new (input, NULL);
+	ole = gsf_infile_msole_new (input, nullptr);
 	if (ole)
 		{
 			GsfInput * starWriterDocument = gsf_infile_child_by_name (ole, "StarWriterDocument");
-			if (starWriterDocument != NULL)
+			if (starWriterDocument != nullptr)
 				{
 					confidence = UT_CONFIDENCE_PERFECT;
 					g_object_unref (G_OBJECT (starWriterDocument));
@@ -532,7 +526,7 @@ bool IE_Imp_StarOffice_Sniffer::getDlgLabels(const char** pszDesc, const char** 
 // ********************************************************************************
 // Header Class
 
-void DocHdr::load(GsfInput* stream) throw(UT_Error) 
+void DocHdr::load(GsfInput* stream)
 {
 	UT_DEBUGMSG(("SDW: entering DocHdr::load\n"));
 	static const char sw3hdr[] = "SW3HDR";
@@ -581,7 +575,7 @@ void DocHdr::load(GsfInput* stream) throw(UT_Error)
 		streamRead(stream, buf, 64);
 		UT_DEBUGMSG(("SDW: BLOCKNAME: %.64s\n", buf));
 		// XXX verify that the string is really null terminated
-		sBlockName = reinterpret_cast<UT_UCS4Char*>(UT_convert_cd(buf, strlen(buf) + 1, converter, NULL, NULL));
+		sBlockName = reinterpret_cast<UT_UCS4Char*>(UT_convert_cd(buf, strlen(buf) + 1, converter, nullptr, nullptr));
 	}
 
 	if (nRecSzPos != 0 && nVersion >= SWG_RECSIZES) {
@@ -596,7 +590,7 @@ void DocHdr::load(GsfInput* stream) throw(UT_Error)
 	if (nFileFlags & SWGF_HAS_PASSWD)
 		cryptor = new SDWCryptor(nDate, nTime, cPasswd);
 	else
-		cryptor = NULL;
+		cryptor = nullptr;
 
 }
 
@@ -604,7 +598,7 @@ void DocHdr::load(GsfInput* stream) throw(UT_Error)
 // Actual Importer
 
 IE_Imp_StarOffice::IE_Imp_StarOffice(PD_Document *pDocument)
-	: IE_Imp(pDocument), mOle(NULL), mDocStream(NULL) {
+	: IE_Imp(pDocument), mOle(nullptr), mDocStream(nullptr) {
 }
 
 IE_Imp_StarOffice::~IE_Imp_StarOffice() {
@@ -614,7 +608,7 @@ IE_Imp_StarOffice::~IE_Imp_StarOffice() {
 		g_object_unref(G_OBJECT(mOle));
 }
 
-void IE_Imp_StarOffice::readRecSize(GsfInput* aStream, UT_uint32& aSize, gsf_off_t* aEOR) throw(UT_Error) {
+void IE_Imp_StarOffice::readRecSize(GsfInput* aStream, UT_uint32& aSize, gsf_off_t* aEOR) {
 	// Yes, that's correct, only 3 bytes.
 	guint8 buf [3];
 	aSize = 0;
@@ -630,7 +624,7 @@ void IE_Imp_StarOffice::readRecSize(GsfInput* aStream, UT_uint32& aSize, gsf_off
 		*aEOR = gsf_input_tell(aStream) + aSize;
 }
 
-void readFlagRec(GsfInput* stream, UT_uint8& flags, gsf_off_t* newPos) throw(UT_Error) 
+void readFlagRec(GsfInput* stream, UT_uint8& flags, gsf_off_t* newPos)
 {
 	streamRead(stream, flags);
 	if (newPos)
@@ -642,7 +636,7 @@ UT_Error IE_Imp_StarOffice::_loadFile(GsfInput * input)
 {
 	try {
 		UT_DEBUGMSG(("SDW: Starting import\n"));
-		mOle = GSF_INFILE (gsf_infile_msole_new(input, NULL));
+		mOle = GSF_INFILE (gsf_infile_msole_new(input, nullptr));
 		if (!mOle)
 			return UT_IE_BOGUSDOCUMENT;
 
@@ -655,7 +649,7 @@ UT_Error IE_Imp_StarOffice::_loadFile(GsfInput * input)
 
 		gsf_off_t size = gsf_input_size(mDocStream);
 
-		if (!appendStrux(PTX_Section, NULL))
+		if (!appendStrux(PTX_Section, PP_NOPROPS))
 			return UT_IE_NOMEMORY;
 
 		UT_DEBUGMSG(("SDW: Attempting to load DocHdr...\n"));
@@ -736,8 +730,8 @@ UT_Error IE_Imp_StarOffice::_loadFile(GsfInput * input)
 								UT_DEBUGMSG(("SDW: ...length=%zu contents are: |%s|\n", textNode.length(), textNode.utf8_str()));
 
 								// now get the attributes
-								UT_String attrs;
-								UT_String pAttrs;
+								std::string attrs;
+								std::string pAttrs;
 								UT_Vector charAttributes;
 								while (gsf_input_tell(mDocStream) < eor2) {
 									char attVal;
@@ -769,16 +763,21 @@ UT_Error IE_Imp_StarOffice::_loadFile(GsfInput * input)
 											if (attVal == SWG_ATTRIBUTE) {
 												TextAttr a;
 												streamRead(mDocStream, a, eoa2);
-                        if (!a.attrVal.empty()) {
-  												if (a.isPara)
-	  												UT_String_setProperty(pAttrs, a.attrName, a.attrVal);
-		  										else
-			  										UT_String_setProperty(attrs, a.attrName, a.attrVal);
-                        }
-						UT_DEBUGMSG(("SDW: ......found paragraph attr, which=0x%x, ver=0x%x, start=%u, end=%u (string now %s) Data:%s Len=%lld Data:", a.which, a.ver, (a.startSet?a.start:0), (a.endSet?a.end:0), attrs.c_str(), (a.data ? "Yes" : "No"), (long long)a.dataLen));
+												if (!a.attrVal.empty()) {
+													if (a.isPara)
+														UT_std_string_setProperty(pAttrs, a.attrName, a.attrVal);
+													else
+														UT_std_string_setProperty(attrs, a.attrName, a.attrVal);
+												}
+												UT_DEBUGMSG(("SDW: ......found paragraph attr, which=0x%x, ver=0x%x, start=%u, end=%u (string now %s) Data:%s Len=%lld Data:",
+															 a.which, a.ver,
+															 (a.startSet?a.start:0),
+															 (a.endSet?a.end:0), attrs.c_str(),
+															 (a.data ? "Yes" : "No"),
+															 (long long)a.dataLen));
 #ifdef DEBUG
 												hexdump(a.data, a.dataLen);
-                        putc('\n', stderr);
+												putc('\n', stderr);
 #endif
 											}
 											if (gsf_input_seek(mDocStream, eoa2, G_SEEK_SET))
@@ -792,17 +791,15 @@ UT_Error IE_Imp_StarOffice::_loadFile(GsfInput * input)
 										return UT_IE_BOGUSDOCUMENT;
 								}
 
-								static const gchar* attributes[3] = {
+								PP_PropertyVector attributes = {
 									"props",
-									NULL,
-									NULL
+									pAttrs.c_str()
 								};
-								attributes[1] = const_cast<gchar*>(reinterpret_cast<const gchar*>(pAttrs.c_str()));
 								// first, insert the paragraph
-								if (!appendStrux(PTX_Block, (const gchar**)attributes))
+								if (!appendStrux(PTX_Block, attributes))
 									return UT_IE_NOMEMORY;
 
-								UT_String pca(attrs); // character attributes for the whole paragraph
+								std::string pca(attrs); // character attributes for the whole paragraph
 								// now insert the spans of text
 								UT_uint32 len = textNode.length();
 								UT_uint32 lastInsPos = 0;
@@ -813,21 +810,21 @@ UT_Error IE_Imp_StarOffice::_loadFile(GsfInput * input)
 										// clear the last attribute, if set
 										if (a->endSet && a->end == (i - 1)) {
 											if (a->isOff) {
-												UT_String propval = UT_String_getPropVal(pca, a->attrName);
-												UT_String_setProperty(attrs, a->attrName, propval);
+												std::string propval = UT_std_string_getPropVal(pca, a->attrName);
+												UT_std_string_setProperty(attrs, a->attrName, propval);
 											}
 											else
-												UT_String_removeProperty(attrs, a->attrName);
+												UT_std_string_removeProperty(attrs, a->attrName);
 										}
 
 										// now set new attribute, if needed
 										if (a->startSet && a->start == (i - 1)) {
 											if (a->isPara)
-												UT_String_setProperty(pAttrs, a->attrName, a->attrVal);
+												UT_std_string_setProperty(pAttrs, a->attrName, a->attrVal);
 											else if (a->isOff)
-												UT_String_removeProperty(attrs, a->attrName);
+												UT_std_string_removeProperty(attrs, a->attrName);
 											else
-												UT_String_setProperty(attrs, a->attrName, a->attrVal);
+												UT_std_string_setProperty(attrs, a->attrName, a->attrVal);
 										}
 
 										// insert if this is the last character, or if there was a format change
@@ -835,13 +832,14 @@ UT_Error IE_Imp_StarOffice::_loadFile(GsfInput * input)
 											doInsert = true;
 									}
 									if (doInsert || i == (len - 1)) {
-										attributes[1] = const_cast<gchar*>(reinterpret_cast<const gchar*>(attrs.c_str()));
-										UT_DEBUGMSG(("SDW: Going to appendFmt with %s\n", attributes[1]));
-										if (!appendFmt((const gchar **) attributes))
+										attributes[1] = attrs.c_str();
+										UT_DEBUGMSG(("SDW: Going to appendFmt with %s\n", attributes[1].c_str()));
+										if (!appendFmt(attributes))
 											return UT_IE_NOMEMORY; /* leave cast alone! */
 										UT_DEBUGMSG(("SDW: About to insert %u-%u\n", lastInsPos, i));
 										size_t spanLen = i - lastInsPos;
-										if (i == (len - 1)) spanLen++;
+										if (i == (len - 1))
+											spanLen++;
 										UT_UCS4String span = textNode.substr(lastInsPos, spanLen);
 										appendSpan(span.ucs4_str(), spanLen);
 										lastInsPos = i;
@@ -889,18 +887,12 @@ UT_Error IE_Imp_StarOffice::_loadFile(GsfInput * input)
 									UT_DEBUGMSG(("SDW: orient %u bin %u format %u width %u height %u\n", orient, paperBin, paperFormat, width, height));
 									// rest of the data is ignored, seems to be printer specific anyway.
 									// Use A4, Portrait by default
-									const char* attributes[] = {
-										"pagetype", // A4/Letter/...
-										"a4",
-										"orientation",
-										"portrait",
-										"width",
-										"210",
-										"height",
-										"297",
-										"units",
-										"mm",
-										NULL
+									PP_PropertyVector attributes = {
+										"pagetype", "a4", // A4/Letter/...
+										"orientation", "portrait",
+										"width", "210",
+										"height", "297",
+										"units", "mm"
 									};
 									const char* sdwPaperToAbi[] = {
 										"A3",
@@ -913,20 +905,19 @@ UT_Error IE_Imp_StarOffice::_loadFile(GsfInput * input)
 										"Tabloid/Ledger",
 										"Custom"
 									};
-									if (paperFormat < sizeof(sdwPaperToAbi)/sizeof(*sdwPaperToAbi))
+									if (paperFormat < sizeof(sdwPaperToAbi)/sizeof(*sdwPaperToAbi)) {
 										attributes[1] = sdwPaperToAbi[paperFormat];
+                                    }
 									const char* sdwOrientToAbi[] = {
 										"portrait",
 										"landscape"
 									};
-									if (orient < sizeof(sdwOrientToAbi)/sizeof(*sdwOrientToAbi))
+									if (orient < sizeof(sdwOrientToAbi)/sizeof(*sdwOrientToAbi)) {
 										attributes[3] = sdwOrientToAbi[orient];
-									UT_String hstr, wstr;
-									UT_String_sprintf(hstr, "%f", static_cast<double>(height)/100);
-									UT_String_sprintf(wstr, "%f", static_cast<double>(width)/100);
-									attributes[5] = wstr.c_str();
-									attributes[7] = hstr.c_str();
-									
+                                    }
+									attributes[5] = UT_std_string_sprintf("%f", static_cast<double>(width)/100);
+									attributes[7] = UT_std_string_sprintf("%f", static_cast<double>(height)/100);
+
 									getDoc()->setPageSizeFromFile(attributes);
 								}
 								break;
@@ -970,7 +961,7 @@ UT_Error IE_Imp_StarOffice::_loadFile(GsfInput * input)
 						// FIXME: find a way to not have to copy and free 
 						// the result of UT_convert_cd.... --hub
 						UT_DEBUGMSG(("SDW: StringPool: found 0x%04x <-> %.*s\n", id, len, str));
-						UT_UCS4Char* convertedString = reinterpret_cast<UT_UCS4Char*>(UT_convert_cd(str, len + 1, cd, NULL, NULL));
+						UT_UCS4Char* convertedString = reinterpret_cast<UT_UCS4Char*>(UT_convert_cd(str, len + 1, cd, nullptr, nullptr));
 						mStringPool.insert(stringpool_map::value_type(id, convertedString));
 						FREEP(convertedString);
                         delete [] str;
@@ -1008,7 +999,7 @@ UT_Error IE_Imp_StarOffice::_loadFile(GsfInput * input)
 /*******************************************************/
 
 // we use a reference-counted sniffer
-static IE_Imp_StarOffice_Sniffer * m_impSniffer = 0;
+static IE_Imp_StarOffice_Sniffer * m_impSniffer = nullptr;
 
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_register (XAP_ModuleInfo * mi)
@@ -1032,17 +1023,17 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-    mi->name = 0;
-    mi->desc = 0;
-    mi->version = 0;
-    mi->author = 0;
-    mi->usage = 0;
+    mi->name = nullptr;
+    mi->desc = nullptr;
+    mi->version = nullptr;
+    mi->author = nullptr;
+    mi->usage = nullptr;
   
     UT_ASSERT (m_impSniffer);
 
     IE_Imp::unregisterImporter (m_impSniffer);
 	delete m_impSniffer;
-	m_impSniffer = 0;
+	m_impSniffer = nullptr;
 
     return 1;
 }

@@ -71,26 +71,25 @@ class IE_RSVGBitmapGraphic : public IE_ImpGraphic
 public:
 
 	IE_RSVGBitmapGraphic()
-		: IE_ImpGraphic(), m_pPngBB(0)
+		: IE_ImpGraphic()
 	{
 	}
 	
 	virtual ~IE_RSVGBitmapGraphic()
 	{
-		// we likely don't own the m_pPngBB, so don't free it
 	}
 	
 	/*!
 	 * Convert an image data buffer into PNG image buffer.
 	 */
-	virtual UT_Error importGraphic(UT_ByteBuf * pBB, FG_Graphic ** ppfg)
+	virtual UT_Error importGraphic(const UT_ConstByteBufPtr & pBB, FG_ConstGraphicPtr & pfg)
 	{
 		UT_Error err = _importGraphic(pBB);
 		if ( err != UT_OK )
 			return err ;
 
-		FG_GraphicRaster * pFGR = new FG_GraphicRaster();
-		if(pFGR == NULL)
+		FG_GraphicRasterPtr pFGR(new FG_GraphicRaster);
+		if(pFGR == nullptr)
 			{
 				return UT_IE_NOMEMORY;
 			}
@@ -100,17 +99,17 @@ public:
 				return UT_IE_FAKETYPE;
 			}
 		
-		*ppfg = static_cast<FG_Graphic *>(pFGR);
+		pfg = std::move(pFGR);
 		return UT_OK;
 	}
   
 private:
 
-	UT_Error _importGraphic(UT_ByteBuf * pBB)
+	UT_Error _importGraphic(const UT_ConstByteBufPtr & pBB)
 	{
-		GdkPixbuf * pixbuf = NULL;		
-		GError * err = NULL;
-		
+		GdkPixbuf * pixbuf = nullptr;
+		GError * err = nullptr;
+
 		RsvgHandle * rsvg = rsvg_handle_new ();
 		if ( FALSE == rsvg_handle_write ( rsvg, static_cast<const guchar *>(pBB->getPointer (0)),
 										  static_cast<gsize>(pBB->getLength ()), &err ) )
@@ -124,19 +123,19 @@ private:
 			{
 				UT_DEBUGMSG(("DOM: couldn't write to loader: %s\n", err->message));
 				g_error_free(err);
-				rsvg_handle_free ( rsvg ) ;
+				g_object_unref(G_OBJECT(rsvg));
 				return UT_ERROR ;
 			}
 		
 		pixbuf = rsvg_handle_get_pixbuf ( rsvg ) ;
-		rsvg_handle_free ( rsvg ) ;
+		g_object_unref(G_OBJECT(rsvg));
 		
 		if (!pixbuf)
 			{
 				return UT_ERROR;
 			}
 		
-		gdk_pixbuf_ref (pixbuf);
+		g_object_ref (pixbuf);
 		
 		// Initialize stuff to create our PNG.
 		UT_Error error = Initialize_PNG();
@@ -214,19 +213,17 @@ private:
 	UT_Error Initialize_PNG(void)
 	{
 		/* Set up png structures for writing */
-		m_pPNG = png_create_write_struct( PNG_LIBPNG_VER_STRING, 
-										  static_cast<void*>(NULL),
-										  NULL, 
-										  NULL );
-		if( m_pPNG == NULL )
+		m_pPNG = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+										  nullptr, nullptr, nullptr);
+		if( m_pPNG == nullptr )
 			{
 				return UT_ERROR;
 			}
 		
 		m_pPNGInfo = png_create_info_struct(m_pPNG);
-		if ( m_pPNGInfo == NULL )
+		if ( m_pPNGInfo == nullptr )
 			{
-				png_destroy_write_struct(&m_pPNG, static_cast<png_infopp>(NULL));
+				png_destroy_write_struct(&m_pPNG, static_cast<png_infopp>(nullptr));
 				return UT_ERROR;
 		}
 		
@@ -242,10 +239,10 @@ private:
 				/* If we get here, we had a problem reading the file */
 				return UT_ERROR;
 			}
-		m_pPngBB = new UT_ByteBuf;  /* Byte Buffer for Converted Data */
+		m_pPngBB.reset(new UT_ByteBuf);  /* Byte Buffer for Converted Data */
 		
 		/* Setting up the Data Writing Function */
-		png_set_write_fn(m_pPNG, static_cast<void *>(m_pPngBB), static_cast<png_rw_ptr>(_write_png), static_cast<png_flush_ptr>(_write_flush));
+		png_set_write_fn(m_pPNG, static_cast<void *>(m_pPngBB.get()), static_cast<png_rw_ptr>(_write_png), static_cast<png_flush_ptr>(_write_flush));
 		
 		return UT_OK;
 	}
@@ -253,7 +250,7 @@ private:
   // PNG structures used
   png_structp  m_pPNG;				// libpng structure for the PNG Object
   png_infop    m_pPNGInfo;			// libpng structure for info on the PNG Object
-  UT_ByteBuf*  m_pPngBB;			// pBB Converted to PNG File
+  UT_ByteBufPtr  m_pPngBB;			// pBB Converted to PNG File
 };
 
 //------------------------------------------------------------------------------------
@@ -285,8 +282,8 @@ public:
   virtual UT_Confidence_t recognizeContents(const char * szBuf, UT_uint32 /*iNum*/)
 	{
 		// todo: make me better
-		if ( strstr ( szBuf, "xml" ) != NULL && 
-			 strstr ( szBuf, "svg" ) != NULL )
+		if (strstr(szBuf, "xml") != nullptr &&
+			 strstr(szBuf, "svg") != nullptr)
 			return UT_CONFIDENCE_PERFECT;
 		return UT_CONFIDENCE_ZILCH;
 	}
@@ -300,7 +297,7 @@ public:
 		image/vnd.adobe.svg+xml
 		text/xml-svg
 		*/
-		return NULL;
+		return nullptr;
 	}
 
 	virtual bool getDlgLabels(const char ** pszDesc,
@@ -317,7 +314,7 @@ public:
 	virtual UT_Error constructImporter(IE_ImpGraphic **ppieg)
 	{
 		*ppieg = new IE_RSVGBitmapGraphic();
-		if (*ppieg == NULL)
+		if (*ppieg == nullptr)
 			return UT_IE_NOMEMORY;
 		return UT_OK;
 	}

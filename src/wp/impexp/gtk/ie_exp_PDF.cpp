@@ -39,8 +39,6 @@
 #include <cairo-svg.h>
 #endif
 
-#include <gsf/gsf-output-memory.h>
-#include <gsf/gsf-input-stdio.h>
 #include <glib/gstdio.h>
 
 #include <unistd.h>
@@ -78,13 +76,13 @@ public:
   {
   }
 
-  virtual UT_Error _writeDocument(void)
+  virtual UT_Error _writeDocument(void) override
   {
-    cairo_t *cr = NULL;
-    cairo_surface_t *surface = NULL;
-    GR_CairoPrintGraphics *print_graphics = NULL;
-    FL_DocLayout *pDocLayout = NULL;
-    FV_View *printView = NULL;
+    cairo_t *cr = nullptr;
+    cairo_surface_t *surface = nullptr;
+    GR_CairoPrintGraphics *print_graphics = nullptr;
+    FL_DocLayout *pDocLayout = nullptr;
+    FV_View *printView = nullptr;
 
     std::set<UT_sint32> pages;
     const std::string & pages_prop = getProperty ("pages");
@@ -113,11 +111,11 @@ public:
 		}
 
 	cr = cairo_create(surface);
-	cairo_surface_destroy(surface), surface = NULL;
+	cairo_surface_destroy(surface), surface = nullptr;
 
 	print_graphics = new GR_CairoPrintGraphics(cr, dpi);
     pDocLayout = new FL_DocLayout(getDoc(), print_graphics);
-    printView = new FV_View(XAP_App::getApp(), 0, pDocLayout);
+    printView = new FV_View(XAP_App::getApp(), nullptr, pDocLayout);
     printView->getLayout()->fillLayouts();
     printView->getLayout()->formatAll();
     printView->getLayout()->recalculateTOCFields();
@@ -129,7 +127,7 @@ public:
 		  char **page_descriptions = g_strsplit(pages_prop.c_str(), ",", -1);
 	
 		  int i = 0;
-		  while (page_descriptions[i] != NULL)
+		  while (page_descriptions[i] != nullptr)
 			  {
 				  char *description = page_descriptions[i];
 				  i++;

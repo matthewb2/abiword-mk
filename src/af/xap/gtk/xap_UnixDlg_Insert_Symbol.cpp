@@ -1,22 +1,21 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
-
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiSource Application Framework
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2009 Hubert Figuiere
- * 
+ * Copyright (C) 2009, 2021 Hubert Figuière
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
  */
 
@@ -40,6 +39,7 @@
 // This header defines some functions for Unix dialogs,
 // like centering them, measuring them, etc.
 #include "xap_UnixDialogHelper.h"
+#include "xap_GtkUtils.h"
 
 #include "xap_App.h"
 #include "xap_UnixApp.h"
@@ -73,12 +73,11 @@ XAP_Dialog * XAP_UnixDialog_Insert_Symbol::static_constructor(XAP_DialogFactory 
 XAP_UnixDialog_Insert_Symbol::XAP_UnixDialog_Insert_Symbol(XAP_DialogFactory * pDlgFactory,
 														   XAP_Dialog_Id id)
 	: XAP_Dialog_Insert_Symbol(pDlgFactory,id),
-	m_windowMain(NULL),
-	m_SymbolMap(NULL)
+	m_SymbolMap(nullptr)
 {
-	m_areaCurrentSym = NULL;
-	m_unixGraphics = NULL;
-	m_unixarea = NULL;
+	m_areaCurrentSym = nullptr;
+	m_unixGraphics = nullptr;
+	m_unixarea = nullptr;
 	m_ix = 0;
 	m_iy = 0;
 }
@@ -98,7 +97,7 @@ void XAP_UnixDialog_Insert_Symbol::activate(void)
 	UT_return_if_fail(m_windowMain);
 	ConstructWindowName();
 	gtk_window_set_title (GTK_WINDOW (m_windowMain), m_WindowName);
-	gdk_window_raise(gtk_widget_get_window(m_windowMain));
+	XAP_gtk_window_raise(m_windowMain);
 }
 
 void   XAP_UnixDialog_Insert_Symbol::notifyActiveFrame(XAP_Frame *)
@@ -122,7 +121,7 @@ void XAP_UnixDialog_Insert_Symbol::runModeless(XAP_Frame * pFrame)
 	//XAP_UnixApp * unixapp = static_cast<XAP_UnixApp *> (m_pApp);
 	//UT_ASSERT(unixapp);
 	
-	UT_ASSERT(m_SymbolMap && gtk_widget_get_window(m_SymbolMap));
+	UT_ASSERT(m_SymbolMap && XAP_HAS_NATIVE_WINDOW(m_SymbolMap));
 
 	// make a new Unix GC
 	DELETEP (m_unixGraphics);
@@ -140,7 +139,7 @@ void XAP_UnixDialog_Insert_Symbol::runModeless(XAP_Frame * pFrame)
 						static_cast<UT_uint32>(alloc.height));
 	
 	// *** Re use the code to draw into the selected symbol area.
-	UT_ASSERT(m_areaCurrentSym && gtk_widget_get_window(m_areaCurrentSym));
+	UT_ASSERT(m_areaCurrentSym && XAP_HAS_NATIVE_WINDOW(m_areaCurrentSym));
 	
 	// make a new Unix GC
 	DELETEP (m_unixarea);
@@ -188,7 +187,7 @@ void XAP_UnixDialog_Insert_Symbol::runModeless(XAP_Frame * pFrame)
 	const char* iSelectedFont = iDrawSymbol->getSelectedFont();
 	s_Prev_Font = iSelectedFont;
 	UT_DEBUGMSG(("Selected Font at startup %s \n",iSelectedFont));
-	gtk_entry_set_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_fontcombo))),
+	XAP_gtk_entry_set_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_fontcombo))),
 					   iSelectedFont);
 
 	// Show the Previously selected symbol
@@ -218,13 +217,13 @@ void XAP_UnixDialog_Insert_Symbol::event_WindowDelete(void)
     m_InsertS_Font_list.clear();
 	
 	modeless_cleanup();
-	gtk_widget_destroy(m_windowMain);
-	m_windowMain = NULL;
+	gtk_widget_destroy(m_windowMain); // TOPLEVEL
+	m_windowMain = nullptr;
 }
 
 void XAP_UnixDialog_Insert_Symbol::New_Font(void )
 {
-	const gchar * buffer = gtk_entry_get_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_fontcombo))));
+	const gchar * buffer = XAP_gtk_entry_get_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_fontcombo))));
 
 	XAP_Draw_Symbol * iDrawSymbol = _getCurrentSymbolMap();
 	UT_return_if_fail(iDrawSymbol);
@@ -233,7 +232,7 @@ void XAP_UnixDialog_Insert_Symbol::New_Font(void )
 	// callbacks when no font has been set.
 	iDrawSymbol->setSelectedFont( buffer && *buffer ? static_cast<const char *>(buffer) :
 		                                              "Symbol");
-	
+
 	// we get strange things if the previous Symbol does not exists in the
 	// new font. Reset it
 	UT_UCSChar c = iDrawSymbol->calcSymbol(0, 0);
@@ -243,9 +242,9 @@ void XAP_UnixDialog_Insert_Symbol::New_Font(void )
 	        m_CurrentSymbol = c;
 		iDrawSymbol->calculatePosition(m_CurrentSymbol, m_ix, m_iy);
 	}
- 	
+
 	_setScrolledWindow ();
-	iDrawSymbol->draw();
+	iDrawSymbol->queueDraw();
 	iDrawSymbol->drawarea(m_CurrentSymbol, m_PreviousSymbol);
 }
 
@@ -302,13 +301,6 @@ static void s_destroy_clicked(GtkWidget * /* widget */,
 	dlg->event_WindowDelete();
 }
 
-static void s_delete_clicked(GtkWidget * widget,
-							 gpointer,
-							 XAP_UnixDialog_Insert_Symbol * /*dlg*/)
-{
-	abiDestroyWidget(widget);
-}
-
 static void s_new_font(GtkWidget * /*widget*/, XAP_UnixDialog_Insert_Symbol * dlg)
 {
 	dlg->New_Font();
@@ -321,7 +313,9 @@ static void s_new_row(GtkWidget * /*widget*/, XAP_UnixDialog_Insert_Symbol * dlg
 
 static void  s_scroll_event(GtkWidget * /*widget*/, GdkEventScroll * event, XAP_UnixDialog_Insert_Symbol * dlg)
 {
-	dlg->Scroll_Event (static_cast <int> (event->direction));
+	GdkScrollDirection ev_direction = (GdkScrollDirection)0;
+	gdk_event_get_scroll_direction((GdkEvent*)event, &ev_direction);
+	dlg->Scroll_Event (static_cast<int>(ev_direction));
 }
 
 static gboolean s_sym_SymbolMap_draw(GtkWidget * /*widget*/, cairo_t * /*cr*/, XAP_UnixDialog_Insert_Symbol * dlg)
@@ -366,7 +360,7 @@ void XAP_UnixDialog_Insert_Symbol::SymbolMap_exposed(void )
 {
 	XAP_Draw_Symbol * iDrawSymbol = _getCurrentSymbolMap();
 	UT_return_if_fail(iDrawSymbol);
-	iDrawSymbol->draw();
+	iDrawSymbol->queueDraw();
 	UT_DEBUGMSG(("main symbol area exposed \n"));
 	/*
 	    Need this to see the blue square after an expose event
@@ -384,7 +378,13 @@ void XAP_UnixDialog_Insert_Symbol::Symbolarea_exposed(void )
 void XAP_UnixDialog_Insert_Symbol::setSymbolMap_size(UT_uint32 width, UT_uint32 height)
 {
 	XAP_Draw_Symbol * iDrawSymbol = _getCurrentSymbolMap();
-	UT_return_if_fail(iDrawSymbol);
+	if (!iDrawSymbol) {
+		// We can be called before the XAP_Draw_Symbol is created.
+		// Just move on.
+		UT_DEBUGMSG(("XAP_UnixDialog_Insert_Symbol::setSymbolMap_size() before XAP_Draw_Symbol created\n"));
+		return;
+	}
+
 	UT_return_if_fail(m_windowMain);
 	UT_return_if_fail(m_SymbolMap);
 
@@ -397,7 +397,7 @@ void XAP_UnixDialog_Insert_Symbol::setSymbolMap_size(UT_uint32 width, UT_uint32 
 	// between window and drawingarea this show stay constant
 	GtkRequisition diff;
 	GtkAllocation alloc;
-	gtk_widget_get_preferred_size (m_windowMain, &diff, NULL);
+	gtk_widget_get_preferred_size (m_windowMain, &diff, nullptr);
 	gtk_widget_get_allocation (m_SymbolMap, &alloc);
 	if (!diff_width || !diff_height)
 	{
@@ -423,7 +423,9 @@ gboolean XAP_UnixDialog_Insert_Symbol::Key_Pressed(GdkEventKey * e)
 	UT_uint32 ix = m_ix;
 	UT_uint32 iy = m_iy;
 	UT_DEBUGMSG(("Current Symbol %x \n",m_CurrentSymbol));
-	switch (e->keyval)
+	guint ev_keyval = 0;
+	gdk_event_get_keyval((GdkEvent*)e, &ev_keyval);
+	switch (ev_keyval)
 	{
 	case GDK_KEY_Up:
 		if(iy > 0)
@@ -516,9 +518,9 @@ gboolean XAP_UnixDialog_Insert_Symbol::Key_Pressed(GdkEventKey * e)
 
 void XAP_UnixDialog_Insert_Symbol::SymbolMap_clicked( GdkEvent * event)
 {
-	UT_uint32 x,y;
-	x = static_cast<UT_uint32>(event->button.x);
-	y = static_cast<UT_uint32>(event->button.y);
+	gdouble x, y;
+	x = y = 0;
+	gdk_event_get_coords(event, &x, &y);
 
 	XAP_Draw_Symbol * iDrawSymbol = _getCurrentSymbolMap();
 	UT_return_if_fail(iDrawSymbol);
@@ -531,7 +533,7 @@ void XAP_UnixDialog_Insert_Symbol::SymbolMap_clicked( GdkEvent * event)
 		iDrawSymbol->drawarea(m_CurrentSymbol, m_PreviousSymbol);
 
 		// double click should also insert the symbol
-		if(event->type == GDK_2BUTTON_PRESS)
+		if (gdk_event_get_event_type(event) == GDK_DOUBLE_BUTTON_PRESS)
 			event_Insert();
 	}
 }
@@ -557,7 +559,7 @@ GtkWidget *XAP_UnixDialog_Insert_Symbol::_previewNew (int w, int h)
 void XAP_UnixDialog_Insert_Symbol::CurrentSymbol_clicked(GdkEvent *event)
 {
 	// have single-click insert the symbol
-	if(event->type == GDK_BUTTON_PRESS)
+	if (gdk_event_get_event_type((GdkEvent*)event), GDK_BUTTON_PRESS)
 	    event_Insert();
 }
 
@@ -568,8 +570,8 @@ void XAP_UnixDialog_Insert_Symbol::destroy(void)
 	modeless_cleanup();
 	
 	// Just nuke this dialog
-	gtk_widget_destroy(m_windowMain);
-	m_windowMain = NULL;
+	gtk_widget_destroy(m_windowMain); // TOPLEVEL
+	m_windowMain = nullptr;
 }
 
 /*****************************************************************/
@@ -698,6 +700,8 @@ GtkWidget *XAP_UnixDialog_Insert_Symbol::_createComboboxWithFonts (void)
 
 void XAP_UnixDialog_Insert_Symbol::_connectSignals (void)
 {
+	connectBasicSignals();
+
 	g_signal_connect(G_OBJECT(m_windowMain),
 					 "response",
 					 G_CALLBACK(s_dlg_response),
@@ -717,11 +721,6 @@ void XAP_UnixDialog_Insert_Symbol::_connectSignals (void)
 			   "destroy",
 			   G_CALLBACK(s_destroy_clicked),
 			   static_cast<gpointer>(this));
-	g_signal_connect(G_OBJECT(m_windowMain),
-			   "delete_event",
-			   G_CALLBACK(s_delete_clicked),
-			   static_cast<gpointer>(this));
-
 
 	// The event to choose the Symbol!
 	g_signal_connect(G_OBJECT(m_SymbolMap),

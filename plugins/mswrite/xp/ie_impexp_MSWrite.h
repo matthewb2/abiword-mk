@@ -20,8 +20,7 @@
  * 02110-1301 USA.
  */
 
-#ifndef IE_IMPEXP_MSWRITE_H
-#define IE_IMPEXP_MSWRITE_H
+#pragma once
 
 #include <gsf/gsf.h>
 
@@ -70,5 +69,3 @@ void DEBUG_WRI_STRUCT(wri_struct *w, int spaces = 1);
 	p[2] = ((s) & 0xff0000) >> 16; \
 	p[3] = ((s) & 0xff000000) >> 24; \
 }
-
-#endif

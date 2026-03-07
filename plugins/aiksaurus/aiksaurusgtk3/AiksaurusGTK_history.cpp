@@ -37,7 +37,7 @@
 
 AiksaurusGTK_history::AiksaurusGTK_history()
 {
-	d_forward_tip_ptr = d_back_tip_ptr = d_current_ptr = static_cast<char*>(NULL);
+	d_forward_tip_ptr = d_back_tip_ptr = d_current_ptr = nullptr;
 }
 
 
@@ -91,7 +91,7 @@ AiksaurusGTK_history::tip_back() const
 	if (d_back_tip_ptr)
 	{
 		delete[] d_back_tip_ptr;
-		d_back_tip_ptr = 0;
+		d_back_tip_ptr = nullptr;
 	}
 
 	d_back_tip_ptr = AiksaurusGTK_strConcat(backto, backone);
@@ -107,7 +107,7 @@ AiksaurusGTK_history::search(const char* str)
 	d_forward.clear();
 
 	// push current entry to top of back.
-	if (d_current_ptr != NULL)
+	if (d_current_ptr != nullptr)
 	{
 		d_back.push_front(d_current_ptr);
 		delete[] d_current_ptr;
@@ -128,8 +128,9 @@ AiksaurusGTK_history::move_back()
 	// make current element become first element of forward.
 	d_forward.push_front(d_current_ptr);
 
-    while (d_forward.size() > 200)
-        d_forward.pop_back();
+	while (d_forward.size() > 200) {
+		d_forward.pop_back();
+	}
 
 	// make first element of back become current.
 	delete[] d_current_ptr;
@@ -150,8 +151,9 @@ AiksaurusGTK_history::move_forward()
 	// make current element become first element of back.
 	d_back.push_front(d_current_ptr);
 
-    while (d_back.size() > 200)
-        d_back.pop_back();
+	while (d_back.size() > 200) {
+		d_back.pop_back();
+	}
 
 	// make first element of forward become current.
 	delete[] d_current_ptr;
@@ -166,7 +168,7 @@ void
 AiksaurusGTK_history::move_back_to(GList* element)
 {
     int back_steps = 0;
-    for(GList* itor = const_cast<GList*>(d_back.list()); itor != NULL; itor = itor->next)
+    for(GList* itor = const_cast<GList*>(d_back.list()); itor != nullptr; itor = itor->next)
     {
         ++back_steps;
 
@@ -191,7 +193,7 @@ void
 AiksaurusGTK_history::move_forward_to(GList* element)
 {
     int forward_steps = 0;
-    for(GList* itor = const_cast<GList*>(d_forward.list()); itor != NULL; itor = itor->next)
+    for(GList* itor = const_cast<GList*>(d_forward.list()); itor != nullptr; itor = itor->next)
     {
         ++forward_steps;
 

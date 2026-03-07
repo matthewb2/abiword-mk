@@ -42,10 +42,10 @@ XAP_Dialog_Print::XAP_Dialog_Print(XAP_DialogFactory * pDlgFactory, XAP_Dialog_I
 	m_persistColorSpace = GR_Graphics::GR_COLORSPACE_COLOR;	/* full color is default */
 	m_persistPrintToFile = false;
 
-	m_szDocumentTitle = NULL;
-	m_szDocumentPathname = NULL;
-	m_szPrintToFilePathname = NULL;
-	m_szPrintCommand = NULL;
+	m_szDocumentTitle = nullptr;
+	m_szDocumentPathname = nullptr;
+	m_szPrintToFilePathname = nullptr;
+	m_szPrintCommand = nullptr;
 	m_bBypassActualDialog = false;
 	m_bEnablePageRange = false;
 	m_bEnablePrintSelection = false;
@@ -53,7 +53,7 @@ XAP_Dialog_Print::XAP_Dialog_Print(XAP_DialogFactory * pDlgFactory, XAP_Dialog_I
 	m_nFirstPage = 0;
 	m_nLastPage = 0;
 
-	m_pageSize = 0;
+	m_pageSize = nullptr;
 	m_answer = a_VOID;
 }
 
@@ -236,9 +236,9 @@ bool XAP_Dialog_Print::_getPrintToFilePathname(XAP_Frame * pFrame,
 	pDialog->setCurrentPathname(szSuggestedName);
 	pDialog->setSuggestFilename(true);
 
-	const char ** szDescList = NULL;
-	const char ** szSuffixList = NULL;
-	UT_sint32 * nTypeList = NULL;
+	const char ** szDescList = nullptr;
+	const char ** szSuffixList = nullptr;
+	UT_sint32 * nTypeList = nullptr;
 	{
 		// TODO : FIX THIS!  Make this pull dynamic types from the export
 		// TODO : filter list (creat that while you're at it).

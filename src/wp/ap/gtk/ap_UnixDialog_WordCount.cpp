@@ -1,6 +1,7 @@
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 2000 AbiSource, Inc.
- * Copyright (C) 2005 Hubert Figuiere
+ * Copyright (C) 2005, 2019 Hubert Figuière
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -39,12 +40,6 @@ static void s_destroy_clicked(GtkWidget * /* widget */,
 	dlg->event_OK();
 }
 
-static void s_delete_clicked(GtkWidget * widget,
-							 gpointer, gpointer)
-{
-	abiDestroyWidget(widget);
-}
-
 XAP_Dialog * AP_UnixDialog_WordCount::static_constructor(XAP_DialogFactory * pFactory, XAP_Dialog_Id id)
 {
 	return new AP_UnixDialog_WordCount(pFactory,id);
@@ -71,7 +66,7 @@ void  AP_UnixDialog_WordCount::activate(void)
 	setWidgetLabel(DIALOG_WID, std::string(m_WindowName));
 	setCountFromActiveFrame ();
 	updateDialogData();
-	gdk_window_raise (gtk_widget_get_window(m_windowMain));
+	XAP_gtk_window_raise(m_windowMain);
 }
 
 void AP_UnixDialog_WordCount::s_response(GtkWidget * wid, gint id,
@@ -146,8 +141,8 @@ void AP_UnixDialog_WordCount::destroy(void)
 	m_pAutoUpdateWC->stop();
 	m_answer = AP_Dialog_WordCount::a_CANCEL;	
 	modeless_cleanup();
-	gtk_widget_destroy(m_windowMain);
-	m_windowMain = NULL;
+	gtk_widget_destroy(m_windowMain); // TOPLEVEL
+	m_windowMain = nullptr;
 	DELETEP(m_pAutoUpdateWC);
 }
 
@@ -160,7 +155,7 @@ XAP_Widget *AP_UnixDialog_WordCount::getWidget(xap_widget_id wid)
 		return new XAP_UnixWidget(m_windowMain);
 		break;
 	case CLOSE_BTN_WID:
-		return new XAP_UnixWidget(NULL);
+		return new XAP_UnixWidget(nullptr);
 		break;
 	case TITLE_LBL_WID:
 	  {
@@ -214,12 +209,12 @@ XAP_Widget *AP_UnixDialog_WordCount::getWidget(xap_widget_id wid)
 	default:
 		UT_ASSERT(UT_NOT_REACHED);
 	}
-	return NULL;
+	return nullptr;
 }
 
 void AP_UnixDialog_WordCount::constructDialog(void)
 {	
-	GtkBuilder * builder = newDialogBuilder("ap_UnixDialog_WordCount.ui");
+	GtkBuilder * builder = newDialogBuilderFromResource("ap_UnixDialog_WordCount.ui");
 
 	m_windowMain   = GTK_WIDGET(gtk_builder_get_object(builder, "ap_UnixDialog_WordCount"));
 	m_labelWCount  = GTK_WIDGET(gtk_builder_get_object(builder, "lbWordsVal"));
@@ -245,15 +240,15 @@ void AP_UnixDialog_WordCount::constructDialog(void)
 	localizeDialog();
 
 	ConstructWindowName();
+
+	connectBasicSignals();
+
 	gtk_window_set_title (GTK_WINDOW(m_windowMain), m_WindowName);
 
    	g_signal_connect(G_OBJECT(m_windowMain), "response", 
 					 G_CALLBACK(s_response), this);
 	g_signal_connect(G_OBJECT(m_windowMain), "destroy",
 					   G_CALLBACK(s_destroy_clicked),
-					   reinterpret_cast<gpointer>(this));
-	g_signal_connect(G_OBJECT(m_windowMain), "delete_event",
-					   G_CALLBACK(s_delete_clicked),
 					   reinterpret_cast<gpointer>(this));
 
 	gtk_widget_show_all (m_windowMain);

@@ -69,13 +69,13 @@ static void s_background_properties (const gchar * pszBgStyle, const gchar * psz
 									 PP_PropertyMap::Background & background);
 
 
-fl_FrameLayout::fl_FrameLayout(FL_DocLayout* pLayout,
-							   pf_Frag_Strux* sdh,
-							   PT_AttrPropIndex indexAP,
+fl_FrameLayout::fl_FrameLayout(FL_DocLayout* pLayout, 
+							   pf_Frag_Strux* sdh, 
+							   PT_AttrPropIndex indexAP, 
 							   fl_ContainerLayout * pMyContainerLayout)
- 	: fl_SectionLayout(pLayout,
-					   sdh,
-					   indexAP,
+ 	: fl_SectionLayout(pLayout, 
+					   sdh, 
+					   indexAP, 
 					   FL_SECTION_FRAME,
 					   FL_CONTAINER_FRAME,
 					   PTX_SectionFrame,
@@ -103,14 +103,14 @@ fl_FrameLayout::fl_FrameLayout(FL_DocLayout* pLayout,
 	  m_iPrefColumn(0),
 	  m_bExpandHeight(false),
 	  m_iMinHeight(0),
-	  m_pParentContainer(NULL)
+	  m_pParentContainer(nullptr)
 {
 }
 
 fl_FrameLayout::~fl_FrameLayout()
 {
 	// NB: be careful about the order of these
-	UT_DEBUGMSG(("Deleting Framelayout %p \n",this));
+	UT_DEBUGMSG(("Deleting Framelayout %p \n", (void*)this));
 	_purgeLayout();
 	fp_FrameContainer * pFC = static_cast<fp_FrameContainer *>(getFirstContainer());
 	while(pFC)
@@ -118,14 +118,14 @@ fl_FrameLayout::~fl_FrameLayout()
 		fp_FrameContainer * pNext = static_cast<fp_FrameContainer *>(pFC->getNext());
 		if(pFC == static_cast<fp_FrameContainer *>(getLastContainer()))
 		{
-			pNext = NULL;
+			pNext = nullptr;
 		}
 		delete pFC;
 		pFC = pNext;
 	}
 
-	setFirstContainer(NULL);
-	setLastContainer(NULL);
+	setFirstContainer(nullptr);
+	setLastContainer(nullptr);
 //
 // Remove pointers to this if they exist
 //
@@ -146,7 +146,7 @@ fl_FrameLayout::~fl_FrameLayout()
 void 	fl_FrameLayout::setContainerProperties(void)
 {
 	fp_FrameContainer * pFrame = static_cast<fp_FrameContainer *>(getLastContainer());
-	if(pFrame == NULL)
+	if(pFrame == nullptr)
 	{
 		UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
 		return;
@@ -180,9 +180,9 @@ void 	fl_FrameLayout::setContainerProperties(void)
 //
 	if(m_pGraphicImage)
 	{
-		if(m_pImageImage == NULL)
+		if(m_pImageImage == nullptr)
 		{
-			const PP_AttrProp * pAP = NULL;
+			const PP_AttrProp * pAP = nullptr;
 			getAP(pAP);
 			GR_Graphics * pG = getDocLayout()->getGraphics();
 			UT_sint32 iWidth = pG->tlu(100);
@@ -214,7 +214,7 @@ void 	fl_FrameLayout::setContainerProperties(void)
 		pFrame->getFillType().setImagePointer(m_pGraphicImage, &m_pImageImage);
 	}
 	if(m_iFrameWrapMode >= FL_FRAME_WRAPPED_TO_RIGHT)
-	{
+	{ 
 //
 // Set text wrapping around frame
 //
@@ -232,31 +232,31 @@ UT_sint32 fl_FrameLayout::getBoundingSpace(void) const
 /*!
  * Returns the position in the document of the PTX_SectionFrame strux
 */
-PT_DocPosition fl_FrameLayout::getDocPosition(void)
+PT_DocPosition fl_FrameLayout::getDocPosition(void) 
 {
 	pf_Frag_Strux* sdh = getStruxDocHandle();
     return 	m_pLayout->getDocument()->getStruxPosition(sdh);
 }
 
 /*!
- * This method returns the length of the Frame. This is such that
+ * This method returns the length of the Frame. This is such that 
  * getDocPosition() + getLength() is one value beyond the the EndFrame
  * strux
  */
 UT_uint32 fl_FrameLayout::getLength(void)
 {
 	PT_DocPosition startPos = getDocPosition();
-	pf_Frag_Strux* sdhEnd = NULL;
+	pf_Frag_Strux* sdhEnd = nullptr;
 	pf_Frag_Strux* sdhStart = getStruxDocHandle();
 	UT_DebugOnly<bool> bres;
 	bres = m_pLayout->getDocument()->getNextStruxOfType(sdhStart,PTX_EndFrame,&sdhEnd);
 	UT_ASSERT(bres && sdhEnd);
-	if(sdhEnd == NULL)
+	if(sdhEnd == nullptr)
 	{
 	  return 1;
 	}
 	PT_DocPosition endPos = m_pLayout->getDocument()->getStruxPosition(sdhEnd);
-	UT_uint32 length = static_cast<UT_uint32>(endPos - startPos + 1);
+	UT_uint32 length = static_cast<UT_uint32>(endPos - startPos + 1); 
 	return length;
 }
 
@@ -277,7 +277,7 @@ bool fl_FrameLayout::insertBlockAfter(fl_ContainerLayout* /*pLBlock*/,
 	UT_ASSERT(pcrx->getType()==PX_ChangeRecord::PXT_InsertStrux);
 	UT_ASSERT(pcrx->getStruxType()==PTX_Block);
 
-	fl_ContainerLayout * pNewCL = NULL;
+	fl_ContainerLayout * pNewCL = nullptr;
 	fl_ContainerLayout * pMyCL = myContainingLayout();
 	pNewCL = pMyCL->insert(sdh,this,pcrx->getIndexAP(), FL_CONTAINER_BLOCK);
 	fl_BlockLayout * pBlock = static_cast<fl_BlockLayout *>(pNewCL);
@@ -291,7 +291,7 @@ bool fl_FrameLayout::insertBlockAfter(fl_ContainerLayout* /*pLBlock*/,
 		// with the document (piece table) *** before *** anything tries
 		// to call down into the document (like all of the view
 		// listeners).
-
+		
 	fl_ContainerLayout* sfhNew = pNewCL;
 	pfnBindHandles(sdh,lid,sfhNew);
 //
@@ -322,7 +322,7 @@ bool fl_FrameLayout::bl_doclistener_insertEndFrame(fl_ContainerLayout*,
 	// The endFrame strux actually needs a format handle to to this Frame layout.
 	// so we bind to this layout. We also set a pointer to keep track of the endFrame strux.
 
-
+	
 	fl_ContainerLayout* sfhNew = this;
 	pfnBindHandles(sdh,lid,sfhNew);
 	setEndStruxDocHandle(sdh);
@@ -368,7 +368,7 @@ fl_SectionLayout * fl_FrameLayout::getSectionLayout(void) const
 		}
 		pDSL = pDSL->myContainingLayout();
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -378,7 +378,7 @@ bool fl_FrameLayout::doclistener_changeStrux(const PX_ChangeRecord_StruxChange *
 	fp_FrameContainer * pFrameC = static_cast<fp_FrameContainer *>(getFirstContainer());
 	UT_GenericVector<fl_ContainerLayout *> AllLayouts;
 	AllLayouts.clear();
-	fp_Page * pPage = NULL;
+	fp_Page * pPage = nullptr;
 	UT_sint32 i = 0;
 	if(pFrameC)
 	{
@@ -415,7 +415,7 @@ bool fl_FrameLayout::recalculateFields(UT_uint32 iUpdateCount)
 	FV_View * pView = getDocLayout()->getView();
 	GR_Graphics * pG = getDocLayout()->getGraphics();
 	UT_return_val_if_fail( pView && pG, false );
-
+	
 	bool bResult = false;
 	fl_ContainerLayout*	pBL = getFirstLayout();
 	while (pBL)
@@ -443,7 +443,7 @@ void fl_FrameLayout::updateLayout(bool /*bDoAll*/)
 	FV_View * pView = getDocLayout()->getView();
 	GR_Graphics * pG = getDocLayout()->getGraphics();
 	UT_return_if_fail( pView && pG);
-
+	
 	xxx_UT_DEBUGMSG(("UpdsateLayout in in framelayout \n"));
 	if(needsReformat())
 	{
@@ -504,17 +504,17 @@ bool fl_FrameLayout::doclistener_deleteStrux(const PX_ChangeRecord_Strux * pcrx)
 //
 	collapse();
 	myContainingLayout()->remove(this);
-	UT_DEBUGMSG(("Unlinking frame Layout %p \n",this));
+	UT_DEBUGMSG(("Unlinking frame Layout %p \n", (void*)this));
 //
 // Remove from the list of frames in the previous block
 //
 	fl_ContainerLayout * pCL = getParentContainer();
-	fl_BlockLayout * pBL = NULL;
+	fl_BlockLayout * pBL = nullptr;
 	if(pCL)
 	{
 		if(!pCL->removeFrame(this))
 		{
-			UT_DEBUGMSG(("Whoops! Frame not found in container %p\n",pCL));
+			UT_DEBUGMSG(("Whoops! Frame not found in container %p\n", (void*)pCL));
 			UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
 		}
 	}
@@ -553,22 +553,21 @@ void fl_FrameLayout::_purgeLayout(void)
  * from the Attributes/properties of this Layout
  */
 void fl_FrameLayout::_createFrameContainer(void)
-{
+{	
 	lookupProperties();
 	fp_FrameContainer * pFrameContainer = new fp_FrameContainer(static_cast<fl_SectionLayout *>(this));
 	setFirstContainer(pFrameContainer);
 	setLastContainer(pFrameContainer);
 	pFrameContainer->setWidth(m_iWidth);
 	pFrameContainer->setHeight(m_iHeight);
-
 	// Now do Frame image
 
-	const PP_AttrProp* pSectionAP = NULL;
+	const PP_AttrProp* pSectionAP = nullptr;
 	// This is a real NO-NO: must *always* call getAP()
 	// m_pLayout->getDocument()->getAttrProp(m_apIndex, &pSectionAP);
 	getAP(pSectionAP);
-
-	const gchar * pszDataID = NULL;
+	
+	const gchar * pszDataID = nullptr;
 	pSectionAP->getAttribute(PT_STRUX_IMAGE_DATAID, (const gchar *&)pszDataID);
 	DELETEP(m_pImageImage);
 	//
@@ -591,7 +590,7 @@ void fl_FrameLayout::_createFrameContainer(void)
           list, otherwise just append it to the end.
   \return The newly created Frame container
 */
-fp_Container* fl_FrameLayout::getNewContainer(fp_Container *)
+fp_Container* fl_FrameLayout::getNewContainer(const fp_Container*)
 {
 	UT_DEBUGMSG(("creating new Frame container\n"));
 	_createFrameContainer();
@@ -613,9 +612,9 @@ void fl_FrameLayout::miniFormat(void)
 	FV_View * pView = getDocLayout()->getView();
 	GR_Graphics * pG = getDocLayout()->getGraphics();
 	UT_return_if_fail( pView && pG );
-
+	
 	fl_ContainerLayout*	pBL = getFirstLayout();
-
+	
 	while (pBL)
 	{
 		pBL->format();
@@ -634,7 +633,7 @@ void fl_FrameLayout::format(void)
 	FV_View * pView = getDocLayout()->getView();
 	GR_Graphics * pG = getDocLayout()->getGraphics();
 	UT_return_if_fail( pView && pG );
-
+	
 	xxx_UT_DEBUGMSG(("SEVIOR: Formatting first container is %x \n",getFirstContainer()));
 	if(isHidden() > FP_VISIBLE)
 	{
@@ -642,7 +641,7 @@ void fl_FrameLayout::format(void)
 		return;
 	}
 
-	if(getFirstContainer() == NULL)
+	if(getFirstContainer() == nullptr)
 	{
 		getNewContainer();
 	}
@@ -651,7 +650,7 @@ void fl_FrameLayout::format(void)
 	{
 		pBL2->format();
 		UT_sint32 count = 0;
-		while(pBL2->getLastContainer() == NULL || pBL2->getFirstContainer()==NULL)
+		while(pBL2->getLastContainer() == nullptr || pBL2->getFirstContainer()==nullptr)
 		{
 			UT_DEBUGMSG(("Error formatting a block try again \n"));
 			count = count + 1;
@@ -678,7 +677,7 @@ void fl_FrameLayout::format(void)
 			UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
 			return;
 		}
-		fl_BlockLayout * pBL = NULL;
+		fl_BlockLayout * pBL = nullptr;
 		pBL = static_cast<fl_BlockLayout *>(pCL);
 		UT_sint32 count = pBL->getNumFrames();
 		UT_sint32 i = 0;
@@ -698,7 +697,7 @@ void fl_FrameLayout::format(void)
 		}
 		if(!pBL->isCollapsed())
 		{
-			m_bIsOnPage = pBL->setFramesOnPage(NULL);
+			m_bIsOnPage = pBL->setFramesOnPage(nullptr);
 			if(!m_bIsOnPage)
 			{
 				setNeedsReformat(this);
@@ -745,33 +744,33 @@ void fl_FrameLayout::_lookupProperties(const PP_AttrProp* pSectionAP)
 	GR_Graphics * pG = getDocLayout()->getGraphics();
 	UT_return_if_fail( pView && pG );
 
-	const gchar *pszFrameType = NULL;
-	const gchar *pszPositionTo = NULL;
-	const gchar *pszWrapMode = NULL;
-	const gchar *pszXpos = NULL;
-	const gchar *pszYpos = NULL;
-	const gchar *pszColXpos = NULL;
-	const gchar *pszColYpos = NULL;
-	const gchar *pszPageXpos = NULL;
-	const gchar *pszPageYpos = NULL;
-	const gchar *pszWidth = NULL;
-	const gchar *pszHeight = NULL;
-	const gchar *pszXpad = NULL;
-	const gchar *pszYpad = NULL;
+	const gchar *pszFrameType = nullptr;
+	const gchar *pszPositionTo = nullptr;
+	const gchar *pszWrapMode = nullptr;
+	const gchar *pszXpos = nullptr;
+	const gchar *pszYpos = nullptr;
+	const gchar *pszColXpos = nullptr;
+	const gchar *pszColYpos = nullptr;
+	const gchar *pszPageXpos = nullptr;
+	const gchar *pszPageYpos = nullptr;
+	const gchar *pszWidth = nullptr;
+	const gchar *pszHeight = nullptr;
+	const gchar *pszXpad = nullptr;
+	const gchar *pszYpad = nullptr;
 
-	const gchar * pszColor = NULL;
-	const gchar * pszBorderColor = NULL;
-	const gchar * pszBorderStyle = NULL;
-	const gchar * pszBorderWidth = NULL;
+	const gchar * pszColor = nullptr;
+	const gchar * pszBorderColor = nullptr;
+	const gchar * pszBorderStyle = nullptr;
+	const gchar * pszBorderWidth = nullptr;
 
-	const gchar * pszBoundingSpace = NULL;
-	const gchar * pszTightWrapped = NULL;
-	const gchar * pszPrefPage = NULL;
-	const gchar * pszPrefColumn = NULL;
+	const gchar * pszBoundingSpace = nullptr;
+	const gchar * pszTightWrapped = nullptr;
+	const gchar * pszPrefPage = nullptr;
+	const gchar * pszPrefColumn = nullptr;
 
-	const gchar * pszExpandHeight = NULL;
-	const gchar * pszPercentWidth = NULL;
-	const gchar * pszMinHeight = NULL;
+	const gchar * pszExpandHeight = nullptr;
+	const gchar * pszPercentWidth = nullptr;
+	const gchar * pszMinHeight = nullptr;
 // Frame Type
 
 	if(!pSectionAP || !pSectionAP->getProperty("frame-type",pszFrameType))
@@ -786,7 +785,7 @@ void fl_FrameLayout::_lookupProperties(const PP_AttrProp* pSectionAP)
 	{
 		m_iFrameType = FL_FRAME_WRAPPER_IMAGE;
 	}
-	else
+	else 
 	{
 		UT_DEBUGMSG(("Unknown Frame Type %s \n",pszFrameType));
 		UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
@@ -811,7 +810,7 @@ void fl_FrameLayout::_lookupProperties(const PP_AttrProp* pSectionAP)
 	{
 		m_iFramePositionTo = FL_FRAME_POSITIONED_TO_PAGE;
 	}
-	else
+	else 
 	{
 		UT_DEBUGMSG(("Unknown Position to %s \n",pszPositionTo));
 		UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
@@ -820,7 +819,7 @@ void fl_FrameLayout::_lookupProperties(const PP_AttrProp* pSectionAP)
 
 
 // wrap-mode
-
+	
 	if(!pSectionAP || !pSectionAP->getProperty("wrap-mode",pszWrapMode))
 	{
 		m_iFrameWrapMode = FL_FRAME_ABOVE_TEXT;
@@ -849,7 +848,7 @@ void fl_FrameLayout::_lookupProperties(const PP_AttrProp* pSectionAP)
 	{
 		m_iFrameWrapMode = FL_FRAME_WRAPPED_TOPBOT;
 	}
-	else
+	else 
 	{
 		UT_DEBUGMSG(("Unknown wrap-mode %s \n",pszWrapMode));
 		UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
@@ -1011,9 +1010,9 @@ void fl_FrameLayout::_lookupProperties(const PP_AttrProp* pSectionAP)
 
 	s_border_properties (pszBorderColor, pszBorderStyle, pszBorderWidth, pszColor, m_lineBottom);
 
-	pszBorderColor = NULL;
-	pszBorderStyle = NULL;
-	pszBorderWidth = NULL;
+	pszBorderColor = nullptr;
+	pszBorderStyle = nullptr;
+	pszBorderWidth = nullptr;
 
 	pSectionAP->getProperty ("left-color", pszBorderColor);
 	pSectionAP->getProperty ("left-style", pszBorderStyle);
@@ -1021,9 +1020,9 @@ void fl_FrameLayout::_lookupProperties(const PP_AttrProp* pSectionAP)
 
 	s_border_properties (pszBorderColor, pszBorderStyle, pszBorderWidth, pszColor, m_lineLeft);
 
-	pszBorderColor = NULL;
-	pszBorderStyle = NULL;
-	pszBorderWidth = NULL;
+	pszBorderColor = nullptr;
+	pszBorderStyle = nullptr;
+	pszBorderWidth = nullptr;
 
 	pSectionAP->getProperty ("right-color",pszBorderColor);
 	pSectionAP->getProperty ("right-style",pszBorderStyle);
@@ -1031,9 +1030,9 @@ void fl_FrameLayout::_lookupProperties(const PP_AttrProp* pSectionAP)
 
 	s_border_properties (pszBorderColor, pszBorderStyle, pszBorderWidth, pszColor, m_lineRight);
 
-	pszBorderColor = NULL;
-	pszBorderStyle = NULL;
-	pszBorderWidth = NULL;
+	pszBorderColor = nullptr;
+	pszBorderStyle = nullptr;
+	pszBorderWidth = nullptr;
 
 	pSectionAP->getProperty ("top-color",  pszBorderColor);
 	pSectionAP->getProperty ("top-style",  pszBorderStyle);
@@ -1045,9 +1044,9 @@ void fl_FrameLayout::_lookupProperties(const PP_AttrProp* pSectionAP)
 	 */
 	m_background.reset ();
 
-	const gchar * pszBgStyle = NULL;
-	const gchar * pszBgColor = NULL;
-	const gchar * pszBackgroundColor = NULL;
+	const gchar * pszBgStyle = nullptr;
+	const gchar * pszBgColor = nullptr;
+	const gchar * pszBackgroundColor = nullptr;
 
 	pSectionAP->getProperty ("bg-style",    pszBgStyle);
 	pSectionAP->getProperty ("bgcolor",     pszBgColor);
@@ -1094,7 +1093,7 @@ void fl_FrameLayout::_lookupProperties(const PP_AttrProp* pSectionAP)
 		else
 			m_iPrefColumn = -1;
 	}
-	//
+	// 
 	// Percent Width
 	//
 	if(pSectionAP && pSectionAP->getProperty("frame-rel-width",pszPercentWidth))
@@ -1131,7 +1130,7 @@ void fl_FrameLayout::_lookupProperties(const PP_AttrProp* pSectionAP)
 	//
 	// left/right aligned
 	//
-	const char * pszAlign = NULL;
+	const char * pszAlign = nullptr;
 	if(pSectionAP && pSectionAP->getProperty("frame-horiz-align",pszAlign))
 	{
 		if(pszAlign && (strcmp(pszAlign,"right") == 0) && (m_iXpos == 0))
@@ -1145,12 +1144,12 @@ void fl_FrameLayout::_lookupProperties(const PP_AttrProp* pSectionAP)
 
 void fl_FrameLayout::_lookupMarginProperties(const PP_AttrProp* pSectionAP)
 {
-
+	
 	UT_return_if_fail(pSectionAP);
 	FV_View * pView = getDocLayout()->getView();
 	GR_Graphics * pG = getDocLayout()->getGraphics();
 	UT_return_if_fail( pView && pG );
-
+	
 	UT_sint32 iFramePositionTo = m_iFramePositionTo;
 	FL_FrameWrapMode iFrameWrapMode = m_iFrameWrapMode;
 	bool bIsTightWrap = m_bIsTightWrap;
@@ -1161,7 +1160,7 @@ void fl_FrameLayout::_lookupMarginProperties(const PP_AttrProp* pSectionAP)
 	UT_sint32 iXPage = m_iXPage;
 	UT_sint32 iYPage = m_iYPage;
 
-
+	
 	if(pView->getViewMode() == VIEW_NORMAL && !pG->queryProperties(GR_Graphics::DGP_PAPER))
 	{
 		m_iFramePositionTo = FL_FRAME_POSITIONED_TO_BLOCK;
@@ -1176,15 +1175,15 @@ void fl_FrameLayout::_lookupMarginProperties(const PP_AttrProp* pSectionAP)
 	}
 	else
 	{
-		const gchar *pszPositionTo = NULL;
-		const gchar *pszWrapMode = NULL;
-		const gchar *pszXpos = NULL;
-		const gchar *pszYpos = NULL;
-		const gchar *pszColXpos = NULL;
-		const gchar *pszColYpos = NULL;
-		const gchar *pszPageXpos = NULL;
-		const gchar *pszPageYpos = NULL;
-		const gchar * pszTightWrapped = NULL;
+		const gchar *pszPositionTo = nullptr;
+		const gchar *pszWrapMode = nullptr;
+		const gchar *pszXpos = nullptr;
+		const gchar *pszYpos = nullptr;
+		const gchar *pszColXpos = nullptr;
+		const gchar *pszColYpos = nullptr;
+		const gchar *pszPageXpos = nullptr;
+		const gchar *pszPageYpos = nullptr;
+		const gchar * pszTightWrapped = nullptr;
 
 
 		// Position-to
@@ -1205,7 +1204,7 @@ void fl_FrameLayout::_lookupMarginProperties(const PP_AttrProp* pSectionAP)
 		{
 			m_iFramePositionTo = FL_FRAME_POSITIONED_TO_PAGE;
 		}
-		else
+		else 
 		{
 			UT_DEBUGMSG(("Unknown Position to %s \n",pszPositionTo));
 			UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
@@ -1243,7 +1242,7 @@ void fl_FrameLayout::_lookupMarginProperties(const PP_AttrProp* pSectionAP)
 		{
 			m_iFrameWrapMode = FL_FRAME_WRAPPED_TOPBOT;
 		}
-		else
+		else 
 		{
 			UT_DEBUGMSG(("Unknown wrap-mode %s \n",pszWrapMode));
 			UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
@@ -1392,7 +1391,7 @@ void fl_FrameLayout::collapse(void)
 		if(pFC->getPage())
 		{
 			pFC->getPage()->removeFrameContainer(pFC);
-			pFC->setPage(NULL);
+			pFC->setPage(nullptr);
 		}
 //
 // remove it from the linked list.
@@ -1408,8 +1407,8 @@ void fl_FrameLayout::collapse(void)
 		}
 		delete pFC;
 	}
-	setFirstContainer(NULL);
-	setLastContainer(NULL);
+	setFirstContainer(nullptr);
+	setLastContainer(nullptr);
 }
 
 // Frame Background
@@ -1448,7 +1447,7 @@ static void s_border_properties (const gchar * border_color, const gchar * borde
 								 const gchar * color, PP_PropertyMap::Line & line)
 {
 	/* frame-border properties:
-	 *
+	 * 
 	 * (1) color      - defaults to value of "color" property
 	 * (2) line-style - defaults to solid (in contrast to "none" in CSS)
 	 * (3) thickness  - defaults to 1 layout unit (??, vs "medium" in CSS)

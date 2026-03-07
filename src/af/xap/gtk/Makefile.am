@@ -31,6 +31,8 @@ libgtk_la_SOURCES = \
 	xap_UnixDialogFactory.h \
 	xap_UnixDialogHelper.cpp \
 	xap_UnixDialogHelper.h \
+	xap_UnixDialog.cpp \
+	xap_UnixDialog.h \
 	xap_UnixDlg_About.cpp \
 	xap_UnixDlg_About.h \
 	xap_UnixDlg_ClipArt.cpp \
@@ -87,9 +89,7 @@ libgtk_la_SOURCES = \
 	xap_UnixWidget.h
 
 
-uidir=$(ABIWORD_UIDIR)
-
-ui_DATA =  \
+EXTRA_DIST =  \
 	xap_UnixDlg_Encoding.ui \
 	xap_UnixDlg_Image.ui \
 	xap_UnixDlg_Language.ui \

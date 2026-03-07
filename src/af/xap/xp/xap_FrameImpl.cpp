@@ -30,7 +30,7 @@
 #include "xad_Document.h"
 #include "ut_types.h"
 #include "ut_vector.h"
-#include "ut_string.h"
+#include "ut_std_string.h"
 #include "ev_Keyboard.h"
 #include "ev_Mouse.h"
 #include "ev_Toolbar.h"
@@ -41,15 +41,15 @@
 /*** Also look at xap_Frame.cpp, half the XAP_FrameImpl seems to be there!!! ***/
 
 XAP_FrameImpl::XAP_FrameImpl(XAP_Frame *pFrame) :
-	m_pMouse(0),
-	m_pKeyboard(0),
+	m_pMouse(nullptr),
+	m_pKeyboard(nullptr),
 	m_iFrameMode(XAP_NormalFrame),
 	m_ViewAutoUpdaterID(0),
-	m_ViewAutoUpdater(NULL),
-	m_szToolbarLabelSetName(0),
-	m_szToolbarAppearance(0),
-	m_szMenuLayoutName(0),
-	m_szMenuLabelSetName(0),
+	m_ViewAutoUpdater(nullptr),
+	m_szToolbarLabelSetName(nullptr),
+	m_szToolbarAppearance(nullptr),
+	m_szMenuLayoutName(nullptr),
+	m_szMenuLabelSetName(nullptr),
 	m_pFrame(pFrame)
 {
 }
@@ -107,7 +107,7 @@ bool XAP_FrameImpl::_updateTitle()
 	UT_return_val_if_fail(pSS, false);
 
 	std::string s;
-	UT_GOFilePermissions *perm = NULL;
+	UT_GOFilePermissions *perm = nullptr;
 	const std::string & szURI = m_pFrame->m_pDoc->getFilename();
 
 	if (!szURI.empty())
@@ -170,8 +170,8 @@ bool XAP_FrameImpl::_updateTitle()
 	{
 		UT_ASSERT(m_pFrame->m_iUntitled);
 		pSS->getValueUTF8(XAP_STRING_ID_UntitledDocument,s);
-		
-		m_pFrame->m_sTitle = UT_UTF8String_sprintf(m_pFrame->m_sTitle,s.c_str(),m_pFrame->m_iUntitled);
+
+		m_pFrame->m_sTitle = UT_std_string_sprintf(s.c_str(),m_pFrame->m_iUntitled);
 	}
 
 	m_pFrame->m_sNonDecoratedTitle = m_pFrame->m_sTitle;
@@ -179,8 +179,7 @@ bool XAP_FrameImpl::_updateTitle()
 	if (m_pFrame->m_nView)
 	{
 		// multiple top-level views, so append : & view number
-		UT_UTF8String sBuf;
-		UT_UTF8String_sprintf(sBuf, ":%d", m_pFrame->m_nView);
+		std::string sBuf = UT_std_string_sprintf(":%d", m_pFrame->m_nView);
 		m_pFrame->m_sTitle += sBuf;
 	}
 

@@ -1,35 +1,31 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
-
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t; -*- */
 /* AbiSource
- * 
+ *
  * Copyright (C) 2008 Firat Kiyak <firatkiyak@gmail.com>
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
  */
 
-// Class definition include
-#include <OXML_Element_Table.h>
+#include "ut_types.h"
+#include "ut_string.h"
+#include "pd_Document.h"
+#include "OXML_Element_Table.h"
 
-// AbiWord includes
-#include <ut_types.h>
-#include <ut_string.h>
-#include <pd_Document.h>
-
-OXML_Element_Table::OXML_Element_Table(const std::string & id) : 
-	OXML_Element(id, TBL_TAG, TABLE),
+OXML_Element_Table::OXML_Element_Table(const std::string & id)
+	: OXML_Element(id, TBL_TAG, TABLE),
 	m_currentRowNumber(0),
 	m_currentColNumber(0)
 {
@@ -57,7 +53,7 @@ UT_Error OXML_Element_Table::serialize(IE_Exp_OpenXML* exporter)
 	OXML_ElementVector children = getChildren();
 	for (i = 0; i < children.size(); i++)
 	{
-		OXML_Element_Row* r = static_cast<OXML_Element_Row*>(get_pointer(children[i]));
+		OXML_Element_Row* r = static_cast<OXML_Element_Row*>(children[i].get());
 		r->setRowNumber(i);
 	}
 
@@ -71,7 +67,7 @@ UT_Error OXML_Element_Table::serialize(IE_Exp_OpenXML* exporter)
 UT_Error OXML_Element_Table::serializeProperties(IE_Exp_OpenXML* exporter)
 {
 	UT_Error err = UT_OK;
-	const gchar* szValue = NULL;
+	const gchar* szValue = nullptr;
 
 	if(getProperty("table-column-props", szValue) == UT_OK)
 	{
@@ -133,9 +129,9 @@ UT_Error OXML_Element_Table::serializeProperties(IE_Exp_OpenXML* exporter)
 	if(err != UT_OK)
 		return err;
 
-	const gchar* borderType = NULL;
-	const gchar* color = NULL;
-	const gchar* size = NULL;
+	const gchar* borderType = nullptr;
+	const gchar* color = nullptr;
+	const gchar* size = nullptr;
 
 	//left border
 	borderType = "single";
@@ -147,13 +143,13 @@ UT_Error OXML_Element_Table::serializeProperties(IE_Exp_OpenXML* exporter)
 		}
 	}
 
-	color = NULL; 
+	color = nullptr;
 	if(getProperty("left-color", szValue) == UT_OK)
 	{
 		color = szValue;
 	}
 
-	size = NULL;
+	size = nullptr;
 	if(getProperty("left-thickness", szValue) == UT_OK)
 	{
 		size = szValue;
@@ -173,13 +169,13 @@ UT_Error OXML_Element_Table::serializeProperties(IE_Exp_OpenXML* exporter)
 		}
 	}
 
-	color = NULL; 
+	color = nullptr;
 	if(getProperty("right-color", szValue) == UT_OK)
 	{
 		color = szValue;
 	}
 
-	size = NULL;
+	size = nullptr;
 	if(getProperty("right-thickness", szValue) == UT_OK)
 	{
 		size = szValue;
@@ -198,13 +194,13 @@ UT_Error OXML_Element_Table::serializeProperties(IE_Exp_OpenXML* exporter)
 		}
 	}
 
-	color = NULL; 
+	color = nullptr;
 	if(getProperty("top-color", szValue) == UT_OK)
 	{
 		color = szValue;
 	}
 
-	size = NULL;
+	size = nullptr;
 	if(getProperty("top-thickness", szValue) == UT_OK)
 	{
 		size = szValue;
@@ -222,14 +218,14 @@ UT_Error OXML_Element_Table::serializeProperties(IE_Exp_OpenXML* exporter)
 			 borderType = "dashed";
 		}
 	}
-	
-	color = NULL; 
+
+	color = nullptr;
 	if(getProperty("bot-color", szValue) == UT_OK)
 	{
 		color = szValue;
 	}
-	
-	size = NULL;
+
+	size = nullptr;
 	if(getProperty("bot-thickness", szValue) == UT_OK)
 	{
 		size = szValue;
@@ -287,9 +283,9 @@ UT_Error OXML_Element_Table::addToPT(PD_Document * pDocument)
 {
 	UT_Error ret = UT_OK;
 
-	const gchar * bgColor = NULL;
+	const gchar * bgColor = nullptr;
 	if(getProperty("background-color", bgColor) != UT_OK)
-		bgColor = NULL;
+		bgColor = nullptr;
 
 	//OpenXML supports bookmarks anywhere in the tables
 	//We will append children bookmarks that go inside table here
@@ -312,15 +308,15 @@ UT_Error OXML_Element_Table::addToPT(PD_Document * pDocument)
 		}
 	}
 
-	const gchar ** atts = getAttributesWithProps();
+	const PP_PropertyVector atts = getAttributesWithProps();
 	if(!pDocument->appendStrux(PTX_SectionTable, atts))
 		return UT_ERROR;
-	
+
 	ret = addChildrenToPT(pDocument);
 	if(ret != UT_OK)
 		return ret;
-	
-	if(!pDocument->appendStrux(PTX_EndTable,NULL))
+
+	if(!pDocument->appendStrux(PTX_EndTable, PP_NOPROPS))
 		return UT_ERROR;
 
 	return ret;
@@ -376,7 +372,7 @@ std::string OXML_Element_Table::getRowHeight(int rowIndex) const
 	return rowHeight.at(rowIndex);
 }
 
-bool OXML_Element_Table::incrementBottomVerticalMergeStart(OXML_Element_Cell* cell)
+bool OXML_Element_Table::incrementBottomVerticalMergeStart(const OXML_SharedElement_Cell& cell)
 {
 	std::vector<OXML_Element_Row*>::reverse_iterator rit;
 	for( rit=m_rows.rbegin(); rit < m_rows.rend(); ++rit )
@@ -388,26 +384,26 @@ bool OXML_Element_Table::incrementBottomVerticalMergeStart(OXML_Element_Cell* ce
 	return false;	
 }
 
-bool OXML_Element_Table::incrementRightHorizontalMergeStart(OXML_Element_Cell* cell)
+bool OXML_Element_Table::incrementRightHorizontalMergeStart(const OXML_SharedElement_Cell& cell)
 {
-	std::vector<OXML_Element_Row*>::reverse_iterator rit;
-	for( rit=m_rows.rbegin(); rit < m_rows.rend(); ++rit )
+	for (auto rit = m_rows.rbegin(); rit < m_rows.rend(); ++rit)
 	{
-		OXML_Element_Row* pRow = *rit;
-		if(pRow->incrementRightHorizontalMergeStart(cell))
+		auto pRow = *rit;
+		if (pRow->incrementRightHorizontalMergeStart(cell))
 			return true;
+
 		cell->setTop(cell->getTop()-1); //decrement top if we can't find the starting cell in this row
 	}
-	return false;	
+	return false;
 }
 
-void OXML_Element_Table::addMissingCell(unsigned int rowNumber, OXML_Element_Cell* cell)
+void OXML_Element_Table::addMissingCell(unsigned int rowNumber, const OXML_SharedElement_Cell& cell)
 {
 	OXML_ElementVector::size_type i;
 	OXML_ElementVector children = getChildren();
 	for (i = 0; i < children.size(); i++)
 	{
-		OXML_Element_Row* r = static_cast<OXML_Element_Row*>(get_pointer(children[i]));
+		OXML_Element_Row* r = static_cast<OXML_Element_Row*>(children[i].get());
 		if(i == rowNumber)
 		{
 			r->addMissingCell(cell);
@@ -418,5 +414,5 @@ void OXML_Element_Table::addMissingCell(unsigned int rowNumber, OXML_Element_Cel
 
 void OXML_Element_Table::applyStyle(OXML_SharedStyle style)
 {
-	inheritProperties(get_pointer(style));
+	inheritProperties(style.get());
 }

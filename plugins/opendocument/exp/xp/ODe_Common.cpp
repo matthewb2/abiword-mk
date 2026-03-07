@@ -28,13 +28,9 @@
 
 
 // Abiword includes
-#include <ut_debugmsg.h>
-#include <ut_assert.h>
-#include <ut_string_class.h>
-
-// External includes
-#include <gsf/gsf-output-stdio.h>
-#include <gsf/gsf-input.h>
+#include "ut_debugmsg.h"
+#include "ut_assert.h"
+#include "ut_string_class.h"
 
 // Standard includes
 #include <string.h>

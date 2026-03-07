@@ -118,13 +118,10 @@ enum FPRUN_CLEAR_SCREEN
 		fp_ForcedPageBreakRun
 		fp_ImageRun
 		fp_FieldRun
-		fp_FmtMarkRun
 		fp_FieldStartRun
 		fp_FieldEndRun
 		fp_BookmarkRun
 		fp_HyperlinkRun
-		fp_AnnotationRun
-		fp_RDFAnchorRun
 		fp_DummyRun
 
 	As far as the formatter's concerned, each subclass behaves somewhat
@@ -149,25 +146,25 @@ public:
 	FP_RUN_TYPE		        getType() const 				{ return m_iType; }
 	fp_Line*		        getLine() const 				{ return m_pLine; }
 	fl_BlockLayout*	        getBlock() const 				{ return m_pBL; }
-	UT_sint32		        getX() const 					{ return m_iX; }
-	UT_sint32		        getY() const 					{ return m_iY; }
+	virtual UT_sint32		getX() const override			{ return m_iX; }
+	virtual UT_sint32		getY() const override			{ return m_iY; }
 
-	UT_sint32		        getHeight() const;
-	UT_sint32		        getWidth() const;
+	virtual UT_sint32		getHeight() const override;
+	virtual UT_sint32		getWidth() const override;
 	UT_uint32		        getAscent() const;
 	UT_uint32		        getDescent() const;
-	virtual UT_sint32       getDrawingWidth() const;
+	virtual UT_sint32       getDrawingWidth() const override;
 
 	fp_Run* 		        getNextRun() const					{ return m_pNext; }
 	fp_Run*			        getPrevRun() const					{ return m_pPrev; }
-	bool                    isInSelectedTOC(void);
-	virtual fp_ContainerObject * getNext(void) const { return NULL;}
-	virtual fp_ContainerObject * getPrev(void) const { return NULL;}
-	virtual fp_Container *       getNextContainerInSection(void) const { return NULL;}
-	virtual fp_Container *       getPrevContainerInSection(void) const { return NULL;}
-	virtual void                 setNext(fp_ContainerObject * /*pNull*/) {}
-	virtual void                 setPrev(fp_ContainerObject * /*pNull*/) {}
-	virtual void                 draw(GR_Graphics * /*pG*/) {}
+	bool isInSelectedTOC(void) const;
+	virtual fp_ContainerObject * getNext(void) const override { return nullptr;}
+	virtual fp_ContainerObject * getPrev(void) const override { return nullptr;}
+	virtual fp_Container *       getNextContainerInSection(void) const override { return nullptr;}
+	virtual fp_Container *       getPrevContainerInSection(void) const override { return nullptr;}
+	virtual void                 setNext(fp_ContainerObject * /*pNull*/) override {}
+	virtual void                 setPrev(fp_ContainerObject * /*pNull*/) override {}
+	virtual void                 draw(GR_Graphics * /*pG*/) override {}
 
 	UT_uint32		    getBlockOffset() const			{ return m_iOffsetFirst; }
 	UT_uint32		    getLength() const				{ return m_iLen; }
@@ -188,7 +185,7 @@ public:
 	void				insertIntoRunListBeforeThis(fp_Run& newRun);
 	void				insertIntoRunListAfterThis(fp_Run& newRun);
 	fd_Field*			getField(void) const { return m_pField; }
-	bool				isField(void) const { return (bool) (m_pField != NULL); }
+	bool				isField(void) const { return (bool) (m_pField != nullptr); }
 	void				unlinkFromRunList();
 
 	const UT_RGBColor 	getFGColor(void) const;
@@ -197,9 +194,9 @@ public:
 
 	void				setLine(fp_Line*);
 	void				setBlock(fl_BlockLayout * pBL) { _setBlock(pBL); }
-	virtual void        setX(UT_sint32 x, bool bDontClearIfNeeded = false);
+	virtual void        setX(UT_sint32 x, bool bDontClearIfNeeded = false) override;
 	void			    Run_setX(UT_sint32, FPRUN_CLEAR_SCREEN eClearScreen = FP_CLEARSCREEN_AUTO);
-	virtual void		setY(UT_sint32);
+	virtual void		setY(UT_sint32) override;
 	void				setBlockOffset(UT_uint32);
 	void				setLength(UT_uint32 iLen, bool bRefresh = true);
 	void				setNextRun(fp_Run*, bool bRefresh = true);
@@ -220,17 +217,17 @@ public:
 }
 	bool                isPrinting(void) const
 	{ return m_bPrinting;}
-	virtual void		draw(dg_DrawArgs*);
-	virtual void        clearScreen(void);
+	virtual void		draw(dg_DrawArgs*) override;
+	virtual void        clearScreen(void) override;
 	void                Run_ClearScreen(bool bFullLineHeightRect = false);
-	virtual void        setWidth(UT_sint32 /*iW*/) {}
-	virtual void        setHeight(UT_sint32 /*iH*/) {}
-	virtual bool        isVBreakable(void) {return false;}
-	virtual bool        isHBreakable(void) {return false;}
-	virtual UT_sint32   wantVBreakAt(UT_sint32 i) {return i;}
-	virtual UT_sint32   wantHBreakAt(UT_sint32 i) {return i;}
-	virtual fp_ContainerObject * VBreakAt(UT_sint32) { return NULL;}
-	virtual fp_ContainerObject * HBreakAt(UT_sint32) { return NULL;}
+	virtual void        setWidth(UT_sint32 /*iW*/) override {}
+	virtual void        setHeight(UT_sint32 /*iH*/) override {}
+	virtual bool        isVBreakable(void) override {return false;}
+	virtual bool        isHBreakable(void) override {return false;}
+	virtual UT_sint32   wantVBreakAt(UT_sint32 i) override {return i;}
+	virtual UT_sint32   wantHBreakAt(UT_sint32 i) override {return i;}
+	virtual fp_ContainerObject * VBreakAt(UT_sint32) override { return nullptr;}
+	virtual fp_ContainerObject * HBreakAt(UT_sint32) override { return nullptr;}
 
 	void				markAsDirty(void);
 	void                setCleared(void);
@@ -240,8 +237,8 @@ public:
 	virtual void        updateOnDelete(UT_uint32 offset, UT_uint32 iLen);
 	virtual void        updateVerticalMetric();
 
-    virtual UT_Option<UT_Rect>     getScreenRect() const;
-    virtual void        markDirtyOverlappingRuns(const UT_Rect& recScreen);
+    virtual UT_Option<UT_Rect>     getScreenRect() const override;
+    virtual void        markDirtyOverlappingRuns(const UT_Rect& recScreen) override;
 
 	virtual void		_draw(dg_DrawArgs*) = 0;
     void                _drawTextLine(UT_sint32, UT_sint32, UT_uint32, UT_uint32, UT_UCSChar *);
@@ -257,13 +254,13 @@ public:
 	virtual UT_sint32	findTrailingSpaceDistance(void) const { return 0; }
 	virtual bool		findFirstNonBlankSplitPoint(fp_RunSplitInfo& /*si*/) { return false; }
 	virtual void		mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos,
-										PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool & isTOC) = 0;
+										PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool & isTOC) override = 0;
 
 	virtual void 		findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y,
 										UT_sint32& x2, UT_sint32& y2, UT_sint32& height,
 										bool& bDirection) = 0;
 
-	void			    lookupProperties(GR_Graphics * pG=NULL);
+	void			    lookupProperties(GR_Graphics * pG=nullptr);
 	virtual bool		doesContainNonBlankData(void) const { return true; }	// Things like text whould return false if it is all spaces.
 	void                drawDecors(UT_sint32 xoff, UT_sint32 yoff, GR_Graphics * pG);
 	virtual bool		isSuperscript(void) const { return false; }
@@ -285,9 +282,9 @@ public:
 	UT_sint32		    getMinOverline(void) const;
 	UT_sint32           getToplineThickness(void) const;
 
-	virtual UT_BidiCharType	getDirection() const { return m_iDirection; };
+	virtual UT_BidiCharType	getDirection() const override { return m_iDirection; };
 	UT_BidiCharType		getVisDirection() const;
-	virtual void        setDirection(UT_BidiCharType iDirection = UT_BIDI_WS);
+	virtual void        setDirection(UT_BidiCharType iDirection = UT_BIDI_WS) override;
 	void				setVisDirection(UT_BidiCharType iDir);
 	UT_uint32           getVisPosition(UT_uint32 ilogPos) const;
 	UT_uint32           getVisPosition(UT_uint32 iLogPos, UT_uint32 iLen) const;
@@ -360,7 +357,7 @@ public:
 #endif
 	void               setMustClearScreen(void)
 	{ m_bMustClearScreen = true;}
-	bool               getMustClearScreen(void)
+	bool getMustClearScreen(void) const
 	{return m_bMustClearScreen;}
 
 protected:
@@ -387,8 +384,8 @@ protected:
 	// use these with great care -- most of the time we need to use
 	// getWidth() and getHeight() which deal with
 	// visibility/hiddenness issues
-	UT_sint32           _getWidth() {return m_iWidth;}
-	UT_sint32           _getHeight(){return m_iHeight;}
+	UT_sint32 _getWidth() const  { return m_iWidth; }
+	UT_sint32 _getHeight() const { return m_iHeight; }
 
 	void				_setBlock(fl_BlockLayout * pBL) { m_pBL = pBL; }
 	void				_setAscent(int iAscent) { m_iAscent = iAscent; }
@@ -404,7 +401,7 @@ protected:
 	void				_setDecorations(unsigned char d) {m_fDecorations = d;}
 
 	void				_orDecorations(unsigned char d) { m_fDecorations |= d; }
-	UT_sint32			_getLineWidth(void) { return m_iLineWidth; }
+	UT_sint32 _getLineWidth(void) const { return m_iLineWidth; }
 	bool				_setLineWidth(UT_sint32 w)
 	                         {
 								 UT_sint32 o = m_iLineWidth;
@@ -426,7 +423,7 @@ protected:
 	virtual void	    _lookupProperties(const PP_AttrProp * pSpanAP,
 										  const PP_AttrProp * pBlockAP,
 										  const PP_AttrProp * pSectionAP,
-										  GR_Graphics * pG = NULL) = 0;
+										  GR_Graphics * pG = nullptr) = 0;
 
 	virtual bool        _canContainPoint(void) const;
 	virtual bool        _letPointPass(void) const;
@@ -445,8 +442,8 @@ protected:
 	};
 
 private:
-	fp_Run(const fp_Run&);			// no impl.
-	void operator=(const fp_Run&);	// no impl.
+	fp_Run(const fp_Run&) = delete;
+	void operator=(const fp_Run&) = delete;
 
 	FP_RUN_TYPE				m_iType;
 	fp_Line*				m_pLine;
@@ -513,14 +510,14 @@ class ABI_EXPORT fp_TabRun : public fp_Run
 {
 public:
 	fp_TabRun(fl_BlockLayout* pBL, UT_uint32 iOffsetFirst, UT_uint32 iLen);
-	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool & isTOC);
-	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection);
-	virtual bool			canBreakAfter(void) const;
-	virtual bool			canBreakBefore(void) const;
-	virtual bool 			hasLayoutProperties(void) const;
+	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool & isTOC) override;
+	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection) override;
+	virtual bool			canBreakAfter(void) const override;
+	virtual bool			canBreakBefore(void) const override;
+	virtual bool 			hasLayoutProperties(void) const override;
 	void			       	setTabWidth(UT_sint32);
 	void			       	setLeader(eTabLeader iTabType);
-	eTabLeader			    getLeader(void);
+	eTabLeader getLeader(void) const;
 	void                    setTabType(eTabType iTabType);
 	eTabType                getTabType(void) const;
 	bool                    isTOCTab(void);
@@ -532,14 +529,14 @@ public:
 
 protected:
 	virtual void			_drawArrow(UT_uint32 iLeft,UT_uint32 iTop,UT_uint32 iWidth, UT_uint32 iHeight);
-	virtual void			_draw(dg_DrawArgs*);
-	virtual void			_clearScreen(bool bFullLineHeightRect);
+	virtual void			_draw(dg_DrawArgs*) override;
+	virtual void			_clearScreen(bool bFullLineHeightRect) override;
 	virtual void			_lookupProperties(const PP_AttrProp * pSpanAP,
 											  const PP_AttrProp * pBlockAP,
 											  const PP_AttrProp * pSectionAP,
-											  GR_Graphics * pG = NULL);
+											  GR_Graphics * pG = nullptr) override;
 
-	virtual bool			_letPointPass(void) const;
+	virtual bool			_letPointPass(void) const override;
 
 private:
 	//UT_RGBColor			    m_colorFG;
@@ -554,60 +551,60 @@ class ABI_EXPORT fp_ForcedLineBreakRun : public fp_Run
 {
 public:
 	fp_ForcedLineBreakRun(fl_BlockLayout* pBL, UT_uint32 iOffsetFirst, UT_uint32 iLen);
-	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool & isTOC);
-	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection);
-	virtual bool			canBreakAfter(void) const;
-	virtual bool			canBreakBefore(void) const;
-	virtual bool			isForcedBreak(void) const { return true; }
+	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool & isTOC) override;
+	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection) override;
+	virtual bool			canBreakAfter(void) const override;
+	virtual bool			canBreakBefore(void) const override;
+	virtual bool			isForcedBreak(void) const override { return true; }
 protected:
 	virtual void			_lookupProperties(const PP_AttrProp * pSpanAP,
 											  const PP_AttrProp * pBlockAP,
 											  const PP_AttrProp * pSectionAP,
-											  GR_Graphics * pG = NULL);
+											  GR_Graphics * pG = nullptr) override;
 
-	virtual void			_draw(dg_DrawArgs*);
-	virtual void			_clearScreen(bool bFullLineHeightRect);
-	virtual bool			_letPointPass(void) const;
+	virtual void			_draw(dg_DrawArgs*) override;
+	virtual void			_clearScreen(bool bFullLineHeightRect) override;
+	virtual bool			_letPointPass(void) const override;
 };
 
 class ABI_EXPORT fp_FieldStartRun : public fp_Run
 {
 public:
 	fp_FieldStartRun(fl_BlockLayout* pBL, UT_uint32 iOffsetFirst, UT_uint32 iLen);
-	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool & isTOC);
-	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection);
-	virtual bool			canBreakAfter(void) const;
-	virtual bool			canBreakBefore(void) const;
-	virtual bool			isForcedBreak(void) const { return true; }
+	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool & isTOC) override;
+	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection) override;
+	virtual bool			canBreakAfter(void) const override;
+	virtual bool			canBreakBefore(void) const override;
+	virtual bool			isForcedBreak(void) const override { return true; }
 protected:
 	virtual void			_lookupProperties(const PP_AttrProp * pSpanAP,
 											  const PP_AttrProp * pBlockAP,
 											  const PP_AttrProp * pSectionAP,
-											  GR_Graphics * pG = NULL);
+											  GR_Graphics * pG = nullptr) override;
 
-	virtual void			_draw(dg_DrawArgs*);
-	virtual void			_clearScreen(bool bFullLineHeightRect);
-	virtual bool			_letPointPass(void) const;
+	virtual void			_draw(dg_DrawArgs*) override;
+	virtual void			_clearScreen(bool bFullLineHeightRect) override;
+	virtual bool			_letPointPass(void) const override;
 };
 
 class ABI_EXPORT fp_FieldEndRun : public fp_Run
 {
 public:
 	fp_FieldEndRun(fl_BlockLayout* pBL, UT_uint32 iOffsetFirst, UT_uint32 iLen);
-	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool & isTOC);
-	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection);
-	virtual bool			canBreakAfter(void) const;
-	virtual bool			canBreakBefore(void) const;
-	virtual bool			isForcedBreak(void) const { return true; }
+	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool & isTOC) override;
+	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection) override;
+	virtual bool			canBreakAfter(void) const override;
+	virtual bool			canBreakBefore(void) const override;
+	virtual bool			isForcedBreak(void) const override { return true; }
 protected:
 	virtual void			_lookupProperties(const PP_AttrProp * pSpanAP,
 											  const PP_AttrProp * pBlockAP,
 											  const PP_AttrProp * pSectionAP,
-											  GR_Graphics * pG = NULL);
+											  GR_Graphics * pG = nullptr) override;
 
-	virtual void			_draw(dg_DrawArgs*);
-	virtual void			_clearScreen(bool bFullLineHeightRect);
-	virtual bool			_letPointPass(void) const;
+	virtual void			_draw(dg_DrawArgs*) override;
+	virtual void			_clearScreen(bool bFullLineHeightRect) override;
+	virtual bool			_letPointPass(void) const override;
 };
 
 class ABI_EXPORT fp_ForcedColumnBreakRun : public fp_Run
@@ -615,41 +612,41 @@ class ABI_EXPORT fp_ForcedColumnBreakRun : public fp_Run
 public:
 	fp_ForcedColumnBreakRun(fl_BlockLayout* pBL, UT_uint32 iOffsetFirst, UT_uint32 iLen);
 
-	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool & isTOC);
-	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection);
-	virtual bool			canBreakAfter(void) const;
-	virtual bool			canBreakBefore(void) const;
-	virtual bool			isForcedBreak(void) const { return true; }
+	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool & isTOC) override;
+	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection) override;
+	virtual bool			canBreakAfter(void) const override;
+	virtual bool			canBreakBefore(void) const override;
+	virtual bool			isForcedBreak(void) const override { return true; }
 protected:
 	virtual void			_lookupProperties(const PP_AttrProp * pSpanAP,
 											  const PP_AttrProp * pBlockAP,
 											  const PP_AttrProp * pSectionAP,
-											  GR_Graphics * pG = NULL);
+											  GR_Graphics * pG = nullptr) override;
 
-	virtual void			_draw(dg_DrawArgs*);
-	virtual void			_clearScreen(bool bFullLineHeightRect);
-	virtual bool			_letPointPass(void) const;
+	virtual void			_draw(dg_DrawArgs*) override;
+	virtual void			_clearScreen(bool bFullLineHeightRect) override;
+	virtual bool			_letPointPass(void) const override;
 };
 
 class ABI_EXPORT fp_ForcedPageBreakRun : public fp_Run
 {
 public:
 	fp_ForcedPageBreakRun(fl_BlockLayout* pBL, UT_uint32 iOffsetFirst, UT_uint32 iLen);
-	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool & isTOC);
-	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection);
-	virtual bool			canBreakAfter(void) const;
-	virtual bool			canBreakBefore(void) const;
-	virtual bool			isForcedBreak(void) const { return true; }
+	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool & isTOC) override;
+	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection) override;
+	virtual bool			canBreakAfter(void) const override;
+	virtual bool			canBreakBefore(void) const override;
+	virtual bool			isForcedBreak(void) const override { return true; }
 
 protected:
 	virtual void			_lookupProperties(const PP_AttrProp * pSpanAP,
 											  const PP_AttrProp * pBlockAP,
 											  const PP_AttrProp * pSectionAP,
-											  GR_Graphics * pG = NULL);
+											  GR_Graphics * pG = nullptr) override;
 
-	virtual void			_draw(dg_DrawArgs*);
-	virtual void			_clearScreen(bool bFullLineHeightRect);
-	virtual bool			_letPointPass(void) const;
+	virtual void			_draw(dg_DrawArgs*) override;
+	virtual void			_clearScreen(bool bFullLineHeightRect) override;
+	virtual bool			_letPointPass(void) const override;
 };
 
 class ABI_EXPORT fp_EndOfParagraphRun : public fp_Run
@@ -657,11 +654,11 @@ class ABI_EXPORT fp_EndOfParagraphRun : public fp_Run
 public:
 	fp_EndOfParagraphRun(fl_BlockLayout* pBL,  UT_uint32 iOffsetFirst, UT_uint32 iLen);
 
-	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool &isToc);
-	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection);
-	virtual bool			canBreakAfter(void) const;
-	virtual bool			canBreakBefore(void) const;
-	virtual UT_sint32       getDrawingWidth() const { return static_cast<UT_sint32>(m_iDrawWidth);}
+	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool &isToc) override;
+	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection) override;
+	virtual bool			canBreakAfter(void) const override;
+	virtual bool			canBreakBefore(void) const override;
+	virtual UT_sint32       getDrawingWidth() const override { return static_cast<UT_sint32>(m_iDrawWidth);}
 
 //
 // Tomas this breaks line breaking....
@@ -671,12 +668,12 @@ protected:
 	virtual void			_lookupProperties(const PP_AttrProp * pSpanAP,
 											  const PP_AttrProp * pBlockAP,
 											  const PP_AttrProp * pSectionAP,
-											  GR_Graphics * pG = NULL);
+											  GR_Graphics * pG = nullptr) override;
 
-	virtual void			_draw(dg_DrawArgs*);
-	virtual void       		_clearScreen(bool bFullLineHeightRect);
-	virtual bool			_letPointPass(void) const;
-	virtual bool			_recalcWidth(void);
+	virtual void			_draw(dg_DrawArgs*) override;
+	virtual void       		_clearScreen(bool bFullLineHeightRect) override;
+	virtual bool			_letPointPass(void) const override;
+	virtual bool			_recalcWidth(void) override;
 
 private:
 	UT_uint32				m_iXoffText;
@@ -694,15 +691,15 @@ public:
 	const gchar * 	getName() const {return m_pName;};
 	bool 				isComrade(fp_BookmarkRun *pBR) const;
 
-	virtual bool canBreakAfter(void) const;
-	virtual bool canBreakBefore(void) const;
+	virtual bool canBreakAfter(void) const override;
+	virtual bool canBreakBefore(void) const override;
 
 	virtual void mapXYToPosition(UT_sint32 x,
 								 UT_sint32 y,
 								 PT_DocPosition& pos,
 								 bool& bBOL,
 								 bool& bEOL,
-								 bool & isTOC);
+								 bool & isTOC) override;
 
 	virtual void findPointCoords(UT_uint32 iOffset,
 								 UT_sint32& x,
@@ -710,12 +707,12 @@ public:
 								 UT_sint32& x2,
 								 UT_sint32& y2,
 								 UT_sint32& height,
-								 bool& bDirection);
-	virtual bool hasLayoutProperties(void) const
+								 bool& bDirection) override;
+	virtual bool hasLayoutProperties(void) const override
 	{ return false; }
 
 	// for the purposes of linebreaking, just whitespace
-	virtual bool doesContainNonBlankData(void) const { return false; }
+	virtual bool doesContainNonBlankData(void) const override { return false; }
 
 	UT_uint32 getBookmarkedDocPosition(bool bAfter) const;
 
@@ -724,13 +721,13 @@ private:
 	virtual void			_lookupProperties(const PP_AttrProp * pSpanAP,
 											  const PP_AttrProp * pBlockAP,
 											  const PP_AttrProp * pSectionAP,
-											  GR_Graphics * pG = NULL);
+											  GR_Graphics * pG = nullptr) override;
 
-	virtual void _clearScreen(bool /* bFullLineHeightRect */);
-	virtual void _draw(dg_DrawArgs* /*pDA */);
-	virtual bool _letPointPass(void) const;
-	virtual bool _canContainPoint(void) const;
-	virtual bool _deleteFollowingIfAtInsPoint() const;
+	virtual void _clearScreen(bool /* bFullLineHeightRect */) override;
+	virtual void _draw(dg_DrawArgs* /*pDA */) override;
+	virtual bool _letPointPass(void) const override;
+	virtual bool _canContainPoint(void) const override;
+	virtual bool _deleteFollowingIfAtInsPoint() const override;
 
 	bool m_bIsStart;
 	#define BOOKMARK_NAME_SIZE 30
@@ -747,16 +744,16 @@ public:
 	bool 				isStartOfHyperlink() const {return m_bIsStart;};
 	const gchar * 	getTarget() const {return static_cast<const gchar *>(m_pTarget);};
 	const gchar * 	getTitle() const {return static_cast<const gchar *>(m_pTitle);};
-	
-	virtual bool canBreakAfter(void) const;
-	virtual bool canBreakBefore(void) const;
+
+	virtual bool canBreakAfter(void) const override;
+	virtual bool canBreakBefore(void) const override;
 
 	virtual void mapXYToPosition(UT_sint32 x,
 								 UT_sint32 y,
 								 PT_DocPosition& pos,
 								 bool& bBOL,
 								 bool& bEOL,
-								 bool &isTOC);
+								 bool &isTOC) override;
 
 	virtual void findPointCoords(UT_uint32 iOffset,
 								 UT_sint32& x,
@@ -764,25 +761,25 @@ public:
 								 UT_sint32& x2,
 								 UT_sint32& y2,
 								 UT_sint32& height,
-								 bool& bDirection);
+								 bool& bDirection) override;
 
-	virtual bool hasLayoutProperties(void) const
+	virtual bool hasLayoutProperties(void) const override
 	{ return false; }
 
 	// for the purposes of linebreaking, just whitespace
-	virtual bool doesContainNonBlankData(void) const { return false; }
+	virtual bool doesContainNonBlankData(void) const override { return false; }
 
 protected:
 	virtual void			_lookupProperties(const PP_AttrProp * pSpanAP,
 											  const PP_AttrProp * pBlockAP,
 											  const PP_AttrProp * pSectionAP,
-											  GR_Graphics * pG = NULL);
+											  GR_Graphics * pG = nullptr) override;
 
-	virtual void _clearScreen(bool /* bFullLineHeightRect */);
-	virtual void _draw(dg_DrawArgs* /*pDA */);
-	virtual bool _letPointPass(void) const;
-	virtual bool _canContainPoint(void) const;
-	virtual bool _deleteFollowingIfAtInsPoint() const;
+	virtual void _clearScreen(bool /* bFullLineHeightRect */) override;
+	virtual void _draw(dg_DrawArgs* /*pDA */) override;
+	virtual bool _letPointPass(void) const override;
+	virtual bool _canContainPoint(void) const override;
+	virtual bool _deleteFollowingIfAtInsPoint() const override;
 	void _setTarget( const gchar * pTarget );
 	void _setTitle( const gchar * pTitle );
 	void _setTargetFromAPAttribute( const gchar* pAttrName );
@@ -793,100 +790,31 @@ protected:
 };
 
 
-
-class ABI_EXPORT fp_AnnotationRun : public fp_HyperlinkRun
-{
-public:
-	fp_AnnotationRun(fl_BlockLayout* pBL, UT_uint32 iOffsetFirst, UT_uint32 iLen);
-	virtual ~fp_AnnotationRun();
-	virtual FP_HYPERLINK_TYPE getHyperlinkType(void) const { return HYPERLINK_ANNOTATION; }
-	UT_uint32 getPID(void) { return m_iPID;}
-	const char * getValue(void);
-    void         recalcValue(void);
-	virtual bool canBreakAfter(void) const;
-	virtual bool canBreakBefore(void) const;
-	UT_sint32    getRealWidth(void) const {return m_iRealWidth;}
-    void         cleanDraw(dg_DrawArgs*);
-	UT_sint32    calcWidth(void);
-
- protected:
-	virtual void			_draw(dg_DrawArgs*);
-	virtual void			_clearScreen(bool bFullLineHeightRect);
-	virtual bool			_recalcWidth(void);
-	bool                    _setValue(void);
-	virtual void            _setWidth(UT_sint32 iWidth);
-	virtual bool _letPointPass(void) const;
-	virtual bool _canContainPoint(void) const;
-    virtual void _lookupProperties(const PP_AttrProp * pSpanAP,
-									const PP_AttrProp * pBlockAP,
-									const PP_AttrProp * pSectionAP,
-								   GR_Graphics * pG);
- private:
-	UT_uint32               m_iPID;
-	UT_UTF8String           m_sValue;
-	UT_sint32               m_iRealWidth;
-};
-
-class ABI_EXPORT fp_RDFAnchorRun : public fp_HyperlinkRun
-{
-public:
-	fp_RDFAnchorRun(fl_BlockLayout* pBL, UT_uint32 iOffsetFirst, UT_uint32 iLen);
-	virtual ~fp_RDFAnchorRun();
-	virtual FP_HYPERLINK_TYPE getHyperlinkType(void) const { return HYPERLINK_RDFANCHOR; }
-	UT_uint32 getPID(void) { return m_iPID;}
-	const char * getValue(void);
-    void         recalcValue(void);
-	virtual bool canBreakAfter(void) const;
-	virtual bool canBreakBefore(void) const;
-	UT_sint32    getRealWidth(void) const {return m_iRealWidth;}
-    void         cleanDraw(dg_DrawArgs*);
-	UT_sint32    calcWidth(void);
-
-    std::string  getXMLID();
-
- protected:
-	virtual void			_draw(dg_DrawArgs*);
-	virtual void			_clearScreen(bool bFullLineHeightRect);
-	virtual bool			_recalcWidth(void);
-	bool                    _setValue(void);
-	virtual void            _setWidth(UT_sint32 iWidth);
-	virtual bool _letPointPass(void) const;
-	virtual bool _canContainPoint(void) const;
-    virtual void _lookupProperties(const PP_AttrProp * pSpanAP,
-									const PP_AttrProp * pBlockAP,
-									const PP_AttrProp * pSectionAP,
-								   GR_Graphics * pG);
- private:
-	UT_uint32               m_iPID;
-	UT_UTF8String           m_sValue;
-	UT_sint32               m_iRealWidth;
-};
-
 class ABI_EXPORT fp_ImageRun : public fp_Run
 {
 public:
 	fp_ImageRun(fl_BlockLayout* pBL, UT_uint32 iOffsetFirst, UT_uint32 iLen, FG_GraphicPtr && pGraphic,  pf_Frag_Object* oh);
 	virtual ~fp_ImageRun();
 
-	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool & isTOC);
-	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection);
-	virtual bool			canBreakAfter(void) const;
-	virtual bool			canBreakBefore(void) const;
+	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool & isTOC) override;
+	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection) override;
+	virtual bool			canBreakAfter(void) const override;
+	virtual bool			canBreakBefore(void) const override;
 	const char *            getDataId(void) const;
-	virtual bool 			hasLayoutProperties(void) const;
-	virtual GR_Image * 				getImage();
+	virtual bool 			hasLayoutProperties(void) const override;
+	virtual GR_Image* getImage() const;
 	void                     regenerateImage(GR_Graphics * pG);
-	UT_sint32               getPointHeight(void)
+	UT_sint32 getPointHeight(void) const
 	{ return m_iPointHeight;}
 protected:
 	virtual void			_lookupProperties(const PP_AttrProp * pSpanAP,
 											  const PP_AttrProp * pBlockAP,
 											  const PP_AttrProp * pSectionAP,
-											  GR_Graphics * pG = NULL);
+											  GR_Graphics * pG = nullptr) override;
 
-	virtual void			_draw(dg_DrawArgs*);
-	virtual void			_clearScreen(bool bFullLineHeightRect);
-	virtual bool			_letPointPass(void) const;
+	virtual void			_draw(dg_DrawArgs*) override;
+	virtual void			_clearScreen(bool bFullLineHeightRect) override;
+	virtual bool			_letPointPass(void) const override;
 
 private:
 	FG_GraphicPtr           m_pFGraphic;
@@ -969,15 +897,15 @@ public:
 	fp_FieldRun(fl_BlockLayout* pBL, UT_uint32 iOffsetFirst, UT_uint32 iLen);
 	virtual ~fp_FieldRun();
 
-	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool &isTOC);
-	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection);
-	virtual bool			canBreakAfter(void) const;
+	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool &isTOC) override;
+	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection) override;
+	virtual bool			canBreakAfter(void) const override;
 	virtual fp_FieldsEnum	getFieldType(void) const;
-	virtual bool			canBreakBefore(void) const;
-	virtual bool 			hasLayoutProperties(void) const;
+	virtual bool			canBreakBefore(void) const override;
+	virtual bool 			hasLayoutProperties(void) const override;
 
-	virtual bool			isSuperscript(void) const;
-	virtual bool			isSubscript(void) const;
+	virtual bool			isSuperscript(void) const override;
+	virtual bool			isSubscript(void) const override;
 
 	bool					_setValue(const UT_UCSChar *p_new_value);
 
@@ -989,14 +917,14 @@ protected:
 	virtual void			_lookupProperties(const PP_AttrProp * pSpanAP,
 											  const PP_AttrProp * pBlockAP,
 											  const PP_AttrProp * pSectionAP,
-											  GR_Graphics * pG = NULL);
+											  GR_Graphics * pG = nullptr) override;
 
-	virtual void			_draw(dg_DrawArgs*) {};
+	virtual void			_draw(dg_DrawArgs*) override {};
 	virtual void			_defaultDraw(dg_DrawArgs*);
-	virtual void			_clearScreen(bool bFullLineHeightRect);
+	virtual void			_clearScreen(bool bFullLineHeightRect) override;
 	const gchar *		_getParameter() const { return m_pParameter; }
-	virtual bool			_letPointPass(void) const;
-	virtual bool			_recalcWidth(void);
+	virtual bool			_letPointPass(void) const override;
+	virtual bool			_recalcWidth(void) override;
 
 private:
 
@@ -1023,10 +951,10 @@ public:
 
 	virtual ~fp_FieldEndnoteRefRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual bool		    canBreakBefore(void) const;
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_ENDNOTE;};
+	virtual bool			calculateValue(void) override;
+	virtual bool		    canBreakBefore(void) const override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_ENDNOTE;};
 	UT_uint32				getPID() const {return m_iPID;}
 
 private:
@@ -1042,9 +970,9 @@ public:
 
 	virtual ~fp_FieldEndnoteAnchorRun() {}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_ENDNOTE;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_ENDNOTE;};
 	UT_uint32				getPID() const {return m_iPID;}
 
 private:
@@ -1059,10 +987,10 @@ public:
 
 	virtual ~fp_FieldFootnoteRefRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual bool		    canBreakBefore(void) const;
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_ENDNOTE;};
+	virtual bool			calculateValue(void) override;
+	virtual bool		    canBreakBefore(void) const override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_ENDNOTE;};
 	UT_uint32				getPID() const {return m_iPID;}
 
 private:
@@ -1077,9 +1005,9 @@ public:
 
 	virtual ~fp_FieldFootnoteAnchorRun() {}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_ENDNOTE;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_ENDNOTE;};
 	UT_uint32				getPID() const {return m_iPID;}
 
 private:
@@ -1094,9 +1022,9 @@ public:
 
 	virtual ~fp_FieldTimeRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_TIME;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_TIME;};
 };
 
 class ABI_EXPORT fp_FieldPageNumberRun : public fp_FieldRun
@@ -1107,9 +1035,9 @@ public:
 
 	virtual ~fp_FieldPageNumberRun() {}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_PAGE;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates()override {return FIELD_UPDATE_PAGE;};
 };
 
 class ABI_EXPORT fp_FieldPageReferenceRun : public fp_FieldRun
@@ -1120,9 +1048,9 @@ public:
 
 	virtual ~fp_FieldPageReferenceRun() {}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_PAGE;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_PAGE;};
 };
 
 class ABI_EXPORT fp_FieldPageCountRun : public fp_FieldRun
@@ -1133,9 +1061,9 @@ public:
 
 	virtual ~fp_FieldPageCountRun() {}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_PAGE;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_PAGE;};
 };
 
 class ABI_EXPORT fp_FieldDateRun : public fp_FieldRun
@@ -1145,9 +1073,9 @@ public:
 
 	virtual ~fp_FieldDateRun() {}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_DATE;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_DATE;};
 };
 
 
@@ -1158,8 +1086,8 @@ public:
 
 	virtual ~fp_FieldFileNameRun() {}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
 };
 
 class ABI_EXPORT fp_FieldShortFileNameRun : public fp_FieldRun
@@ -1169,8 +1097,8 @@ public:
 
 	virtual ~fp_FieldShortFileNameRun() {}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
 };
 
 // BEGIN DOM
@@ -1186,9 +1114,9 @@ public:
 
 	virtual ~fp_FieldCharCountRun() {}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_TIME;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_TIME;};
 };
 
 // count of the non-blank characters
@@ -1200,9 +1128,9 @@ public:
 
 	virtual ~fp_FieldNonBlankCharCountRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_TIME;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_TIME;};
 };
 
 // count of the #lines in the document
@@ -1213,9 +1141,9 @@ public:
 
 	virtual ~fp_FieldLineCountRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_LINE_COUNT;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_LINE_COUNT;};
 };
 
 
@@ -1227,9 +1155,9 @@ public:
 
 	virtual ~fp_FieldTableSumRows(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_WORD_COUNT;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_WORD_COUNT;};
 };
 
 
@@ -1241,9 +1169,9 @@ public:
 
 	virtual ~fp_FieldTableSumCols(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_WORD_COUNT;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_WORD_COUNT;};
 };
 
 // count of the #para in the document
@@ -1254,9 +1182,9 @@ public:
 
 	virtual ~fp_FieldParaCountRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_PARA_COUNT;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_PARA_COUNT;};
 };
 
 // count of #words in the document
@@ -1267,9 +1195,9 @@ public:
 
 	virtual ~fp_FieldWordCountRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_WORD_COUNT;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_WORD_COUNT;};
 };
 
 
@@ -1283,9 +1211,9 @@ public:
 
 	virtual ~fp_FieldMMDDYYRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_DATE;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_DATE;};
 };
 
 // most of the world - dd/mm/yy
@@ -1296,9 +1224,9 @@ public:
 
 	virtual ~fp_FieldDDMMYYRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_DATE;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_DATE;};
 };
 
 // April 18, 1979
@@ -1309,9 +1237,9 @@ public:
 
 	virtual ~fp_FieldMonthDayYearRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_DATE;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_DATE;};
 };
 
 // Apr. 18, 1979
@@ -1322,9 +1250,9 @@ public:
 
 	virtual ~fp_FieldMthDayYearRun (){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_DATE;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_DATE;};
 };
 
 // default representation for your locale. includes time too
@@ -1335,9 +1263,9 @@ public:
 
 	virtual ~fp_FieldDefaultDateRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_TIME;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_TIME;};
 };
 
 // default for your locale, not appending the time
@@ -1348,9 +1276,9 @@ public:
 
 	virtual ~fp_FieldDefaultDateNoTimeRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_DATE;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_DATE;};
 };
 
 // day of the week (Wednesday)
@@ -1361,9 +1289,9 @@ public:
 
 	virtual ~fp_FieldWkdayRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_DATE;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_DATE;};
 };
 
 // day of year (i.e. 72)
@@ -1374,9 +1302,9 @@ public:
 
 	virtual ~fp_FieldDOYRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_DATE;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_DATE;};
 };
 
 // military (zulu) time
@@ -1387,9 +1315,9 @@ public:
 
 	virtual ~fp_FieldMilTimeRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_TIME;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_TIME;};
 };
 
 // prints am or pm
@@ -1400,9 +1328,9 @@ public:
 
 	virtual ~fp_FieldAMPMRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_DATE;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_DATE;};
 };
 
 // milliseconds since the epoch, for you geeks out there :-)
@@ -1413,9 +1341,9 @@ public:
 
 	virtual ~fp_FieldTimeEpochRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_TIME;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_TIME;};
 };
 
 class ABI_EXPORT fp_FieldDateTimeCustomRun : public fp_FieldRun
@@ -1425,9 +1353,9 @@ public:
 
 	virtual ~fp_FieldDateTimeCustomRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
-	virtual UT_uint32		needsFrequentUpdates(){return FIELD_UPDATE_TIME;};
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
+	virtual UT_uint32		needsFrequentUpdates() override {return FIELD_UPDATE_TIME;};
 };
 
 // your time zone (EST, for example)
@@ -1438,8 +1366,8 @@ public:
 
 	virtual ~fp_FieldTimeZoneRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
 };
 
 // application runs
@@ -1452,8 +1380,8 @@ public:
 
 	virtual ~fp_FieldBuildIdRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
 };
 
 // build version (i.e. 0.7.13)
@@ -1464,8 +1392,8 @@ public:
 
 	virtual ~fp_FieldBuildVersionRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
 };
 
 class ABI_EXPORT fp_FieldBuildOptionsRun : public fp_FieldRun
@@ -1475,8 +1403,8 @@ public:
 
 	virtual ~fp_FieldBuildOptionsRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
 };
 
 class ABI_EXPORT fp_FieldBuildTargetRun : public fp_FieldRun
@@ -1486,8 +1414,8 @@ public:
 
 	virtual ~fp_FieldBuildTargetRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
 };
 
 class ABI_EXPORT fp_FieldBuildCompileDateRun : public fp_FieldRun
@@ -1497,8 +1425,8 @@ public:
 
 	virtual ~fp_FieldBuildCompileDateRun (){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
 };
 
 class ABI_EXPORT fp_FieldBuildCompileTimeRun : public fp_FieldRun
@@ -1508,8 +1436,8 @@ public:
 
 	virtual ~fp_FieldBuildCompileTimeRun(){}
 
-	virtual bool			calculateValue(void);
-	virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
+	virtual bool			calculateValue(void) override;
+	virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
 };
 
 class ABI_EXPORT fp_FieldMailMergeRun : public fp_FieldRun
@@ -1519,10 +1447,10 @@ class ABI_EXPORT fp_FieldMailMergeRun : public fp_FieldRun
 
   virtual ~fp_FieldMailMergeRun(){}
 
-  virtual bool			calculateValue(void);
-  virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
+  virtual bool			calculateValue(void) override;
+  virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
 
-  virtual UT_uint32		needsFrequentUpdates(){ return FIELD_UPDATE_MAILMERGE; }
+  virtual UT_uint32		needsFrequentUpdates() override { return FIELD_UPDATE_MAILMERGE; }
 };
 
 class ABI_EXPORT fp_FieldMetaRun : public fp_FieldRun
@@ -1532,10 +1460,10 @@ class ABI_EXPORT fp_FieldMetaRun : public fp_FieldRun
 
   virtual ~fp_FieldMetaRun(){}
 
-  virtual bool			calculateValue(void);
-  virtual void			_draw(dg_DrawArgs* pDA) { _defaultDraw(pDA); }
+  virtual bool			calculateValue(void) override;
+  virtual void			_draw(dg_DrawArgs* pDA) override { _defaultDraw(pDA); }
 
-  virtual UT_uint32		needsFrequentUpdates(){ return FIELD_UPDATE_META;}
+  virtual UT_uint32		needsFrequentUpdates() override { return FIELD_UPDATE_META;}
 
  private:
   std::string m_which;
@@ -1634,62 +1562,28 @@ class ABI_EXPORT fp_FieldMetaDescriptionRun : public fp_FieldMetaRun
 
 // END DOM
 
-class ABI_EXPORT fp_FmtMarkRun : public fp_Run
-{
-public:
-	fp_FmtMarkRun(fl_BlockLayout* pBL, UT_uint32 iOffsetFirst);
-
-	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool & isTOC);
-	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection);
-	virtual bool			canBreakAfter(void) const;
-	virtual bool			canBreakBefore(void) const;
-	virtual bool			isSuperscript(void) const ;
-	virtual bool			isSubscript(void)  const;
-	virtual bool 			hasLayoutProperties(void) const {return true;}
-
-protected:
-	virtual void			_lookupProperties(const PP_AttrProp * pSpanAP,
-											  const PP_AttrProp * pBlockAP,
-											  const PP_AttrProp * pSectionAP,
-											  GR_Graphics * pG = NULL);
-
-	virtual void			_draw(dg_DrawArgs*);
-	virtual void			_clearScreen(bool bFullLineHeightRect);
-	virtual bool			_letPointPass(void) const;
-
-private:
-	enum
-	{
-		TEXT_POSITION_NORMAL,
-		TEXT_POSITION_SUPERSCRIPT,
-		TEXT_POSITION_SUBSCRIPT
-	};
-	UT_Byte					m_fPosition;
-};
-
-
 class ABI_EXPORT fp_DummyRun : public fp_Run
 {
 public:
 	fp_DummyRun(fl_BlockLayout* pBL, UT_uint32 iOffsetFirst);
 
-	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool &isTOC);
-	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection);
-	virtual bool			canBreakAfter(void) const;
-	virtual bool			canBreakBefore(void) const;
-	virtual bool			isSuperscript(void) const ;
-	virtual bool			isSubscript(void)  const;
-	virtual bool 			hasLayoutProperties(void) const {return false;}
+	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool &isTOC) override;
+	virtual void 			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection) override;
+	virtual bool			canBreakAfter(void) const override;
+	virtual bool			canBreakBefore(void) const override;
+	virtual bool			isSuperscript(void) const override;
+	virtual bool			isSubscript(void)  const override;
+	virtual bool 			hasLayoutProperties(void) const override {return false;}
 
 protected:
 	virtual void			_lookupProperties(const PP_AttrProp * pSpanAP,
 											  const PP_AttrProp * pBlockAP,
 											  const PP_AttrProp * pSectionAP,
-											  GR_Graphics * pG = NULL);
+											  GR_Graphics * pG = nullptr) override;
 
-	virtual void			_draw(dg_DrawArgs*);
-	virtual void			_clearScreen(bool bFullLineHeightRect);
-	virtual bool			_letPointPass(void) const;
+	virtual void			_draw(dg_DrawArgs*) override;
+	virtual void			_clearScreen(bool bFullLineHeightRect) override;
+	virtual bool			_letPointPass(void) const override;
 };
 
 #endif /* FP_RUN_H */

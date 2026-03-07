@@ -1,5 +1,4 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
-
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiSource
  *
  * Copyright (C) 2008 Firat Kiyak <firatkiyak@gmail.com>
@@ -23,32 +22,23 @@
 #ifndef _IE_EXP_OPENXMLLISTENER_H_
 #define _IE_EXP_OPENXMLLISTENER_H_
 
-#include <pd_Document.h>
-#include <pd_Style.h>
-#include <px_ChangeRecord.h>
-#include <px_CR_Strux.h>
-#include <px_CR_Span.h>
-#include <px_CR_Object.h>
-#include <fl_AutoNum.h>
-#include <fd_Field.h>
-#include <fp_PageSize.h>
-#include <OXML_Document.h>
-#include <OXML_Element_Text.h>
-#include <OXML_Element_Run.h>
-#include <OXML_Element_Paragraph.h>
-#include <OXML_Element_Table.h>
-#include <OXML_Element_Row.h>
-#include <OXML_Element_Cell.h>
-#include <OXML_Element_List.h>
-#include <OXML_Element_Image.h>
-#include <OXML_Element_Hyperlink.h>
-#include <OXML_Element_Bookmark.h>
-#include <OXML_Element_Field.h>
-#include <OXML_Element_TextBox.h>
-#include <OXML_Element_Math.h>
-#include <OXML_List.h>
-#include <OXML_Image.h>
-#include <ie_Table.h>
+#include "OXML_Document.h"
+#include "OXML_Element_Text.h"
+#include "OXML_Element_Run.h"
+#include "OXML_Element_Paragraph.h"
+#include "OXML_Element_Table.h"
+#include "OXML_Element_Row.h"
+#include "OXML_Element_Cell.h"
+#include "OXML_Element_List.h"
+#include "OXML_Element_Image.h"
+#include "OXML_Element_Hyperlink.h"
+#include "OXML_Element_Bookmark.h"
+#include "OXML_Element_Field.h"
+#include "OXML_Element_TextBox.h"
+#include "OXML_Element_Math.h"
+#include "OXML_List.h"
+#include "OXML_Image.h"
+#include "ie_Table.h"
 
 class OXML_Document;
 class OXML_Element_Paragraph;
@@ -72,12 +62,12 @@ public:
 	IE_Exp_OpenXML_Listener(PD_Document* doc);
 	~IE_Exp_OpenXML_Listener();
 
-	virtual bool populate(fl_ContainerLayout* sfh, const PX_ChangeRecord * pcr);
-	virtual bool populateStrux(pf_Frag_Strux* sdh, const PX_ChangeRecord * pcr, fl_ContainerLayout* * psfh);
-	virtual bool change(fl_ContainerLayout* sfh, const PX_ChangeRecord * pcr);
+	virtual bool populate(fl_ContainerLayout* sfh, const PX_ChangeRecord * pcr) override;
+	virtual bool populateStrux(pf_Frag_Strux* sdh, const PX_ChangeRecord * pcr, fl_ContainerLayout* * psfh) override;
+	virtual bool change(fl_ContainerLayout* sfh, const PX_ChangeRecord * pcr) override;
 	virtual bool insertStrux(fl_ContainerLayout* sfh, const PX_ChangeRecord * pcr, pf_Frag_Strux* sdhNew, PL_ListenerId lid,
-				     		 void (* pfnBindHandles)(pf_Frag_Strux* sdhNew, PL_ListenerId lid, fl_ContainerLayout* sfhNew));
-	virtual bool signal(UT_uint32 iSignal);
+							void (* pfnBindHandles)(pf_Frag_Strux* sdhNew, PL_ListenerId lid, fl_ContainerLayout* sfhNew)) override;
+	virtual bool signal(UT_uint32 iSignal) override;
 
 	OXML_Document* getDocument();
 
@@ -92,7 +82,7 @@ private:
 
 	std::stack<OXML_Element_Table*> m_tableStack;
 	std::stack<OXML_Element_Row*> m_rowStack;
-	std::stack<OXML_Element_Cell*> m_cellStack;
+	std::stack<OXML_SharedElement_Cell> m_cellStack;
 	OXML_Element_Hyperlink* hyperlink;
 	OXML_Element_TextBox* textbox;
 

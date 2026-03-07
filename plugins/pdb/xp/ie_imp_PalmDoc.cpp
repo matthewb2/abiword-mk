@@ -1,4 +1,4 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
@@ -68,12 +68,12 @@ const IE_SuffixConfidence * IE_Imp_PalmDoc_Sniffer::getSuffixConfidence ()
 	return IE_Imp_PalmDoc_Sniffer__SuffixConfidence;
 }
 
-const IE_MimeConfidence * IE_Imp_PalmDoc_Sniffer::getMimeConfidence () 
+const IE_MimeConfidence * IE_Imp_PalmDoc_Sniffer::getMimeConfidence()
 {
 	// mimetypes once getMimeConfidence is implemented (need to check correctness)
 	// "application/x-palm-database"
 	// "application/vnd.palm"
-	return NULL; 
+	return nullptr;
 }
 
 UT_Confidence_t IE_Imp_PalmDoc_Sniffer::recognizeContents(const char * szBuf, 
@@ -152,7 +152,7 @@ IE_Imp_PalmDoc::~IE_Imp_PalmDoc()
 IE_Imp_PalmDoc::IE_Imp_PalmDoc(PD_Document * pDocument)
 	: IE_Imp(pDocument)
 {
-	m_pdfp = 0;
+	m_pdfp = nullptr;
 	m_numRecords = 0;
 	m_fileSize = 0;
 	m_buf = new buffer;
@@ -171,7 +171,7 @@ IE_Imp_PalmDoc::IE_Imp_PalmDoc(PD_Document * pDocument)
 
 UT_Error IE_Imp_PalmDoc::_writeHeader(GsfInput * /* m_pdfp */)
 {
-	X_ReturnNoMemIfError(appendStrux(PTX_Section, NULL));
+	X_ReturnNoMemIfError(appendStrux(PTX_Section, PP_NOPROPS));
 	return UT_OK;
 }
 
@@ -196,7 +196,7 @@ UT_Error IE_Imp_PalmDoc::_parseFile(GsfInput * pdfp)
 		UT_DEBUGMSG(("This is not a DOC file!\n"));
 
 		// Create an empty paragraph.
-		X_ReturnNoMemIfError(appendStrux(PTX_Block, NULL));
+		X_ReturnNoMemIfError(appendStrux(PTX_Block, PP_NOPROPS));
 		return UT_OK;
 	}
 
@@ -270,7 +270,7 @@ UT_Error IE_Imp_PalmDoc::_parseFile(GsfInput * pdfp)
 		
 				// start a paragraph and emit any text that we
 				// have accumulated.
-				X_ReturnNoMemIfError(appendStrux(PTX_Block, NULL));
+				X_ReturnNoMemIfError(appendStrux(PTX_Block, PP_NOPROPS));
 				bEmptyFile = false;
 				if (gbBlock.getLength() > 0)
 				{
@@ -294,7 +294,7 @@ UT_Error IE_Imp_PalmDoc::_parseFile(GsfInput * pdfp)
 		// if we have text left over (without final CR/LF),
 		// or if we read an empty file,
 		// create a paragraph and emit the text now.
-		X_ReturnNoMemIfError(appendStrux(PTX_Block, NULL));
+		X_ReturnNoMemIfError(appendStrux(PTX_Block, PP_NOPROPS));
 		if (gbBlock.getLength() > 0)
 			X_ReturnNoMemIfError(appendSpan(reinterpret_cast<const UT_UCSChar *>(gbBlock.getPointer(0)), gbBlock.getLength()));
 	}

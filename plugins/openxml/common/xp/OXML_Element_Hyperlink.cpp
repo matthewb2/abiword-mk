@@ -21,12 +21,12 @@
  */
 
 // Class definition include
-#include <OXML_Element_Hyperlink.h>
+#include "OXML_Element_Hyperlink.h"
 
 // AbiWord includes
-#include <ut_types.h>
-#include <ut_string.h>
-#include <pd_Document.h>
+#include "ut_types.h"
+#include "ut_string.h"
+#include "pd_Document.h"
 
 OXML_Element_Hyperlink::OXML_Element_Hyperlink(const std::string & id) : 
 	OXML_Element(id, HYPR_TAG, HYPRLNK)
@@ -86,11 +86,9 @@ UT_Error OXML_Element_Hyperlink::addToPT(PD_Document* pDocument)
 {
 	UT_Error err = UT_OK;
 
-	const gchar *field_fmt[3];
-	field_fmt[0] = "xlink:href";
-	field_fmt[1] = m_target.c_str();
-	field_fmt[2] = 0;
-
+	const PP_PropertyVector field_fmt = {
+		"xlink:href", m_target
+	};
 	if(!pDocument->appendObject(PTO_Hyperlink, field_fmt))
 		return UT_ERROR;
 
@@ -98,7 +96,7 @@ UT_Error OXML_Element_Hyperlink::addToPT(PD_Document* pDocument)
 	if(err != UT_OK)
 		return err;
 
-	if(!pDocument->appendObject(PTO_Hyperlink, NULL))
+	if(!pDocument->appendObject(PTO_Hyperlink, PP_NOPROPS))
 		return UT_ERROR;
 
 	return UT_OK;

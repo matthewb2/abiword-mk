@@ -21,17 +21,17 @@
  */
 
 // Class definition include
-#include <OXML_Section.h>
+#include "OXML_Section.h"
 
 // Internal includes
-#include <OXML_Types.h>
-#include <OXML_Element.h>
-#include <OXML_Document.h>
+#include "OXML_Types.h"
+#include "OXML_Element.h"
+#include "OXML_Document.h"
 
 // AbiWord includes
-#include <ut_types.h>
-#include <pd_Document.h>
-#include <pt_Types.h>
+#include "ut_types.h"
+#include "pd_Document.h"
+#include "pt_Types.h"
 
 // External includes
 #include <string>
@@ -40,12 +40,18 @@ OXML_Section::OXML_Section() :
 	OXML_ObjectWithAttrProp(), 
 	m_id(""), 
 	m_breakType(NEXTPAGE_BREAK),
-	m_lastParagraph(NULL),
+	m_lastParagraph(nullptr),
 	m_target(0),
 	m_handledHdrFtr(false)
 {
-	m_headerIds[0] = NULL; m_headerIds[1] = NULL; m_headerIds[2] = NULL;
-	m_footerIds[0] = NULL; m_footerIds[1] = NULL; m_footerIds[2] = NULL;
+	m_headerIds[0] = nullptr;
+	m_headerIds[1] = nullptr;
+	m_headerIds[2] = nullptr;
+
+	m_footerIds[0] = nullptr;
+	m_footerIds[1] = nullptr;
+	m_footerIds[2] = nullptr;
+
 	m_children.clear();
 }
 
@@ -53,12 +59,18 @@ OXML_Section::OXML_Section(const std::string & id) :
 	OXML_ObjectWithAttrProp(), 
 	m_id(id), 
 	m_breakType(NEXTPAGE_BREAK),
-	m_lastParagraph(NULL),
+	m_lastParagraph(nullptr),
 	m_target(0),
 	m_handledHdrFtr(false)
 {
-	m_headerIds[0] = NULL; m_headerIds[1] = NULL; m_headerIds[2] = NULL;
-	m_footerIds[0] = NULL; m_footerIds[1] = NULL; m_footerIds[2] = NULL;
+	m_headerIds[0] = nullptr;
+	m_headerIds[1] = nullptr;
+	m_headerIds[2] = nullptr;
+
+	m_footerIds[0] = nullptr;
+	m_footerIds[1] = nullptr;
+	m_footerIds[2] = nullptr;
+
 	m_children.clear();
 }
 
@@ -83,7 +95,7 @@ OXML_SharedElement OXML_Section::getElement(const std::string & id)
 
 UT_Error OXML_Section::appendElement(OXML_SharedElement obj)
 {
-	UT_return_val_if_fail(obj.get() != NULL, UT_ERROR);
+	UT_return_val_if_fail(obj.get() != nullptr, UT_ERROR);
 
 	try {
 		m_children.push_back(obj);
@@ -137,30 +149,30 @@ void OXML_Section::applyDocumentProperties()
 {
 	OXML_Document* pDoc = OXML_Document::getInstance();
 
-	const gchar* num = NULL;
+	const gchar* num = nullptr;
 	const gchar* sep = "off";
-	const gchar* marginTop = NULL;
-	const gchar* marginLeft = NULL;
-	const gchar* marginRight = NULL;
-	const gchar* marginBottom = NULL;
+	const gchar* marginTop = nullptr;
+	const gchar* marginLeft = nullptr;
+	const gchar* marginRight = nullptr;
+	const gchar* marginBottom = nullptr;
 
 	if(getProperty("columns", num) != UT_OK)
-		num = NULL;
+		num = nullptr;
 
 	if((getProperty("column-line", sep) != UT_OK) || (strcmp(sep, "on") != 0))
 		sep = "off";
 
 	if(getProperty("page-margin-top", marginTop) != UT_OK)
-		marginTop = NULL;
+		marginTop = nullptr;
 
 	if(getProperty("page-margin-left", marginLeft) != UT_OK)
-		marginLeft = NULL;
+		marginLeft = nullptr;
 
 	if(getProperty("page-margin-right", marginRight) != UT_OK)
-		marginRight = NULL;
+		marginRight = nullptr;
 
 	if(getProperty("page-margin-bottom", marginBottom) != UT_OK)
-		marginBottom = NULL;
+		marginBottom = nullptr;
 
 	if(num && sep)
 		pDoc->setColumns(num, sep);
@@ -183,38 +195,38 @@ UT_Error OXML_Section::serializeProperties(IE_Exp_OpenXML* exporter, OXML_Elemen
 	bool defaultHdr = doc->isAllDefault(true);
 	bool defaultFtr = doc->isAllDefault(false);
 
-	const gchar* num = NULL;
+	const gchar* num = nullptr;
 	const gchar* sep = "off";
-	const gchar* marginTop = NULL;
-	const gchar* marginLeft = NULL;
-	const gchar* marginRight = NULL;
-	const gchar* marginBottom = NULL;
-	const gchar* footerId = NULL;
-	const gchar* headerId = NULL;
+	const gchar* marginTop = nullptr;
+	const gchar* marginLeft = nullptr;
+	const gchar* marginRight = nullptr;
+	const gchar* marginBottom = nullptr;
+	const gchar* footerId = nullptr;
+	const gchar* headerId = nullptr;
 
 	if(getProperty("columns", num) != UT_OK)
-		num = NULL;
+		num = nullptr;
 
 	if((getProperty("column-line", sep) != UT_OK) || (strcmp(sep, "on") != 0))
 		sep = "off";
 
 	if(getProperty("page-margin-top", marginTop) != UT_OK)
-		marginTop = NULL;
+		marginTop = nullptr;
 
 	if(getProperty("page-margin-left", marginLeft) != UT_OK)
-		marginLeft = NULL;
+		marginLeft = nullptr;
 
 	if(getProperty("page-margin-right", marginRight) != UT_OK)
-		marginRight = NULL;
+		marginRight = nullptr;
 
 	if(getProperty("page-margin-bottom", marginBottom) != UT_OK)
-		marginBottom = NULL;
+		marginBottom = nullptr;
 
 	if(getAttribute("header", headerId) != UT_OK)
-		headerId = NULL;
+		headerId = nullptr;
 
 	if(getAttribute("footer", footerId) != UT_OK)
-		footerId = NULL;
+		footerId = nullptr;
 
 	err = exporter->startSectionProperties();
 	if(err != UT_OK)
@@ -234,7 +246,7 @@ UT_Error OXML_Section::serializeProperties(IE_Exp_OpenXML* exporter, OXML_Elemen
 	if(defaultHdr && headerId && doc)
 	{
 		OXML_SharedSection header_section = doc->getHdrFtrById(true, headerId);
-		if(header_section != NULL)
+		if(header_section != nullptr)
 		{
 			header_section->setHandledHdrFtr(true);
 			err = header_section->serializeHeader(exporter);
@@ -246,7 +258,7 @@ UT_Error OXML_Section::serializeProperties(IE_Exp_OpenXML* exporter, OXML_Elemen
 	if(defaultFtr && footerId && doc)
 	{
 		OXML_SharedSection footer_section = doc->getHdrFtrById(false, footerId);
-		if(footer_section != NULL)
+		if(footer_section != nullptr)
 		{
 			footer_section->setHandledHdrFtr(true);
 			err = footer_section->serializeFooter(exporter);
@@ -472,16 +484,15 @@ UT_Error OXML_Section::serializeEndnote(IE_Exp_OpenXML* exporter)
 UT_Error OXML_Section::addToPT(PD_Document * pDocument)
 {
 	UT_Error ret = UT_OK;
-	const gchar ** attr = NULL;
 
-	if (pDocument == NULL)
+	if (pDocument == nullptr)
 		return UT_ERROR;
 
 	ret = _setReferenceIds();
 	UT_return_val_if_fail(ret == UT_OK, ret);
 
 	//Appending section
-	attr = this->getAttributesWithProps();
+	PP_PropertyVector attr = this->getAttributesWithProps();
 	ret = pDocument->appendStrux(PTX_Section, attr) ? UT_OK : UT_ERROR;
 	UT_return_val_if_fail(ret == UT_OK, ret);
 
@@ -505,25 +516,20 @@ UT_Error OXML_Section::addToPT(PD_Document * pDocument)
 UT_Error OXML_Section::addToPTAsFootnote(PD_Document * pDocument)
 {
 	UT_Error ret = UT_OK;
-	const gchar *attr[3];
-	attr[0] = "footnote-id";
-	attr[1] = m_id.c_str();
-	attr[2] = 0;
+	const PP_PropertyVector attr = { "footnote-id", m_id };
 
 	ret = pDocument->appendStrux(PTX_SectionFootnote, attr) ? UT_OK : UT_ERROR;
 	UT_return_val_if_fail(ret == UT_OK, ret);
 
-	const gchar *field_fmt[5];
-	field_fmt[0] = "type";
-	field_fmt[1] = "footnote_anchor";
-	field_fmt[2] = "footnote-id";
-	field_fmt[3] = m_id.c_str();
-	field_fmt[4] = 0;
+	const PP_PropertyVector field_fmt = {
+		"type", "footnote_anchor",
+		"footnote-id", m_id
+	};
 
 	if(!pDocument->appendObject(PTO_Field, field_fmt))
 		return UT_ERROR;
 
-	OXML_ElementVector::size_type i;	
+	OXML_ElementVector::size_type i;
 	i = 0;
 
 	if(m_children[0].get() && ((m_children[0].get())->getTag() == P_TAG))
@@ -540,31 +546,26 @@ UT_Error OXML_Section::addToPTAsFootnote(PD_Document * pDocument)
 		UT_return_val_if_fail(ret == UT_OK, ret);
 	}
 
-	return pDocument->appendStrux(PTX_EndFootnote, NULL) ? UT_OK : UT_ERROR;
+	return pDocument->appendStrux(PTX_EndFootnote, PP_NOPROPS) ? UT_OK : UT_ERROR;
 }
 
 UT_Error OXML_Section::addToPTAsEndnote(PD_Document * pDocument)
 {
 	UT_Error ret = UT_OK;
-	const gchar *attr[3];
-	attr[0] = "endnote-id";
-	attr[1] = m_id.c_str();
-	attr[2] = 0;
+	const PP_PropertyVector attr = { "endnote-id", m_id };
 
 	ret = pDocument->appendStrux(PTX_SectionEndnote, attr) ? UT_OK : UT_ERROR;
 	UT_return_val_if_fail(ret == UT_OK, ret);
 
-	const gchar *field_fmt[5];
-	field_fmt[0] = "type";
-	field_fmt[1] = "endnote_anchor";
-	field_fmt[2] = "endnote-id";
-	field_fmt[3] = m_id.c_str();
-	field_fmt[4] = 0;
+	const PP_PropertyVector field_fmt = {
+		"type", "endnote_anchor",
+		"endnote-id", m_id
+	};
 
 	if(!pDocument->appendObject(PTO_Field, field_fmt))
 		return UT_ERROR;
 
-	OXML_ElementVector::size_type i;	
+	OXML_ElementVector::size_type i;
 	i = 0;
 
 	if(m_children[0].get() && ((m_children[0].get())->getTag() == P_TAG))
@@ -581,13 +582,13 @@ UT_Error OXML_Section::addToPTAsEndnote(PD_Document * pDocument)
 		UT_return_val_if_fail(ret == UT_OK, ret);
 	}
 
-	return pDocument->appendStrux(PTX_EndEndnote, NULL) ? UT_OK : UT_ERROR;
+	return pDocument->appendStrux(PTX_EndEndnote, PP_NOPROPS) ? UT_OK : UT_ERROR;
 }
 
 UT_Error OXML_Section::addToPTAsHdrFtr(PD_Document * pDocument)
 {
 	UT_Error ret = UT_OK;
-	const gchar ** attr = this->getAttributes();
+	const PP_PropertyVector attr = this->getAttributes();
 	ret = pDocument->appendStrux(PTX_SectionHdrFtr, attr) ? UT_OK : UT_ERROR;
 	UT_return_val_if_fail(ret == UT_OK, ret);
 
@@ -602,18 +603,18 @@ UT_Error OXML_Section::addToPTAsHdrFtr(PD_Document * pDocument)
 
 UT_Error OXML_Section::_setReferenceIds()
 {
-	OXML_Document * doc = OXML_Document::getInstance(); UT_ASSERT(NULL != doc);
+	OXML_Document * doc = OXML_Document::getInstance(); UT_ASSERT(nullptr != doc);
 	OXML_SharedSection corresp_sect;
-	const char * ooxml_id(NULL), * abw_id(NULL);
+	const char * ooxml_id(nullptr), * abw_id(nullptr);
 
 	//Headers...
 	for (UT_uint32 i = 0; i <= 2; i++) {
-		ooxml_id = m_headerIds[i]; abw_id = NULL;
-		if (NULL != ooxml_id) {
+		ooxml_id = m_headerIds[i]; abw_id = nullptr;
+		if (nullptr != ooxml_id) {
 			corresp_sect = doc->getHeader(ooxml_id);
-			UT_return_val_if_fail( NULL != corresp_sect.get(), UT_ERROR );
+			UT_return_val_if_fail( nullptr != corresp_sect.get(), UT_ERROR );
 			corresp_sect->getAttribute("id", abw_id);
-			UT_return_val_if_fail( NULL != abw_id, UT_ERROR );
+			UT_return_val_if_fail( nullptr != abw_id, UT_ERROR );
 			if (i == DEFAULT_HDRFTR) {
 				this->setAttribute("header", abw_id );
 			} else if (i == FIRSTPAGE_HDRFTR) {
@@ -626,12 +627,12 @@ UT_Error OXML_Section::_setReferenceIds()
 
 	//Footers...
 	for (UT_uint32 i = 0; i <= 2; i++) {
-		ooxml_id = m_footerIds[i]; abw_id = NULL;
-		if (NULL != ooxml_id) {
+		ooxml_id = m_footerIds[i]; abw_id = nullptr;
+		if (nullptr != ooxml_id) {
 			corresp_sect = doc->getFooter(ooxml_id);
-			UT_return_val_if_fail( NULL != corresp_sect.get(), UT_ERROR );
+			UT_return_val_if_fail( nullptr != corresp_sect.get(), UT_ERROR );
 			corresp_sect->getAttribute("id", abw_id);
-			UT_return_val_if_fail( NULL != abw_id, UT_ERROR );
+			UT_return_val_if_fail( nullptr != abw_id, UT_ERROR );
 			if (i == DEFAULT_HDRFTR) {
 				this->setAttribute("footer", abw_id );
 			} else if (i == FIRSTPAGE_HDRFTR) {

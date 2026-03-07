@@ -18,8 +18,7 @@
  * 02111-1307, USA.
  */
 
-#ifndef INCLUDED_GPL_JARED_AIKSAURUSGTK_PICBUTTON_H
-#define INCLUDED_GPL_JARED_AIKSAURUSGTK_PICBUTTON_H
+#pragma once
 
 #include <glib.h>
 #include <gtk/gtk.h>
@@ -114,5 +113,3 @@ class AiksaurusGTK_picbutton
         GtkWidget* getButton();
 		GtkWidget* getMenuButton();
 };
-
-#endif // INCLUDED_GPL_JARED_AIKSAURUSGTK_PICBUTTON_H

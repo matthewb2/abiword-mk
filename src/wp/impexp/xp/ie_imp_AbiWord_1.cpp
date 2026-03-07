@@ -1,6 +1,7 @@
 /* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
+ * Copyright (C) 2016-2021 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -189,7 +190,7 @@ IE_Imp_AbiWord_1::~IE_Imp_AbiWord_1()
   {
 	  m_refMap->purgeData();
 	  delete m_refMap;
-	  m_refMap = 0;
+	  m_refMap = nullptr;
   }
 }
 
@@ -362,7 +363,7 @@ void IE_Imp_AbiWord_1::startElement(const gchar *name,
 		const std::string & sId = PP_getAttribute("id", atts);
 		bool bOK = true;
 		if(!sId.empty()) {
-			UT_uint32 id = stoi(sId);
+			UT_uint32 id = atoi(sId.c_str());
 			getDoc()->setMinUID(UT_UniqueId::HeaderFtr, id + 1);
 			bOK = getDoc()->verifySectionID(sId.c_str());
 		}
@@ -405,7 +406,7 @@ void IE_Imp_AbiWord_1::startElement(const gchar *name,
 		const std::string & sId = PP_getAttribute("footnote-id", atts);
 		UT_DebugOnly<bool> bOK = true;
 		if(!sId.empty()) {
-			UT_uint32 id = stoi(sId);
+			UT_uint32 id = atoi(sId.c_str());
 			bOK = getDoc()->setMinUID(UT_UniqueId::Footnote, id + 1);
 			UT_ASSERT(bOK);
 		}
@@ -428,7 +429,7 @@ void IE_Imp_AbiWord_1::startElement(const gchar *name,
 		const std::string & sId = PP_getAttribute("annotation-id", atts);
 		UT_DebugOnly<bool> bOK = true;
 		if(!sId.empty()) {
-			UT_uint32 id = stoi(sId);
+			UT_uint32 id = atoi(sId.c_str());
 			bOK = getDoc()->setMinUID(UT_UniqueId::Annotation, id + 1);
 			UT_ASSERT(bOK);
 		}
@@ -448,7 +449,7 @@ void IE_Imp_AbiWord_1::startElement(const gchar *name,
 		const std::string & sId = PP_getAttribute("endnote-id", atts);
 		UT_DebugOnly<bool> bOK = true;
 		if(!sId.empty()) {
-			UT_uint32 id = stoi(sId);
+			UT_uint32 id = atoi(sId.c_str());
 			bOK = getDoc()->setMinUID(UT_UniqueId::Endnote, id + 1);
 			UT_ASSERT(bOK);
 		}
@@ -484,7 +485,7 @@ void IE_Imp_AbiWord_1::startElement(const gchar *name,
 		const std::string & sId = PP_getAttribute("list", atts);
 		bool bOK;
 		if(!sId.empty()) {
-			UT_uint32 id = stoi(sId);
+			UT_uint32 id = atoi(sId.c_str());
 			bOK = getDoc()->setMinUID(UT_UniqueId::List, id + 1);
 			if(!bOK) {
 				UT_DEBUGMSG(("List id %d [%s] already in use\n", id, sId.c_str()));
@@ -509,7 +510,7 @@ void IE_Imp_AbiWord_1::startElement(const gchar *name,
 			m_bWroteParagraph = true;
 		}
 
-		X_CheckError(_pushInlineFmt(atts));
+		_pushInlineFmt(atts);
 
 		if(!isClipboard()) {
 			X_CheckError(appendFmt(m_vecInlineFmt));
@@ -718,7 +719,7 @@ void IE_Imp_AbiWord_1::startElement(const gchar *name,
 // Have to see if the style already exists. If it does, replace it with this.
 //
 		const std::string & sName = PP_getAttribute(PT_NAME_ATTRIBUTE_NAME, atts);
-		PD_Style * pStyle = NULL;
+		PD_Style * pStyle = nullptr;
 		if(getDoc()->getStyle(sName.c_str(), &pStyle)) {
 			X_CheckError(pStyle->addAttributes(atts));
 			pStyle->getBasedOn();
@@ -739,27 +740,27 @@ void IE_Imp_AbiWord_1::startElement(const gchar *name,
 		const std::string & s1 = PP_getAttribute("show", atts);
 		UT_uint32 i;
 		if(!s1.empty()) {
-			i = stoi(s1);
+			i = atoi(s1.c_str());
 			getDoc()->setShowRevisions(i != 0);
 		}
 
 		const std::string & s2 = PP_getAttribute("mark", atts);
 		if(!s2.empty())	{
-			i = stoi(s2);
+			i = atoi(s2.c_str());
 			getDoc()->setMarkRevisions(i != 0);
 		}
 
 		const std::string & s3 = PP_getAttribute("show-level", atts);
 		if(!s3.empty())
 		{
-			i = stoi(s3);
+			i = atoi(s3.c_str());
 			getDoc()->setShowRevisionId(i);
 		}
 
 		const std::string & s4 = PP_getAttribute("auto",atts);
 		if(!s4.empty())
 		{
-			i = stoi(s4);
+			i = atoi(s4.c_str());
 			// we cannot call setAutoRevisioning() from here because
 			// it creates a new revision, so we can only call it after
 			// the revisions have been all read it -- we will call it
@@ -785,17 +786,17 @@ void IE_Imp_AbiWord_1::startElement(const gchar *name,
 		const std::string & s1 = PP_getAttribute(PT_ID_ATTRIBUTE_NAME, atts);
 		if(!s1.empty())
 		{
-			m_currentRevisionId = stoi(s1);
+			m_currentRevisionId = atoi(s1.c_str());
 			m_currentRevisionTime = 0;
 
 			const std::string & s2 = PP_getAttribute("time-started",atts);
 			if(!s2.empty()) {
-				m_currentRevisionTime = (time_t)stoi(s2);
+				m_currentRevisionTime = (time_t)atoi(s2.c_str());
 			}
 
 			const std::string & s3 = PP_getAttribute("version", atts);
 			if(!s3.empty()) {
-				m_currentRevisionVersion = stoi(s3);
+				m_currentRevisionVersion = atoi(s3.c_str());
 			}
 		}
 
@@ -815,7 +816,7 @@ void IE_Imp_AbiWord_1::startElement(const gchar *name,
 		m_parseState = _PS_Author;
 
 		const std::string & sId = PP_getAttribute("id", atts);
-		UT_sint32 iAuthorInt = stoi(sId);
+		UT_sint32 iAuthorInt = atoi(sId.c_str());
 		pp_Author * pA = getDoc()->addAuthor(iAuthorInt);
 		PP_AttrProp * pPA = pA->getAttrProp();
 		const std::string & props = PP_getAttribute(PT_PROPS_ATTRIBUTE_NAME, atts);
@@ -839,21 +840,21 @@ void IE_Imp_AbiWord_1::startElement(const gchar *name,
 		UT_uint32 i;
 		if(!s1.empty())
 		{
-			i = stoi(s1);
+			i = atoi(s1.c_str());
 			getDoc()->setDocVersion(i);
 		}
 
 		const std::string & s2 = PP_getAttribute("edit-time", atts);
 		if(!s2.empty())
 		{
-			i = stoi(s2);
+			i = atoi(s2.c_str());
 			getDoc()->setEditTime(i);
 		}
 
 		const std::string & s3 = PP_getAttribute("last-saved", atts);
 		if(!s3.empty())
 		{
-			i = stoi(s3);
+			i = atoi(s3.c_str());
 			getDoc()->setLastSavedTime((time_t)i);
 		}
 		const std::string & s4 = PP_getAttribute("uid", atts);
@@ -872,18 +873,18 @@ void IE_Imp_AbiWord_1::startElement(const gchar *name,
 
 		const std::string & s1 = PP_getAttribute(PT_ID_ATTRIBUTE_NAME, atts);
 		if(!s1.empty()) {
-			UT_uint32 iId = stoi(s1);
+			UT_uint32 iId = atoi(s1.c_str());
 
 			time_t tStarted = 0;
 			const std::string & s2 = PP_getAttribute("started", atts);
 			if(!s2.empty()) {
-				tStarted = (time_t) stoi(s2);
+				tStarted = (time_t) atoi(s2.c_str());
 			}
 
 			bool bAuto = false;
 			const std::string & sAuto = PP_getAttribute("auto", atts);
 			if(!sAuto.empty()) {
-				bAuto = (0 != stoi(sAuto));
+				bAuto = (0 != atoi(sAuto.c_str()));
 			} else {
 				bAuto = false;
 			}
@@ -891,14 +892,13 @@ void IE_Imp_AbiWord_1::startElement(const gchar *name,
 			UT_uint32 iXID = 0;
 			const std::string & sXID = PP_getAttribute("top-xid", atts);
 			if(!sXID.empty()) {
-				iXID = stoi(sXID);
+				iXID = atoi(sXID.c_str());
 			}
 
 			const std::string & sUid = PP_getAttribute("uid", atts);
 
 			if(!sUid.empty()) {
-				AD_VersionData v(iId, sUid.c_str(), tStarted, bAuto, iXID);
-				getDoc()->addRecordToHistory(v);
+				getDoc()->addRecordToHistory(AD_VersionData(iId, sUid.c_str(), tStarted, bAuto, iXID));
 			}
 		}
 
@@ -1212,7 +1212,7 @@ void IE_Imp_AbiWord_1::endElement(const gchar *name)
 		X_CheckError(getDoc()->createDataItem(m_currentDataItemName.c_str(),
                                               m_currentDataItemEncoded,
                                               m_currentDataItem,
-                                              m_currentDataItemMimeType, NULL));
+                                              m_currentDataItemMimeType, nullptr));
 		m_currentDataItemName.clear();
 		m_currentDataItemMimeType.clear();
 #endif
@@ -1265,7 +1265,7 @@ void IE_Imp_AbiWord_1::endElement(const gchar *name)
 		if(m_currentRevisionId != 0) {
 			// the revision had no comment associated, so it was not
 			// added to the doc by the xml paraser
-			X_CheckError(getDoc()->addRevision(m_currentRevisionId, NULL, 0,
+			X_CheckError(getDoc()->addRevision(m_currentRevisionId, nullptr, 0,
 											   m_currentRevisionTime,
 											   m_currentRevisionVersion, true));
 			m_currentRevisionId = 0;
@@ -1556,7 +1556,7 @@ bool IE_Imp_AbiWord_1::_handleResource (const gchar ** atts, bool isResource)
 			const gchar * r_64 = 0;
 
 			enum { mt_unknown, mt_png, mt_svg, mt_mathml,mt_embed } mt = mt_unknown;
-			const gchar * pszEmbed = NULL;
+			const gchar * pszEmbed = nullptr;
 			const gchar ** attr = atts;
 			while (*attr)
 				{

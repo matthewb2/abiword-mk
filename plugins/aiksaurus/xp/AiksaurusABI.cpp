@@ -24,7 +24,7 @@
 #define abi_plugin_supports_version abipgn_aiksaurus_supports_version
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 	#include "../win/AiksaurusApp.h"
 #else
 	#include <../aiksaurusgtk3/AiksaurusGTK.h>
@@ -99,12 +99,12 @@ AiksaurusABI_addToMenus()
 //
 // Put it in the context menu.
 //
-    XAP_Menu_Id newID = pFact->addNewMenuAfter("contextText",NULL,"Bullets and &Numbering",EV_MLF_Normal);
-    pFact->addNewLabel(NULL,newID,AiksaurusABI_MenuLabel, AiksaurusABI_MenuTooltip);
+    XAP_Menu_Id newID = pFact->addNewMenuAfter("contextText",nullptr,"Bullets and &Numbering",EV_MLF_Normal);
+    pFact->addNewLabel(nullptr,newID,AiksaurusABI_MenuLabel, AiksaurusABI_MenuTooltip);
 //
 // Also put it under word Wount in the main menu,
 //
-    pFact->addNewMenuAfter("Main",NULL,"&Word Count",EV_MLF_Normal,newID);
+    pFact->addNewMenuAfter("Main",nullptr,"&Word Count",EV_MLF_Normal,newID);
 
     // Create the Action that will be called.
     EV_Menu_Action* myAction = new EV_Menu_Action(
@@ -114,8 +114,8 @@ AiksaurusABI_addToMenus()
 	0,                      // no, we don't have a checkbox.
 	0,
 	"AiksaurusABI_invoke",  // name of callback function to call.
-	NULL,                   // don't know/care what this is for
-	NULL                    // don't know/care what this is for
+	nullptr,                   // don't know/care what this is for
+	nullptr                    // don't know/care what this is for
         );
 
     // Now what we need to do is add this particular action to the ActionSet
@@ -149,8 +149,8 @@ AikSaurusABI_RemoveFromMenus ()
   int frameCount = pApp->getFrameCount();
   XAP_Menu_Factory * pFact = pApp->getMenuFactory();
 
-  pFact->removeMenuItem("Main",NULL,AiksaurusABI_MenuLabel);
-  pFact->removeMenuItem("contextText",NULL,AiksaurusABI_MenuLabel);
+  pFact->removeMenuItem("Main",nullptr,AiksaurusABI_MenuLabel);
+  pFact->removeMenuItem("contextText",nullptr,AiksaurusABI_MenuLabel);
   for(int i = 0;i < frameCount;++i)
     {
       // Get the current frame that we're iterating through.
@@ -185,11 +185,11 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-    mi->name = 0;
-    mi->desc = 0;
-    mi->version = 0;
-    mi->author = 0;
-    mi->usage = 0;
+    mi->name = nullptr;
+    mi->desc = nullptr;
+    mi->version = nullptr;
+    mi->author = nullptr;
+    mi->usage = nullptr;
 
     AikSaurusABI_RemoveFromMenus ();
 
@@ -262,7 +262,7 @@ AiksaurusABI_asciiToUcs(const char* text, int& length)
 {
   length = 0 ;
   if ( !text )
-    return static_cast<UT_UCSChar*>(NULL);
+    return nullptr;
 
     // calculate the length of our text so we can create a UCS-2
     // buffer of equal size.
@@ -310,7 +310,7 @@ AiksaurusABI_invoke(AV_View* /*v*/, EV_EditMethodCallData * /*d*/)
     pView->extSelTo(FV_DOCPOS_EOW_SELECT);  
 	
     // Now we will figure out what word to look up when we open our dialog.
-    char* search = 0;
+    char* search = nullptr;
     if (!pView->isSelectionEmpty())
     {
         // We need to get the Ascii version of the current word.
@@ -324,7 +324,7 @@ AiksaurusABI_invoke(AV_View* /*v*/, EV_EditMethodCallData * /*d*/)
     // Now we will run the thesaurus dialog and get a response.
     // We will automatically do a search for the selected/current word. 
 
-#ifdef WIN32
+#ifdef _WIN32
 	AiksaurusApp thesaurus;
 	thesaurus.setInstance( (HINSTANCE)s_hModule );
 #else

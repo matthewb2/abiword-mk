@@ -22,11 +22,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
- 
- 
-// External includes
-#include <gsf/gsf-output-stdio.h>
-#include <gsf/gsf-outfile.h>
 
 #include "ut_std_string.h"
 #include "pd_Document.h"
@@ -120,14 +115,14 @@ bool ODe_ManifestWriter::writeManifest(PD_Document* pDoc, GsfOutfile* pODT)
 
     const char* szName;
     std::string mimeType;
-    const UT_ByteBuf* pByteBuf;
+    UT_ConstByteBufPtr pByteBuf;
     std::set< std::string > pathsAlreadyWritten;
     
     for (UT_uint32 k = 0;
          (pDoc->enumDataItems(k,
-                              NULL,
+                              nullptr,
                               &szName,
-                              &pByteBuf,
+                              pByteBuf,
                               &mimeType)); k++) {
                                 
         if (!mimeType.empty()) {

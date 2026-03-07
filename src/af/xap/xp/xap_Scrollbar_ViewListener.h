@@ -17,8 +17,7 @@
  * 02110-1301 USA.
  */
 
-#ifndef XAP_SCROLLBAR_VIEWLISTENER_H
-#define XAP_SCROLLBAR_VIEWLISTENER_H
+#pragma once
 
 #include "xav_Listener.h"
 
@@ -31,12 +30,10 @@ class ABI_EXPORT ap_Scrollbar_ViewListener : public AV_Listener
 public:
 	ap_Scrollbar_ViewListener(XAP_Frame * pFrame, AV_View * pView);
 
-	virtual bool		notify(AV_View * pView, const AV_ChangeMask mask);
-	virtual  AV_ListenerType getType(void) { return AV_LISTENER_SCROLLBAR;}
+	virtual bool		notify(AV_View * pView, const AV_ChangeMask mask) override;
+	virtual AV_ListenerType getType(void) const override { return AV_LISTENER_SCROLLBAR;}
 
 protected:
 	XAP_Frame *			m_pFrame;
 	AV_View *			m_pView;
 };
-
-#endif /* XAP_SCROLLBAR_VIEWLISTENER_H */

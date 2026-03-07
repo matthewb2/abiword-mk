@@ -29,7 +29,6 @@
 #include "ie_types.h"
 
 #include "ut_go_file.h"
-#include <gsf/gsf-output.h>
 
 #include "ut_string_class.h"
 
@@ -113,12 +112,12 @@ public:
 										  const char * szFilename,
 										  IEFileType ieft,
 										  IE_Exp ** ppie,
-										  IEFileType * pieft = NULL);
+										  IEFileType * pieft = nullptr);
 	static UT_Error		constructExporter(PD_Document * pDocument,
 										  GsfOutput * output,
 										  IEFileType ieft,
 										  IE_Exp ** ppie,
-										  IEFileType * pieft = NULL);
+										  IEFileType * pieft = nullptr);
 	static bool		    enumerateDlgLabels(UT_uint32 ndx,
 										   const char ** pszDesc,
 										   const char ** pszSuffixList,
@@ -156,7 +155,7 @@ public:
 	void setProps (const char * props);
 
 	bool isCopying () const {
-		return getDocRange () != NULL;
+		return getDocRange () != nullptr;
 	}
 
 	void populateFields();

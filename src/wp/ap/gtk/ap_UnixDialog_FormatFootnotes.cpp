@@ -52,19 +52,19 @@ AP_UnixDialog_FormatFootnotes::AP_UnixDialog_FormatFootnotes(XAP_DialogFactory *
 										 XAP_Dialog_Id id)
 	: AP_Dialog_FormatFootnotes(pDlgFactory,id)
 {
-	m_windowMain = NULL;
-	m_wButtonApply = NULL;
+	m_windowMain = nullptr;
+	m_wButtonApply = nullptr;
 
-	m_wFootnotesStyleMenu = NULL;
-	m_wFootnoteNumberingMenu = NULL;
-	m_wFootnoteSpin = NULL;
-	m_oFootnoteSpinAdj = NULL;
+	m_wFootnotesStyleMenu = nullptr;
+	m_wFootnoteNumberingMenu = nullptr;
+	m_wFootnoteSpin = nullptr;
+	m_oFootnoteSpinAdj = nullptr;
 
-	m_wEndnotesStyleMenu = NULL;
-	m_wEndnotesPlaceMenu= NULL;
-	m_wEndnotesRestartOnSection = NULL;
-	m_wEndnoteSpin = NULL;
-	m_oEndnoteSpinAdj = NULL;
+	m_wEndnotesStyleMenu = nullptr;
+	m_wEndnotesPlaceMenu= nullptr;
+	m_wEndnotesRestartOnSection = nullptr;
+	m_wEndnoteSpin = nullptr;
+	m_oEndnoteSpinAdj = nullptr;
 
 	m_FootnoteSpinHanderID= 0;
 	m_EndnoteSpinHanderID =0;
@@ -358,7 +358,7 @@ GtkWidget * AP_UnixDialog_FormatFootnotes::_constructWindow(void)
 	GtkWidget * window;
 	const XAP_StringSet * pSS = XAP_App::getApp()->getStringSet();
 	
-	GtkBuilder * builder = newDialogBuilder("ap_UnixDialog_FormatFootnotes.ui");
+	GtkBuilder * builder = newDialogBuilderFromResource("ap_UnixDialog_FormatFootnotes.ui");
 
 	// might need to be queried or altered later
 	window = GTK_WIDGET(gtk_builder_get_object(builder, "ap_UnixDialog_FormatFootnotes"));

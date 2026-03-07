@@ -49,10 +49,10 @@
 AP_Dialog_Tab::AP_Dialog_Tab(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id)
 	: XAP_Dialog_NonPersistent(pDlgFactory,id, "interface/dialogtabs"),
 	  m_answer(a_OK),
-	  m_pFrame(0),
+	  m_pFrame(nullptr),
 	  m_dim(DIM_IN),
-	  m_pCallbackFn(0),
-	  m_closure(0)
+	  m_pCallbackFn(nullptr),
+	  m_closure(nullptr)
 {
 }
 
@@ -84,11 +84,12 @@ void AP_Dialog_Tab::_storeWindowData()
 
 void AP_Dialog_Tab::_populateWindowData(void)
 {
-	const gchar * szRulerUnits;
-	if (getApp()->getPrefsValue(AP_PREF_KEY_RulerUnits,&szRulerUnits))
-		m_dim = UT_determineDimension(szRulerUnits);
-	else
+	std::string rulerUnits;
+	if (getApp()->getPrefsValue(AP_PREF_KEY_RulerUnits, rulerUnits)) {
+		m_dim = UT_determineDimension(rulerUnits.c_str());
+	} else {
 		m_dim = DIM_IN;
+	}
 
 	UT_return_if_fail (m_pFrame); // needs to be set from runModal for some of the event_'s to work
 
@@ -288,7 +289,7 @@ void AP_Dialog_Tab::_event_Set(void)
 */
 void AP_Dialog_Tab::_event_Update(void)
 {
-	fl_TabStop *pTabInfo1 = NULL;
+	fl_TabStop *pTabInfo1 = nullptr;
 
 	// check the validity of the input
 	UT_String buffer;
@@ -566,7 +567,7 @@ void AP_Dialog_Tab::_event_somethingChanged()
 char *AP_Dialog_Tab::_getTabDimensionString(UT_sint32 tabIndex)
 {
 
-	UT_return_val_if_fail (tabIndex < m_tabInfo.getItemCount(), NULL);
+	UT_return_val_if_fail (tabIndex < m_tabInfo.getItemCount(), nullptr);
 
 	fl_TabStop *pTabInfo = m_tabInfo.getNthItem(tabIndex);
 
@@ -578,7 +579,7 @@ char *AP_Dialog_Tab::_getTabDimensionString(UT_sint32 tabIndex)
 	}
 
 	UT_uint32 iLen = pEnd - pStart;
-	UT_return_val_if_fail (iLen<20, NULL);
+	UT_return_val_if_fail (iLen<20, nullptr);
 
 	strncpy(buf, pStart, iLen);
 	buf[iLen]=0;

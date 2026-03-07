@@ -70,7 +70,7 @@ const char * UT_dimensionName(UT_Dimension dim)
 
 UT_Dimension UT_determineDimension(const char * sz, UT_Dimension fallback)
 {
-  char * p = NULL ;
+  char * p = nullptr ;
 
   {
 	  UT_LocaleTransactor t(LC_NUMERIC, "C");
@@ -86,22 +86,22 @@ UT_Dimension UT_determineDimension(const char * sz, UT_Dimension fallback)
 
       if (g_ascii_strcasecmp(p,"in") == 0 || g_ascii_strcasecmp(p, "inch") == 0)
 	return DIM_IN;
-
+      
       else if (g_ascii_strcasecmp(p,"cm") == 0)
 	return DIM_CM;
-
+      
       else if (g_ascii_strcasecmp(p,"mm") == 0)
 	return DIM_MM;
-
+      
       else if (g_ascii_strcasecmp(p,"pi") == 0)
 	return DIM_PI;
-
+      
       else if (g_ascii_strcasecmp(p,"pt") == 0)
 	return DIM_PT;
-
+      
       else if (g_ascii_strcasecmp(p,"px") == 0)
 	return DIM_PX;
-
+      
       else if (g_ascii_strcasecmp(p,"%") == 0)
 	return DIM_PERCENT;
 
@@ -109,9 +109,9 @@ UT_Dimension UT_determineDimension(const char * sz, UT_Dimension fallback)
 	return DIM_STAR;
 
       UT_DEBUGMSG(("ut_units - unknown unit presented '%s' \n",p));
-//pascal      UT_ASSERT_NOT_REACHED();
+      UT_ASSERT_NOT_REACHED();
     }
-
+  
   return fallback;
 }
 
@@ -371,7 +371,7 @@ double UT_convertDimToInches (double f, UT_Dimension dim)
     case DIM_PX: result = f / 72; break;
     default:
       UT_DEBUGMSG(("Unknown dimension type: %d", dim));
-//pascal      UT_ASSERT_NOT_REACHED();
+      UT_ASSERT_NOT_REACHED();
       result = f;
     }
   return result;
@@ -472,14 +472,14 @@ bool UT_hasDimensionComponent(const char * sz)
 	if (!sz)
 		return false;
 
-	char *p = NULL;
+	char *p = nullptr;
 
 	{
 		UT_LocaleTransactor t(LC_NUMERIC, "C");
 		strtod(sz, &p);
 	}
 
-	// if we landed on non-NULL, unit component
+	// if we landed on non-nullptr, unit component
 	if(p && *p)
 		return true;
 	else
@@ -598,14 +598,14 @@ bool UT_isValidDimensionString(const char * sz, size_t max_length)
 	// should only contain the characters '0'..'9' and/or at most one '.'. The last part possibly
 	// containing the dim specifier is not checked.
 	// This is not perfect, but good enough for most purposes. Feel g_free to improve the test.
-
+	
 	// FIXME: other locales might want to use another character as a decimal seperator.
-	//        we should be able to handle that too.
+	//        we should be able to handle that too.	
 	UT_LocaleTransactor t(LC_NUMERIC, "C");
-
+	
 	if (max_length > 0 && (strlen(sz) > max_length))
 		return false;
-
+	
 	const gchar* p = sz;
 	bool valid = true;
 	bool seenDecSep = false;
@@ -628,19 +628,19 @@ UT_uint32 UT_getDimensionPrecisicion (UT_Dimension dim)
 {
 	switch (dim)
 	{
-		case DIM_IN:
+		case DIM_IN:	
 			return 2;
-		case DIM_CM:
+		case DIM_CM:	
 			return 1;
-		case DIM_MM:
-		case DIM_PI:
-		case DIM_PT:
+		case DIM_MM:	
+		case DIM_PI:	
+		case DIM_PT:	
 		case DIM_PX:
 			return 0;
 		default:
 			UT_ASSERT(UT_NOT_IMPLEMENTED);
 			return 1;
-	}
+	}	
 }
 
 /*!
@@ -651,15 +651,15 @@ double UT_getDimensionResolution (UT_Dimension dim)
 {
 	switch (dim)
 	{
-		case DIM_IN:
+		case DIM_IN:	
 			return 0.1;
-		case DIM_CM:
+		case DIM_CM:	
 			return 0.5;
 		case DIM_PI:
 			return 1;
 		case DIM_MM:
 			return 5;
-		case DIM_PT:
+		case DIM_PT:	
 			return 10;
 		case DIM_PX:
 			return 10;
@@ -668,7 +668,7 @@ double UT_getDimensionResolution (UT_Dimension dim)
 		default:
 			UT_ASSERT(UT_NOT_IMPLEMENTED);
 			return 1;
-	}
+	}	
 }
 
 /*!

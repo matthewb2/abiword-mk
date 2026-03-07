@@ -20,18 +20,16 @@
  * 02110-1301 USA.
  */
 
-#ifndef _ODE_STYLE_STYLE_H_
-#define _ODE_STYLE_STYLE_H_
+#pragma once
 
 #include <vector>
 #include <map>
 #include <string>
 
-// AbiWord includes
-#include <ut_string_class.h>
-
-// External includes
 #include <gsf/gsf.h>
+
+// AbiWord includes
+#include "ut_string_class.h"
 
 // AbiWord classes
 class PP_AttrProp;
@@ -366,6 +364,3 @@ private:
         UT_UTF8String m_padding;         // fo:padding
     } *m_pGraphicProps;
 };
-
-
-#endif //_ODE_STYLE_STYLE_H_

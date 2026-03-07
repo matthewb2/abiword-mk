@@ -106,11 +106,7 @@ GtkWidget * AP_UnixDialog_CollaborationShare::_constructWindow(void)
 	//const XAP_StringSet * pSS = XAP_App::getApp()->getStringSet();
 	
 	// load the dialog from the UI file
-#if GTK_CHECK_VERSION(3,0,0)
 	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_CollaborationShare.ui");
-#else
-	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_CollaborationShare-2.ui");
-#endif
 	
 	// Update our member variables with the important widgets that 
 	// might need to be queried or altered later
@@ -263,7 +259,7 @@ AccountHandler* AP_UnixDialog_CollaborationShare::_getActiveAccountHandler()
 	{
 		gchar * str_data;
 		gpointer* ptr_data;
-		AccountHandler* pHandler = 0;
+		AccountHandler* pHandler = nullptr;
 
 		gtk_tree_model_get (m_pAccountModel, &iter, 
                           0, &str_data,
@@ -273,7 +269,7 @@ AccountHandler* AP_UnixDialog_CollaborationShare::_getActiveAccountHandler()
 		pHandler = reinterpret_cast<AccountHandler*>(ptr_data);
 		return pHandler;
 	}
-	return 0;
+	return nullptr;
 }
 
 void AP_UnixDialog_CollaborationShare::eventOk()

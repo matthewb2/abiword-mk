@@ -48,7 +48,7 @@ public:
 	virtual UT_sint32	getDisplayWidth(void) const;
 	virtual UT_sint32	getDisplayHeight(void) const;
 
-  virtual bool		convertToBuffer(UT_ConstByteBufPtr & ppBB) const = 0;
+   	virtual bool		convertToBuffer(UT_ConstByteBufPtr & ppBB) const = 0;
 	virtual bool		convertFromBuffer(const UT_ConstByteBufPtr & pBB, const std::string& mimetype, UT_sint32 iDisplayWidth, UT_sint32 iDisplayHeight) = 0;
 	/*!
 	 * This should be overridden by platform code. The idea is to create a
@@ -101,9 +101,9 @@ private:
 class ABI_EXPORT GR_RasterImage : public GR_Image
 {
 public:
-	virtual bool hasAlpha(void) const = 0;
-	virtual bool isTransparentAt(UT_sint32 x, UT_sint32 y) = 0;
-   	virtual GRType		getType() const { return GRT_Raster; }
+	virtual bool hasAlpha(void) const override = 0;
+	virtual bool isTransparentAt(UT_sint32 x, UT_sint32 y) override = 0;
+	virtual GRType		getType() const override { return GRT_Raster; }
 };
 
 class ABI_EXPORT GR_ImageFactory

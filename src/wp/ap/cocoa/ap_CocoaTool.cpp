@@ -1,4 +1,4 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t; -*- */
 
 /* AbiSource Application Framework
  * Copyright (C) 2005 Francis James Franklin
@@ -51,16 +51,18 @@ static void s_addToolsToProvider (XAP_CocoaToolProvider * provider)
 	const char * szToolbarLabelSetKey          = AP_PREF_KEY_StringSet;
 	const char * szToolbarLabelSetDefaultValue = AP_PREF_DEFAULT_StringSet;
 
-	const char * szToolbarLabelSetName = NULL;
+	std::string toolbarLabelSetName;
 
 	XAP_App * pApp = XAP_App::getApp();
 
-	if ((pApp->getPrefsValue(szToolbarLabelSetKey, static_cast<const gchar **>(&szToolbarLabelSetName))) && (szToolbarLabelSetName) && (*szToolbarLabelSetName))
+	if (pApp->getPrefsValue(szToolbarLabelSetKey, toolbarLabelSetName)
+        && !toolbarLabelSetName.empty()) {
 		;
-	else
-		szToolbarLabelSetName = szToolbarLabelSetDefaultValue;
+	} else {
+		toolbarLabelSetName = szToolbarLabelSetDefaultValue;
+	}
 
-	EV_Toolbar_LabelSet * toolbarLabelSet = AP_CreateToolbarLabelSet(szToolbarLabelSetName);
+	EV_Toolbar_LabelSet * toolbarLabelSet = AP_CreateToolbarLabelSet(toolbarLabelSetName.c_str());
 	UT_ASSERT(toolbarLabelSet);
 	if (!toolbarLabelSet)
 	{
@@ -224,7 +226,7 @@ static NSImage * s_findImage (NSString * filename)
 		[m_button setAction:@selector(click:)];
 
 		[m_button setToolTip:[m_tool description]];
-		[m_button setBezelStyle:NSRegularSquareBezelStyle];
+		[m_button setBezelStyle:NSBezelStyleRegularSquare];
 		[m_button setBordered:NO];
 
 		NSImage * image = nil;

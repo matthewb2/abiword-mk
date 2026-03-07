@@ -21,18 +21,18 @@
  */
 
 // Class definition include
-#include <OXMLi_ListenerState_Image.h>
+#include "OXMLi_ListenerState_Image.h"
 
 // Internal includes
-#include <OXML_Document.h>
-#include <OXML_FontManager.h>
-#include <OXMLi_PackageManager.h>
+#include "OXML_Document.h"
+#include "OXML_FontManager.h"
+#include "OXMLi_PackageManager.h"
 
 // AbiWord includes
-#include <ut_assert.h>
-#include <ut_misc.h>
-#include <ie_impGraphic.h>
-#include <fg_GraphicRaster.h>
+#include "ut_assert.h"
+#include "ut_misc.h"
+#include "ie_impGraphic.h"
+#include "fg_GraphicRaster.h"
 
 // External includes
 #include <string>
@@ -420,7 +420,7 @@ void OXMLi_ListenerState_Image::charData (OXMLi_CharDataRequest * rqst)
 			contextTag = rqst->context->at(rqst->context->size() - 2);
 		int positionH = contextMatches(contextTag, NS_WP_KEY, "positionH");
 		int positionV = contextMatches(contextTag, NS_WP_KEY, "positionV");
-		if(rqst->buffer == NULL)
+		if(rqst->buffer == nullptr)
 		{
 			UT_DEBUGMSG(("SERHAT: Unexpected situation, request with a null buffer\n"));
 			return;
@@ -446,30 +446,28 @@ void OXMLi_ListenerState_Image::charData (OXMLi_CharDataRequest * rqst)
 bool OXMLi_ListenerState_Image::addImage(const std::string & id)
 {
 	UT_Error err = UT_OK;
-	FG_Graphic* pFG = NULL;
+	FG_ConstGraphicPtr pFG;
 		
 	OXMLi_PackageManager * mgr = OXMLi_PackageManager::getInstance();
-	const UT_ByteBuf* imageData = mgr->parseImageStream(id.c_str());
+	UT_ConstByteBufPtr imageData = mgr->parseImageStream(id.c_str());
 
 	if (!imageData)
 		return false;
 
-	err = IE_ImpGraphic::loadGraphic (*imageData, IEGFT_Unknown, &pFG);
-	if ((err != UT_OK) || !pFG) 
+	err = IE_ImpGraphic::loadGraphic(imageData, IEGFT_Unknown, pFG);
+	if ((err != UT_OK) || !pFG)
 	{
-		DELETEP(imageData);
 		UT_DEBUGMSG(("FRT:OpenXML importer can't import the picture with id:%s\n", id.c_str()));
 		return false;
 	}
-	DELETEP(imageData);
 
 	OXML_Document * doc = OXML_Document::getInstance();
 	if(!doc)
 		return false;
-				
+
 	OXML_Image* img = new OXML_Image();
 	img->setId(id.c_str());
-	img->setGraphic(pFG);
+	img->setGraphic(std::move(pFG));
 
 	OXML_SharedImage shrImg(img);
 

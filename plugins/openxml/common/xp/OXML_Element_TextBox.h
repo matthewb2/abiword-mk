@@ -24,12 +24,12 @@
 #define _OXML_ELEMENT_TEXTBOX_H_
 
 // Internal includes
-#include <OXML_Element.h>
-#include <ie_exp_OpenXML.h>
+#include "OXML_Element.h"
+#include "ie_exp_OpenXML.h"
 
 // AbiWord includes
-#include <ut_types.h>
-#include <pd_Document.h>
+#include "ut_types.h"
+#include "pd_Document.h"
 
 // External includes
 #include <string>
@@ -40,8 +40,8 @@ public:
 	OXML_Element_TextBox(const std::string & id);
 	virtual ~OXML_Element_TextBox();
 
-	virtual UT_Error serialize(IE_Exp_OpenXML* exporter);
-	virtual UT_Error addToPT(PD_Document * pDocument);
+	virtual UT_Error serialize(IE_Exp_OpenXML* exporter) override;
+	virtual UT_Error addToPT(PD_Document * pDocument) override;
 
 private:
 	virtual UT_Error serializeProperties(IE_Exp_OpenXML* exporter);

@@ -176,8 +176,6 @@ GtkWidget * AP_UnixDialog_EpubExportOptions::_constructWindow ()
 
 	const char * title   = "EPUB Export Options";
 	const char * label   = "Select EPUB export options:";
-	const char * save    = static_cast<const char *>(pSS->getValue (XAP_STRING_ID_DLG_HTMLOPT_ExpSave));
-	const char * restore = static_cast<const char *>(pSS->getValue (XAP_STRING_ID_DLG_HTMLOPT_ExpRestore));
 
 	const char * Epub2              = "EPUB 2.0.1";
 	const char * SplitDocument      = "Split document";
@@ -197,30 +195,32 @@ GtkWidget * AP_UnixDialog_EpubExportOptions::_constructWindow ()
 
 	/* The top item in the vbox is a simple label
 	 */
-	GtkWidget * labelActivate = gtk_label_new (label);
+	GtkWidget * labelActivate = gtk_widget_new (GTK_TYPE_LABEL,
+						    "label", label,
+						    "justify", GTK_JUSTIFY_LEFT,
+						    "xalign", 0.0, "yalign", 0.0,
+						    "xpad", 10, "ypad", 5,
+						    NULL);
 	if (labelActivate)
-		{
-			gtk_widget_show (labelActivate);
-			gtk_box_pack_start (GTK_BOX (vboxMain), labelActivate, FALSE, TRUE, 0);
-			gtk_label_set_justify (GTK_LABEL (labelActivate), GTK_JUSTIFY_LEFT);
-			gtk_misc_set_alignment (GTK_MISC (labelActivate), 0, 0);
-			gtk_misc_set_padding (GTK_MISC (labelActivate), 10, 5);
-		}
+	{
+		gtk_widget_show (labelActivate);
+		gtk_box_pack_start (GTK_BOX (vboxMain), labelActivate, FALSE, TRUE, 0);
+	}
 
 	m_wEpub2 = gtk_check_button_new_with_label (Epub2);
-	if (m_wEpub2) 
-    {
-        gtk_container_set_border_width(GTK_CONTAINER(m_wEpub2), 5);
-        gtk_widget_show(m_wEpub2);
-        gtk_box_pack_start(GTK_BOX(vboxMain), m_wEpub2, TRUE, TRUE, 0);
-        g_signal_connect(G_OBJECT(m_wEpub2), "toggled",
+	if (m_wEpub2)
+	{
+		XAP_gtk_widget_set_margin(m_wEpub2, 5);
+		gtk_widget_show(m_wEpub2);
+		gtk_box_pack_start(GTK_BOX(vboxMain), m_wEpub2, TRUE, TRUE, 0);
+	        g_signal_connect(G_OBJECT(m_wEpub2), "toggled",
                          G_CALLBACK(s_Epub2), static_cast<gpointer> (this));
-    }
-    
+	}
+
 	m_wSplitDocument = gtk_check_button_new_with_label (SplitDocument);
 	if (m_wSplitDocument)
     {
-        gtk_container_set_border_width(GTK_CONTAINER(m_wSplitDocument), 5);
+        XAP_gtk_widget_set_margin(m_wSplitDocument, 5);
         gtk_widget_show(m_wSplitDocument);
         gtk_box_pack_start(GTK_BOX(vboxMain), m_wSplitDocument, TRUE, TRUE, 0);
         g_signal_connect(G_OBJECT(m_wSplitDocument), "toggled",
@@ -230,20 +230,24 @@ GtkWidget * AP_UnixDialog_EpubExportOptions::_constructWindow ()
 	m_wRenderMathMlToPng = gtk_check_button_new_with_label (RenderMathMlToPng);
 	if (m_wRenderMathMlToPng) 
     {
-        gtk_container_set_border_width(GTK_CONTAINER(m_wRenderMathMlToPng), 5);
+        XAP_gtk_widget_set_margin(m_wRenderMathMlToPng, 5);
         gtk_widget_show(m_wRenderMathMlToPng);
         gtk_box_pack_start(GTK_BOX(vboxMain), m_wRenderMathMlToPng, TRUE, TRUE, 0);
         g_signal_connect(G_OBJECT(m_wRenderMathMlToPng), "toggled",
                          G_CALLBACK(s_RenderMathMlToPng), static_cast<gpointer> (this));
     }
-    
+
 	refreshStates ();
 
-	abiAddStockButton (GTK_DIALOG(m_windowMain), save,    BUTTON_SAVE_SETTINGS);
-	abiAddStockButton (GTK_DIALOG(m_windowMain), restore, BUTTON_RESTORE_SETTINGS);
+	std::string s;
+	pSS->getValueUTF8(XAP_STRING_ID_DLG_HTMLOPT_ExpSave, s);
+	abiAddButton (GTK_DIALOG(m_windowMain), s,    BUTTON_SAVE_SETTINGS);
+	pSS->getValueUTF8(XAP_STRING_ID_DLG_HTMLOPT_ExpRestore, s);
+	abiAddButton (GTK_DIALOG(m_windowMain), s, BUTTON_RESTORE_SETTINGS);
+	pSS->getValueUTF8(XAP_STRING_ID_DLG_Cancel, s);
+	abiAddButton (GTK_DIALOG(m_windowMain), s, BUTTON_CANCEL);
+	pSS->getValueUTF8(XAP_STRING_ID_DLG_OK, s);
+	abiAddButton (GTK_DIALOG(m_windowMain), s, BUTTON_OK);
 
-	abiAddStockButton (GTK_DIALOG(m_windowMain), GTK_STOCK_CANCEL, BUTTON_CANCEL);
-	abiAddStockButton (GTK_DIALOG(m_windowMain), GTK_STOCK_OK,     BUTTON_OK);
-  
 	return m_windowMain;
 }

@@ -11,15 +11,15 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
 
@@ -36,8 +36,7 @@
 #include <stdio.h>
 #include <time.h>
 
-static const UT_uint32 CURSOR_DELAY_TIME = 10; //milliseconds //pascal
-static const UT_uint32 CURSOR_BLINK_FREQUENCY = 1000; //milliseconds //pascal
+static const UT_uint32 CURSOR_DELAY_TIME = 10; // milliseconds
 
 #ifdef TOOLKIT_GTK_ALL
 #include <gtk/gtk.h>
@@ -61,13 +60,13 @@ GR_Caret::GR_Caret(GR_Graphics * pG)
 		m_yPoint(0),
 		m_xPoint2(0),
 		m_yPoint2(0),
-		m_pClr(NULL),
+		m_pClr(nullptr),
 		m_pG(pG),
 		m_iWindowWidth(0),
 		m_iWindowHeight(0),
-		m_worker(NULL),
-		m_enabler(NULL),
-		//pascal m_blinkTimeout(NULL),
+		m_worker(nullptr),
+		m_enabler(nullptr),
+		m_blinkTimeout(nullptr),
 		m_nDisableCount(1),
 		m_bCursorBlink(true),
 		m_bCursorIsOn(false),
@@ -90,36 +89,33 @@ GR_Caret::GR_Caret(GR_Graphics * pG)
 	UT_WorkerFactory::ConstructMode outMode = UT_WorkerFactory::NONE;
 	m_worker = static_cast<UT_Timer *>(UT_WorkerFactory::static_constructor
 		(s_work, this, UT_WorkerFactory::TIMER, outMode));
-	//pascal m_worker->set(_getCursorBlinkTime());
-    m_worker->set(CURSOR_BLINK_FREQUENCY);
+	m_worker->set(_getCursorBlinkTime());
 
 	m_enabler = static_cast<UT_Timer *>(UT_WorkerFactory::static_constructor
 		(s_enable, this, UT_WorkerFactory::TIMER, outMode));
-	m_enabler->set(CURSOR_DELAY_TIME);//pascal - time before blinking
-
-    //pascal
-	/*m_blinkTimeout = static_cast<UT_Timer *>(UT_WorkerFactory::static_constructor
+	m_enabler->set(CURSOR_DELAY_TIME);
+	
+	m_blinkTimeout = static_cast<UT_Timer *>(UT_WorkerFactory::static_constructor
 		(s_blink_timeout, this, UT_WorkerFactory::TIMER, outMode));
-	m_blinkTimeout->set(_getCursorBlinkTimeout());
-    */
+	m_blinkTimeout->set(_getCursorBlinkTimeout());	
 
 	setBlink (false);
 }
 
-// TODO: fix this code duplication just for the extra sDocUUID (what
+// TODO: fix this code duplication just for the extra sDocUUID (what 
 // is it doing here anyway? - MARCM
 GR_Caret::GR_Caret(GR_Graphics * pG, const std::string& sId)
 	:  	m_xPoint(0), // init the x and y point to some value, since we don't have a sane value here
 		m_yPoint(0),
 		m_xPoint2(0),
 		m_yPoint2(0),
-		m_pClr(NULL),
+		m_pClr(nullptr),
 		m_pG(pG),
 		m_iWindowWidth(0),
 		m_iWindowHeight(0),
-		m_worker(NULL),
-		m_enabler(NULL),
-		//pascal m_blinkTimeout(NULL),
+		m_worker(nullptr),
+		m_enabler(nullptr),
+		m_blinkTimeout(nullptr),
 		m_nDisableCount(1),
 		m_bCursorBlink(true),
 		m_bCursorIsOn(false),
@@ -142,19 +138,16 @@ GR_Caret::GR_Caret(GR_Graphics * pG, const std::string& sId)
 	UT_WorkerFactory::ConstructMode outMode = UT_WorkerFactory::NONE;
 	m_worker = static_cast<UT_Timer *>(UT_WorkerFactory::static_constructor
 		(s_work, this, UT_WorkerFactory::TIMER, outMode));
-	//pascal m_worker->set(_getCursorBlinkTime());
-	m_worker->set(CURSOR_BLINK_FREQUENCY);
+	m_worker->set(_getCursorBlinkTime());
 
 	m_enabler = static_cast<UT_Timer *>(UT_WorkerFactory::static_constructor
 		(s_enable, this, UT_WorkerFactory::TIMER, outMode));
 	m_enabler->set(CURSOR_DELAY_TIME);
 
-	//pascal
-	/*
 	m_blinkTimeout = static_cast<UT_Timer *>(UT_WorkerFactory::static_constructor
 		(s_blink_timeout, this, UT_WorkerFactory::TIMER, outMode));
 	m_blinkTimeout->set(_getCursorBlinkTimeout());
-    */
+
 	m_iCaretNumber = pG->m_vecCarets.getItemCount() + 1;
 
 	setBlink (false);
@@ -164,26 +157,24 @@ GR_Caret::~GR_Caret()
 {
 	m_worker->stop();
 	m_enabler->stop();
-	//pascal m_blinkTimeout->stop();
+	m_blinkTimeout->stop();
 
 	DELETEP(m_worker);
 	DELETEP(m_enabler);
-	//pascal DELETEP(m_blinkTimeout);
+	DELETEP(m_blinkTimeout);
 }
 
 void GR_Caret::s_work(UT_Worker * _w)
 {
 	GR_Caret * c = static_cast<GR_Caret *>(_w->getInstanceData());
-	xxx_UT_DEBUGMSG(("**** GR_Caret::s_work ****: Caret timer called Disable Count = %d \n",c->m_nDisableCount));
+	xxx_UT_DEBUGMSG((" Caret timer called Disable Count = %d \n",c->m_nDisableCount));
 	if (c->m_nDisableCount == 0)
 	{
 #ifdef TOOLKIT_GTK_ALL
 		c->setPendingBlink();
 		c->m_pG->flush(); // set redraw for wayland
 #else
-    c->setPendingBlink();//pascal
-    c->_blink(false);
-
+		c->_blink(false);
 #endif
 	}
 }
@@ -192,13 +183,9 @@ void GR_Caret::s_work(UT_Worker * _w)
 void GR_Caret::s_enable(UT_Worker * _w)
 {
 	GR_Caret * c = static_cast<GR_Caret *>(_w->getInstanceData());
-    xxx_UT_DEBUGMSG(("**** GR_Caret::s_enable **** %d \n",(int)c->m_bCursorIsOn));
 
 	c->m_worker->stop();
-	//c->_blink(true); //pascal
-
-    c->setPendingBlink();//pascal - sinon le curseur apparait invisible au premier blink
-
+	c->_blink(true);
 	if (!c->m_bCursorIsOn)
 		c->_blink(true); // blink again
 	else
@@ -206,22 +193,21 @@ void GR_Caret::s_enable(UT_Worker * _w)
 		c->_blink(true); // ?? - MARCM
 		c->_blink(true);
 	}
-
 	c->m_worker->start();
 	c->m_enabler->stop();
 }
-/*
+
 void GR_Caret::s_blink_timeout(UT_Worker *)
 {
 }
-*/
+
 UT_uint32 GR_Caret::_getCursorBlinkTime() const
 {
 #ifdef TOOLKIT_GTK_ALL
 	UT_uint32 blink;
 	GtkSettings * settings = gtk_settings_get_default ();
 
-	g_object_get (G_OBJECT(settings), "gtk-cursor-blink-time", &blink, NULL);
+	g_object_get (G_OBJECT(settings), "gtk-cursor-blink-time", &blink, nullptr);
 
 	return (blink/2);
 #elif defined(TOOLKIT_WIN)
@@ -231,8 +217,6 @@ UT_uint32 GR_Caret::_getCursorBlinkTime() const
 #endif
 }
 
-//pascal
-/*
 UT_uint32 GR_Caret::_getCursorBlinkTimeout() const
 {
 #ifdef TOOLKIT_GTK_ALL
@@ -240,19 +224,18 @@ UT_uint32 GR_Caret::_getCursorBlinkTimeout() const
 	GtkSettings * settings = gtk_settings_get_default ();
 
 	// retrieves the blink timeout in seconds
-	g_object_get (G_OBJECT(settings), "gtk-cursor-blink-timeout", &timeout, NULL);
+	g_object_get (G_OBJECT(settings), "gtk-cursor-blink-timeout", &timeout, nullptr);
 	return (timeout == 0 ? 2147483647 : timeout * 1000);
 #elif defined(TOOLKIT_WIN)
-	// just use a wacko high number; we could also use -1 to denote infinite blinking,
+	// just use a wacko high number; we could also use -1 to denote infinite blinking, 
 	// but this is simpler, and roughly 25 days if you interpret this as milliseconds :)
 	return 2147483647; // not sure if there is a global windows setting for this
 #else
-	// just use a wacko high number; we could also use -1 to denote infinite blinking,
+	// just use a wacko high number; we could also use -1 to denote infinite blinking, 
 	// but this is simpler, and roughly 25 days if you interpret this as milliseconds :)
-	return 2147483647;
+	return 2147483647; 
 #endif
 }
-*/
 
 bool GR_Caret::_getCanCursorBlink() const
 {
@@ -273,7 +256,7 @@ void GR_Caret::setWindowSize(UT_uint32 width, UT_uint32 height)
 		m_bCaret1OnScreen = false;
 	else
 		m_bCaret1OnScreen = true;
-
+	
 	if(m_xPoint2 < m_pG->tlu(3)+1 || m_yPoint2 < 0 || m_xPoint2 > static_cast<UT_sint32>(m_iWindowWidth) || m_yPoint2 > static_cast<UT_sint32>(m_iWindowHeight))
 		m_bCaret2OnScreen = false;
 	else
@@ -289,18 +272,15 @@ void GR_Caret::setCoords(UT_sint32 x, UT_sint32 y, UT_uint32 h,
 	m_xPoint2 = x2; m_yPoint2 = y2; m_iPointHeight2 = h2;
 	m_bPointDirection = bPointDirection; m_pClr = pClr;
 	m_bPositionSet = true;
-
-	//UT_DEBUGMSG(("Caret %p set to x %d and y %d and h %d and x2 %d and y2 %d and h2 %d\n",this,x,y,h,x2,y2,h2));
-
 	if(m_bRemote)
 	  {
-	    UT_DEBUGMSG(("Remote caret %p set to x %d \n",this,x));
+	    UT_DEBUGMSG(("Remote caret %p set to x %d \n", (void*)this, x));
 	  }
 	if(x < m_pG->tlu(3)+1 || y <= 0 || x > static_cast<UT_sint32>(m_iWindowWidth) || y > static_cast<UT_sint32>(m_iWindowHeight))
 		m_bCaret1OnScreen = false;
 	else
 		m_bCaret1OnScreen = true;
-
+	
 	if(x2 < m_pG->tlu(3)+1 || y2 <= 0 || x2 > static_cast<UT_sint32>(m_iWindowWidth) || y2 > static_cast<UT_sint32>(m_iWindowHeight))
 		m_bCaret2OnScreen = false;
 	else
@@ -312,23 +292,19 @@ void GR_Caret::enable()
 	if (m_bRecursiveDraw)
 		return;
 
-    xxx_UT_DEBUGMSG(("enable : m_nDisableCount : %d \n",m_nDisableCount));
-
 	// If the caret is already enabled, just return
 	if (m_nDisableCount == 0)
 	{
-		xxx_UT_DEBUGMSG(("Don't enable : disable Count is already zero \n"));//xxx_
+		xxx_UT_DEBUGMSG(("Don't emable disable Count is already zero \n"));
 		return;
 	}
 	// Check to see if we still have pending disables.
 	--m_nDisableCount;
-
 	if (m_nDisableCount != 0)
 	{
-		xxx_UT_DEBUGMSG(("Don't enable : disable Count has not reached zero \n"));//xxx_
+		xxx_UT_DEBUGMSG(("Don't emable, disable Count has not reached zero \n"));
 		return;
 	}
-
 	// stop pending enables; in 10 ms, really enable blinking.
 	m_enabler->stop();
 	m_enabler->start();
@@ -340,11 +316,9 @@ void GR_Caret::disable(bool bNoMulti)
 		return;
 
 	if (bNoMulti && (m_nDisableCount > 0))
-		return;//seulement incrémenté si aucun "disable" en cours
+		return;
 
 	m_nDisableCount++;
-	xxx_UT_DEBUGMSG(("disable Count is incremented \n"));
-
 	if ((m_nDisableCount == 1) && m_bCursorIsOn)
 		_erase();
 
@@ -362,7 +336,7 @@ void GR_Caret::setBlink(bool bBlink)
 	gboolean can;
 	GtkSettings * settings = gtk_settings_get_default ();
 
-	g_object_get (G_OBJECT(settings), "gtk-cursor-blink", &can, NULL);
+	g_object_get (G_OBJECT(settings), "gtk-cursor-blink", &can, nullptr);
 	m_bCursorBlink = (can != FALSE);
 	UT_UNUSED(bBlink);
 #elif defined(TOOLKIT_WIN)
@@ -402,41 +376,33 @@ void GR_Caret::_erase()
 {
 	if (m_bCursorIsOn)
 		_blink(true);
-
-   xxx_UT_DEBUGMSG(("_erase() \n"));
 }
 
 void GR_Caret::_blink(bool bExplicit)
 {
-
 	if(m_bRecursiveDraw)
 	{
 	    xxx_UT_DEBUGMSG(("Doing recursive blink! - abort \n"));
 	    return;
 	}
-
-	if(!m_bPositionSet)
+	if (!m_bPositionSet)
 		return;
-
 	if(!m_bPendingBlink)
 		return;
-
 	struct timespec spec;
 
-    clock_gettime(CLOCK_REALTIME, &spec);
+	UT_clock_gettime_realtime(&spec);
 
     UT_sint32 s  = spec.tv_sec;
     long ms = round(spec.tv_nsec / 1.0e6); // Convert nanoseconds to milliseconds
-	long this_time = 1000*s + ms;
+	long this_time = 1000l*s + ms;
 	long time_between = this_time - m_iLastDrawTime;
 	m_iLastDrawTime = this_time;
     //
 	// If this number is high enough the caret will not blink at all
 	// This places the caret on the screen during rapid moves.
 	//
-	//pascal if(time_between < _getCursorBlinkTime()/2)
-
-	if(time_between < (long)(CURSOR_BLINK_FREQUENCY / 2))
+	if(time_between < _getCursorBlinkTime()/2) 
 	{
 		m_iRetry++;
 		xxx_UT_DEBUGMSG(("Caret redraw after %d ms \n",time_between));
@@ -445,22 +411,19 @@ void GR_Caret::_blink(bool bExplicit)
 	{
 		m_iRetry = 0;
 	}
-
 	m_bRecursiveDraw = true;
 	GR_Painter painter (m_pG, false);
 	m_bRecursiveDraw = false;
 
-	// After any autoblink, we want there to be BLINK_TIME
+	// After any autoblink, we want there to be BLINK_TIME 
 	// until next autoblink.
-
-/*
+	/*
 	if (!bExplicit)
 	{
 		m_worker->stop();
 		m_worker->start();
 	}
-*/
-
+	*/
 	// Blink if: (a) _blink explicitly called (not autoblink); or
 	//           (b) autoblink and caret blink enabled; or
 	//           (c) autoblink, caret blink disabled, caret is off
@@ -470,12 +433,10 @@ void GR_Caret::_blink(bool bExplicit)
 		UT_RGBColor oldColor;
 		m_pG->getColor(oldColor);
 
-
 		if (m_bCursorIsOn)
 		{
 			xxx_UT_DEBUGMSG(("Clear Caret reTry %d \n",m_iRetry));
 			m_pG->restoreRectangle(m_iCaretNumber*3+0);
-
 
 			if(m_bSplitCaret)
 			{
@@ -483,7 +444,6 @@ void GR_Caret::_blink(bool bExplicit)
 				m_pG->restoreRectangle(m_iCaretNumber*3+2);
 				m_bSplitCaret = false;
 			}
-
 			m_bCursorIsOn = false;
 		}
 		else
@@ -503,16 +463,13 @@ void GR_Caret::_blink(bool bExplicit)
 			// of coordinances instead of substraction; we will use
 			// the following value as a sign to avoid having to branch
 			// all the draw calls (Tomas, Oct 26, 2003).
-
+			
 			UT_sint32 iDelta = m_bPointDirection ? 1 : -1;
-
+			
 			UT_Rect r0(m_xPoint-m_pG->tlu(2),
 					   m_yPoint+m_pG->tlu(1),
 					   m_pG->tlu(5),
 					   m_iPointHeight+m_pG->tlu(2));
-
-			//UT_DEBUGMSG(("*****Draw Caret -1- reTry X:%d  Y:%d HEIGHT:%d TLU2:%d\n",m_xPoint,m_yPoint,m_iPointHeight,m_pG->tlu(2)));
-
 			m_bRecursiveDraw = false;
 			m_pG->allCarets()->JustErase(m_xPoint,m_yPoint);
 			m_bRecursiveDraw = true;
@@ -521,19 +478,19 @@ void GR_Caret::_blink(bool bExplicit)
 			if((m_xPoint != m_xPoint2) || (m_yPoint != m_yPoint2))
 			{
 				m_bSplitCaret = true;
-
+				
 				// have to save the rectangle for the joining line
 				// before we draw the carets
 				UT_uint32 xmin = UT_MIN(m_xPoint, m_xPoint2);
 				UT_uint32 xmax = UT_MAX(m_xPoint, m_xPoint2);
 				UT_uint32 ymin = UT_MIN(m_yPoint, m_yPoint2);
 				UT_uint32 ymax = UT_MAX(m_yPoint, m_yPoint2);
-
+			
 				UT_Rect r2(xmin-m_pG->tlu(1),
 						   ymin + m_iPointHeight,
 						   xmax - xmin + m_pG->tlu(2),
 						   ymax - ymin + m_pG->tlu(1));
-
+				
 				m_pG->saveRectangle(r2,m_iCaretNumber*3+2);
 			}
 			else
@@ -543,14 +500,12 @@ void GR_Caret::_blink(bool bExplicit)
 				m_pG->setColor(m_clrInsert);
 			else
 				m_pG->setColor(m_clrOverwrite);
-
 			if(m_bRemote)
 			        m_pG->setColor(m_clrRemote);
-
 			if(m_bCaret1OnScreen)
 			{
 				// draw the primary caret
-				xxx_UT_DEBUGMSG(("Draw Caret reTry %d \n",m_iRetry));
+				xxx_UT_DEBUGMSG(("Draw Caret reTry %d \n",m_iRetry)); 
 
 				UT_sint32 x1 = m_xPoint + iDelta * m_pG->tlu(1);
 				UT_sint32 x2 = m_xPoint;
@@ -560,22 +515,19 @@ void GR_Caret::_blink(bool bExplicit)
 				}
 				painter.drawLine(x1,
 								 m_yPoint + m_pG->tlu(1),
-								 x1,
+								 x1, 
 								 m_yPoint + m_iPointHeight+m_pG->tlu(1));
-
+				
 				painter.drawLine(x2,
 								 m_yPoint + m_pG->tlu(1),
-								 x2,
+								 x2, 
 								 m_yPoint + m_iPointHeight + m_pG->tlu(1));
 				m_bCursorIsOn = true;
-
-				//UT_DEBUGMSG(("*****Draw Caret reTry -2- X:%d  Y:%d HEIGHT:%d TLU2:%d\n",m_xPoint,m_yPoint,m_iPointHeight,m_pG->tlu(1)));
-
 			}
-
+			
 			if(m_bSplitCaret)
 			{
-				// each of the two carets will have a small flag at the top
+				// each of the two carets will have a small flag at the top 
 				// indicating the direction of writing to which it
 				// applies
 				if(m_bCaret1OnScreen)
@@ -588,7 +540,7 @@ void GR_Caret::_blink(bool bExplicit)
 										 m_yPoint + m_pG->tlu(1),
 										 m_xPoint /*- m_pG->tlu(1)*/,
 										 m_yPoint + m_pG->tlu(1));
-
+						
 						painter.drawLine(m_xPoint - m_pG->tlu(1),
 										 m_yPoint + m_pG->tlu(2),
 										 m_xPoint /*- m_pG->tlu(1)*/,
@@ -601,7 +553,7 @@ void GR_Caret::_blink(bool bExplicit)
 										 m_yPoint + m_pG->tlu(1),
 										 m_xPoint + m_pG->tlu(3),
 										 m_yPoint + m_pG->tlu(1));
-
+						
 						painter.drawLine(m_xPoint + m_pG->tlu(1),
 										 m_yPoint + m_pG->tlu(2),
 										 m_xPoint + m_pG->tlu(2),
@@ -609,7 +561,7 @@ void GR_Caret::_blink(bool bExplicit)
 					}
 					m_bCursorIsOn = true;
 				}
-
+				
 				// Now we deal with the secondary caret needed on ltr-rtl boundary
 				if(m_bCaret2OnScreen)
 				{
@@ -618,24 +570,24 @@ void GR_Caret::_blink(bool bExplicit)
 							   m_yPoint2 + m_pG->tlu(1),
 							   m_pG->tlu(5),
 							   m_iPointHeight);
-
-					m_pG->saveRectangle(r1,m_iCaretNumber*3+1);
+					
+					m_pG->saveRectangle(r1,m_iCaretNumber*3+1);				
 
 					// draw the caret
 
 					painter.drawLine(m_xPoint2 - iDelta * m_pG->tlu(1),
-									 m_yPoint2 + m_pG->tlu(1),
+									 m_yPoint2 + m_pG->tlu(1), 
 									 m_xPoint2 - iDelta * m_pG->tlu(1),
 									 m_yPoint2 + m_iPointHeight + m_pG->tlu(1));
-
+					
 					painter.drawLine(m_xPoint2,
-									 m_yPoint2 + m_pG->tlu(1),
+									 m_yPoint2 + m_pG->tlu(1), 
 									 m_xPoint2,
 									 m_yPoint2 + m_iPointHeight + m_pG->tlu(1));
 
 					// Now draw the line that links the two carets
 					painter.drawLine(m_xPoint,
-									 m_yPoint + m_iPointHeight,
+									 m_yPoint + m_iPointHeight, 
 									 m_xPoint2,
 									 m_yPoint2 + m_iPointHeight);
 
@@ -644,12 +596,12 @@ void GR_Caret::_blink(bool bExplicit)
 					{
 						// secondary LTR caret flag
 						painter.drawLine(m_xPoint2 + m_pG->tlu(1),
-										 m_yPoint2 + m_pG->tlu(1),
+										 m_yPoint2 + m_pG->tlu(1), 
 										 m_xPoint2 + m_pG->tlu(3),
 										 m_yPoint2 + m_pG->tlu(1));
-
+						
 						painter.drawLine(m_xPoint2 + m_pG->tlu(1),
-										 m_yPoint2 + m_pG->tlu(2),
+										 m_yPoint2 + m_pG->tlu(2), 
 										 m_xPoint2 + m_pG->tlu(2),
 										 m_yPoint2 + m_pG->tlu(2));
 					}
@@ -657,20 +609,20 @@ void GR_Caret::_blink(bool bExplicit)
 					{
 						// secondary RTL caret flag
 						painter.drawLine(m_xPoint2 - m_pG->tlu(2),
-										 m_yPoint2 + m_pG->tlu(1),
+										 m_yPoint2 + m_pG->tlu(1), 
 										 m_xPoint2 /*- m_pG->tlu(1)*/,
 										 m_yPoint2 + m_pG->tlu(1));
-
+						
 						painter.drawLine(m_xPoint2 - m_pG->tlu(1),
-										 m_yPoint2 + m_pG->tlu(2),
+										 m_yPoint2 + m_pG->tlu(2), 
 										 m_xPoint2 /*- m_pG->tlu(1)*/,
 										 m_yPoint2 + m_pG->tlu(2));
 					}
 					m_bCursorIsOn = true;
 				}
-
+				
 			}
-
+			
 		}
 
  		m_pG->setColor(oldColor);
@@ -688,6 +640,7 @@ void GR_Caret::_blink(bool bExplicit)
 //
 void GR_Caret::setPendingBlink()
 {
+	xxx_UT_DEBUGMSG(("Pending blink set in GR_CARET \n"));
 	m_bPendingBlink = true;
 }
 
@@ -700,10 +653,8 @@ bool GR_Caret::doBlinkIfNeeded()
 	{
 		return false;
 	}
-
 	_blink(true);
 	m_bPendingBlink = false;
-
 	return true;
 }
 /*!
@@ -717,18 +668,16 @@ void GR_Caret::forceDraw(void)
 	}
 }
 
-//pascal
-/*
 void GR_Caret::resetBlinkTimeout(void)
 {
 	// reset the blink timeout timer
 	m_blinkTimeout->stop();
 	m_blinkTimeout->start();
-
+	
 	// resume normal blinking if we previously hit the
 	// blink timeout
 	if (!isEnabled())
 		enable();
 }
-*/
+
 //////////////////////////////////////////////////////////////////////////////////////

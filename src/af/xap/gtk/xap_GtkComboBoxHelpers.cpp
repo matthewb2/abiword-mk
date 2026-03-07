@@ -34,7 +34,7 @@ void XAP_makeGtkComboBoxText(GtkComboBox * combo, GType secondary)
 	GtkCellRenderer *cell = GTK_CELL_RENDERER(gtk_cell_renderer_text_new());
 	gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(combo), cell, TRUE);
 	gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(combo), cell,
-								   "text", 0, NULL);
+								   "text", 0, nullptr);
 }
 
 void XAP_makeGtkComboBoxText2(GtkComboBox * combo, GType secondary,
@@ -48,7 +48,7 @@ void XAP_makeGtkComboBoxText2(GtkComboBox * combo, GType secondary,
 	GtkCellRenderer *cell = GTK_CELL_RENDERER(gtk_cell_renderer_text_new());
 	gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(combo), cell, TRUE);
 	gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(combo), cell,
-								   "text", 0, NULL);
+								   "text", 0, nullptr);
 }
 
 void XAP_populateComboBoxWithIndex(GtkComboBox * combo, 
@@ -123,7 +123,7 @@ int  XAP_comboBoxGetActiveInt(GtkComboBox * combo)
 
 std::string XAP_comboBoxGetActiveText(GtkComboBox * combo)
 {
-    char* value = 0;
+	char* value = nullptr;
 	GtkTreeIter iter;
 	gtk_combo_box_get_active_iter(combo, &iter);
 	GtkTreeModel *store = gtk_combo_box_get_model(combo);

@@ -21,12 +21,12 @@
  */
 
 // Class definition include
-#include <OXML_Element_Run.h>
+#include "OXML_Element_Run.h"
 
 // AbiWord includes
-#include <ut_types.h>
-#include <ut_misc.h>
-#include <pd_Document.h>
+#include "ut_types.h"
+#include "ut_misc.h"
+#include "pd_Document.h"
 
 // External includes
 #include <string>
@@ -83,7 +83,7 @@ UT_Error OXML_Element_Run::serializeProperties(IE_Exp_OpenXML* exporter)
 {
 	//TODO: Add all the property serializations here
 	UT_Error err = UT_OK;
-	const gchar* szValue = NULL;
+	const gchar* szValue = nullptr;
 
 	err = exporter->startRunProperties(TARGET);
 	if(err != UT_OK)
@@ -200,12 +200,12 @@ UT_Error OXML_Element_Run::serializeProperties(IE_Exp_OpenXML* exporter)
 
 UT_Error OXML_Element_Run::addToPT(PD_Document * pDocument)
 {
-	UT_return_val_if_fail(pDocument != NULL, UT_ERROR);
+	UT_return_val_if_fail(pDocument != nullptr, UT_ERROR);
 
 	UT_Error ret = UT_OK;
 
-	const gchar ** atts = getAttributesWithProps();
-	if (atts != NULL) {
+	PP_PropertyVector atts = getAttributesWithProps();
+	if (!atts.empty()) {
 		//We open the formatting tag
 		ret = pDocument->appendFmt(atts) ? UT_OK : UT_ERROR;
 		if(ret != UT_OK)
@@ -222,9 +222,9 @@ UT_Error OXML_Element_Run::addToPT(PD_Document * pDocument)
 		return ret;
 	}
 
-	if (atts != NULL) {
+	if (!atts.empty()) {
 		//We close the formatting tag
-		ret = pDocument->appendFmt((const gchar **)NULL) ? UT_OK : UT_ERROR;
+		ret = pDocument->appendFmt(PP_NOPROPS) ? UT_OK : UT_ERROR;
 		UT_return_val_if_fail(ret == UT_OK, ret);
 	}
 	return ret;

@@ -1,44 +1,38 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
-
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiSource
- * 
+ *
  * Copyright (C) 2007 Philippe Milot <PhilMilot@gmail.com>
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
  */
 
-// Class definition include
-#include <OXML_Document.h>
-
-// Internal includes
-#include <OXML_Section.h>
-#include <OXML_Style.h>
-#include <OXML_Types.h>
-#include <OXML_Theme.h>
-#include <OXML_FontManager.h>
-
-// AbiWord includes
-#include <fp_PageSize.h>
-#include <ut_types.h>
-#include <pd_Document.h>
-
-// External includes
 #include <string>
 
-OXML_Document* OXML_Document::s_docInst = NULL;
+#include "fp_PageSize.h"
+#include "ut_types.h"
+#include "pd_Document.h"
+
+#include "OXML_Document.h"
+#include "OXML_Section.h"
+#include "OXML_Style.h"
+#include "OXML_Types.h"
+#include "OXML_Theme.h"
+#include "OXML_FontManager.h"
+
+OXML_Document* OXML_Document::s_docInst = nullptr;
 
 OXML_Document* OXML_Document::getNewInstance()
 {
@@ -48,7 +42,7 @@ OXML_Document* OXML_Document::getNewInstance()
 
 OXML_Document* OXML_Document::getInstance()
 {
-	if (s_docInst == NULL)
+	if (s_docInst == nullptr)
 		s_docInst = new OXML_Document();
 	return s_docInst;
 }
@@ -60,13 +54,13 @@ void OXML_Document::destroyInstance()
 
 OXML_SharedSection OXML_Document::getCurrentSection()
 {
-	UT_return_val_if_fail(s_docInst != NULL, OXML_SharedSection() );
+	UT_return_val_if_fail(s_docInst != nullptr, OXML_SharedSection() );
 	return s_docInst->getLastSection();
 }
 
-OXML_Document::OXML_Document() : 
-	OXML_ObjectWithAttrProp(), 
-	m_theme(), 
+OXML_Document::OXML_Document()
+	: OXML_ObjectWithAttrProp(),
+	m_theme(),
 	m_fontManager()
 {
 	clearStyles();
@@ -101,18 +95,18 @@ OXML_SharedStyle OXML_Document::getStyleByName(const std::string & name) const
 	return it != m_styles_by_name.end() ? it->second : OXML_SharedStyle() ;
 }
 
-UT_Error OXML_Document::addStyle(const std::string & id, const std::string & name, 
+UT_Error OXML_Document::addStyle(const std::string & id, const std::string & name,
 								 const gchar ** attributes)
 {
 	OXML_SharedStyle obj;
 	try {
 		obj.reset( new OXML_Style(id, name) );
-	} 
+	}
     catch(...) {
 		UT_DEBUGMSG(("Object creation failed!\n"));
 		return UT_OUTOFMEM;
 	}
-	obj->setAttributes(attributes);
+	obj->setAttributes(PP_std_copyProps(attributes));
 	return addStyle(obj);
 }
 
@@ -187,7 +181,7 @@ UT_Error OXML_Document::clearHeaders()
 
 bool OXML_Document::isAllDefault(const bool & header) const
 {
-	const gchar* type = NULL;
+	const gchar* type = nullptr;
 	OXML_SectionMap::const_iterator it;
 	if(!header)
 	{
@@ -219,7 +213,7 @@ bool OXML_Document::isAllDefault(const bool & header) const
 }
 OXML_SharedSection OXML_Document::getHdrFtrById(const bool & header, const std::string & id) const
 {
-	const gchar* hdrFtrId = NULL;
+	const gchar* hdrFtrId = nullptr;
 	OXML_SectionMap::const_iterator it;
 	if(!header)
 	{
@@ -332,7 +326,7 @@ UT_Error OXML_Document::appendSection(const OXML_SharedSection & obj)
 
 	try {
 		m_sections.push_back(obj);
-	} 
+	}
     catch(...) {
 		UT_DEBUGMSG(("Bad alloc!\n"));
 		return UT_OUTOFMEM;
@@ -348,10 +342,10 @@ UT_Error OXML_Document::clearSections()
 
 OXML_SharedTheme OXML_Document::getTheme()
 {
-	if (m_theme.get() == NULL) {
+	if (m_theme.get() == nullptr) {
 		try {
 			m_theme.reset(new OXML_Theme());
-		} 
+		}
         catch(...) {
 			UT_DEBUGMSG(("Bad alloc!\n"));
 			return OXML_SharedTheme();
@@ -362,10 +356,10 @@ OXML_SharedTheme OXML_Document::getTheme()
 
 OXML_SharedFontManager OXML_Document::getFontManager()
 {
-	if (m_fontManager.get() == NULL) {
+	if (m_fontManager.get() == nullptr) {
 		try {
 			m_fontManager.reset(new OXML_FontManager());
-		} 
+		}
         catch(...) {
 			UT_DEBUGMSG(("Bad alloc!\n"));
 			return OXML_SharedFontManager();
@@ -377,7 +371,7 @@ OXML_SharedFontManager OXML_Document::getFontManager()
 UT_Error OXML_Document::serialize(IE_Exp_OpenXML* exporter)
 {
 	UT_Error ret = UT_OK;
-	
+
 	ret = exporter->startDocument();
 	if(ret != UT_OK)
 		return ret;
@@ -444,9 +438,9 @@ UT_Error OXML_Document::serialize(IE_Exp_OpenXML* exporter)
 	for (it5 = m_headers.begin(); it5 != m_headers.end(); it5++) {
 
 		if(it5->second->hasFirstPageHdrFtr())
-			firstPageHdrFtr = true;	
+			firstPageHdrFtr = true;
 		if(it5->second->hasEvenPageHdrFtr())
-			evenPageHdrFtr = true;	
+			evenPageHdrFtr = true;
 
 		handled = it5->second->getHandledHdrFtr();
 
@@ -463,9 +457,9 @@ UT_Error OXML_Document::serialize(IE_Exp_OpenXML* exporter)
 	for (it6 = m_footers.begin(); it6 != m_footers.end(); it6++) {
 
 		if(it6->second->hasFirstPageHdrFtr())
-			firstPageHdrFtr = true;	
+			firstPageHdrFtr = true;
 		if(it6->second->hasEvenPageHdrFtr())
-			evenPageHdrFtr = true;	
+			evenPageHdrFtr = true;
 
 		handled = it6->second->getHandledHdrFtr();
 
@@ -501,7 +495,7 @@ UT_Error OXML_Document::serialize(IE_Exp_OpenXML* exporter)
 	{
 		ret = exporter->setPageSize(TARGET_DOCUMENT, m_pageWidth.c_str(), m_pageHeight.c_str(), m_pageOrientation.c_str());
 		if(ret != UT_OK)
-			return ret;		
+			return ret;
 	}
 
 	//set page margins
@@ -510,7 +504,7 @@ UT_Error OXML_Document::serialize(IE_Exp_OpenXML* exporter)
 		ret = exporter->setPageMargins(TARGET_DOCUMENT, m_pageMarginTop.c_str(), m_pageMarginLeft.c_str(),
 										m_pageMarginRight.c_str(), m_pageMarginBottom.c_str());
 		if(ret != UT_OK)
-			return ret;		
+			return ret;
 	}
 
 	//set page columns
@@ -540,7 +534,7 @@ UT_Error OXML_Document::serialize(IE_Exp_OpenXML* exporter)
 		if (ret != UT_OK)
 			return ret;
 	}
-	
+
 	return exporter->finishDocument();
 }
 
@@ -552,7 +546,8 @@ UT_Error OXML_Document::addToPT(PD_Document * pDocument)
 	OXML_StyleMap::iterator it1;
 	for (it1 = m_styles_by_id.begin(); it1 != m_styles_by_id.end(); it1++) {
 		ret = it1->second->addToPT(pDocument);
-		if (ret != UT_OK) return ret;
+		if (ret != UT_OK)
+			return ret;
 	}
 
 	_assignHdrFtrIds(); //Must be done before appending sections to the PT
@@ -560,36 +555,42 @@ UT_Error OXML_Document::addToPT(PD_Document * pDocument)
 	//Adding sections to PT
 	OXML_SectionVector::iterator it2;
 	for (it2 = m_sections.begin(); it2 != m_sections.end(); it2++) {
-		//set page margins here 
+		//set page margins here
 		ret = (*it2)->setPageMargins(m_pageMarginTop, m_pageMarginLeft, m_pageMarginRight, m_pageMarginBottom);
-		if (ret != UT_OK) return ret;		
+		if (ret != UT_OK)
+			return ret;
 		ret = (*it2)->addToPT(pDocument);
-		if (ret != UT_OK) return ret;
+		if (ret != UT_OK)
+			return ret;
 	}
 
 	//Adding header and footer sections to PT
 	OXML_SectionMap::iterator it3;
 	for (it3 = m_headers.begin(); it3 != m_headers.end(); it3++) {
 		ret = it3->second->addToPTAsHdrFtr(pDocument);
-		if (ret != UT_OK) return ret;
+		if (ret != UT_OK)
+			return ret;
 	}
 	for (it3 = m_footers.begin(); it3 != m_footers.end(); it3++) {
 		ret = it3->second->addToPTAsHdrFtr(pDocument);
-		if (ret != UT_OK) return ret;
+		if (ret != UT_OK)
+			return ret;
 	}
 
 	//Adding lists to PT
 	OXML_ListMap::iterator it4;
 	for (it4 = m_lists_by_id.begin(); it4 != m_lists_by_id.end(); it4++) {
 		ret = it4->second->addToPT(pDocument);
-		if (ret != UT_OK) return ret;
+		if (ret != UT_OK)
+			return ret;
 	}
 
 	//Adding images to PT
 	OXML_ImageMap::iterator it5;
 	for (it5 = m_images_by_id.begin(); it5 != m_images_by_id.end(); it5++) {
 		ret = it5->second->addToPT(pDocument);
-		if (ret != UT_OK) return ret;
+		if (ret != UT_OK)
+			return ret;
 	}
 
 	return applyPageProps(pDocument);
@@ -597,38 +598,34 @@ UT_Error OXML_Document::addToPT(PD_Document * pDocument)
 
 UT_Error OXML_Document::applyPageProps(PD_Document* pDocument)
 {
-	const gchar* pageAtts[13];
-	int index = 0;
+	PP_PropertyVector pageAtts = {
+        "units",    "in",
+        "page-scale", "1.0"
+    };
 
 	if(m_pageOrientation.empty())
 		m_pageOrientation = "portrait";
 
 	if(!m_pageWidth.empty())
 	{
-		pageAtts[index++] = "width";
-		pageAtts[index++] = m_pageWidth.c_str();
+		pageAtts.push_back("width");
+		pageAtts.push_back(m_pageWidth);
 	}
 	if(!m_pageHeight.empty())
 	{
-		pageAtts[index++] = "height";
-		pageAtts[index++] = m_pageHeight.c_str();
+		pageAtts.push_back("height");
+		pageAtts.push_back(m_pageHeight);
 	}
 	if(!m_pageOrientation.empty())
 	{
-		pageAtts[index++] = "orientation";
-		pageAtts[index++] = m_pageOrientation.c_str();
+		pageAtts.push_back("orientation");
+		pageAtts.push_back(m_pageOrientation);
 	}
-	pageAtts[index++] = "units";
-	pageAtts[index++] = "in";
-	pageAtts[index++] = "page-scale";
-	pageAtts[index++] = "1.0";
 
 	fp_PageSize ps(UT_convertDimensionless(m_pageWidth.c_str()), UT_convertDimensionless(m_pageHeight.c_str()), DIM_IN);
-	pageAtts[index++] = "pagetype";
-	pageAtts[index++] = ps.getPredefinedName();
+	pageAtts.push_back("pagetype");
+	pageAtts.push_back(ps.getPredefinedName());
 
-	pageAtts[index] = 0; // To signal the end of the array
-   
 	return pDocument->setPageSizeFromFile(pageAtts) ? UT_OK : UT_ERROR;
 }
 
@@ -651,7 +648,7 @@ std::string OXML_Document::getMappedNumberingId(const std::string & numId) const
 	std::map<std::string, std::string>::const_iterator iter = m_numberingMap.find(numId);
 	if(iter == m_numberingMap.end())
 		return "";
-	return iter->second; 
+	return iter->second;
 }
 
 bool OXML_Document::setMappedNumberingId(const std::string & numId, const std::string & abstractNumId)
@@ -668,7 +665,7 @@ std::string OXML_Document::getBookmarkName(const std::string & bookmarkId) const
 		UT_DEBUGMSG(("FRT:Can't find bookmark name with id:%s\n", bookmarkId.c_str()));
 		return "";
 	}
-	return iter->second; 
+	return iter->second;
 }
 
 std::string OXML_Document::getBookmarkId(const std::string & bookmarkName) const
@@ -680,7 +677,7 @@ std::string OXML_Document::getBookmarkId(const std::string & bookmarkName) const
 			return iter->first;
 		}
 	}
-	return ""; 
+	return "";
 }
 
 bool OXML_Document::setBookmarkName(const std::string & bookmarkId, const std::string & bookmarkName)

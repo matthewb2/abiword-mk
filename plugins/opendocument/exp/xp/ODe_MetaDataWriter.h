@@ -22,17 +22,12 @@
  * 02110-1301 USA.
  */
 
+#pragma once
 
-
-#ifndef _ODE_METADATAWRITER_H_
-#define _ODE_METADATAWRITER_H_
-
-// External includes
 #include <gsf/gsf.h>
 
 // Abiword classes
 class PD_Document;
-
 
 /**
  * Class holding 1 static member. Its sole duty is to write
@@ -48,5 +43,3 @@ private:
 
     ODe_MetaDataWriter ();
 };
-
-#endif //_ODE_METADATAWRITER_H_

@@ -28,7 +28,7 @@
 #include "ODi_Style_PageLayout.h"
 
 // AbiWord includes
-#include <ut_string_class.h>
+#include "ut_string_class.h"
 
 // AbiWord classes
 class PD_Document;
@@ -43,12 +43,12 @@ public:
     ODi_Style_MasterPage(PD_Document* pDocument, ODi_ElementStack& rElementStack);
     virtual ~ODi_Style_MasterPage() {}
 
-    void startElement(const gchar* pName, const gchar** ppAtts,
-                      ODi_ListenerStateAction& rAction);
+    virtual void startElement(const gchar* pName, const gchar** ppAtts,
+                      ODi_ListenerStateAction& rAction) override;
 
-    void endElement(const gchar* pName, ODi_ListenerStateAction& rAction);
+    virtual void endElement(const gchar* pName, ODi_ListenerStateAction& rAction) override;
 
-    void charData (const gchar* /*pBuffer*/, int /*length*/) {}
+    virtual void charData (const gchar* /*pBuffer*/, int /*length*/) override {}
 
 
     inline const std::string& getLayoutName() const {return m_layoutName;}

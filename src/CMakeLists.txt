@@ -81,6 +81,9 @@ target_compile_options(abiword PRIVATE
     ${FRIBIDI_CFLAGS}
     ${LIBXML2_CFLAGS}
     ${GSF_CFLAGS}
+    ${CAIRO_CFLAGS}
+    ${PANGO_CFLAGS}
+    ${BOOST_CFLAGS}
 )
 
 target_compile_definitions(abiword PRIVATE
@@ -101,6 +104,9 @@ target_link_libraries(abiword
     ${FRIBIDI_LIBRARIES}
     ${LIBXML2_LIBRARIES}
     ${GSF_LIBRARIES}
+    ${CAIRO_LIBRARIES}
+    ${PANGO_LIBRARIES}
+    ${BOOST_LIBRARIES}
 
     gdi32
     user32

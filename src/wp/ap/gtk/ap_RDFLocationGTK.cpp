@@ -36,7 +36,7 @@ static void
 AP_RDFLocationGTK_AnimationCompleted_cb( ChamplainView * /*view*/,
 										 AP_RDFLocationGTK* obj )
 {
-    obj->OnMouseClick( 0, 0 );
+    obj->OnMouseClick(nullptr, nullptr);
 }
 #endif
 
@@ -44,7 +44,7 @@ static void
 AP_RDFLocationGTK_LatLon_cb( ChamplainView * /*view*/, 
 							 GParamSpec * /*gobject*/, AP_RDFLocationGTK* obj ) 
 {
-    obj->OnMouseClick( 0, 0 );
+    obj->OnMouseClick(nullptr, nullptr);
 }
 #endif
 
@@ -84,7 +84,7 @@ AP_RDFLocationGTK::createEditor()
 {
     UT_DEBUGMSG(("AP_RDFLocationGTK::createEditor()\n" ));
     
-	GtkBuilder* builder = newDialogBuilder("pd_RDFLocation.ui");
+	GtkBuilder* builder = newDialogBuilderFromResource("pd_RDFLocation.ui");
     UT_DEBUGMSG(("createEditor(loc)\n"));
 
 #ifdef WITH_CHAMPLAIN

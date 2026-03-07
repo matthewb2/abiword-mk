@@ -17,8 +17,7 @@
  * 02110-1301 USA.
  */
 
-#ifndef AP_UNIXDIALOG_PAGENUMBERS_H
-#define AP_UNIXDIALOG_PAGENUMBERS_H
+#pragma once
 
 #include "ut_types.h"
 #include "ap_Dialog_PageNumbers.h"
@@ -32,11 +31,12 @@ class AP_UnixDialog_PageNumbers : public AP_Dialog_PageNumbers
   AP_UnixDialog_PageNumbers(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
   virtual ~AP_UnixDialog_PageNumbers(void);
 
-  virtual void runModal(XAP_Frame * pFrame);
+  virtual void runModal(XAP_Frame * pFrame) override;
 
   static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 
-  void event_PreviewExposed(void);
+  void event_PreviewInvalidate(void);
+  void event_PreviewDraw(void);
   void event_AlignChanged(AP_Dialog_PageNumbers::tAlign);
   void event_HdrFtrChanged(AP_Dialog_PageNumbers::tControl);
 
@@ -54,5 +54,3 @@ class AP_UnixDialog_PageNumbers : public AP_Dialog_PageNumbers
 
   GR_UnixCairoGraphics * m_unixGraphics;
 };
-
-#endif /* AP_UNIXDIALOG_PAGENUBMERS_H */

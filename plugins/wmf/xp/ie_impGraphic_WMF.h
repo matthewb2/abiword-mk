@@ -30,29 +30,29 @@
 class IE_ImpGraphicWMF_Sniffer : public IE_ImpGraphicSniffer
 {
  public:
-	virtual const IE_SuffixConfidence * getSuffixConfidence ();
-	virtual const IE_MimeConfidence * getMimeConfidence () { return NULL; }
-	virtual UT_Confidence_t recognizeContents (const char * szBuf,
-					UT_uint32 iNumbytes);
-	virtual bool getDlgLabels (const char ** szDesc,
+	virtual const IE_SuffixConfidence * getSuffixConfidence() override;
+	virtual const IE_MimeConfidence * getMimeConfidence() override { return nullptr; }
+	virtual UT_Confidence_t recognizeContents(const char * szBuf,
+					UT_uint32 iNumbytes) override;
+	virtual bool getDlgLabels(const char ** szDesc,
 				   const char ** szSuffixList,
-				   IEGraphicFileType * ft);
-	virtual UT_Error constructImporter (IE_ImpGraphic ** ppieg);
+				   IEGraphicFileType * ft) override;
+	virtual UT_Error constructImporter(IE_ImpGraphic ** ppieg) override;
 };
 
 class IE_ImpGraphic_WMF : public IE_ImpGraphic
 {
 public:
-    	virtual UT_Error	importGraphic(UT_ByteBuf* pBB,
-					      FG_Graphic ** ppfg);
+    virtual UT_Error importGraphic(const UT_ConstByteBufPtr & pBB,
+                                      FG_ConstGraphicPtr &pfg) override;
 private:
     // that on is used internally. But we removed it
     // from the API.
     // Convert to a PNG.
-    	UT_Error	convertGraphic(UT_ByteBuf* pBB,
-					       UT_ByteBuf** ppBB);
+	UT_Error convertGraphic(const UT_ConstByteBufPtr & pBB,
+					       UT_ConstByteBufPtr & ppBB);
 
-	UT_Error convertGraphicToSVG(UT_ByteBuf* pBB, UT_ByteBuf** ppBB);
+	UT_Error convertGraphicToSVG(const UT_ConstByteBufPtr & pBB, UT_ConstByteBufPtr & ppBB);
 };
 
 #endif /* IE_IMPGRAPHIC_WMF_H */

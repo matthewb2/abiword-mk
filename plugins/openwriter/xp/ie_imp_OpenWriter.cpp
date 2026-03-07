@@ -1,4 +1,4 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
+/* -*- mode: C++; tab-width: 2; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
 /* AbiSource Program Utilities
  * Copyright (C) 2002-2003 Dom Lachowicz <cinamod@hotmail.com>
@@ -19,10 +19,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
-
-#include <gsf/gsf-input-stdio.h>
-#include <gsf/gsf-infile.h>
-#include <gsf/gsf-infile-zip.h>
 
 #include "ut_locale.h"
 #include <math.h>
@@ -100,7 +96,7 @@ public:
   */
   const gchar ** getAbiPageAtts(const gchar * masterName)
   {
-    UT_return_val_if_fail(masterName != NULL, (const gchar **)m_pageAtts);
+    UT_return_val_if_fail(masterName != nullptr, (const gchar **)m_pageAtts);
 
     if (strcmp (m_name.c_str(), masterName))
     {
@@ -123,7 +119,7 @@ private:
 	
   void parse (const gchar ** props)
   {
-    const gchar * val = NULL;
+    const gchar * val = nullptr;
     int propCtr = 0;
     double width = 0;
     double height = 0;
@@ -167,7 +163,7 @@ private:
     m_pageAtts[propCtr++] = "pagetype";
     m_pageAtts[propCtr++] = ps.getPredefinedName();
 
-    m_pageAtts[propCtr] = 0; 
+    m_pageAtts[propCtr] = nullptr;
 
     // will go as props into the <section> tag
     val = UT_getAttribute ("fo:margin-left", props);
@@ -269,8 +265,8 @@ public:
 
   void parse (const gchar ** props)
   {
-    const gchar * val = NULL;
-    const gchar * val2 = NULL;
+    const gchar * val = nullptr;
+    const gchar * val2 = nullptr;
 
     val = UT_getAttribute ("fo:text-align", props);
     if (val) {
@@ -320,7 +316,7 @@ public:
 	  }
       else if (dim == DIM_PERCENT && m_pParentStyle) {
         // calculate font-size based on parent's 
-        const gchar * parentFontSize = NULL;
+        const gchar * parentFontSize = nullptr;
         double fontSize = 12;
 		if (m_pParentStyle->getProperty("font-size", parentFontSize)) {
           fontSize = atoi(parentFontSize) * atoi(val) / 100.0;
@@ -343,123 +339,139 @@ public:
         m_lang = UT_String_sprintf ("lang:%s-%s;", val, val2);
       }
     }
-    
+
     val = UT_getAttribute("style:text-position", props);
     if(val) {
       m_textPos = "text-position: ";
-      if (strstr(val, "sup"))
-	m_textPos += "superscript;";
-      else if (strstr(val, "sub"))
-	m_textPos += "subscript;";
-      else
-	m_textPos += "normal;";
+      if (strstr(val, "sup")) {
+        m_textPos += "superscript;";
+      } else if (strstr(val, "sub")) {
+        m_textPos += "subscript;";
+      } else {
+        m_textPos += "normal;";
+      }
     }
 
-	const gchar * undr = NULL;
-	const gchar * strk = NULL;
-	if (m_bOpenDocument) {
-		undr = const_cast<const gchar *>(UT_getAttribute("style:text-underline-style", props));
-		strk = const_cast<const gchar *>(UT_getAttribute("style:text-line-through-style", props));
-	}
-	else {
-		undr = const_cast<const gchar *>(UT_getAttribute("style:text-underline", props));
-		strk = const_cast<const gchar *>(UT_getAttribute("style:text-crossing-out", props));
-	}
-	if (undr || strk) {
-		m_textDecoration = "text-decoration: ";
-		
-		if(undr)
-		  if (strcmp(undr, "none") != 0)
-		    m_textDecoration += "underline";
-		
-		if (undr && strk)
-		  m_textDecoration += ",";
-		
-		if(strk)
-		  if (strcmp(strk, "none") != 0)
-		    m_textDecoration += "line-through";
-		
-		  m_textDecoration += ";";
-	}
- 
+    const gchar * undr = nullptr;
+    const gchar * strk = nullptr;
+    if (m_bOpenDocument) {
+      undr = const_cast<const gchar *>(UT_getAttribute("style:text-underline-style", props));
+      strk = const_cast<const gchar *>(UT_getAttribute("style:text-line-through-style", props));
+    }
+    else {
+      undr = const_cast<const gchar *>(UT_getAttribute("style:text-underline", props));
+      strk = const_cast<const gchar *>(UT_getAttribute("style:text-crossing-out", props));
+    }
+    if (undr || strk) {
+      m_textDecoration = "text-decoration: ";
+
+      if(undr) {
+        if (strcmp(undr, "none") != 0) {
+          m_textDecoration += "underline";
+        }
+      }
+
+      if (undr && strk) {
+        m_textDecoration += ",";
+      }
+
+      if(strk) {
+        if (strcmp(strk, "none") != 0) {
+          m_textDecoration += "line-through";
+        }
+      }
+
+      m_textDecoration += ";";
+    }
+
     val = UT_getAttribute ("fo:margin-left", props);
-    if(val)
+    if(val) {
       m_marginLeft = UT_String_sprintf ("margin-left: %s;", val);
-    
+    }
+
     val = UT_getAttribute ("fo:margin-top", props);
-    if(val)
+    if(val) {
       m_marginTop = UT_String_sprintf ("margin-top: %s;", val);
-    
+    }
+
     val = UT_getAttribute ("fo:margin-right", props);
-    if(val)
+    if(val) {
       m_marginRight = UT_String_sprintf ("margin-right: %s;", val);
-  
+    }
+
     val = UT_getAttribute ("fo:margin-bottom", props);
-    if(val)
+    if(val) {
       m_marginBottom = UT_String_sprintf ("margin-bottom: %s;", val);
-    
+    }
+
     val = UT_getAttribute ("style:line-height-at-least", props);
-    if (val)
+    if (val) {
       m_lineHeight = UT_String_sprintf ("line-height: %s+;", val);
-    
+    }
+
     val = UT_getAttribute ("fo:line-height", props);
     if (val) {
-        if (strstr(val, "%") != NULL) {
-            int spacing;
-            
-            sscanf (val, "%d%%", &spacing);	
-            UT_LocaleTransactor lt(LC_NUMERIC, "C");
-            m_lineHeight = UT_String_sprintf ("line-height: %f;", (double)spacing/100.);
-        }
-        else
-            m_lineHeight = UT_String_sprintf ("line-height: %s;", val);
+      if (strstr(val, "%") != nullptr) {
+        int spacing;
+
+        sscanf (val, "%d%%", &spacing);
+        UT_LocaleTransactor lt(LC_NUMERIC, "C");
+        m_lineHeight = UT_String_sprintf ("line-height: %f;", (double)spacing/100.);
+      }
+      else {
+        m_lineHeight = UT_String_sprintf ("line-height: %s;", val);
+      }
     }
     val = UT_getAttribute("fo:keep-with-next", props);
-    if (val)
+    if (val) {
       m_keepWithNext = UT_String_sprintf ("keep-with-next: %s;", !strcmp(val, "true") ? "yes" : "no");
-    
+    }
+
     val = UT_getAttribute("style:break-inside", props);
-    if (val)
+    if (val) {
       m_keepTogether = UT_String_sprintf ("keep-together: %s;", !strcmp(val, "avoid") ? "yes" : "no" );
-    
+    }
+
     val = UT_getAttribute("fo:widows", props);
     if (val) {
       int widows = 0;
       sscanf(val, "%d", &widows);
       m_widows = UT_String_sprintf ("widows: %d", widows);
     }
-    
+
     val = UT_getAttribute("fo:orphans", props);
     if (val) {
       int orphans = 0;
       sscanf (val, "%d", &orphans);
       m_orphans = UT_String_sprintf ("orphans: %d", orphans);
     }
-      
+
     val = UT_getAttribute("fo:column-count", props);
     if (val) {
       int columns = 0;
       sscanf (val, "%d", &columns);
-      
-      m_columns = UT_String_sprintf ("columns: %d;", columns);       
+
+      m_columns = UT_String_sprintf ("columns: %d;", columns);
     }
-    
+
     val = UT_getAttribute ("fo:break-before", props);
     if (val) {
-      if (!strcmp (val, "column"))
-	m_bColBreakBefore = true;
-      else if (!strcmp (val, "page"))
-	m_bPageBreakBefore = true;
+      if (!strcmp (val, "column")) {
+        m_bColBreakBefore = true;
+      }
+      else if (!strcmp (val, "page")) {
+        m_bPageBreakBefore = true;
+      }
     }
 
-	m_styleProps = "";
+    m_styleProps = "";
 
 #define APPEND_STYLE(sty) if (sty.size()) { m_styleProps += sty; }
-    
+
     APPEND_STYLE(m_align);
     APPEND_STYLE(m_fontWeight);
     APPEND_STYLE(m_fontStyle);
-    APPEND_STYLE(m_color);    
+    APPEND_STYLE(m_color);
     APPEND_STYLE(m_bgcolor);
     APPEND_STYLE(m_fontName);
     APPEND_STYLE(m_fontSize);
@@ -479,8 +491,9 @@ public:
 
 #undef APPEND_STYLE
 
-    if (m_styleProps.size () > 0)
-      m_styleProps [m_styleProps.size()-1] = 0; 
+    if (m_styleProps.size () > 0) {
+      m_styleProps [m_styleProps.size()-1] = 0;
+    }
   }
 
 private:
@@ -507,7 +520,7 @@ private:
   UT_String m_widows;
   UT_String m_orphans;
   UT_String m_columns;
-  
+
   UT_String m_styleProps;
 
   bool m_bColBreakBefore;
@@ -539,7 +552,7 @@ public:
 
 protected:
 
-	virtual UT_Error _loadFile(GsfInput * input);
+	virtual UT_Error _loadFile(GsfInput * input) override;
 
 private:
 
@@ -588,8 +601,8 @@ UT_Confidence_t IE_Imp_OpenWriter_Sniffer::recognizeContents (GsfInput * input)
 
 	GsfInfile * zip;
 
-	zip = gsf_infile_zip_new (input, NULL);
-	if (zip != NULL)
+	zip = gsf_infile_zip_new (input, nullptr);
+	if (zip != nullptr)
 		{
 			GsfInput* pInput = gsf_infile_child_by_name(zip, "mimetype");
 
@@ -599,7 +612,7 @@ UT_Confidence_t IE_Imp_OpenWriter_Sniffer::recognizeContents (GsfInput * input)
     
 					if (gsf_input_size (pInput) > 0) {
 						mimetype.append(
-										(const char *)gsf_input_read(pInput, gsf_input_size (pInput), NULL),
+										(const char *)gsf_input_read(pInput, gsf_input_size (pInput), nullptr),
 										gsf_input_size (pInput));
 					}
 
@@ -623,7 +636,7 @@ UT_Confidence_t IE_Imp_OpenWriter_Sniffer::recognizeContents (GsfInput * input)
 							int min = UT_MIN(size, 150);
 
 							UT_UTF8String content;
-							content.append((const char *)gsf_input_read(pInput, min, NULL));
+							content.append((const char *)gsf_input_read(pInput, min, nullptr));
 
 							if (strstr(content.utf8_str(), "<!DOCTYPE office:document-content PUBLIC"))
 								confidence = UT_CONFIDENCE_GOOD;
@@ -669,14 +682,14 @@ void IE_Imp_OpenWriter::defineSimpleStyle (const UT_UTF8String & name, const gch
   if (!name.size() || !props)
     return;
   
-  OO_Style * style = new OO_Style (props, NULL, m_bOpenDocument);
+  OO_Style * style = new OO_Style (props, nullptr, m_bOpenDocument);
   m_styleBucket.insert (name.utf8_str(), style);
 }
 
 const gchar* IE_Imp_OpenWriter::mapStyle (const gchar * name) const
 {
   OO_Style * style = m_styleBucket.pick((const char *)name);
-  if (NULL == style)
+  if (nullptr == style)
     return "";
   return style->getAbiStyle (); 
 }
@@ -684,7 +697,7 @@ const gchar* IE_Imp_OpenWriter::mapStyle (const gchar * name) const
 const OO_Style * IE_Imp_OpenWriter::mapStyleObj (const gchar * name) const
 {
   if (!name)
-    return NULL;
+    return nullptr;
   return m_styleBucket.pick((const char *)name);
 }
 
@@ -695,7 +708,7 @@ const OO_Style * IE_Imp_OpenWriter::mapStyleObj (const gchar * name) const
  * Create a new OpenWriter importer object
  */
 IE_Imp_OpenWriter::IE_Imp_OpenWriter (PD_Document * pDocument)
-  : IE_Imp (pDocument), m_pSSListener(0), m_oo (0), m_bOpenDocument(false)
+  : IE_Imp(pDocument), m_pSSListener(nullptr), m_oo(nullptr), m_bOpenDocument(false)
 {
 }
 
@@ -705,9 +718,9 @@ IE_Imp_OpenWriter::IE_Imp_OpenWriter (PD_Document * pDocument)
  */
 UT_Error IE_Imp_OpenWriter::_loadFile (GsfInput * oo_src)
 {
-  m_oo = GSF_INFILE (gsf_infile_zip_new (oo_src, NULL));
+  m_oo = GSF_INFILE (gsf_infile_zip_new (oo_src, nullptr));
 
-  if (m_oo == NULL)
+  if (m_oo == nullptr)
     return UT_ERROR;
   
   UT_Error err = UT_OK;
@@ -769,12 +782,12 @@ static const size_t BUF_SZ = 4096;
 
 static UT_Error loadStream ( GsfInfile * oo,
 			     const char * stream,
-			     UT_ByteBuf & buf )
+			     const UT_ByteBufPtr & buf )
 {
-  guint8 const *data = NULL;
+  guint8 const *data = nullptr;
   size_t len = 0;
   
-  buf.truncate (0);
+  buf->truncate(0);
   GsfInput * input = gsf_infile_child_by_name(oo, stream);
 
   if (!input)
@@ -783,11 +796,11 @@ static UT_Error loadStream ( GsfInfile * oo,
   if (gsf_input_size (input) > 0) {
     while ((len = gsf_input_remaining (input)) > 0) {
       len = UT_MIN (len, BUF_SZ);
-      if (NULL == (data = gsf_input_read (input, len, NULL))) {
+      if (nullptr == (data = gsf_input_read (input, len, nullptr))) {
 	g_object_unref (G_OBJECT (input));
 	return UT_ERROR;
       }
-      buf.append ((const UT_Byte *)data, len);
+      buf->append((const UT_Byte *)data, len);
     }
   }
   
@@ -803,7 +816,7 @@ static UT_Error parseStream ( GsfInfile * oo,
 			      const char * stream,
 			      UT_XML & parser )
 {
-  guint8 const *data = NULL;
+  guint8 const *data = nullptr;
   size_t len = 0;
 
   GsfInput * input = gsf_infile_child_by_name(oo, stream);
@@ -816,7 +829,7 @@ static UT_Error parseStream ( GsfInfile * oo,
       // FIXME: we want to pass the stream in chunks, but libXML2 finds this disagreeable.
       // we probably need to pass some magic to our XML parser? 
       // len = UT_MIN (len, BUF_SZ);
-      if (NULL == (data = gsf_input_read (input, len, NULL))) {
+      if (nullptr == (data = gsf_input_read (input, len, nullptr))) {
 	g_object_unref (G_OBJECT (input));
 	return UT_ERROR;
       }
@@ -868,7 +881,7 @@ public:
   {
   }
   
-  virtual void startElement (const gchar * name, const gchar ** atts) 
+  virtual void startElement (const gchar * name, const gchar ** atts) override
   {
     mCharData.clear ();
     mAttrib.clear ();
@@ -876,12 +889,12 @@ public:
     if (!strcmp (name, "meta:user-defined"))
 	{
 	  const gchar * attrib = UT_getAttribute ("meta:name", atts);
-	  if (attrib != NULL)
+	  if (attrib != nullptr)
 	    mAttrib = attrib;
 	}
   }
   
-  virtual void endElement (const gchar * name)
+  virtual void endElement (const gchar * name) override
   {
     if (mCharData.size()) {
       if (!strcmp (name, "dc:language"))
@@ -896,7 +909,7 @@ public:
     mAttrib.clear ();
   }
   
-  virtual void charData (const gchar * buffer, int length)
+  virtual void charData (const gchar * buffer, int length) override
   {
     if (buffer && length)      
 		mCharData += std::string (buffer, length);
@@ -925,7 +938,7 @@ UT_Error IE_Imp_OpenWriter::_handleMimetype ()
 
   UT_UTF8String mimetype;
   if (gsf_input_size (input) > 0) {
-    mimetype.append((const char *)gsf_input_read(input, gsf_input_size (input), NULL), gsf_input_size (input));
+    mimetype.append((const char *)gsf_input_read(input, gsf_input_size (input), nullptr), gsf_input_size (input));
   }
   
   if (strcmp("application/vnd.sun.xml.writer", mimetype.utf8_str()) &&
@@ -956,9 +969,8 @@ UT_Error IE_Imp_OpenWriter::_handleMetaStream ()
 class OpenWriter_SettingsStream_Listener : public OpenWriter_Stream_Listener
 {
 public:
-  OpenWriter_SettingsStream_Listener ( IE_Imp_OpenWriter * importer, bool bOpenDocument )
-    : OpenWriter_Stream_Listener ( importer ), 
-      m_bOpenDocument ( bOpenDocument )
+  OpenWriter_SettingsStream_Listener (IE_Imp_OpenWriter * importer)
+    : OpenWriter_Stream_Listener ( importer )
   {
   }
 
@@ -966,20 +978,19 @@ public:
   {
   }
 
-  virtual void startElement (const gchar * /*name*/, const gchar ** /*atts*/) 
+  virtual void startElement (const gchar * /*name*/, const gchar ** /*atts*/) override
   {
   }
 
-  virtual void endElement (const gchar * /*name*/)
+  virtual void endElement (const gchar * /*name*/) override
   {
   }
 
-  virtual void charData (const gchar * /*buffer*/, int /*length*/)
+  virtual void charData (const gchar * /*buffer*/, int /*length*/) override
   {
   }
-  
+
 private:
-  const bool m_bOpenDocument;
 };
 
 /*!
@@ -987,7 +998,7 @@ private:
  */
 UT_Error IE_Imp_OpenWriter::_handleSettingsStream ()
 {
-  OpenWriter_SettingsStream_Listener listener ( this, m_bOpenDocument );
+  OpenWriter_SettingsStream_Listener listener ( this );
   return handleStream (m_oo, "settings.xml", listener);
 }
 
@@ -1001,10 +1012,10 @@ class OpenWriter_StylesStream_Listener : public OpenWriter_Stream_Listener
 {
 public:
   OpenWriter_StylesStream_Listener ( IE_Imp_OpenWriter * importer, bool bOpenDocument )
-    : OpenWriter_Stream_Listener ( importer ), m_ooStyle (0), m_bOpenDocument(bOpenDocument)
+    : OpenWriter_Stream_Listener(importer), m_ooStyle(nullptr), m_bOpenDocument(bOpenDocument)
   {
   }
-  
+
   virtual ~OpenWriter_StylesStream_Listener ()
   {
     m_styleNameMap.purgeData();
@@ -1020,7 +1031,7 @@ public:
       return *name;
   }
   
-  virtual void startElement (const gchar * name, const gchar ** atts) 
+  virtual void startElement (const gchar * name, const gchar ** atts) override
   {
 	/* SXW || ODT */
     if (!strcmp (name, "style:page-master") || !strcmp (name, "style:page-layout")) {
@@ -1029,10 +1040,10 @@ public:
     else if (!strcmp (name, "style:master-page")) {
       const gchar * masterName = UT_getAttribute("style:page-master-name", atts);
       const gchar ** pageAtts = m_ooPageStyle.getAbiPageAtts(masterName);
-      getDocument()->setPageSizeFromFile(pageAtts);
+      getDocument()->setPageSizeFromFile(PP_std_copyProps(pageAtts));
     }
     else if (!strcmp (name, "style:style")) {
-      const gchar * attr = NULL;
+      const gchar * attr = nullptr;
 
       attr = UT_getAttribute("style:name",atts);
       if (attr)
@@ -1074,7 +1085,7 @@ public:
 	m_type = PARAGRAPH;
       }
       DELETEP(m_ooStyle);
-      m_ooStyle = NULL;
+      m_ooStyle = nullptr;
     }
     else if (/* SXW || ODT */
 	     (!strcmp (name, "style:properties") || !strcmp (name, "style:page-layout-properties")) && 
@@ -1086,7 +1097,7 @@ public:
 	     !strcmp (name, "style:text-properties") || 		/* ODT */
 	     !strcmp (name, "style:paragraph-properties")) {
       
-      if (m_ooStyle == NULL) {
+      if (m_ooStyle == nullptr) {
 	getDocument()->getStyle (m_parent.utf8_str(), &m_pParentStyle);
 	m_ooStyle = new OO_Style (atts, m_pParentStyle, m_bOpenDocument);
       }
@@ -1096,7 +1107,7 @@ public:
     }
   } 
 
-  virtual void endElement (const gchar * name)
+  virtual void endElement (const gchar * name) override
   {
     if (!strcmp (name, "style:page-master")) {
       m_pageMaster.clear();
@@ -1135,8 +1146,8 @@ public:
 	}
 
 	// must be last
-	atts[propCtr] = 0;
-	getDocument()->appendStyle(atts);
+	atts[propCtr] = nullptr;
+	getDocument()->appendStyle(PP_std_copyProps(atts));
       }
 
       m_name.clear ();
@@ -1144,11 +1155,11 @@ public:
       m_parent.clear ();
       m_next.clear ();
       DELETEP(m_ooStyle);
-      m_ooStyle = NULL;
+      m_ooStyle = nullptr;
     }
   }
   
-  virtual void charData (const gchar * /*buffer*/, int /*length*/)
+  virtual void charData (const gchar * /*buffer*/, int /*length*/) override
   {
   }  
 
@@ -1157,7 +1168,7 @@ public:
     if (!strcmp (m_ooPageStyle.getName(), "")) 
     {
       UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
-      return NULL;
+      return nullptr;
     }
     return m_ooPageStyle.getAbiSectionProps();
   }
@@ -1207,7 +1218,7 @@ private:
 
   UT_UTF8String m_curStyleName;
 
-  UT_GenericVector<const gchar*>	m_vecInlineFmt;
+  PP_PropertyVector	m_vecInlineFmt;
   UT_NumberStack		m_stackFmtStartIndex;
   const OpenWriter_StylesStream_Listener * m_pSSListener;
 
@@ -1230,7 +1241,7 @@ public:
   {
   }
 
-  virtual void startElement (const gchar * name, const gchar ** atts) 
+  virtual void startElement (const gchar * name, const gchar ** atts) override
   {
     // if we're inside a TOC, ignore the contents since SXW/ODT include a copy of the TOC
     if (m_bInTOC)
@@ -1254,7 +1265,7 @@ public:
 	if (abi_sty) {
 	  // append an empty paragraph with this one char
 	  if (abi_sty->getColBreakBefore () || abi_sty->getPageBreakBefore ()) {
-	    _insureInBlock(NULL);
+	    _insureInBlock(nullptr);
 	    UT_UCSChar ucs = (abi_sty->getColBreakBefore () ? UCS_VTAB : UCS_FF);
 	    getDocument()->appendSpan (&ucs, 1);
 	  }
@@ -1262,7 +1273,7 @@ public:
 	  const gchar * props[3];
 	  props[0] = "props";
 	  props[1] = abi_sty->getAbiStyle ();
-	  props[2] = 0;
+	  props[2] = nullptr;
 	  
 	  _insureInBlock((const gchar **)props);
 	}
@@ -1270,12 +1281,12 @@ public:
 	  const gchar * props[3];
 	  props[0] = "style";
 	  props[1] = oo_sty.utf8_str();
-	  props[2] = 0;
+	  props[2] = nullptr;
 
 	  _insureInBlock((const gchar **)props);
 	}
 	else
-	  _insureInBlock(NULL);
+	  _insureInBlock(nullptr);
 	m_bAcceptingText = true;
       }
     else if (!strcmp(name, "text:span"))
@@ -1290,13 +1301,13 @@ public:
 	if(abi_sty && *abi_sty) {
 	  props[0] = "props";
 	  props[1] = abi_sty;
-	  props[2] = 0;
+	  props[2] = nullptr;
 	} else {
-	  props[0] = 0;
+	  props[0] = nullptr;
 	}
 	  
 	_pushInlineFmt(props);
-	getDocument()->appendFmt(&m_vecInlineFmt);
+	getDocument()->appendFmt(m_vecInlineFmt);
       }
     else if (!strcmp(name, "text:line-break"))
       {
@@ -1310,25 +1321,19 @@ public:
       }
     else if (!strcmp(name, "text:ordered-list") || !strcmp(name, "text:unordered-list"))
       {
-	const gchar * list_atts[15];
-	UT_uint32 iOffset = 0;
+        PP_PropertyVector list_atts = {
+          // list type
+          "type", "",
+          "id", "0"
+        };
+        if (!strcmp(name, "text:ordered-list")) {
+          list_atts[1] = "Numbered List";
+        } else {
+          list_atts[1] = "Bullet List";
+        }
+        getDocument()->appendList(list_atts);
 
-	// list type
-	list_atts[iOffset++] = "type";
-	if (!strcmp(name, "text:ordered-list"))
-	  list_atts[iOffset++] = "Numbered List";
-	else
-	  list_atts[iOffset++] = "Bullet List";
-
-	list_atts[iOffset++] = "id";
-	list_atts[iOffset++] = "0";
-
-	// NULL
-	list_atts[iOffset++] = 0;  
-
-	getDocument()->appendList(list_atts);
-
-	UT_DEBUGMSG(("DOM: appended a list\n"));
+        UT_DEBUGMSG(("DOM: appended a list\n"));
       }
     else if (!strcmp(name, "style:style"))
       {
@@ -1345,12 +1350,11 @@ public:
       }
     else if (!strcmp(name, "text:a"))
       {
-	_flush();
-	const gchar * xlink_atts[3];
-	xlink_atts[0] = "xlink:href";
-	xlink_atts[1] = UT_getAttribute("xlink:href", atts);
-	xlink_atts[2] = 0;
-	getDocument()->appendObject(PTO_Hyperlink, xlink_atts);
+        _flush();
+        const PP_PropertyVector xlink_atts = {
+          "xlink:href", UT_getAttribute("xlink:href", atts)
+        };
+        getDocument()->appendObject(PTO_Hyperlink, xlink_atts);
       }
     else if (!strcmp(name, "text:bookmark"))
     {
@@ -1398,22 +1402,22 @@ public:
     else if (!strcmp(name, "text:table-of-content"))
     {
       _flush ();
-      _insureInBlock(NULL);
+      _insureInBlock(nullptr);
       
-      getDocument()->appendStrux(PTX_SectionTOC, NULL);
-      getDocument()->appendStrux(PTX_EndTOC, NULL);
+      getDocument()->appendStrux(PTX_SectionTOC, PP_NOPROPS);
+      getDocument()->appendStrux(PTX_EndTOC, PP_NOPROPS);
 
       m_bInTOC = true;
     }
     else if (!strcmp(name, "draw:image"))
       {
 	_flush ();
-	_insureInBlock(NULL);
+	_insureInBlock(nullptr);
 	_insertImage (atts);
       }
     else if (!strcmp(name, "table:table"))
       {
-	_insureInSection(NULL);
+	_insureInSection(nullptr);
 	_openTable (atts);
       }
     else if (!strcmp(name, "table:table-column"))
@@ -1473,16 +1477,15 @@ public:
       else if(!strcmp(name, "text:title"))
 	type = "meta_title";
 
-      const gchar *field_fmt[3];
-      field_fmt[0] = "type";
-      field_fmt[1] = type;
-      field_fmt[2] = 0;
-      getDocument()->appendObject(PTO_Field, (const gchar**)field_fmt);
+      const PP_PropertyVector field_fmt = {
+        "type", type
+      };
+      getDocument()->appendObject(PTO_Field, field_fmt);
       m_bAcceptingText = false;
     }
   }
 
-  virtual void endElement (const gchar * name)
+  virtual void endElement (const gchar * name) override
   {
     if (!strcmp(name, "text:section" ))
       {
@@ -1497,7 +1500,7 @@ public:
       {
 	_flush ();
 	_popInlineFmt();
-	getDocument()->appendFmt(&m_vecInlineFmt);
+	getDocument()->appendFmt(m_vecInlineFmt);
       }
     else if (!strcmp(name, "text:ordered-list") || !strcmp(name, "text:unordered-list"))
       {
@@ -1505,7 +1508,7 @@ public:
     else if (!strcmp(name, "text:a"))
       {
 	_flush ();
-	getDocument()->appendObject(PTO_Hyperlink, NULL);
+	getDocument()->appendObject(PTO_Hyperlink, PP_NOPROPS);
       }
     else if (!strcmp(name, "text:table-of-content")) {
       m_bInTOC = false;
@@ -1545,7 +1548,7 @@ public:
     }
   }
 
-  virtual void charData (const gchar * buffer, int length)
+  virtual void charData (const gchar * buffer, int length) override
   {
     if (buffer && length && m_bAcceptingText && !m_bInTOC)
       m_charData += UT_UCS4String (buffer, length, true);
@@ -1560,12 +1563,12 @@ private:
     const gchar * height = UT_getAttribute ("svg:height", atts);
     const gchar * href   = UT_getAttribute ("xlink:href", atts);
 
-    if (width == NULL || height == NULL || href == NULL)
+    if (width == nullptr || height == nullptr || href == nullptr)
         return; //don't crash on invalid images
 
     m_imgCnt++;
 
-    UT_ByteBuf img_buf;
+    UT_ByteBufPtr img_buf(new UT_ByteBuf);
 
     GsfInfile * pictures_dir = GSF_INFILE(gsf_infile_child_by_name(getImporter()->getOO(), "Pictures"));
 
@@ -1583,13 +1586,13 @@ private:
     if (error != UT_OK)
       return;
 
-    FG_Graphic* pFG		= 0;
-    const UT_ByteBuf * pictData       = 0;
+    FG_ConstGraphicPtr pFG;
+    UT_ConstByteBufPtr pictData;
     
     UT_String propBuffer;
     UT_String propsName;
     
-    error = IE_ImpGraphic::loadGraphic (img_buf, IEGFT_Unknown, &pFG);
+    error = IE_ImpGraphic::loadGraphic (img_buf, IEGFT_Unknown, pFG);
 	if ((error != UT_OK) || !pFG)
       {
 		  // pictData is already freed in ~FG_Graphic
@@ -1609,24 +1612,22 @@ private:
     //
     // This next bit of code will set up our properties based on the image attributes
     //
-    
-    UT_String_sprintf(propBuffer, "width:%s; height:%s", width, height);    
+
+    UT_String_sprintf(propBuffer, "width:%s; height:%s", width, height);
     UT_String_sprintf(propsName, "image%d", m_imgCnt);
 
-    const gchar* propsArray[5];
-    propsArray[0] = (gchar *)"props";
-    propsArray[1] = (gchar *)propBuffer.c_str();
-    propsArray[2] = (gchar *)"dataid";
-    propsArray[3] = (gchar *)propsName.c_str();
-    propsArray[4] = 0;
-    
+    PP_PropertyVector propsArray = {
+      "props", propBuffer.c_str(),
+      "dataid", propsName.c_str()
+    };
+
     if (!getDocument()->appendObject (PTO_Image, propsArray))
       {
 		  return;
       }
 
     if (!getDocument()->createDataItem(propsName.c_str(), false,
-                                       pictData, pFG->getMimeType(), NULL))
+                                       pictData, pFG->getMimeType(), nullptr))
       {
 		  return;
       }
@@ -1638,15 +1639,15 @@ private:
     if (m_bAcceptingText)
       return;
 
-    _insureInSection(NULL);
+    _insureInSection(nullptr);
 
     if (!m_bAcceptingText) {
-      getDocument()->appendStrux(PTX_Block, (const gchar**)atts);	
+      getDocument()->appendStrux(PTX_Block, PP_std_copyProps(atts));
       m_bAcceptingText = true;
     }
   }
 
-  void _insureInSection(const gchar * props) 
+  void _insureInSection(const gchar * props)
   {
     if (m_bInSection)
       return;
@@ -1654,11 +1655,10 @@ private:
     UT_String allProps(props);
     allProps += m_pSSListener->getSectionProps();
 
-    const gchar * atts[3];
-    atts[0] = "props";
-    atts[1] = allProps.c_str();
-    atts[2] = 0;
-    getDocument()->appendStrux(PTX_Section, (const gchar**)atts);	
+    const PP_PropertyVector atts = {
+      "props", allProps.c_str()
+    };
+    getDocument()->appendStrux(PTX_Section, atts);
 
     m_bInSection = true;
     m_bAcceptingText = false;
@@ -1668,12 +1668,9 @@ private:
     {
 	UT_return_if_fail(name && type);
 
-	const gchar* propsArray[5];
-	propsArray[0] = (gchar *)"name";
-	propsArray[1] = name;
-	propsArray[2] = (gchar *)"type";
-	propsArray[3] = type;
-	propsArray[4] = 0;
+	const PP_PropertyVector propsArray = {
+		"name",	name,	"type",	type
+	};
 	getDocument()->appendObject (PTO_Bookmark, propsArray);
     }
 
@@ -1688,7 +1685,7 @@ private:
 
   void _openTable (const gchar ** /*props*/)
   {
-    getDocument()->appendStrux(PTX_SectionTable,NULL);
+    getDocument()->appendStrux(PTX_SectionTable,PP_NOPROPS);
   }
 
   void _openColumn (const gchar ** /*props*/)
@@ -1703,23 +1700,20 @@ private:
 
   void _openCell (const gchar ** /*props*/)
   {
-    UT_String attach;
-
-    attach = UT_String_sprintf("left-attach: %d; top-attach: %d; right-attach: %d; bot-attach: %d", m_cel, m_row-1, m_cel+1, m_row);
+    std::string attach = UT_std_string_sprintf("left-attach: %d; top-attach: %d; right-attach: %d; bot-attach: %d", m_cel, m_row-1, m_cel+1, m_row);
 
     m_cel++;
 
-    const gchar *cell_props[3];
-    cell_props[0] = "props";
-    cell_props[1] = attach.c_str();
-    cell_props[2] = 0;
-    
+    const PP_PropertyVector cell_props = {
+      "props", attach
+    };
+
     getDocument()->appendStrux(PTX_SectionCell,cell_props);
   }
 
   void _closeTable ()
   {
-    getDocument()->appendStrux(PTX_EndTable, NULL);
+    getDocument()->appendStrux(PTX_EndTable, PP_NOPROPS);
 
     m_row = m_cel = m_col = 0;
   }
@@ -1736,7 +1730,7 @@ private:
 
   void _closeCell ()
   {
-    getDocument()->appendStrux(PTX_EndCell,NULL);
+    getDocument()->appendStrux(PTX_EndCell,PP_NOPROPS);
   }
   
   void _defineSimpleStyle (const gchar **props)
@@ -1756,22 +1750,15 @@ private:
     return getImporter ()->mapStyleObj (oo_sty.utf8_str());
   }
 
-  bool _pushInlineFmt(const gchar ** atts)
+  void _pushInlineFmt(const gchar ** atts)
   {
-    UT_uint32 start = m_vecInlineFmt.getItemCount()+1;
+    UT_uint32 start = m_vecInlineFmt.size() + 1;
     UT_uint32 k;
     
-    for (k=0; (atts[k]); k++)
-      {
-	gchar * p;
-	if (!(p = g_strdup(atts[k])))
-	  return false;
-	if (m_vecInlineFmt.addItem(p)!=0)
-	  return false;
-      }
-    if (!m_stackFmtStartIndex.push(start))
-      return false;
-    return true;
+    for (k=0; (atts[k]); k++) {
+      m_vecInlineFmt.push_back(atts[k]);
+    }
+    m_stackFmtStartIndex.push(start);
   }
   
   void _popInlineFmt(void)
@@ -1779,15 +1766,9 @@ private:
     UT_sint32 start;
     if (!m_stackFmtStartIndex.pop(&start))
       return;
-    UT_sint32 k;
-    UT_uint32 end = m_vecInlineFmt.getItemCount();
-    for (k=end; k>=start; k--)
-      {
-	const gchar * p = (const gchar *)m_vecInlineFmt.getNthItem(k-1);
-	m_vecInlineFmt.deleteNthItem(k-1);
-	if (p)
-	  g_free((void *)p);
-      }
+
+    m_vecInlineFmt.erase(m_vecInlineFmt.begin() + (start - 1),
+                         m_vecInlineFmt.end());
   }
   
 };

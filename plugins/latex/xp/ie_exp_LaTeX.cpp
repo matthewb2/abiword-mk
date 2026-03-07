@@ -71,7 +71,7 @@ ABI_PLUGIN_DECLARE("LaTeX")
 // completely generic code to allow this to be a plugin
 
 // we use a reference-counted sniffer
-static IE_Exp_LaTeX_Sniffer * m_sniffer = 0;
+static IE_Exp_LaTeX_Sniffer * m_sniffer = nullptr;
 
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_register (XAP_ModuleInfo * mi)
@@ -95,17 +95,17 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-	mi->name = 0;
-	mi->desc = 0;
-	mi->version = 0;
-	mi->author = 0;
-	mi->usage = 0;
+	mi->name = nullptr;
+	mi->desc = nullptr;
+	mi->version = nullptr;
+	mi->author = nullptr;
+	mi->usage = nullptr;
 
 	UT_return_val_if_fail (m_sniffer, 0);
 
 	IE_Exp::unregisterExporter (m_sniffer);
 	delete m_sniffer;
-	m_sniffer = 0;
+	m_sniffer = nullptr;
 
 	return 1;
 }
@@ -166,7 +166,7 @@ IE_Exp_LaTeX::IE_Exp_LaTeX(PD_Document * pDocument)
 	: IE_Exp(pDocument)
 {
 	m_error = 0;
-	m_pListener = NULL;
+	m_pListener = nullptr;
 }
 
 IE_Exp_LaTeX::~IE_Exp_LaTeX()
@@ -210,45 +210,45 @@ public:
 	}
 
 	virtual bool		populate(fl_ContainerLayout* /*sfh*/,
-					    const PX_ChangeRecord * /*pcr*/)
+					    const PX_ChangeRecord * /*pcr*/) override
 	{
 		return true;	
 	}
 
 	virtual bool		populateStrux(pf_Frag_Strux* sdh,
 						const PX_ChangeRecord * pcr,
-						fl_ContainerLayout* * psfh)
+						fl_ContainerLayout* * psfh) override
 	{
 		UT_ASSERT(pcr->getType() == PX_ChangeRecord::PXT_InsertStrux);
 		const PX_ChangeRecord_Strux * pcrx = static_cast<const PX_ChangeRecord_Strux *> (pcr);
-		*psfh = 0;							// we don't need it.
+		*psfh = nullptr;							// we don't need it.
 
 		switch (pcrx->getStruxType())
 		{
-		    case PTX_SectionEndnote:
-		    case PTX_EndEndnote:
+		case PTX_SectionEndnote:
+		case PTX_EndEndnote:
 			m_hasEndnotes = true;
 			break;
-		    case PTX_SectionTable:
-		    {
-			m_pTableHelper->OpenTable(sdh, pcr->getIndexAP());
+		case PTX_SectionTable:
+		{
+			m_pTableHelper->openTable(sdh, pcr->getIndexAP());
 			m_hasTable = true;
 			break;
-		    }
-		    case PTX_EndTable:
-		    {
-			m_pTableHelper->CloseTable();
+		}
+		case PTX_EndTable:
+		{
+			m_pTableHelper->closeTable();
 			break;
-		    }
-		    case PTX_SectionCell:
-			m_pTableHelper->OpenCell(pcr->getIndexAP());
+		}
+		case PTX_SectionCell:
+			m_pTableHelper->openCell(pcr->getIndexAP());
 			if(m_pTableHelper->getBot() - m_pTableHelper->getTop() >1)
-			    this->m_hasMultiRow = true;
+				this->m_hasMultiRow = true;
 			break;
-		    case PTX_EndCell:
-			m_pTableHelper->CloseCell();
+		case PTX_EndCell:
+			m_pTableHelper->closeCell();
 			break;
-		    default:
+		default:
 			break;
 		}
 
@@ -256,7 +256,7 @@ public:
 	}
 
 	virtual bool		change(fl_ContainerLayout* /*sfh*/,
-					const PX_ChangeRecord * /*pcr*/)
+					const PX_ChangeRecord * /*pcr*/) override
 	{
 		UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
 		return false;
@@ -268,13 +268,13 @@ public:
 					    PL_ListenerId /*lid*/,
 					    void (* /*pfnBindHandles*/)(pf_Frag_Strux* sdhNew,
 									PL_ListenerId lid,
-									fl_ContainerLayout* sfhNew))
+									fl_ContainerLayout* sfhNew)) override
 	{
 		UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
 		return false;
 	}
 
-	virtual bool		signal(UT_uint32 /*iSignal*/)
+	virtual bool		signal(UT_uint32 /*iSignal*/) override
 	{
 		UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
 		return false;
@@ -290,14 +290,14 @@ public:
 	virtual ~s_LaTeX_Listener();
 
 	virtual bool		populate(fl_ContainerLayout* sfh,
-					const PX_ChangeRecord * pcr);
+					const PX_ChangeRecord * pcr) override;
 
 	virtual bool		populateStrux(pf_Frag_Strux* sdh,
 						const PX_ChangeRecord * pcr,
-						fl_ContainerLayout* * psfh);
+						fl_ContainerLayout* * psfh) override;
 
 	virtual bool		change(fl_ContainerLayout* sfh,
-					const PX_ChangeRecord * pcr);
+					const PX_ChangeRecord * pcr) override;
 
 	virtual bool		insertStrux(fl_ContainerLayout* sfh,
 						const PX_ChangeRecord * pcr,
@@ -305,9 +305,9 @@ public:
 						PL_ListenerId lid,
 						void (* pfnBindHandles)(pf_Frag_Strux* sdhNew,
 							PL_ListenerId lid,
-							fl_ContainerLayout* sfhNew));
+							fl_ContainerLayout* sfhNew)) override;
 
-	virtual bool		signal(UT_uint32 iSignal);
+	virtual bool		signal(UT_uint32 iSignal) override;
 
 protected:
 	void				_closeBlock(void);
@@ -501,7 +501,7 @@ void s_LaTeX_Listener::_closeBlock(void)
 
 void s_LaTeX_Listener::_openCell(PT_AttrPropIndex api)
 {
-	this->m_pTableHelper->OpenCell(api);
+	this->m_pTableHelper->openCell(api);
 	m_CellLeft = this->m_pTableHelper->getLeft();
 	m_CellTop = this->m_pTableHelper->getTop();
 	m_CellRight = this->m_pTableHelper->getRight();
@@ -595,7 +595,7 @@ void s_LaTeX_Listener::_openParagraph(PT_AttrPropIndex api)
 		return;
 	}
 	
-	const PP_AttrProp * pAP = NULL;
+	const PP_AttrProp * pAP = nullptr;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 	m_iBlockType = BT_NORMAL;
 	
@@ -609,16 +609,17 @@ void s_LaTeX_Listener::_openParagraph(PT_AttrPropIndex api)
 		{
 			int indent = 0;
 			bool bNewList = false;
-			const gchar * szIndent, * szLeft, * szListStyle = NULL;
+			const gchar * szIndent, * szLeft, * szListStyle;
+			szIndent = szLeft = szListStyle = nullptr;
 			FL_ListType this_list_type = NOT_A_LIST;
 			pAP->getProperty("list-style", szListStyle);
 			
 			if(szListStyle)
 			{
-			    if (0 == strcmp(szListStyle, "Numbered List") )
-				this_list_type = NUMBERED_LIST;
-			    else if (0 == strcmp(szListStyle, "Bullet List") )
-				this_list_type = BULLETED_LIST;
+				if (0 == strcmp(szListStyle, "Numbered List") )
+					this_list_type = NUMBERED_LIST;
+				else if (0 == strcmp(szListStyle, "Bullet List") )
+					this_list_type = BULLETED_LIST;
 			}
 			
 			if (this_list_type == NOT_A_LIST)
@@ -790,8 +791,8 @@ void s_LaTeX_Listener::_openParagraph(PT_AttrPropIndex api)
 
 void s_LaTeX_Listener::_openSection(PT_AttrPropIndex api)
 {
-	const PP_AttrProp* pAP = NULL;
-	const gchar* pszNbCols = NULL;
+	const PP_AttrProp* pAP = nullptr;
+	const gchar* pszNbCols = nullptr;
 
 	m_bBetweenQuotes = false;
 	m_bInList = false;
@@ -800,26 +801,26 @@ void s_LaTeX_Listener::_openSection(PT_AttrPropIndex api)
 
 	if (m_pDocument->getAttrProp(api, &pAP) && pAP)
 	{
-		const gchar* pszPageMarginLeft = NULL;
-		const gchar* pszPageMarginRight = NULL;
+		const gchar* pszPageMarginLeft = nullptr;
+		const gchar* pszPageMarginRight = nullptr;
 
 		pAP->getProperty("columns", pszNbCols);
 		pAP->getProperty("page-margin-right", pszPageMarginLeft);
 		pAP->getProperty("page-margin-left", pszPageMarginRight);
 
-		if (pszNbCols != NULL && ((0 == strcmp(pszNbCols, "2"))
+		if (pszNbCols != nullptr && ((0 == strcmp(pszNbCols, "2"))
 						|| (0 == strcmp(pszNbCols, "3"))))
 		{
 			m_bMultiCols = true;
 		}
-		if (pszPageMarginLeft != NULL)
+		if (pszPageMarginLeft != nullptr)
 		{
 			m_pie->write("\\setlength{\\oddsidemargin}{");
 			m_pie->write(static_cast<const char *> (pszPageMarginLeft));
 			m_pie->write("-1in");
 			m_pie->write("}\n");
 		}
-		if (pszPageMarginRight != NULL)
+		if (pszPageMarginRight != nullptr)
 		{
 			m_pie->write("\\setlength{\\textwidth}{\\paperwidth - ");
 			m_pie->write(static_cast<const char *> (pszPageMarginRight));
@@ -847,9 +848,9 @@ void s_LaTeX_Listener::_convertColor(UT_String& szDest, const char* pszColor)
 	}
 	UT_LocaleTransactor lt (LC_NUMERIC, "C");
 	UT_String_sprintf (szDest, "%.3f,%.3f,%.3f",
-			   strtol (&colors[0][0],NULL,16)/255.,
-			   strtol (&colors[1][0],NULL,16)/255.,
-			   strtol (&colors[2][0],NULL,16)/255.);
+			   strtol (&colors[0][0],nullptr,16)/255.,
+			   strtol (&colors[1][0],nullptr,16)/255.,
+			   strtol (&colors[2][0],nullptr,16)/255.);
 }
 
 struct LaTeX_Font_Size
@@ -881,7 +882,7 @@ static const LaTeX_Font_Size fontsizes[]=
 void s_LaTeX_Listener::_convertFontSize(UT_String& szDest, const char* pszFontSize)
 {
 	double fSizeInPoints = UT_convertToPoints(pszFontSize);
-	const LaTeX_Font_Size *fs = NULL;
+	const LaTeX_Font_Size *fs = nullptr;
 
 	if(m_bInScript) {
 		fSizeInPoints -= 4;
@@ -949,7 +950,7 @@ void s_LaTeX_Listener::_openSpan(PT_AttrPropIndex api)
 		return;
 	}
 	
-	const PP_AttrProp * pAP = NULL;
+	const PP_AttrProp * pAP = nullptr;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 	m_bOverline = false;
 	m_NumCloseBrackets = 0;
@@ -990,7 +991,7 @@ void s_LaTeX_Listener::_openSpan(PT_AttrPropIndex api)
 			}
 		}
 		
-		const gchar* pszColor = NULL;
+		const gchar* pszColor = nullptr;
 		pAP->getProperty("color", pszColor);
 		if (pszColor)
 		{
@@ -1006,7 +1007,7 @@ void s_LaTeX_Listener::_openSpan(PT_AttrPropIndex api)
 		    }
 		}
 		
-		const gchar* pszBgColor = NULL;
+		const gchar* pszBgColor = nullptr;
 		pAP->getProperty("bgcolor", pszBgColor);
 
 		if (pszBgColor)
@@ -1081,7 +1082,7 @@ void s_LaTeX_Listener::_openSpan(PT_AttrPropIndex api)
 					m_pie->write("\\sout{");
 					m_NumCloseBrackets++;
 			    }
-			    q = strtok(NULL, " ");
+			    q = strtok(nullptr, " ");
 			}
 			
 			/* This should be at the very last, in order to match
@@ -1121,7 +1122,7 @@ void s_LaTeX_Listener::_closeCell(void)
 	if (m_CellRight - m_CellLeft >1)
 	    m_pie->write("}");
 	m_bInCell = false;
-	this->m_pTableHelper->CloseCell();
+	this->m_pTableHelper->closeCell();
 	if(m_CellRight == m_TableWidth)
 	{
 	    m_ExpectedLeft = 0;
@@ -1149,7 +1150,7 @@ void s_LaTeX_Listener::_closeSpan(void)
 		for(; m_NumCloseBrackets>0; m_NumCloseBrackets--)
 			m_pie->write("}");
 
-		m_pAP_Span = NULL;
+		m_pAP_Span = nullptr;
 	}
 
 	m_bInSpan = false;
@@ -1163,7 +1164,7 @@ void s_LaTeX_Listener::_closeTable(void)
 		for(unsigned int i=0; i<m_pqRect->size(); i++)
 		{
 			delete m_pqRect->at(i);
-			m_pqRect->at(i) = NULL;
+			m_pqRect->at(i) = nullptr;
 		}
 		m_pqRect->clear();
     }
@@ -1378,7 +1379,7 @@ void s_LaTeX_Listener::_outputBabelPackage(void)
 	// Language appears in <abiword> as property "lang",
 	// es-ES, en-US, and so forth...
 	
-	const gchar * szLangCode = NULL;
+	const gchar * szLangCode = nullptr;
 	m_pDocument->getAttrProp()->getProperty("lang", szLangCode); // language code
 	if(szLangCode && *szLangCode)
 	{
@@ -1437,7 +1438,7 @@ s_LaTeX_Listener::s_LaTeX_Listener(PD_Document * pDocument, IE_Exp_LaTeX * pie,
 	m_DefaultFontSize(12),
 	m_NumCloseBrackets(0),
 	list_type(BULLETED_LIST),
-	m_pqRect(NULL)
+	m_pqRect(nullptr)
 {
 	m_pie->write("%% ================================================================================\n");
 	m_pie->write("%% This LaTeX file was created by AbiWord.                                         \n");
@@ -1479,11 +1480,11 @@ s_LaTeX_Listener::s_LaTeX_Listener(PD_Document * pDocument, IE_Exp_LaTeX * pie,
 	    m_pie->write(",landscape");
 	
 	//retrieve the actual font size
-	PD_Style * pStyle = NULL;
+	PD_Style * pStyle = nullptr;
 	pDocument->getStyle ("Normal", &pStyle);
 	if(pStyle)
 	{
-	    const gchar * szValue = 0;
+	    const gchar * szValue = nullptr;
 		pStyle->getProperty("font-size", szValue);
 		if (szValue)
 		{
@@ -1553,7 +1554,7 @@ s_LaTeX_Listener::~s_LaTeX_Listener()
 	    for(unsigned int i=0; i<m_pqRect->size(); i++)
 	    {
 		delete m_pqRect->at(i);
-		m_pqRect->at(i) = NULL;
+		m_pqRect->at(i) = nullptr;
 	    }
 	    delete m_pqRect;
 	}
@@ -1592,12 +1593,12 @@ bool s_LaTeX_Listener::populate(fl_ContainerLayout* /*sfh*/,
 			PT_AttrPropIndex api = pcr->getIndexAP();
 			const PX_ChangeRecord_Object * pcro = static_cast<const PX_ChangeRecord_Object *> (pcr);
 
-			const PP_AttrProp * pAP = NULL;
+			const PP_AttrProp * pAP = nullptr;
 			bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 
-			const gchar* szValue = NULL;
+			const gchar* szValue = nullptr;
 
-			fd_Field* field = NULL;
+			fd_Field* field = nullptr;
 
 			switch (pcro->getObjectType())
 			{
@@ -1660,21 +1661,21 @@ bool s_LaTeX_Listener::populate(fl_ContainerLayout* /*sfh*/,
 				if(bHaveProp && pAP)
 				{
 					UT_UTF8String sLatex;
-					const UT_ByteBuf * pByteBuf = NULL;
+					UT_ConstByteBufPtr pByteBuf;
 					UT_UCS4_mbtowc myWC;
 					
 					if(pAP->getAttribute("latexid", szValue) &&	szValue 
 							&& *szValue)
 					{					
 						bool bFoundLatex = m_pDocument->getDataItemDataByName(szValue, 
-						    &pByteBuf,
-						    NULL, NULL);
+						    pByteBuf,
+						    nullptr, nullptr);
 						if(!bFoundLatex)
 						{
 							UT_DEBUGMSG(("Equation %s not found in document \n", szValue));
 							return true;
 						}
-						sLatex.appendBuf(*pByteBuf, myWC);
+						sLatex.appendBuf(pByteBuf, myWC);
 						
 						m_pie->write("$");
 						m_pie->write(sLatex.utf8_str());
@@ -1686,15 +1687,15 @@ bool s_LaTeX_Listener::populate(fl_ContainerLayout* /*sfh*/,
 					{
 						UT_UTF8String sMathML;
 						bool bFoundMathML = m_pDocument->getDataItemDataByName(szValue, 
-						    &pByteBuf,
-						    NULL, NULL);
+						    pByteBuf,
+						    nullptr, nullptr);
 						if(!bFoundMathML)
 						{
 							UT_DEBUGMSG(("Equation %s not found in document \n", szValue));
 							return true;
 						}
 						
-						sMathML.appendBuf(*pByteBuf, myWC);
+						sMathML.appendBuf(pByteBuf, myWC);
 
 						if(!convertMathMLtoLaTeX(sMathML, sLatex))
 							return true;		
@@ -1728,7 +1729,7 @@ bool s_LaTeX_Listener::populateStrux(pf_Frag_Strux* sdh,
 {
 	UT_ASSERT(pcr->getType() == PX_ChangeRecord::PXT_InsertStrux);
 	const PX_ChangeRecord_Strux * pcrx = static_cast<const PX_ChangeRecord_Strux *> (pcr);
-	*psfh = 0;							// we don't need it.
+	*psfh = nullptr;						// we don't need it.
 
 	switch (pcrx->getStruxType())
 	{
@@ -1737,10 +1738,10 @@ bool s_LaTeX_Listener::populateStrux(pf_Frag_Strux* sdh,
 		_closeSection();
 
 		PT_AttrPropIndex indexAP = pcr->getIndexAP();
-		const PP_AttrProp* pAP = NULL;
+		const PP_AttrProp* pAP = nullptr;
 		if (m_pDocument->getAttrProp(indexAP, &pAP) && pAP)
 		{
-			const gchar* pszSectionType = NULL;
+			const gchar* pszSectionType = nullptr;
 			pAP->getAttribute("type", pszSectionType);
 			if (
 				!pszSectionType
@@ -1768,10 +1769,10 @@ bool s_LaTeX_Listener::populateStrux(pf_Frag_Strux* sdh,
 		_closeSection();
 
 		PT_AttrPropIndex indexAP = pcr->getIndexAP();
-		const PP_AttrProp* pAP = NULL;
+		const PP_AttrProp* pAP = nullptr;
 		if (m_pDocument->getAttrProp(indexAP, &pAP) && pAP)
 		{
-			const gchar* pszSectionType = NULL;
+			const gchar* pszSectionType = nullptr;
 			pAP->getAttribute("type", pszSectionType);
 			if (
 				!pszSectionType
@@ -1804,7 +1805,7 @@ bool s_LaTeX_Listener::populateStrux(pf_Frag_Strux* sdh,
 
 	case PTX_SectionTable:
 	{
-		m_pTableHelper->OpenTable(sdh, pcr->getIndexAP());
+		m_pTableHelper->openTable(sdh, pcr->getIndexAP());
 		m_TableWidth = m_pTableHelper->getNumCols();
 		_openTable(pcr->getIndexAP());
 		return true;
@@ -1813,7 +1814,7 @@ bool s_LaTeX_Listener::populateStrux(pf_Frag_Strux* sdh,
 	case PTX_EndTable:
 	{
 		_closeTable();
-		m_pTableHelper->CloseTable();
+		m_pTableHelper->closeTable();
 		return true;
 	}
 
@@ -1919,7 +1920,7 @@ UT_Error IE_Exp_LaTeX::_writeDocument(void)
 		return UT_ERROR;
 	delete m_pListener;
 
-	m_pListener = NULL;
+	m_pListener = nullptr;
 	
 	return ((m_error) ? UT_IE_COULDNOTWRITE : UT_OK);
 }
@@ -1936,9 +1937,8 @@ void s_LaTeX_Listener::_handleDataItems(void)
 void s_LaTeX_Listener::_handleImage(const PP_AttrProp * pAP)
 {	
 	/* Part of code taken from the HTML exporter */
-	const UT_ByteBuf * pByteBuf;
-	UT_ByteBuf decodedByteBuf;				
-	const gchar *szHeight = NULL, *szWidth = NULL, *szDataID = NULL;
+	UT_ConstByteBufPtr pByteBuf;
+	const gchar *szHeight = nullptr, *szWidth = nullptr, *szDataID = nullptr;
     std::string mimeType;
 	
 	if (! pAP)
@@ -1946,10 +1946,10 @@ void s_LaTeX_Listener::_handleImage(const PP_AttrProp * pAP)
 	if (! pAP->getAttribute("dataid", szDataID))
 		return;
 
-	if (! m_pDocument->getDataItemDataByName(szDataID, &pByteBuf,
-                                             &mimeType, NULL))
+	if(!m_pDocument->getDataItemDataByName(szDataID, pByteBuf,
+                                             &mimeType, nullptr))
 		return;
-	if ((pByteBuf == 0) || (mimeType.empty())) 
+	if ((pByteBuf == nullptr) || (mimeType.empty()))
         return; // ??
 
     const char * extension = ".png";

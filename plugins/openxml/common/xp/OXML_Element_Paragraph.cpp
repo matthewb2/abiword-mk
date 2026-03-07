@@ -21,15 +21,15 @@
  */
 
 // Class definition include
-#include <OXML_Element_Paragraph.h>
+#include "OXML_Element_Paragraph.h"
 
 // AbiWord includes
-#include <ut_types.h>
-#include <ut_string.h>
-#include <pd_Document.h>
+#include "ut_types.h"
+#include "ut_string.h"
+#include "pd_Document.h"
 
 OXML_Element_Paragraph::OXML_Element_Paragraph(const std::string & id) : 
-	OXML_Element(id, P_TAG, BLOCK), pageBreak(false), m_section(NULL)
+	OXML_Element(id, P_TAG, BLOCK), pageBreak(false), m_section(nullptr)
 {
 }
 
@@ -87,7 +87,7 @@ UT_Error OXML_Element_Paragraph::serializeProperties(IE_Exp_OpenXML* exporter)
 {
 	//TODO: Add all the property serializations here
 	UT_Error err = UT_OK;
-	const gchar* szValue = NULL;
+	const gchar* szValue = nullptr;
 
 	err = exporter->startParagraphProperties(TARGET);
 	if(err != UT_OK)
@@ -225,7 +225,7 @@ UT_Error OXML_Element_Paragraph::addToPT(PD_Document * pDocument)
 {
 	UT_Error ret = UT_OK;
 
-	if (pDocument == NULL)
+	if (pDocument == nullptr)
 		return UT_ERROR;
 
 	//update list id and parent id here
@@ -281,18 +281,18 @@ UT_Error OXML_Element_Paragraph::addToPT(PD_Document * pDocument)
 
 	}
 
-	const gchar ** atts = getAttributesWithProps();
+	const PP_PropertyVector atts = getAttributesWithProps();
 
-	if (atts != NULL) {
+	if (!atts.empty()) {
 		ret = pDocument->appendStrux(PTX_Block, atts) ? UT_OK : UT_ERROR;
 		if(ret != UT_OK) {
 			UT_ASSERT_HARMLESS(ret == UT_OK);
 			return ret;
 		}
 	} else {
-		ret = pDocument->appendStrux(PTX_Block, NULL) ? UT_OK : UT_ERROR;
+		ret = pDocument->appendStrux(PTX_Block, PP_NOPROPS) ? UT_OK : UT_ERROR;
 	}
-		
+
 
 	if(pListId && pListLevel)
 	{
@@ -300,17 +300,17 @@ UT_Error OXML_Element_Paragraph::addToPT(PD_Document * pDocument)
 		if(ret != UT_OK)
 			return ret;
 
-		const gchar ** ppAttr = getAttributesWithProps();
-    
+		const PP_PropertyVector ppAttr = getAttributesWithProps();
+
 		if(!pDocument->appendObject(PTO_Field, ppAttr))
 			return ret;
 
 		pDocument->appendFmt(ppAttr);
-	
+
 		UT_UCS4String string = "\t";
 		pDocument->appendSpan(string.ucs4_str(), string.size());
 	}
-	
+
 	return addChildrenToPT(pDocument);
 }
 
@@ -322,7 +322,7 @@ const gchar* OXML_Element_Paragraph::getListLevel()
 	err = getAttribute("level", szValue);
 	if(err != UT_OK)
 	{
-		return NULL;
+		return nullptr;
 	}
 	return szValue;
 }
@@ -335,7 +335,7 @@ const gchar* OXML_Element_Paragraph::getListId()
 	err = getAttribute("listid", szValue);
 	if(err != UT_OK)
 	{
-		return NULL;
+		return nullptr;
 	}
 	return szValue;
 }

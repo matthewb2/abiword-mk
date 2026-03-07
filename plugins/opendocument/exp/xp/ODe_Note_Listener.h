@@ -27,7 +27,7 @@
 #include "ODe_AbiDocListenerImpl.h"
 
 // Abiword includes
-#include <ut_types.h>
+#include "ut_types.h"
 
 // External includes
 #include <stdio.h>
@@ -54,13 +54,13 @@ public:
                       UT_uint8 spacesOffset);
 
 
-    virtual void openFootnote(const PP_AttrProp* pAP, ODe_ListenerAction& rAction);
-    virtual void closeFootnote(ODe_ListenerAction& rAction);
+    virtual void openFootnote(const PP_AttrProp* pAP, ODe_ListenerAction& rAction) override;
+    virtual void closeFootnote(ODe_ListenerAction& rAction) override;
 
-    virtual void openEndnote(const PP_AttrProp* pAP, ODe_ListenerAction& rAction);
-    virtual void closeEndnote(ODe_ListenerAction& rAction);
+    virtual void openEndnote(const PP_AttrProp* pAP, ODe_ListenerAction& rAction) override;
+    virtual void closeEndnote(ODe_ListenerAction& rAction) override;
 
-    virtual void openBlock(const PP_AttrProp* pAP, ODe_ListenerAction& rAction);
+    virtual void openBlock(const PP_AttrProp* pAP, ODe_ListenerAction& rAction) override;
 
 private:
     void _openNote(const gchar* pNoteClass, const gchar* pNoteId,

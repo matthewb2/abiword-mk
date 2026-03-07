@@ -2,6 +2,7 @@
  *
  * Copyright (C) 2005 Daniel d'Andrada T. de Carvalho
  * <daniel.carvalho@indt.org.br>
+ * Copyright (C) 2021 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,8 +20,12 @@
  * 02110-1301 USA.
  */
 
-#ifndef _ODI_STREAMLISTENER_H_
-#define _ODI_STREAMLISTENER_H_
+#pragma once
+
+#include <stack>
+#include <vector>
+
+#include <gsf/gsf.h>
 
 // Internal includes
 #include "ODi_ListenerStateAction.h"
@@ -28,13 +33,14 @@
 #include "ODi_FontFaceDecls.h"
 #include "ODi_XMLRecorder.h"
 
-// External includes
-#include <gsf/gsf.h>
+#include "ut_types.h"
+#include "ut_xml.h"
 
-// AbiWord includes
-#include <ut_types.h>
-#include <ut_xml.h>
-#include <ut_vector.h>
+// Internal includes
+#include "ODi_ListenerStateAction.h"
+#include "ODi_ElementStack.h"
+#include "ODi_FontFaceDecls.h"
+#include "ODi_XMLRecorder.h"
 
 // Internal classes
 class ODi_Office_Styles;
@@ -58,27 +64,27 @@ public:
 
     ODi_StreamListener(PD_Document* pAbiDocument, GsfInfile* pGsfInfile,
                       ODi_Office_Styles* pStyles, ODi_Abi_Data& rAbiData,
-                      ODi_ElementStack* pElementStack = NULL);
+                      ODi_ElementStack* pElementStack = nullptr);
 
     virtual ~ODi_StreamListener();
 
-    void startElement (const gchar* pName, const gchar** ppAtts) {
+    void startElement (const gchar* pName, const gchar** ppAtts) override {
         _startElement(pName, ppAtts, false);
     }
 
-    void endElement (const gchar* pName) {
+    void endElement (const gchar* pName) override {
         _endElement(pName, false);
     }
 
-    void charData (const gchar* pBuffer, int length);
+    void charData (const gchar* pBuffer, int length) override;
 
     UT_Error setState(const char* pStateName);
     void setState(ODi_ListenerState* pState, bool deleteWhenPop);
 
     void clearFontFaceDecls() {m_fontFaceDecls.clear();}
 
-    ODi_ElementStack* getElementStack() {return m_pElementStack;}
-    ODi_ListenerState* getCurrentState() { return m_pCurrentState; }
+    ODi_ElementStack* getElementStack() const { return m_pElementStack; }
+    ODi_ListenerState* getCurrentState() const { return m_pCurrentState; }
 
 
 private:
@@ -122,18 +128,22 @@ private:
 
     class StackCell {
     public:
-        StackCell() {m_pState=NULL; m_deleteWhenPop=false;}
+        constexpr StackCell()
+          : m_pState(nullptr)
+          , m_deleteWhenPop(false)
+        {
+        }
         StackCell(ODi_ListenerState* pState, bool deleteWhenPop) {
             m_deleteWhenPop = deleteWhenPop;
             m_pState = pState;
         }
-        // Work around the "return 0" issue of the UT_GenericVector::getNhItem()
-        StackCell(UT_uint32 /*i*/) {m_pState=NULL; m_deleteWhenPop=false;}
+        StackCell(const StackCell&) = default;
 
         StackCell& operator=(const StackCell& sc) {
-            this->m_deleteWhenPop = sc.m_deleteWhenPop;
-            this->m_pState = sc.m_pState;
-
+            if (this != &sc) {
+                this->m_deleteWhenPop = sc.m_deleteWhenPop;
+                this->m_pState = sc.m_pState;
+            }
             return *this;
         }
 
@@ -145,8 +155,6 @@ private:
     bool m_deleteCurrentWhenPop;
     bool m_ownStack;
 
-    UT_GenericVector <ODi_StreamListener::StackCell> m_stateStack;
-    UT_GenericVector <ODi_Postpone_ListenerState*> m_postponedParsing;
+    std::stack<ODi_StreamListener::StackCell> m_stateStack;
+    std::vector<ODi_Postpone_ListenerState*> m_postponedParsing;
 };
-
-#endif //_ODI_STREAMLISTENER_H_

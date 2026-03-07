@@ -158,7 +158,7 @@ bool ImportStreamFile::_getByte(unsigned char &b)
 {
 	UT_return_val_if_fail(m_pFile, false);
 
-	return (gsf_input_read(m_pFile, 1, &b) != NULL);
+	return (gsf_input_read(m_pFile, 1, &b) != nullptr);
 }
 
 /*!
@@ -222,14 +222,14 @@ bool IE_Imp_Text::_insertBlock()
 	}
 	else
 	{
-		pf_Frag_Strux* sdh = NULL;
+		pf_Frag_Strux* sdh = nullptr;
 		if(getDoc()->getStruxOfTypeFromPosition(getDocPos(), PTX_Block,&sdh))
 		{
 			m_pBlock = sdh;
 		}
 		else
 		{
-			m_pBlock = NULL;
+			m_pBlock = nullptr;
 		}
 	}
 	return ret;
@@ -273,9 +273,9 @@ bool IE_Imp_Text::_insertSpan(UT_GrowBuf &b)
 					"props", props
 				};
 				// we need to modify the existing formatting ...
-				if(m_pBlock == NULL)
+				if(m_pBlock == nullptr)
 				{
-					pf_Frag_Strux* sdh = NULL;
+					pf_Frag_Strux* sdh = nullptr;
 					if(getDoc()->getStruxOfTypeFromPosition(getDocPos(), PTX_Block,&sdh))
 					{
 						m_pBlock = sdh;
@@ -619,7 +619,7 @@ bool IE_Imp_EncodedText_Sniffer::getDlgLabels(const char ** pszDesc,
 */
 UT_Error IE_Imp_Text::_loadFile(GsfInput * fp)
 {
-	ImportStream *pStream = 0;
+	ImportStream *pStream = nullptr;
 	UT_Error error;
 
 	// First we try to determine the encoding.
@@ -656,7 +656,7 @@ Cleanup:
 */
 IE_Imp_Text::IE_Imp_Text(PD_Document * pDocument, bool bEncoded)
   : IE_Imp(pDocument),
-    m_szEncoding(0),
+    m_szEncoding(nullptr),
     m_bExplicitlySetEncoding(false),
     m_bIsEncoded(false),
     m_bIs16Bit(false),
@@ -664,11 +664,11 @@ IE_Imp_Text::IE_Imp_Text(PD_Document * pDocument, bool bEncoded)
 	m_bBigEndian(false),
 	m_bBlockDirectionPending(true),
 	m_bFirstBlockData(true),
-	m_pBlock(NULL)
+	m_pBlock(nullptr)
 {
 	// Get encoding dialog prefs setting
 	bool bAlwaysPrompt;
-	XAP_App::getApp()->getPrefsValueBool(AP_PREF_KEY_AlwaysPromptEncoding, &bAlwaysPrompt);
+	XAP_App::getApp()->getPrefsValueBool(AP_PREF_KEY_AlwaysPromptEncoding, bAlwaysPrompt);
 
 	m_bIsEncoded = bAlwaysPrompt | bEncoded;
 
@@ -681,7 +681,7 @@ IE_Imp_Text::IE_Imp_Text(PD_Document * pDocument, bool bEncoded)
 
 IE_Imp_Text::IE_Imp_Text(PD_Document * pDocument, const char * encoding)
   : IE_Imp(pDocument),
-    m_szEncoding(0),
+    m_szEncoding(nullptr),
     m_bExplicitlySetEncoding(false),
     m_bIsEncoded(false),
     m_bIs16Bit(false),
@@ -689,9 +689,9 @@ IE_Imp_Text::IE_Imp_Text(PD_Document * pDocument, const char * encoding)
 	m_bBigEndian(false),
 	m_bBlockDirectionPending(true),
 	m_bFirstBlockData(true),
-	m_pBlock(0)
+	m_pBlock(nullptr)
 {
-  m_bIsEncoded = ((encoding != NULL) && (strlen(encoding) > 0));
+  m_bIsEncoded = ((encoding != nullptr) && (strlen(encoding) > 0));
   
   if ( m_bIsEncoded )
     {

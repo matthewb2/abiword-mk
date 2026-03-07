@@ -31,12 +31,6 @@
 #include "ie_imp.h"
 #include "ie_imp_RTF.h"
 
-#include <gsf/gsf-input.h>
-#include <gsf/gsf-output.h>
-#include <gsf/gsf-input-memory.h>
-#include <gsf/gsf-output-memory.h>
-#include <gsf/gsf-utils.h>
-
 static const GtkTargetEntry targets[] = {
   { (gchar*)"text/rtf", 0, 0},
   { (gchar*)"text/uri-list",0,0}
@@ -152,14 +146,14 @@ void FV_UnixVisualDrag::mouseDrag(UT_sint32 x, UT_sint32 y)
 	 GtkTargetList *target_list = gtk_target_list_new(targets, G_N_ELEMENTS(targets));
 	 GdkDragContext *context = gtk_drag_begin_with_coordinates(
            pWindow, target_list,
-           (GdkDragAction)(GDK_ACTION_COPY ), 1, NULL, x, y);
+           (GdkDragAction)(GDK_ACTION_COPY ), 1, nullptr, x, y);
 
 	 gdk_drag_status(context, GDK_ACTION_COPY, 0);
 	 gtk_target_list_unref(target_list);
 	 m_bDragOut = true;
 	 getGraphics()->setClipRect(getCurFrame());
 	 m_pView->updateScreen(false);
-	 getGraphics()->setClipRect(NULL);
+	 getGraphics()->setClipRect(nullptr);
 	 setMode(FV_VisualDrag_NOT_ACTIVE);
 	 m_pView->setPrevMouseContext(EV_EMC_VISUALTEXTDRAG);
 	 *pszTmpName = g_strdup(sTmpF.utf8_str());  

@@ -55,11 +55,11 @@ public:
     virtual ~ODi_Style_Style() {}
 
     void startElement(const gchar* pName, const gchar** ppAtts,
-                      ODi_ListenerStateAction& rAction);
+                      ODi_ListenerStateAction& rAction) override;
 
-    void endElement(const gchar* pName, ODi_ListenerStateAction& rAction);
+    void endElement(const gchar* pName, ODi_ListenerStateAction& rAction) override;
 
-    void charData (const gchar* /*pBuffer*/, int /*length*/) {}
+    void charData (const gchar* /*pBuffer*/, int /*length*/) override {}
 
 
     const std::string& getDisplayName() const {return m_displayName;}
@@ -292,10 +292,10 @@ private:
     /**
      * This function shouldn't exist. The code should use
      * UT_isValidDimensionString instead. The problem with the UT function is
-     * that it doesn't check the dimension specifier and only accepts NULL
+     * that it doesn't check the dimension specifier and only accepts nullptr
      * terminated strings.
      *
-     * @param length 0 for NULL terminated strings.
+     * @param length 0 for nullptr terminated strings.
      */
     bool _isValidDimensionString(const gchar* pString, UT_uint32 length=0) const;
 

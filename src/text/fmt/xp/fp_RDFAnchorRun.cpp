@@ -21,7 +21,7 @@
  */
 
 
-#include "fp_Run.h"
+#include "fp_RDFAnchorRun.h"
 #include "fl_BlockLayout.h"
 #include "ut_debugmsg.h"
 #include "pd_Document.h"
@@ -62,7 +62,7 @@ fp_RDFAnchorRun::fp_RDFAnchorRun( fl_BlockLayout* pBL,
     // _setTarget( "fake target" );
     // m_bIsStart = true;
     
-	const PP_AttrProp * pAP = NULL;
+	const PP_AttrProp * pAP = nullptr;
 	getSpanAP(pAP);
 
     RDFAnchor a( pAP );
@@ -141,7 +141,7 @@ void fp_RDFAnchorRun::_draw(dg_DrawArgs* pDA)
 	pG->setFont(_getFont());
 	pG->setColor(_getView()->getColorAnnotation(this));
 //	UT_DEBUGMSG(("Drawing string m_sValue %s \n",m_sValue.utf8_str()));
-	painter.drawChars(m_sValue.ucs4_str().ucs4_str(), 0,m_sValue.ucs4_str().size(), pDA->xoff,iYdraw, NULL);
+	painter.drawChars(m_sValue.ucs4_str().ucs4_str(), 0,m_sValue.ucs4_str().size(), pDA->xoff,iYdraw, nullptr);
 //
 // Draw underline/overline/strikethough
 //
@@ -159,7 +159,7 @@ void fp_RDFAnchorRun::_lookupProperties( const PP_AttrProp * pSpanAP,
 
 	FL_DocLayout * pLayout = getBlock()->getDocLayout();
 	const GR_Font * pFont = pLayout->findFont(pSpanAP,pBlockAP,pSectionAP,pG);
-	if(pFont == NULL)
+	if(pFont == nullptr)
 	{
 	    pFont = pLayout->findFont(pSpanAP,pBlockAP,pSectionAP,getGraphics());
 	    UT_ASSERT_HARMLESS(pFont);
@@ -178,8 +178,9 @@ void fp_RDFAnchorRun::_lookupProperties( const PP_AttrProp * pSpanAP,
 
 void fp_RDFAnchorRun::_clearScreen(bool /*bFullLineHeightRect*/)
 {
-    if(getWidth() == 0)
-        return;
+	if (getWidth() == 0) {
+		return;
+	}
 
 	UT_ASSERT(getGraphics()->queryProperties(GR_Graphics::DGP_SCREEN));
 	UT_sint32 xoff = 0, yoff = 0;
@@ -260,13 +261,13 @@ UT_sint32 fp_RDFAnchorRun::calcWidth(void)
         iNewWidth = getGraphics()->measureString(m_sValue.ucs4_str().ucs4_str(),
                                                  0,
                                                  m_sValue.ucs4_str().size(),
-                                                 NULL);
+                                                 nullptr);
     }
 //    UT_ASSERT(iNewWidth > 0);
     return iNewWidth;
 }
 
-const char * fp_RDFAnchorRun::getValue(void)
+const char* fp_RDFAnchorRun::getValue(void) const
 {
   return m_sValue.utf8_str();
 }
@@ -296,7 +297,7 @@ bool fp_RDFAnchorRun::_setValue(void)
 {
   //  UT_uint32 pos = getBlock()->getDocLayout()->getAnnotationVal(getPID()) + 1;
 
-  const PP_AttrProp * pAP = NULL;
+  const PP_AttrProp * pAP = nullptr;
   getSpanAP(pAP);
   RDFAnchor a( pAP );
   
@@ -311,7 +312,7 @@ bool fp_RDFAnchorRun::_setValue(void)
 
 std::string fp_RDFAnchorRun::getXMLID()
 {
-    const PP_AttrProp * pAP = NULL;
+    const PP_AttrProp * pAP = nullptr;
     getSpanAP(pAP);
     RDFAnchor a( pAP );
     return a.getID();

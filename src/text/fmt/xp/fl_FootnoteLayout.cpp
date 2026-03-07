@@ -33,6 +33,7 @@
 #include "fb_LineBreaker.h"
 #include "fp_Page.h"
 #include "fp_Run.h"
+#include "fp_AnnotationRun.h"
 #include "fp_Line.h"
 #include "fp_Column.h"
 #include "fp_FootnoteContainer.h"
@@ -94,8 +95,8 @@ fl_BlockLayout * fl_EmbedLayout::getContainingBlock(void)
   {
       pCL = pCL->getPrev();
   }
-  if(pCL == NULL)
-      return NULL;
+  if(pCL == nullptr)
+      return nullptr;
   fl_BlockLayout * pBL = static_cast<fl_BlockLayout *>(pCL);
   while(pBL && pBL->getPosition(true) > getDocPosition())
       pBL = pBL->getPrevBlockInDocument();
@@ -111,7 +112,7 @@ UT_uint32 fl_EmbedLayout::getLength(void)
 {
 	UT_return_val_if_fail( m_pLayout, 0 );
 	PT_DocPosition startPos = getDocPosition();
-	pf_Frag_Strux* sdhEnd = NULL;
+	pf_Frag_Strux* sdhEnd = nullptr;
 	pf_Frag_Strux* sdhStart = getStruxDocHandle();
 	UT_DebugOnly<bool> bres;
 	if(getContainerType() == FL_CONTAINER_FOOTNOTE)
@@ -197,7 +198,7 @@ fl_SectionLayout * fl_EmbedLayout::getSectionLayout(void) const
 		}
 		pDSL = pDSL->myContainingLayout();
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -365,14 +366,14 @@ fl_FootnoteLayout::~fl_FootnoteLayout()
 		fp_FootnoteContainer * pNext = static_cast<fp_FootnoteContainer *>(pFC->getNext());
 		if(pFC == static_cast<fp_FootnoteContainer *>(getLastContainer()))
 		{
-			pNext = NULL;
+			pNext = nullptr;
 		}
 		delete pFC;
 		pFC = pNext;
 	}
 
-	setFirstContainer(NULL);
-	setLastContainer(NULL);
+	setFirstContainer(nullptr);
+	setLastContainer(nullptr);
 
 	UT_return_if_fail( m_pLayout );
 	m_pLayout->removeFootnote(this);
@@ -389,12 +390,12 @@ void fl_FootnoteLayout::_createFootnoteContainer(void)
 	setFirstContainer(pFootnoteContainer);
 	setLastContainer(pFootnoteContainer);
 	fl_ContainerLayout * pCL = myContainingLayout();
-	while(pCL!= NULL && pCL->getContainerType() != FL_CONTAINER_DOCSECTION)
+	while(pCL!= nullptr && pCL->getContainerType() != FL_CONTAINER_DOCSECTION)
 	{
 		pCL = pCL->myContainingLayout();
 	}
 	fl_DocSectionLayout * pDSL = static_cast<fl_DocSectionLayout *>(pCL);
-	UT_return_if_fail(pDSL != NULL);
+	UT_return_if_fail(pDSL != nullptr);
 
 	fp_Container * pCon = pCL->getLastContainer();
 	UT_return_if_fail(pCon);
@@ -409,7 +410,7 @@ void fl_FootnoteLayout::_createFootnoteContainer(void)
           list, otherwise just append it to the end.
   \return The newly created Footnote container
 */
-fp_Container* fl_FootnoteLayout::getNewContainer(fp_Container *)
+fp_Container* fl_FootnoteLayout::getNewContainer(const fp_Container*)
 {
 	UT_DEBUGMSG(("PLAM: creating new footnote container\n"));
 	_createFootnoteContainer();
@@ -422,12 +423,12 @@ void fl_FootnoteLayout::_insertFootnoteContainer(fp_Container * pNewFC)
 	UT_DEBUGMSG(("inserting footnote container into container list\n"));
 	fl_ContainerLayout * pUPCL = myContainingLayout();
 	fl_ContainerLayout * pPrevL = static_cast<fl_ContainerLayout *>(m_pLayout->findBlockAtPosition(getDocPosition()-1));
-	fp_Container * pPrevCon = NULL;
-	fp_Container * pUpCon = NULL;
-	fp_Page * pPage = NULL;
+	fp_Container * pPrevCon = nullptr;
+	fp_Container * pUpCon = nullptr;
+	fp_Page * pPage = nullptr;
 
 	// get the owning container
-	if(pPrevL != NULL)
+	if(pPrevL != nullptr)
 	{
 		pPrevCon = pPrevL->getLastContainer();
 		if(pPrevL->getContainerType() == FL_CONTAINER_BLOCK)
@@ -449,7 +450,7 @@ void fl_FootnoteLayout::_insertFootnoteContainer(fp_Container * pNewFC)
 				pPrevCon = static_cast<fp_Container *>(pRun->getLine());
 			}
 		}
-		if(pPrevCon == NULL)
+		if(pPrevCon == nullptr)
 		{
 			pPrevCon = pPrevL->getLastContainer();
 		}
@@ -467,7 +468,7 @@ void fl_FootnoteLayout::_insertFootnoteContainer(fp_Container * pNewFC)
 	{
 		pPage = pUpCon->getPage();
 	}
-	pNewFC->setContainer(NULL);
+	pNewFC->setContainer(nullptr);
 
 	// need to put onto page as well, in the appropriate place.
 //	UT_ASSERT(pPage);
@@ -482,7 +483,7 @@ void fl_FootnoteLayout::_insertFootnoteContainer(fp_Container * pNewFC)
 void fl_FootnoteLayout::format(void)
 {
 	xxx_UT_DEBUGMSG(("SEVIOR: Formatting first container is %x \n",getFirstContainer()));
-	if(getFirstContainer() == NULL)
+	if(getFirstContainer() == nullptr)
 	{
 		getNewContainer();
 	}
@@ -496,7 +497,7 @@ void fl_FootnoteLayout::format(void)
 	{
 		pBL->format();
 		UT_sint32 count = 0;
-		while(pBL->getLastContainer() == NULL || pBL->getFirstContainer()==NULL)
+		while(pBL->getLastContainer() == nullptr || pBL->getFirstContainer()==nullptr)
 		{
 			UT_DEBUGMSG(("Error formatting a block try again \n"));
 			count = count + 1;
@@ -524,7 +525,7 @@ void fl_FootnoteLayout::_lookupProperties(const PP_AttrProp* pSectionAP)
 	UT_return_if_fail(pSectionAP);
 	// I can't think of any properties we need for now.
 	// If we need any later, we'll add them. -PL
-	const gchar *pszFootnotePID = NULL;
+	const gchar *pszFootnotePID = nullptr;
 	if(!pSectionAP->getAttribute("footnote-id",pszFootnotePID))
 	{
 		m_iFootnotePID = 0;
@@ -566,7 +567,7 @@ void fl_FootnoteLayout::collapse(void)
 		if(pFC->getPage())
 		{
 			pFC->getPage()->removeFootnoteContainer(pFC);
-			pFC->setPage(NULL);
+			pFC->setPage(nullptr);
 		}
 //
 // remove it from the linked list.
@@ -582,8 +583,8 @@ void fl_FootnoteLayout::collapse(void)
 		}
 		delete pFC;
 	}
-	setFirstContainer(NULL);
-	setLastContainer(NULL);
+	setFirstContainer(nullptr);
+	setLastContainer(nullptr);
 }
 
 /************************************************************************/
@@ -610,7 +611,7 @@ fl_AnnotationLayout::fl_AnnotationLayout(FL_DocLayout* pLayout,
 fl_AnnotationLayout::~fl_AnnotationLayout()
 {
 	// NB: be careful about the order of these
-	UT_DEBUGMSG(("Deleting Annotationlayout %p \n",this));
+	UT_DEBUGMSG(("Deleting Annotationlayout %p \n", (void*)this));
 	_purgeLayout();
 	fp_AnnotationContainer * pAC = static_cast<fp_AnnotationContainer *>(getFirstContainer());
 	while(pAC)
@@ -618,14 +619,14 @@ fl_AnnotationLayout::~fl_AnnotationLayout()
 		fp_AnnotationContainer * pNext = static_cast<fp_AnnotationContainer *>(pAC->getNext());
 		if(pAC == static_cast<fp_AnnotationContainer *>(getLastContainer()))
 		{
-			pNext = NULL;
+			pNext = nullptr;
 		}
 		delete pAC;
 		pAC = pNext;
 	}
 
-	setFirstContainer(NULL);
-	setLastContainer(NULL);
+	setFirstContainer(nullptr);
+	setLastContainer(nullptr);
 
 	UT_return_if_fail( m_pLayout );
 	m_pLayout->removeAnnotation(this);
@@ -642,12 +643,12 @@ void fl_AnnotationLayout::_createAnnotationContainer(void)
 	setFirstContainer(pAnnotationContainer);
 	setLastContainer(pAnnotationContainer);
 	fl_ContainerLayout * pCL = myContainingLayout();
-	while(pCL!= NULL && pCL->getContainerType() != FL_CONTAINER_DOCSECTION)
+	while(pCL!= nullptr && pCL->getContainerType() != FL_CONTAINER_DOCSECTION)
 	{
 		pCL = pCL->myContainingLayout();
 	}
 	fl_DocSectionLayout * pDSL = static_cast<fl_DocSectionLayout *>(pCL);
-	UT_return_if_fail(pDSL != NULL);
+	UT_return_if_fail(pDSL != nullptr);
 
 	fp_Container * pCon = pCL->getLastContainer();
 	UT_return_if_fail(pCon);
@@ -662,7 +663,7 @@ void fl_AnnotationLayout::_createAnnotationContainer(void)
           list, otherwise just append it to the end.
   \return The newly created Annotation container
 */
-fp_Container* fl_AnnotationLayout::getNewContainer(fp_Container *)
+fp_Container* fl_AnnotationLayout::getNewContainer(const fp_Container*)
 {
 	UT_DEBUGMSG(("Creating new Annotation container\n"));
 	_createAnnotationContainer();
@@ -675,12 +676,12 @@ void fl_AnnotationLayout::_insertAnnotationContainer(fp_Container * pNewAC)
 	UT_DEBUGMSG(("inserting annotation container into container list\n"));
 	fl_ContainerLayout * pUPCL = myContainingLayout();
 	fl_ContainerLayout * pPrevL = static_cast<fl_ContainerLayout *>(m_pLayout->findBlockAtPosition(getDocPosition()-1));
-	fp_Container * pPrevCon = NULL;
-	fp_Container * pUpCon = NULL;
-	fp_Page * pPage = NULL;
+	fp_Container * pPrevCon = nullptr;
+	fp_Container * pUpCon = nullptr;
+	fp_Page * pPage = nullptr;
 
 	// get the owning container
-	if(pPrevL != NULL)
+	if(pPrevL != nullptr)
 	{
 		pPrevCon = pPrevL->getLastContainer();
 		if(pPrevL->getContainerType() == FL_CONTAINER_BLOCK)
@@ -702,7 +703,7 @@ void fl_AnnotationLayout::_insertAnnotationContainer(fp_Container * pNewAC)
 				pPrevCon = static_cast<fp_Container *>(pRun->getLine());
 			}
 		}
-		if(pPrevCon == NULL)
+		if(pPrevCon == nullptr)
 		{
 			pPrevCon = pPrevL->getLastContainer();
 		}
@@ -720,7 +721,7 @@ void fl_AnnotationLayout::_insertAnnotationContainer(fp_Container * pNewAC)
 	{
 		pPage = pUpCon->getPage();
 	}
-	pNewAC->setContainer(NULL);
+	pNewAC->setContainer(nullptr);
 
 	// need to put onto page as well, in the appropriate place.
 	UT_ASSERT(pPage);
@@ -735,8 +736,8 @@ void fl_AnnotationLayout::_insertAnnotationContainer(fp_Container * pNewAC)
 
 void fl_AnnotationLayout::format(void)
 {
-	UT_DEBUGMSG(("SEVIOR: Formatting Annotations first container is %p\n", getFirstContainer()));
-	if(getFirstContainer() == NULL)
+	UT_DEBUGMSG(("SEVIOR: Formatting Annotations first container is %p\n", (void*)getFirstContainer()));
+	if(getFirstContainer() == nullptr)
 	{
 		getNewContainer();
 	}
@@ -750,7 +751,7 @@ void fl_AnnotationLayout::format(void)
 	{
 		pBL->format();
 		UT_sint32 count = 0;
-		while(pBL->getLastContainer() == NULL || pBL->getFirstContainer()==NULL)
+		while(pBL->getLastContainer() == nullptr || pBL->getFirstContainer()==nullptr)
 		{
 			UT_DEBUGMSG(("Error formatting a block try again \n"));
 			count = count + 1;
@@ -778,7 +779,7 @@ void fl_AnnotationLayout::_lookupProperties(const PP_AttrProp* pSectionAP)
 	UT_return_if_fail(pSectionAP);
 	// I can't think of any properties we need for now.
 	// If we need any later, we'll add them. -PL
-	const gchar *pszAnnotationPID = NULL;
+	const gchar *pszAnnotationPID = nullptr;
 	if(!pSectionAP->getAttribute("annotation-id",pszAnnotationPID))
 	{
 		m_iAnnotationPID = 0;
@@ -833,7 +834,7 @@ fp_AnnotationRun *  fl_AnnotationLayout::getAnnotationRun(void)
 	fl_ContainerLayout * pPrevL = static_cast<fl_ContainerLayout *>(m_pLayout->findBlockAtPosition(posFL));
 
 	// get the owning container
-	if(pPrevL != NULL)
+	if(pPrevL != nullptr)
 	{
 		if(pPrevL->getContainerType() == FL_CONTAINER_BLOCK)
 		{
@@ -862,15 +863,15 @@ fp_AnnotationRun *  fl_AnnotationLayout::getAnnotationRun(void)
 			}
 			else
 			{
-			    return NULL;
+			    return nullptr;
 			}
 		}
 		else
 	        {
-		    return NULL;
+		    return nullptr;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 	
 
@@ -886,7 +887,7 @@ void fl_AnnotationLayout::collapse(void)
 		if(pAC->getPage())
 		{
 			pAC->getPage()->removeAnnotationContainer(pAC);
-			pAC->setPage(NULL);
+			pAC->setPage(nullptr);
 		}
 //
 // remove it from the linked list.
@@ -902,8 +903,8 @@ void fl_AnnotationLayout::collapse(void)
 		}
 		delete pAC;
 	}
-	setFirstContainer(NULL);
-	setLastContainer(NULL);
+	setFirstContainer(nullptr);
+	setLastContainer(nullptr);
 	m_bIsOnPage = false;
 }
 
@@ -926,7 +927,7 @@ fl_EndnoteLayout::fl_EndnoteLayout(FL_DocLayout* pLayout,
 					 PTX_SectionEndnote),
 	  m_iEndnotePID(0)
 {
-        UT_DEBUGMSG(("Create Endnote section %p from pos %d \n",this,getPosition()));
+        UT_DEBUGMSG(("Create Endnote section %p from pos %d \n", (void*)this, getPosition()));
 	m_pLayout->addEndnote(this);
 	UT_DEBUGMSG(("myContaining Layout %s \n",myContainingLayout()->getContainerString()));
 	_createEndnoteContainer();
@@ -943,15 +944,15 @@ fl_EndnoteLayout::~fl_EndnoteLayout()
 		fp_EndnoteContainer * pNext = static_cast<fp_EndnoteContainer *>(pEC->getNext());
 		if(pEC == static_cast<fp_EndnoteContainer *>(getLastContainer()))
 		{
-			pNext = NULL;
+			pNext = nullptr;
 		}
 		m_pLayout->removeEndnoteContainer(pEC);
 		delete pEC;
 		pEC = pNext;
 	}
 
-	setFirstContainer(NULL);
-	setLastContainer(NULL);
+	setFirstContainer(nullptr);
+	setLastContainer(nullptr);
 	m_pLayout->removeEndnote(this);
 }
 
@@ -978,7 +979,7 @@ void fl_EndnoteLayout::_localCollapse(void)
 {
 	// ClearScreen on our Cell. One Cell per layout.
 	fp_EndnoteContainer *pFC = static_cast<fp_EndnoteContainer *>(getFirstContainer());
-	UT_DEBUGMSG(("fl_endnote: _localCollapse First Container %p \n",pFC));
+	UT_DEBUGMSG(("fl_endnote: _localCollapse First Container %p \n", (void*)pFC));
 	if (pFC)
 	{
 		pFC->clearScreen();
@@ -996,7 +997,7 @@ void fl_EndnoteLayout::_localCollapse(void)
 
 void fl_EndnoteLayout::collapse(void)
 {
-	UT_DEBUGMSG(("Collapsing  Endnote %p \n",this));
+	UT_DEBUGMSG(("Collapsing  Endnote %p \n", (void*)this));
 	_localCollapse();
 	fp_EndnoteContainer *pFC = static_cast<fp_EndnoteContainer *>(getFirstContainer());
 	while(pFC)
@@ -1015,16 +1016,16 @@ void fl_EndnoteLayout::collapse(void)
 		delete pFC;
 		pFC = pNext;
 	}
-	setFirstContainer(NULL);
-	setLastContainer(NULL);
+	setFirstContainer(nullptr);
+	setLastContainer(nullptr);
 	m_bIsOnPage = false;
 }
 
 
 void fl_EndnoteLayout::format(void)
 {
-	UT_DEBUGMSG(("SEVIOR: Formatting Endnote first container is %p \n",getFirstContainer()));
-	if(getFirstContainer() == NULL)
+	UT_DEBUGMSG(("SEVIOR: Formatting Endnote first container is %p \n", (void*)getFirstContainer()));
+	if(getFirstContainer() == nullptr)
 	{
 		getNewContainer();
 	}
@@ -1037,7 +1038,7 @@ void fl_EndnoteLayout::format(void)
 	{
 		pBL->format();
 		UT_sint32 count = 0;
-		while(pBL->getLastContainer() == NULL || pBL->getFirstContainer()==NULL)
+		while(pBL->getLastContainer() == nullptr || pBL->getFirstContainer()==nullptr)
 		{
 			UT_DEBUGMSG(("Error formatting a block try again \n"));
 			count = count + 1;
@@ -1053,13 +1054,13 @@ void fl_EndnoteLayout::format(void)
 	static_cast<fp_EndnoteContainer *>(getFirstContainer())->layout();
 	m_bNeedsFormat = false;
 	m_bNeedsReformat = false;
-	bool bOnPage = (getFirstContainer()->getPage() != NULL);
-	FV_View * pView = NULL;
+	bool bOnPage = (getFirstContainer()->getPage() != nullptr);
+	FV_View * pView = nullptr;
 	if(m_pLayout)
 		pView = m_pLayout->getView();
 	if(bOnPage && pView && !pView->isLayoutFilling())
 	{
-	       getDocSectionLayout()->setNeedsSectionBreak(true,NULL);
+	       getDocSectionLayout()->setNeedsSectionBreak(true,nullptr);
 	}
 	UT_ASSERT(getFirstContainer()->getPage());
 }
@@ -1074,7 +1075,7 @@ void fl_EndnoteLayout::_lookupProperties(const PP_AttrProp* pSectionAP)
 	UT_return_if_fail(pSectionAP);
 	// I can't think of any properties we need for now.
 	// If we need any later, we'll add them. -PL
-	const gchar *pszEndnotePID = NULL;
+	const gchar *pszEndnotePID = nullptr;
 	if(!pSectionAP->getAttribute("endnote-id",pszEndnotePID))
 	{
 		m_iEndnotePID = 0;
@@ -1092,7 +1093,7 @@ void fl_EndnoteLayout::_lookupProperties(const PP_AttrProp* pSectionAP)
           list, otherwise just append it to the end.
   \return The newly created Endnote container
 */
-fp_Container* fl_EndnoteLayout::getNewContainer(fp_Container *)
+fp_Container* fl_EndnoteLayout::getNewContainer(const fp_Container*)
 {
 	UT_DEBUGMSG(("fl_EndnoteLayoutx: creating new Endnote container\n"));
 	_createEndnoteContainer();

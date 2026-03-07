@@ -2,20 +2,21 @@
 
 /* AbiWord
  * Copyright (C) 2006 Rob Staudinger <robert.staudinger@gmail.com>
- * 
+ * Copyright (c) 2020 Hubert Figuière
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
  */
 
@@ -77,7 +78,8 @@ fill_store (XAP_UnixDialog_ClipArt *self)
 
 		GtkWidget *err = gtk_message_dialog_new (GTK_WINDOW (dlg), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s", s.c_str());
 		gtk_dialog_run (GTK_DIALOG (err));
-		gtk_widget_destroy (err); err = NULL;
+		gtk_widget_destroy(err); // TOPLEVEL
+		err = nullptr;
 
 		gtk_dialog_response(GTK_DIALOG(dlg), GTK_RESPONSE_CANCEL);
 	}
@@ -116,12 +118,17 @@ XAP_UnixDialog_ClipArt::XAP_UnixDialog_ClipArt(XAP_DialogFactory * pDlgFactory, 
  */
 XAP_UnixDialog_ClipArt::~XAP_UnixDialog_ClipArt()
 {
-	this->dir_path = NULL;
-	this->progress = NULL;
-	this->icon_view = NULL;
-	this->store = NULL;
+	this->dir_path = nullptr;
+	this->progress = nullptr;
+	this->icon_view = nullptr;
+	this->store = nullptr;
 }
 
+static
+void _free_path(GtkTreePath *path, gpointer)
+{
+    gtk_tree_path_free(path);
+}
 /**
  *
  */
@@ -153,7 +160,7 @@ void XAP_UnixDialog_ClipArt::runModal(XAP_Frame * pFrame)
 	gtk_progress_bar_set_text (GTK_PROGRESS_BAR (this->progress), s.c_str());
 	gtk_box_pack_start (GTK_BOX (vbox), this->progress, FALSE, FALSE, 0);
 
-	scroll = gtk_scrolled_window_new (NULL, NULL);
+	scroll = gtk_scrolled_window_new (nullptr, nullptr);
 	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scroll), GTK_SHADOW_ETCHED_IN);
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
 									GTK_POLICY_AUTOMATIC,
@@ -181,16 +188,16 @@ void XAP_UnixDialog_ClipArt::runModal(XAP_Frame * pFrame)
 	case GTK_RESPONSE_OK:
 		list = gtk_icon_view_get_selected_items (GTK_ICON_VIEW (this->icon_view));
 		if (list && list->data) {
-			gchar *graphic = NULL;
-			gchar *graphicUri = NULL;
+			gchar *graphic = nullptr;
+			gchar *graphicUri = nullptr;
 			GtkTreePath *treePath;
 			GtkTreeIter  iter;
 			treePath = (GtkTreePath *) list->data;
 			gtk_tree_model_get_iter (GTK_TREE_MODEL (this->store), &iter, treePath);
 			gtk_tree_model_get (GTK_TREE_MODEL (this->store), &iter, COL_PATH, &graphic, -1);
 			if (graphic) {
-				error = NULL;
-				graphicUri = g_filename_to_uri (graphic, NULL, &error);
+				error = nullptr;
+				graphicUri = g_filename_to_uri (graphic, nullptr, &error);
 				setGraphicName (graphicUri);
 				g_free (graphic);
 				g_free (graphicUri);
@@ -199,7 +206,7 @@ void XAP_UnixDialog_ClipArt::runModal(XAP_Frame * pFrame)
 			else {
 				setAnswer (XAP_Dialog_ClipArt::a_CANCEL);
 			}
-			g_list_foreach (list, (void (*)(void*, void*)) gtk_tree_path_free, NULL);
+			g_list_foreach (list, (GFunc)_free_path, nullptr);
 			g_list_free (list);
 		}
 		break;
@@ -226,7 +233,7 @@ gboolean XAP_UnixDialog_ClipArt::fillStore()
 		return FALSE;
 	}
 
-	error = NULL;
+	error = nullptr;
 	dir = g_dir_open (this->dir_path, 0, &error);
 	if (error) {
 		g_warning ("%s", error->message);
@@ -237,7 +244,7 @@ gboolean XAP_UnixDialog_ClipArt::fillStore()
 	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (this->progress), 0.);
 	_count = 0;
 	name = g_dir_read_name (dir);
-	while (name != NULL) {
+	while (name != nullptr) {
 
 		gchar *file_path, *display_name;
 
@@ -246,13 +253,13 @@ gboolean XAP_UnixDialog_ClipArt::fillStore()
 			goto next;
 		}
 
-		file_path = g_build_filename (this->dir_path, name, NULL);
+		file_path = g_build_filename (this->dir_path, name, nullptr);
 		if (g_file_test (file_path, G_FILE_TEST_IS_DIR)) {
 			goto next;
 		}
 
-		display_name = g_filename_to_utf8 (name, -1, NULL, NULL, NULL);
-		error = NULL;
+		display_name = g_filename_to_utf8 (name, -1, nullptr, nullptr, nullptr);
+		error = nullptr;
 		pixbuf = gdk_pixbuf_new_from_file_at_size (file_path, 48, 48, &error);
 		if (error) {
 			g_warning ("%s", error->message);
@@ -266,12 +273,15 @@ gboolean XAP_UnixDialog_ClipArt::fillStore()
 							COL_DISPLAY_NAME, display_name,
 							COL_PIXBUF, pixbuf,
 							-1);
-		g_free (file_path);					file_path = NULL;
-		g_free (display_name); 				display_name = NULL;
-		g_object_unref (G_OBJECT (pixbuf)); pixbuf = NULL;
+		g_free(file_path);
+		file_path = nullptr;
+		g_free(display_name);
+		display_name = nullptr;
+		g_object_unref(G_OBJECT (pixbuf));
+		pixbuf = nullptr;
 
 		if (clipartCount) {
-			gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (this->progress), 
+			gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (this->progress),
 										   _count / clipartCount * 100.);
 		}
 		else {
@@ -279,7 +289,7 @@ gboolean XAP_UnixDialog_ClipArt::fillStore()
 		}
 		_count++;
 		if (_count % 10 == 0) {
-			gtk_main_iteration_do (FALSE);
+			g_main_context_iteration(nullptr, false);
 		}
 next:
 		name = g_dir_read_name (dir);

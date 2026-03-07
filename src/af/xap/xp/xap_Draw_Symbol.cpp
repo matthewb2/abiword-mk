@@ -1,19 +1,19 @@
 /* AbiSource Application Framework
  * Copyright (C) 1998 AbiSource, Inc.
- *
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
 
@@ -37,8 +37,8 @@ static UT_UCSChar MaxHeightChar = 0;
 
 XAP_Draw_Symbol::XAP_Draw_Symbol(GR_Graphics * gc)
 	: XAP_Preview(gc),
-	  m_areagc(NULL),
-	  m_pFont(NULL),
+	  m_areagc(nullptr),
+	  m_pFont(nullptr),
 	  m_drawWidth(0),
 	  m_drawHeight(0),
 	  m_drawareaWidth(0),
@@ -64,7 +64,7 @@ void XAP_Draw_Symbol::setWindowSize( UT_uint32 width, UT_uint32 height)
 
 void XAP_Draw_Symbol::setAreaGc( GR_Graphics * gc)
 {
-	m_areagc = gc;
+	m_areagc = gc;   
 }
 
 void XAP_Draw_Symbol::setAreaSize( UT_uint32 width, UT_uint32 height)
@@ -76,7 +76,7 @@ void XAP_Draw_Symbol::setAreaSize( UT_uint32 width, UT_uint32 height)
 
 void XAP_Draw_Symbol::setFontString( void )
 {
-	setFontToGC(m_gc, m_drawWidth / 32, m_drawHeight / 7);
+	setFontToGC(m_gc, m_drawWidth / 32, m_drawHeight / 7);	
 }
 
 void XAP_Draw_Symbol::setFontToGC(GR_Graphics *p_gc, UT_uint32 MaxWidthAllowable, UT_uint32 MaxHeightAllowable)
@@ -85,7 +85,7 @@ void XAP_Draw_Symbol::setFontToGC(GR_Graphics *p_gc, UT_uint32 MaxWidthAllowable
 	UT_ASSERT(MaxWidthAllowable);
 	UT_ASSERT(MaxHeightAllowable);
 
-	GR_Font* font = NULL;
+	GR_Font* font = nullptr;
 
 
 	// Estimate Pointsize
@@ -109,21 +109,21 @@ void XAP_Draw_Symbol::setFontToGC(GR_Graphics *p_gc, UT_uint32 MaxWidthAllowable
 							  "normal", "",
 							  "normal", "",
 							  temp,
-							  NULL);
+							  nullptr);
 		/* findFont does a fuzzy match.  If the font found doesn't
 		 * have the same family name that we asked for, we retrieve
 		 * the new name and we use it
 		 */
 		if (font->getFamily())
 			m_stFont = font->getFamily();
-
+		
 		p_gc->setFont(font);
 
 		p_gc->getCoverage(m_vCharSet);
 
 		if (PointSize == LastPointSize)
 			break;
-
+		
 		if (!MaxWidthChar)
 		{
 			UT_uint32 MaxWidth = 0;
@@ -140,13 +140,13 @@ void XAP_Draw_Symbol::setFontToGC(GR_Graphics *p_gc, UT_uint32 MaxWidthAllowable
 					UT_UCSChar c = base + j;
 				        UT_uint32 width, height;
 		   			p_gc->getMaxCharacterDimension(&c, 1, width, height);
-					if (width > MaxWidth)
+					if (width > MaxWidth) 
 					{
 						MaxWidth = width;
 						MaxWidthChar = c;
 					}
-
-					if (height > MaxHeight)
+						
+					if (height > MaxHeight) 
 					{
 						MaxHeight = height;
 						MaxHeightChar = c;
@@ -156,8 +156,7 @@ void XAP_Draw_Symbol::setFontToGC(GR_Graphics *p_gc, UT_uint32 MaxWidthAllowable
 	        }
 
 
-	    //pascal
-        UT_uint32 width = 0, height = 0;
+	        UT_uint32 width, height;
 		p_gc->getMaxCharacterDimension(&MaxWidthChar, 1, width, height);
 		UT_sint32 xdiff_temp = MaxWidthAllowable - width;
 		p_gc->getMaxCharacterDimension(&MaxHeightChar, 1, width, height);
@@ -190,7 +189,7 @@ void XAP_Draw_Symbol::setFontToGC(GR_Graphics *p_gc, UT_uint32 MaxWidthAllowable
 
 }
 
-const char* XAP_Draw_Symbol::getSelectedFont()
+const char* XAP_Draw_Symbol::getSelectedFont() const
 {
 	return m_stFont.c_str();
 }
@@ -228,10 +227,10 @@ void XAP_Draw_Symbol::setRow (UT_uint32 row)
 		}
 		chars += numb;
 	}
-	draw ();
+	queueDraw();
 }
 
-UT_uint32 XAP_Draw_Symbol::getSymbolRows (void)
+UT_uint32 XAP_Draw_Symbol::getSymbolRows (void) const
 {
 	UT_uint32 chars = 0;
 	for (UT_sint32 i = m_start_base; i < m_vCharSet.size(); i += 2)
@@ -243,7 +242,7 @@ UT_uint32 XAP_Draw_Symbol::getSymbolRows (void)
 	return rows;
 }
 
-void XAP_Draw_Symbol::draw(const UT_Rect *clip)
+void XAP_Draw_Symbol::drawImmediate(const UT_Rect *clip)
 {
 	UT_UNUSED(clip);
 	UT_ASSERT(m_gc);
@@ -251,7 +250,7 @@ void XAP_Draw_Symbol::draw(const UT_Rect *clip)
 	UT_sint32 i;
 
 	GR_Painter painter(m_gc);
-
+	
 	wwidth = m_drawWidth;
 	wheight = m_drawHeight;
 	UT_uint32 tmpw = wwidth / 32;
@@ -276,21 +275,19 @@ void XAP_Draw_Symbol::draw(const UT_Rect *clip)
 					w = tmpw;
 				x = (pos % 32) * tmpw + (tmpw - w) / 2;
 				y = pos / 32 * tmph;
-
+			
 				painter.drawChars(&j, 0, 1, x, y);
 			}
-
+			
 			++pos;
-
+			
 			if(pos > 32 * 7)
 				break;
 		}
-
+		
 		if(pos > 32 * 7)
 			break;
 	}
-
-	m_gc->setColor(UT_RGBColor(0,0,0));  //pascal
 
 	y = 0;
 	for(i = 0; i <= 7; i++)
@@ -336,7 +333,7 @@ UT_UCSChar XAP_Draw_Symbol::calcSymbol(UT_uint32 x, UT_uint32 y)
 	UT_uint32 height = m_drawHeight;
 	UT_uint32 ix;
 	UT_uint32 iy;
-
+	
 	if (x > width || y > height)
 		return static_cast<UT_UCSChar>(0);
 
@@ -353,7 +350,7 @@ void XAP_Draw_Symbol::calculatePosition(UT_UCSChar c, UT_uint32 &x, UT_uint32 &y
 	{
 		UT_uint32 base = static_cast<UT_uint32>(m_vCharSet[i]);
 		UT_uint32 size =  static_cast<UT_uint32>(m_vCharSet[i + 1]);
-
+		
 		if (base + size > c)
 		{
 			index += c - (i == m_start_base? base + m_start_nb_char: base);
@@ -400,29 +397,13 @@ void XAP_Draw_Symbol::drawarea(UT_UCSChar c, UT_UCSChar p)
 
 	areaPainter.clearArea(0, 0, wwidth, wheight);
 
-    //pascal dessiner une bordure pour le caractère "preview"
-
-    //UT_RGBColor colour10(100, 100, 100);
-	//areaPainter.fillRect(colour10, 0, 0, wwidth, wheight);
-
-    UT_RGBColor colour1(248, 0, 0);
-    m_areagc->setColor(colour1);
-
-    areaPainter.drawLine(0, 0, wwidth - m_gc->tlu(1), 0);
-    areaPainter.drawLine(0, wheight - m_gc->tlu(1), wwidth, wheight - m_gc->tlu(1));
-    areaPainter.drawLine(0, 0, 0, wheight - m_gc->tlu(1));
-    areaPainter.drawLine(wwidth - m_gc->tlu(1), 0, wwidth - m_gc->tlu(1), wheight);
-
-    //fin pascal
-
 	if(w1 != GR_CW_ABSENT)
 	{
 		x = (m_drawareaWidth > (unsigned) w1)? (m_drawareaWidth - w1) / 2: 0;
 		y = (m_drawareaHeight - h1) / 2;
-		//pascal areaPainter.drawChars(&c, 0, 1, x, y);
-		areaPainter.drawChars(&c, 0, 1, x, 0); //pascal y=>0 tmp
+		areaPainter.drawChars(&c, 0, 1, x, y);
 	}
-
+			
 	//
 	// Calculate the cordinates of the current and previous symbol
 	// along with the widths of the appropriate boxes.
@@ -436,7 +417,7 @@ void XAP_Draw_Symbol::drawarea(UT_UCSChar c, UT_UCSChar p)
 
 	cx *= tmpw;
 	cy *= tmph;
-
+	
 	//	cx1 = cx + tmpw;
 	//	cy1 = cy + tmph;
 
@@ -445,7 +426,7 @@ void XAP_Draw_Symbol::drawarea(UT_UCSChar c, UT_UCSChar p)
 
 	px *= tmpw;
 	py *= tmph;
-
+	
 	px1 = px + tmpw;
 	py1 = py + tmph;
 
@@ -456,7 +437,7 @@ void XAP_Draw_Symbol::drawarea(UT_UCSChar c, UT_UCSChar p)
 	{
 		painter.drawChars(&p, 0, 1, px + ((tmpw > (unsigned) wp)? (tmpw - wp) / 2: 0), py);
 	}
-
+	
 	// Redraw only the white box boundaries
 	// you do not notice the missing of the
 	// selected box

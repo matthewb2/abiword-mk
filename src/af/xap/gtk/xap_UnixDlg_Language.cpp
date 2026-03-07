@@ -17,14 +17,12 @@
  * 02110-1301 USA.
  */
 
-#include "ut_compiler.h"
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-ABI_W_NO_CONST_QUAL
+
 #include <gtk/gtk.h>
-ABI_W_POP
+
 #include "ut_assert.h"
 #include "ut_debugmsg.h"
 #include "ut_string.h"
@@ -43,7 +41,7 @@ XAP_Dialog * XAP_UnixDialog_Language::static_constructor(XAP_DialogFactory * pFa
 
 XAP_UnixDialog_Language::XAP_UnixDialog_Language(XAP_DialogFactory * pDlgFactory,
 						 XAP_Dialog_Id id)
-  : XAP_Dialog_Language(pDlgFactory,id), m_pLanguageList ( NULL )
+  : XAP_Dialog_Language(pDlgFactory,id), m_pLanguageList ( nullptr )
 {
 }
 
@@ -107,7 +105,7 @@ GtkWidget * XAP_UnixDialog_Language::constructWindow(void)
 	GtkCellRenderer *renderer;
 	GtkTreeViewColumn *column;
 	
-	GtkBuilder * builder = newDialogBuilder("xap_UnixDlg_Language.ui");
+	GtkBuilder * builder = newDialogBuilderFromResource("xap_UnixDlg_Language.ui");
 
 	// Update our member variables with the important widgets that 
 	// might need to be queried or altered later
@@ -133,7 +131,7 @@ GtkWidget * XAP_UnixDialog_Language::constructWindow(void)
 													   renderer,
 													   "text", 
 													   0,
-													   NULL);
+													   nullptr);
 	gtk_tree_view_append_column( GTK_TREE_VIEW(m_pLanguageList), column);
 	  
 	g_object_unref(G_OBJECT(builder));
@@ -187,7 +185,7 @@ void XAP_UnixDialog_Language::_populateWindowData()
 									 gtk_tree_view_get_column (GTK_TREE_VIEW(m_pLanguageList), 0), 
 									 FALSE);
 			gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_pLanguageList),
-						     path, NULL, TRUE, 0.5, 0.0);
+						     path, nullptr, TRUE, 0.5, 0.0);
 			gtk_widget_grab_focus (m_pLanguageList);
 			
 			gtk_tree_path_free (path);

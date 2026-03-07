@@ -21,6 +21,7 @@
 #include "xap_UnixApp.h"
 #include "xap_Frame.h"
 #include "xap_UnixDialogHelper.h"
+#include "xap_GtkUtils.h"
 #include "ut_string_class.h"
 #include <xp/AbiCollabSessionManager.h>
 
@@ -85,11 +86,7 @@ GtkWidget * AP_UnixDialog_CollaborationAddBuddy::_constructWindow(void)
 	//const XAP_StringSet * pSS = XAP_App::getApp()->getStringSet();
 	
 	// load the dialog from the UI file
-#if GTK_CHECK_VERSION(3,0,0)
 	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_CollaborationAddBuddy.ui");
-#else
-	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_CollaborationAddBuddy-2.ui");
-#endif
 	
 	// Update our member variables with the important widgets that 
 	// might need to be queried or altered later
@@ -154,13 +151,13 @@ void AP_UnixDialog_CollaborationAddBuddy::event_Ok()
 	GtkTreeIter iter;
 	if (gtk_combo_box_get_active_iter(GTK_COMBO_BOX(m_wAccount), &iter))
 	{
-		gpointer handler = 0;
+		gpointer handler = nullptr;
 		gtk_tree_model_get(m_model, &iter, HANDLER_COLUMN, &handler, -1);
 		
 		if (handler)
 		{
 			m_pAccount = reinterpret_cast<AccountHandler*>(handler);
-			_setName(gtk_entry_get_text(GTK_ENTRY(m_wName)));
+			_setName(XAP_gtk_entry_get_text(GTK_ENTRY(m_wName)));
 		}
 		else
 			UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);

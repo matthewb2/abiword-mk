@@ -1,3 +1,4 @@
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
 /* AbiSource Program Utilities
  * 
  * Copyright (C) 2002 Dom Lachowicz <cinamod@hotmail.com>
@@ -30,11 +31,11 @@
 #include "ODi_Abi_Data.h"
 
 // AbiWord includes
-#include <ut_math.h>
-#include <fp_PageSize.h>
-#include <pd_Document.h>
-#include <ut_locale.h>
-#include <ut_std_string.h>
+#include "ut_math.h"
+#include "fp_PageSize.h"
+#include "pd_Document.h"
+#include "ut_locale.h"
+#include "ut_std_string.h"
 
 /**
  * 
@@ -83,7 +84,7 @@ void ODi_Style_PageLayout::startElement(const gchar* pName,
         if(m_columnLine.empty()) {
             pVal = UT_getAttribute ("style:style", ppAtts);
         } else {
-            pVal = NULL; //m_columnLine is already set to "on" - don't bother looking up more props
+            pVal = nullptr; //m_columnLine is already set to "on" - don't bother looking up more props
         }
 
         if (pVal) {
@@ -118,55 +119,41 @@ void ODi_Style_PageLayout::endElement(const gchar* pName,
  * Sets the <pagesize> tag.
  */
 void ODi_Style_PageLayout::definePageSizeTag(PD_Document* pDocument) const {
-    
-    UT_uint32 propCtr = 0;
-    static const int MAX_PAGE_ATTS = 13; // 2*(width height orientation pagetype units page-scale) 0 
-    const gchar* pageAtts[MAX_PAGE_ATTS];
-    double pageWidthMmNumeric = 0.0;
-    double pageHeightMmNumeric = 0.0;
-    std::string pageWidthMm;
-    std::string pageHeightMm;
+
+    double pageWidthMmNumeric = 0.0f;
+    double pageHeightMmNumeric = 0.0f;
     UT_LocaleTransactor lt(LC_NUMERIC, "C");
-    
-    // width and height are rounded to full mm because that's how they are
+
+    PP_PropertyVector pageAtts = {
+        "page-scale", "1.0",
+        "pagetype", "",
+        "units", "mm"
+    };
+
+	// width and height are rounded to full mm because that's how they are
     // predefined in Abi and there seem to be rounding errors in oow's exporter
 
     if (!m_pageWidth.empty()) {
-        pageAtts[propCtr++] = "width";
-        
+        pageAtts.push_back("width");
         pageWidthMmNumeric = rint(UT_convertToDimension(m_pageWidth.c_str(),
                                                         DIM_MM));
-        pageWidthMm  = UT_std_string_sprintf("%f", pageWidthMmNumeric);
-        pageAtts[propCtr++] = pageWidthMm.c_str();
+        pageAtts.push_back(UT_std_string_sprintf("%f", pageWidthMmNumeric));
     }
 
     if (!m_pageHeight.empty()) {
-        pageAtts[propCtr++] = "height";
-        
+        pageAtts.push_back("height");
         pageHeightMmNumeric = rint(UT_convertToDimension(m_pageHeight.c_str(),
                                                          DIM_MM));
-        pageHeightMm = UT_std_string_sprintf("%f", pageHeightMmNumeric);
-        pageAtts[propCtr++] = pageHeightMm.c_str();
+        pageAtts.push_back(UT_std_string_sprintf("%f", pageHeightMmNumeric));
     }
-
-    pageAtts[propCtr++] = "units";
-    pageAtts[propCtr++] = "mm";
-
-    if (!m_printOrientation.empty()) {
-        pageAtts[propCtr++] = "orientation";
-        pageAtts[propCtr++] = m_printOrientation.c_str();
-    }
-
-    pageAtts[propCtr++] = "page-scale";
-    pageAtts[propCtr++] = "1.0";
 
     fp_PageSize ps(pageWidthMmNumeric, pageHeightMmNumeric, DIM_MM);
-    pageAtts[propCtr++] = "pagetype";
-    pageAtts[propCtr++] = ps.getPredefinedName();
+    pageAtts[3] = ps.getPredefinedName();
 
-    pageAtts[propCtr] = 0; // To signal the end of the array
-    
-    
+    if (!m_printOrientation.empty()) {
+        pageAtts.push_back("orientation");
+        pageAtts.push_back(m_printOrientation);
+    }
     pDocument->setPageSizeFromFile(pageAtts);
 }
 
@@ -180,7 +167,7 @@ const std::string ODi_Style_PageLayout::getSectionProps(bool hasHeader, bool has
  */
 void ODi_Style_PageLayout::_parseHeaderFooterProperties(const gchar** ppAtts) {
     
-    const gchar* pVal = NULL;
+    const gchar* pVal = nullptr;
     pVal = UT_getAttribute ("svg:height", ppAtts);
     
     if (m_rElementStack.hasElement("style:header-style")) {
@@ -207,7 +194,7 @@ void ODi_Style_PageLayout::_parseHeaderFooterProperties(const gchar** ppAtts) {
  */
 void ODi_Style_PageLayout::_parsePageLayoutProperties(const gchar** ppAtts) {
     
-    const gchar* pVal = NULL;
+    const gchar* pVal = nullptr;
     
     pVal = UT_getAttribute ("fo:page-width", ppAtts);
     if (pVal) {
@@ -256,7 +243,7 @@ void ODi_Style_PageLayout::_parsePageLayoutProperties(const gchar** ppAtts) {
  */
 void ODi_Style_PageLayout::_parseBackgroundImage(const gchar** ppAtts) {
     
-    const gchar* pVal = NULL;
+    const gchar* pVal = nullptr;
     
     pVal = UT_getAttribute ("xlink:href", ppAtts);
     if(!pVal) {

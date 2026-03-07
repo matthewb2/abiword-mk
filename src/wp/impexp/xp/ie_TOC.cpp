@@ -44,14 +44,14 @@ public:
   virtual ~TOC_Listener();
   
   virtual bool		populate(fl_ContainerLayout* sfh,
-				 const PX_ChangeRecord * pcr);
+				 const PX_ChangeRecord * pcr) override;
   
   virtual bool		populateStrux(pf_Frag_Strux* sdh,
 				      const PX_ChangeRecord * pcr,
-				      fl_ContainerLayout* * psfh);
+				      fl_ContainerLayout* * psfh) override;
   
   virtual bool		change(fl_ContainerLayout* sfh,
-			       const PX_ChangeRecord * pcr);
+			       const PX_ChangeRecord * pcr) override;
   
   virtual bool		insertStrux(fl_ContainerLayout* sfh,
 				    const PX_ChangeRecord * pcr,
@@ -59,9 +59,9 @@ public:
 				    PL_ListenerId lid,
 				    void (* pfnBindHandles)(pf_Frag_Strux* sdhNew,
 							    PL_ListenerId lid,
-							    fl_ContainerLayout* sfhNew));
+							    fl_ContainerLayout* sfhNew)) override;
   
-  virtual bool		signal(UT_uint32 iSignal);
+  virtual bool		signal(UT_uint32 iSignal) override;
   
   
 private:
@@ -148,7 +148,7 @@ bool TOC_Listener::populateStrux(pf_Frag_Strux* /*sdh*/,
 {
   UT_return_val_if_fail(pcr->getType() == PX_ChangeRecord::PXT_InsertStrux, false);
   const PX_ChangeRecord_Strux * pcrx = static_cast<const PX_ChangeRecord_Strux *> (pcr);
-  *psfh = 0;
+  *psfh = nullptr;
   
   // resets all TOC foo
   _commitTOCData();
@@ -162,11 +162,11 @@ bool TOC_Listener::populateStrux(pf_Frag_Strux* /*sdh*/,
       }
     case PTX_Block:
       {
-	const PP_AttrProp * pAP = NULL;
+	const PP_AttrProp * pAP = nullptr;
 	bool bHaveProp = mDocument->getAttrProp (pcr->getIndexAP(), &pAP);
 
 	if (bHaveProp) {
-	  const gchar * szValue = 0;
+	  const gchar * szValue = nullptr;
 	  bool bHaveStyle  = pAP->getAttribute (PT_STYLE_ATTRIBUTE_NAME,  szValue);
 	  
 	  if (bHaveStyle) {
@@ -239,7 +239,7 @@ bool IE_TOCHelper::docHasTOC() const
 bool IE_TOCHelper::_tocNameLevelHelper(const UT_UTF8String & style_name,
 				       const char * base_name) const
 {
-  PD_Style * style = 0;
+  PD_Style * style = nullptr;
   mDoc->getStyle (style_name.utf8_str(), &style);
   UT_sint32 iLoop = 0;
   
@@ -295,7 +295,7 @@ UT_UTF8String IE_TOCHelper::getNthTOCEntry(int nth, int * out_level) const
 {
   UT_return_val_if_fail(nth < getNumTOCEntries(), "");
 
-  if (out_level != NULL)
+  if (out_level != nullptr)
     *out_level = mTOCLevels[nth];
 
   return *mTOCStrings.getNthItem(nth);

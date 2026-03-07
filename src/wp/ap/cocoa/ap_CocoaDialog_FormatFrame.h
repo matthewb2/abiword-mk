@@ -3,7 +3,7 @@
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
  * Copyright (C) 2003 Marc Maurer
- * Copyright (C) 2003-2004 Hubert Figuiere
+ * Copyright (C) 2003-2004-2021 Hubert Figuière
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -20,8 +20,7 @@
  * 02110-1301 USA.
  */
 
-#ifndef AP_COCOADIALOG_FORMATFRAME_H
-#define AP_COCOADIALOG_FORMATFRAME_H
+#pragma once
 
 #import <Cocoa/Cocoa.h>
 
@@ -30,7 +29,7 @@
 
 
 class XAP_CocoaFrame;
-class GR_CocoaCairoGraphics;
+class GR_CocoaGraphics;
 @class AP_CocoaDialog_FormatFrameController;
 
 /*****************************************************************/
@@ -41,26 +40,26 @@ public:
 	AP_CocoaDialog_FormatFrame(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id dlgid);
 	virtual ~AP_CocoaDialog_FormatFrame(void);
 
-	virtual void			runModeless(XAP_Frame * pFrame);
+	virtual void runModeless(XAP_Frame * pFrame) override;
 
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id dlgid);
 
 	// callbacks can fire these events
 	virtual void			event_Close(void);
 	void					event_ApplyToChanged(void);
-	void 					event_previewExposed(void);
-	virtual void            setBorderThicknessInGUI(UT_UTF8String & sThick);
-	virtual void			setSensitivity(bool bSens);
-	virtual void            destroy(void);
-	virtual void            activate(void);
-	virtual void            notifyActiveFrame(XAP_Frame * pFrame);
+	void event_previewInvalidate(void);
+	virtual void setBorderThicknessInGUI(UT_UTF8String & sThick) override;
+	virtual void setSensitivity(bool bSens) override;
+	virtual void destroy(void) override;
+	virtual void activate(void) override;
+	virtual void notifyActiveFrame(XAP_Frame * pFrame) override;
 	char * 					getWindowName()
 						{ return m_WindowName; };
 protected:
 	void					_populateWindowData(void);
 	void					_storeWindowData(void);
 
-	GR_CocoaCairoGraphics	* 		m_pPreviewWidget;
+	GR_CocoaGraphics* m_pPreviewWidget;
 private:
 	AP_CocoaDialog_FormatFrameController*	m_dlg;
 };
@@ -129,8 +128,8 @@ private:
 
 	BOOL	m_bEnabled;
 
-	int		m_menuButtonTag;
-	int		m_activeMenuTag;
+	NSInteger m_menuButtonTag;
+	NSInteger m_activeMenuTag;
 }
 - (IBAction)applyAction:(id)sender;
 - (IBAction)wrapAction:(id)sender;
@@ -166,5 +165,3 @@ private:
 
 //- (int)applyItemTag;
 @end
-
-#endif /* AP_COCOADIALOG_FORMATTABLE_H */

@@ -24,9 +24,7 @@
 #include "xap_Dialog.h"
 class XAP_App;
 
-#include <boost/bind.hpp>
 #include <boost/function.hpp>
-
 
 // we return some special values for file types depending
 // on how the derived classes do different things for different
@@ -44,9 +42,9 @@ public:
 	XAP_Dialog_FileOpenSaveAs(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~XAP_Dialog_FileOpenSaveAs(void);
 
-	virtual void						useStart(void);
-	virtual void						runModal(XAP_Frame * pFrame) = 0;
-	virtual void						useEnd(void);
+	virtual void						useStart(void) override;
+	virtual void						runModal(XAP_Frame * pFrame) override = 0;
+	virtual void						useEnd(void) override;
 
 	typedef enum { a_VOID, a_OK, a_CANCEL }	tAnswer;
 

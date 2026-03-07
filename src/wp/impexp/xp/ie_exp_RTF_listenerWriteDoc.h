@@ -46,25 +46,25 @@ public:
 						   bool bHasMultiBlock);
 	virtual ~s_RTF_ListenerWriteDoc();
 
-	virtual bool		populate(fl_ContainerLayout* sfh,
-								 const PX_ChangeRecord * pcr);
+	virtual bool populate(fl_ContainerLayout* sfh,
+								 const PX_ChangeRecord * pcr) override;
 
-	virtual bool		populateStrux(pf_Frag_Strux* sdh,
+	virtual bool populateStrux(pf_Frag_Strux* sdh,
 									  const PX_ChangeRecord * pcr,
-									  fl_ContainerLayout* * psfh);
+									  fl_ContainerLayout* * psfh) override;
 
-	virtual bool		change(fl_ContainerLayout* sfh,
-							   const PX_ChangeRecord * pcr);
+	virtual bool change(fl_ContainerLayout* sfh,
+							   const PX_ChangeRecord * pcr) override;
 
-	virtual bool		insertStrux(fl_ContainerLayout* sfh,
+	virtual bool insertStrux(fl_ContainerLayout* sfh,
 									const PX_ChangeRecord * pcr,
 									pf_Frag_Strux* sdh,
 									PL_ListenerId lid,
 									void (* pfnBindHandles)(pf_Frag_Strux* sdhNew,
 															PL_ListenerId lid,
-															fl_ContainerLayout* sfhNew));
+															fl_ContainerLayout* sfhNew)) override;
 
-	virtual bool		signal(UT_uint32 iSignal);
+	virtual bool signal(UT_uint32 iSignal) override;
 
 protected:
 	UT_sint32            getRightOfCell(UT_sint32 row,UT_sint32 col);
@@ -74,7 +74,7 @@ protected:
 	void                _openFrame(PT_AttrPropIndex api);
 	void                _closeFrame(void);
 	void                _writeSPNumProp(const char * prop, UT_sint32 val);
-	void				_openSpan(PT_AttrPropIndex apiSpan,const PP_AttrProp * pSpanAP = NULL );
+	void				_openSpan(PT_AttrPropIndex apiSpan,const PP_AttrProp * pSpanAP = nullptr );
 	void				_openTag(const char * szPrefix, const char * szSuffix,
 								 bool bNewLineAfter, PT_AttrPropIndex api);
 	void				_outputData(const UT_UCSChar * p, UT_uint32 length, PT_DocPosition pos, bool bIgnorePos);

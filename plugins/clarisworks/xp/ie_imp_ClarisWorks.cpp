@@ -49,7 +49,7 @@ ABI_PLUGIN_DECLARE("ClarisWorks")
 // completely generic code to allow this to be a plugin
 
 // we use a reference-counted sniffer
-static IE_Imp_ClarisWorks_Sniffer * m_sniffer = 0;
+static IE_Imp_ClarisWorks_Sniffer * m_sniffer = nullptr;
 
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_register (XAP_ModuleInfo * mi)
@@ -73,17 +73,17 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-	mi->name = 0;
-	mi->desc = 0;
-	mi->version = 0;
-	mi->author = 0;
-	mi->usage = 0;
+	mi->name = nullptr;
+	mi->desc = nullptr;
+	mi->version = nullptr;
+	mi->author = nullptr;
+	mi->usage = nullptr;
 
 	UT_ASSERT (m_sniffer);
 
 	IE_Imp::unregisterImporter (m_sniffer);
 	delete m_sniffer;
-	m_sniffer = 0;
+	m_sniffer = nullptr;
 
 	return 1;
 }
@@ -106,19 +106,6 @@ int abi_plugin_supports_version (UT_uint32 /*major*/, UT_uint32 /*minor*/,
 /*
   Import ClarisWorks/AppleWorks file
 */
-
-static const char PROPS_XML_ATTR_NAME[] = "props";
-
-// char attributes
-static const char FONT_FAMILY[] = "font-family:%s;";
-
-static const char FONT_STYLE[] = "font-style:%s;";
-static const char FONT_STYLE_ITALIC[] = "italic";
-
-static const char FONT_WEIGHT[] = "font-weight:%s;";
-static const char FONT_WEIGHT_BOLD[] = "bold";
-
-static const char FONT_SIZE[] = "font-size:%spt;";
 
 enum {
     CW_HANDLED_VERSION = 5
@@ -181,7 +168,7 @@ UT_Confidence_t IE_Imp_ClarisWorks_Sniffer::recognizeContents(const char * szBuf
             else 
             {
                 UT_DEBUGMSG (("%s,%d: Mismatch version.\n",__FILE__,__LINE__));
-		return (UT_CONFIDENCE_SOSO);
+                return (UT_CONFIDENCE_SOSO);
             }
         }
     
@@ -228,7 +215,7 @@ IE_Imp_ClarisWorks::IE_Imp_ClarisWorks(PD_Document * pDocument)
 
 UT_Error IE_Imp_ClarisWorks::_writeHeader(GsfInput * /* fp */)
 {
-    X_ReturnNoMemIfError(appendStrux(PTX_Section, NULL));
+    X_ReturnNoMemIfError(appendStrux(PTX_Section, PP_NOPROPS));
     
     return UT_OK;
 }
@@ -249,14 +236,14 @@ UT_Error IE_Imp_ClarisWorks::_parseFile(GsfInput * fp)
    if (strncmp (reinterpret_cast<char *>(buf), "ETBL", 4) != 0) 
    {
        // ERROR !
-       UT_DEBUGMSG(("ETBL marker not found!\n"));
+       UT_WARNINGMSG(("ETBL marker not found!\n"));
    }
    gsf_input_read (fp, sizeof (offset), (guint8*)&offset);
    {
        if (offset >= gsf_input_tell (fp)) 
        {
            // ERROR again !
-           UT_DEBUGMSG(("incorrect offset for ETBL struct !\n"));
+           UT_WARNINGMSG(("incorrect offset for ETBL struct !\n"));
        }
    }
    
@@ -267,19 +254,19 @@ UT_Error IE_Imp_ClarisWorks::_parseFile(GsfInput * fp)
    if (strncmp (reinterpret_cast<char *>(buf), "ETBL", 4) != 0) 
    {
        // ERROR !
-       UT_DEBUGMSG(("ETBL marker from ETBL not found!\n"));
+       UT_WARNINGMSG(("ETBL marker from ETBL not found!\n"));
    }
    gsf_input_read (fp, sizeof (offset), (guint8*)&offset);
    {
        if (offset >= gsf_input_tell (fp)) 
        {
            // ERROR again !
-           UT_DEBUGMSG(("incorrect offset for  struct !\n"));
+           UT_WARNINGMSG(("incorrect offset for  struct !\n"));
        }
    }
    
    
-   while (gsf_input_read(fp, 1, &c) != NULL)
+   while (gsf_input_read(fp, 1, &c) != nullptr)
    {
        switch (c)
        {
@@ -288,7 +275,7 @@ UT_Error IE_Imp_ClarisWorks::_parseFile(GsfInput * fp)
            
            // start a paragraph and emit any text that we
            // have accumulated.
-           X_ReturnNoMemIfError(appendStrux(PTX_Block, NULL));
+           X_ReturnNoMemIfError(appendStrux(PTX_Block, PP_NOPROPS));
            bEmptyFile = false;
            if (gbBlock.getLength() > 0)
            {
@@ -316,7 +303,7 @@ UT_Error IE_Imp_ClarisWorks::_parseFile(GsfInput * fp)
        // if we have text left over (without final CR/LF),
        // or if we read an empty file,
        // create a paragraph and emit the text now.
-       X_ReturnNoMemIfError(appendStrux(PTX_Block, NULL));
+       X_ReturnNoMemIfError(appendStrux(PTX_Block, PP_NOPROPS));
        if (gbBlock.getLength() > 0)
            X_ReturnNoMemIfError(appendSpan(reinterpret_cast<const UT_UCSChar *>(gbBlock.getPointer(0)), gbBlock.getLength()));
    }
@@ -330,92 +317,6 @@ UT_Error IE_Imp_ClarisWorks::_parseFile(GsfInput * fp)
 #undef X_ReturnNoMemIfError
 #undef X_ReturnIfFail
 
-
-/*****************************************************************/
-/*****************************************************************/
-
-//
-// What is this for ? I don't know...
-// FIXME -- temporarily removed
-//
-#if 0
-
-void IE_Imp_ClarisWorks::pasteFromBuffer(PD_DocumentRange * pDocRange,
-                                     unsigned char * pData, UT_uint32 lenData)
-{
-	UT_ASSERT(getDoc() == pDocRange->m_pDoc);
-	UT_ASSERT(pDocRange->m_pos1 == pDocRange->m_pos2);
-
-	UT_GrowBuf gbBlock(1024);
-	bool bEatLF = false;
-	bool bSuppressLeadingParagraph = true;
-	bool bInColumn1 = true;
-	unsigned char * pc;
-
-	PT_DocPosition dpos = pDocRange->m_pos1;
-	
-	for (pc=pData; (pc<pData+lenData); pc++)
-	{
-		unsigned char c = *pc;
-		
-		switch (c)
-		{
-		case '\r':
-		case '\n':
-			if ((c == '\n') && bEatLF)
-			{
-				bEatLF = false;
-				break;
-			}
-
-			if (c == '\r')
-			{
-				bEatLF = true;
-			}
-			
-			// we interprete either CRLF, CR, or LF as a paragraph break.
-			
-			if (gbBlock.getLength() > 0)
-			{
-				// flush out what we have
-				getDoc()->insertSpan(dpos, gbBlock.getPointer(0), gbBlock.getLength());
-				dpos += gbBlock.getLength();
-                                gbBlock.truncate(0);
-			}
-			bInColumn1 = true;
-			break;
-
-		default:
-			bEatLF = false;
-			if (bInColumn1 && !bSuppressLeadingParagraph)
-			{
-				getDoc()->insertStrux(dpos,PTX_Block);
-				dpos++;
-			}
-			
-			// deal with plain character.
-			// this cast is OK.  we have US-ASCII (actually Latin-1) character
-			// data, so we can do this.
-			UT_GrowBufElement gbe = reinterpret_cast<UT_GrowBufElement>(reinterpret_cast<UT_UCSChar>(c));
-			gbBlock.ins(gbBlock.getLength(),&gbe,1);
-
-			bInColumn1 = false;
-			bSuppressLeadingParagraph = false;
-			break;
-		}
-	} 
-
-	if (gbBlock.getLength() > 0)
-	{
-		// if we have text left over (without final CR/LF),
-		getDoc()->insertSpan(dpos, gbBlock.getPointer(0), gbBlock.getLength());
-		dpos += gbBlock.getLength();
-	}
-
-	return;
-}
-
-#endif
 
 /*****************************************************************/
 /*****************************************************************/

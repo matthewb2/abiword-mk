@@ -1,6 +1,6 @@
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (c) 2003 Hubert Figuiere
+ * Copyright (c) 2003-2021 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,7 +25,7 @@
 
 #include "xap_CocoaDialog_Utilities.h"
 
-#include "gr_CocoaCairoGraphics.h"
+#include "gr_CocoaGraphics.h"
 
 #include "xap_App.h"
 #include "xap_CocoaApp.h"
@@ -50,7 +50,7 @@ XAP_Dialog * AP_CocoaDialog_Paragraph::static_constructor(XAP_DialogFactory * pF
 AP_CocoaDialog_Paragraph::AP_CocoaDialog_Paragraph(XAP_DialogFactory * pDlgFactory,
 												 XAP_Dialog_Id dlgid)
 	: AP_Dialog_Paragraph(pDlgFactory,dlgid),
-		m_pGraphics(NULL),
+		m_pGraphics(nullptr),
 		m_dlg(nil)
 {
 }
@@ -91,17 +91,18 @@ void AP_CocoaDialog_Paragraph::runModal(XAP_Frame * pFrame)
 void	AP_CocoaDialog_Paragraph::_createGC(XAP_CocoaNSView* owner)
 {
 	NSSize  size;
-	GR_CocoaCairoAllocInfo ai(owner);
-	m_pGraphics = (GR_CocoaCairoGraphics*)XAP_App::getApp()->newGraphics(ai);
+	GR_CocoaAllocInfo ai(owner);
+	m_pGraphics = (GR_CocoaGraphics*)XAP_App::getApp()->newGraphics(ai);
 
 	size = [owner bounds].size;
 	_createPreviewFromGC(m_pGraphics, lrintf(size.width), lrintf(size.height));
+	m_dlg.preview.drawable = m_paragraphPreview;
 }
 
 void AP_CocoaDialog_Paragraph::_deleteGC(void)
 {
 	DELETEP(m_pGraphics);
-	m_pGraphics = NULL;
+	m_pGraphics = nullptr;
 }
 /*****************************************************************/
 
@@ -177,13 +178,13 @@ void AP_CocoaDialog_Paragraph::event_CheckToggled(id sender)
 	tCheckState cs = check_FALSE;
 
 	switch (state) {
-	case NSOnState:
+	case NSControlStateValueOn:
 		cs = check_TRUE;
 		break;
-	case NSOffState:
+	case NSControlStateValueOff:
 		cs = check_FALSE;
 		break;
-	case NSMixedState:
+	case NSControlStateValueMixed:
 		cs = check_INDETERMINATE;
 		break;
 	default:
@@ -196,7 +197,7 @@ void AP_CocoaDialog_Paragraph::event_CheckToggled(id sender)
 void AP_CocoaDialog_Paragraph::event_PreviewAreaExposed(void)
 {
 	if (m_paragraphPreview)
-		m_paragraphPreview->draw();
+		m_paragraphPreview->queueDraw();
 }
 
 
@@ -341,11 +342,11 @@ int AP_CocoaDialog_Paragraph::_tCheckStateToNS(AP_CocoaDialog_Paragraph::tCheckS
 {
 	switch (x) {
 	case check_FALSE:
-		return NSOffState;
+		return NSControlStateValueOff;
 	case check_TRUE:
-		return NSOnState;
+		return NSControlStateValueOn;
 	case check_INDETERMINATE:
-		return NSMixedState;
+		return NSControlStateValueMixed;
 	}
 	UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
 	return 0;
@@ -369,7 +370,7 @@ int AP_CocoaDialog_Paragraph::_tCheckStateToNS(AP_CocoaDialog_Paragraph::tCheckS
 {
 	if (_xap) {
 		_xap->_deleteGC();
-		_xap = NULL;
+		_xap = nullptr;
 	}
 }
 

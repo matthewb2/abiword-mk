@@ -6,36 +6,30 @@
 * Copyright (C) 2003-2005 Mark Gilbert <mg_abimail@yahoo.com>
 * Copyright (C) 2002, 2004 Francis James Franklin <fjf@alinameridon.com>
 * Copyright (C) 2001-2002 AbiSource, Inc.
-*
+* 
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
 * as published by the Free Software Foundation; either version 2
 * of the License, or (at your option) any later version.
-*
+* 
 * This program is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
-*
+* 
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
 * 02110-1301 USA.
 */
 
 #include "ie_exp_HTML.h"
 
 #include <pd_DocumentRDF.h>
+#include "ut_std_string.h"
 #include "ie_exp_DocRangeListener.h"
 #include "pl_ListenerCoupleCloser.h"
 
-#include <gsf/gsf-outfile.h>
-#include <gsf/gsf-output-stdio.h>
-#include <gsf/gsf-outfile-stdio.h>
-#include <gsf/gsf-output-memory.h>
-#include <gsf/gsf-infile.h>
-#include <gsf/gsf-input.h>
-#include <gsf/gsf-input-stdio.h>
 #include <glib.h>
 #include <glib/gstdio.h>
 
@@ -106,9 +100,9 @@ IE_Exp_HTML::IE_Exp_HTML(PD_Document * pDocument)
 		m_pWriterFactory(new IE_Exp_HTML_DefaultWriterFactory(pDocument,this->m_exp_opt)),
         m_suffix("")
 {
-
+  
 	// We can't create navigation helper before a
-	m_pNavigationHelper = NULL;
+	m_pNavigationHelper = nullptr;
 
     m_exp_opt.bIs4 = false;
     m_exp_opt.bIsAbiWebDoc = false;
@@ -155,7 +149,7 @@ UT_Error IE_Exp_HTML::copyToBuffer(PD_DocumentRange * pDocRange,UT_ByteBuf *  bu
     pDocRange->m_pDoc->tellListenerSubset(pRangeListener,pDocRange,pCloser);
     if( pCloser)
         delete pCloser;
-
+    
     //
     // Grab the RDF triples while we are copying...
     //
@@ -176,7 +170,7 @@ UT_Error IE_Exp_HTML::copyToBuffer(PD_DocumentRange * pDocRange,UT_ByteBuf *  bu
             subm->dumpModel("copied rdf triples subm");
             outrdf->dumpModel("copied rdf triples result");
         }
-
+        
         // PD_DocumentRDFMutationHandle m = outrdf->createMutation();
         // m->add( PD_URI("http://www.example.com/foo"),
         //         PD_URI("http://www.example.com/bar"),
@@ -188,22 +182,22 @@ UT_Error IE_Exp_HTML::copyToBuffer(PD_DocumentRange * pDocRange,UT_ByteBuf *  bu
     // OK now we have a complete and valid document containing our selected
     // content. We export this to an in memory GSF buffer
     //
-    IE_Exp_HTML * pNewExp = NULL;
-    char *szTempFileName = NULL;
-    GError *err = NULL;
+    IE_Exp_HTML * pNewExp = nullptr;
+    char *szTempFileName = nullptr;
+    GError *err = nullptr;
     g_file_open_tmp ("XXXXXX", &szTempFileName, &err);
     GsfOutput * outBuf =  gsf_output_stdio_new (szTempFileName,&err);
     IEFileType ftHTML = IE_Exp::fileTypeForMimetype("text/html");
     UT_Error aerr = IE_Exp::constructExporter(outDoc,outBuf,
 											  ftHTML,(IE_Exp**)&pNewExp);
-    if(pNewExp == NULL)
+    if(pNewExp == nullptr)
     {
          return aerr;
     }
 
 	pNewExp->suppressDialog();
-
-    aerr = pNewExp->writeFile(szTempFileName);
+    std::string url = UT_std_string_sprintf("file://%s", szTempFileName);
+    aerr = pNewExp->writeFile(url.c_str());
     if(aerr != UT_OK)
     {
 	delete pNewExp;
@@ -219,10 +213,10 @@ UT_Error IE_Exp_HTML::copyToBuffer(PD_DocumentRange * pDocRange,UT_ByteBuf *  bu
 
     GsfInput *  fData = gsf_input_stdio_new(szTempFileName,&err);
     UT_DebugOnly<UT_sint32> siz = gsf_input_size(fData);
-    const UT_Byte * pData = gsf_input_read(fData,gsf_input_size(fData),NULL);
+    const UT_Byte * pData = gsf_input_read(fData,gsf_input_size(fData),nullptr);
     UT_DEBUGMSG(("Writing %d bytes to clipboard \n", (UT_sint32)siz));
     bufHTML->append( pData, gsf_input_size(fData));
-
+    
     delete pNewExp;
     delete pRangeListener;
     UNREFP( outDoc);
@@ -233,10 +227,10 @@ UT_Error IE_Exp_HTML::copyToBuffer(PD_DocumentRange * pDocRange,UT_ByteBuf *  bu
 
 void IE_Exp_HTML::_buildStyleTree()
 {
-    const PD_Style * p_pds = 0;
-    const gchar * szStyleName = 0;
+    const PD_Style * p_pds = nullptr;
+    const gchar * szStyleName = nullptr;
 
-    UT_GenericVector<PD_Style*> * pStyles = NULL;
+    UT_GenericVector<PD_Style*> * pStyles = nullptr;
     getDoc()->enumStyles(pStyles);
     UT_return_if_fail(pStyles);
     UT_uint32 iStyleCount = getDoc()->getStyleCount();
@@ -248,11 +242,12 @@ void IE_Exp_HTML::_buildStyleTree()
 
         szStyleName = p_pds->getName();
 
-        if (p_pds == 0) continue;
+        if (p_pds == nullptr)
+            continue;
 
         PT_AttrPropIndex api = p_pds->getIndexAP();
 
-        const PP_AttrProp * pAP_style = 0;
+        const PP_AttrProp * pAP_style = nullptr;
         bool bHaveProp = getDoc()->getAttrProp(api, &pAP_style);
 
         if (bHaveProp && pAP_style /* && p_pds->isUsed () */) // can't trust ->isUsed() :-(
@@ -288,8 +283,6 @@ UT_Error IE_Exp_HTML::_doOptions()
     }
     /* run the dialog
      */
-
-    //pascal todo pFrame->getFilename() devient strcmp(pFrame->getFilename(), "") != 0
 	if(!pFrame->getFilename())
 	{
 	    XAP_Dialog_Id id = XAP_DIALOG_ID_HTMLOPTIONS;
@@ -309,7 +302,7 @@ UT_Error IE_Exp_HTML::_doOptions()
 	    /* extract what they did
 	     */
 	    bool bSave = pDialog->shouldSave();
-
+	
 	    pDialogFactory->releaseDialog(pDialog);
 
 	    if (!bSave)
@@ -326,7 +319,7 @@ UT_Error IE_Exp_HTML::_writeDocument()
     UT_UTF8String basename = UT_go_basename(getFileName());
     m_suffix = strchr(basename.utf8_str(), '.');
     UT_DEBUGMSG(("Determined suffix: %s", m_suffix.utf8_str()));
-
+    
     if (!UT_go_utf8_collate_casefold(m_suffix.utf8_str(), ".html")||
         !UT_go_utf8_collate_casefold(m_suffix.utf8_str(), ".htm"))
     {
@@ -338,7 +331,7 @@ UT_Error IE_Exp_HTML::_writeDocument()
     {
         set_MHTML();
     }
-
+    
     UT_Error errOptions = _doOptions();
 
     if (errOptions == UT_SAVE_CANCELLED) //see Bug 10840
@@ -351,7 +344,7 @@ UT_Error IE_Exp_HTML::_writeDocument()
     }
 
     _buildStyleTree();
-
+    
     if (isCopying()) // ClipBoard
     {
         m_exp_opt.bEmbedImages = true;
@@ -567,7 +560,7 @@ UT_Error IE_Exp_HTML::_writeDocument(bool /*bClipBoard*/, bool /*bTemplateBody*/
         getDoc()->getBounds(false, posEnd);
         docBegin = posEnd;
         posEnd = 0;
-        currentTitle = m_pNavigationHelper->getNthTOCEntry(0, NULL).utf8_str();
+        currentTitle = m_pNavigationHelper->getNthTOCEntry(0, nullptr).utf8_str();
         bool isIndex = true;
         for (int i = m_pNavigationHelper->getMinTOCIndex();
             i < m_pNavigationHelper->getNumTOCEntries(); i++)
@@ -578,7 +571,7 @@ UT_Error IE_Exp_HTML::_writeDocument(bool /*bClipBoard*/, bool /*bTemplateBody*/
 
             if (currentLevel == m_pNavigationHelper->getMinTOCLevel())
             {
-                chapterTitle = m_pNavigationHelper->getNthTOCEntry(i, NULL).utf8_str();
+                chapterTitle = m_pNavigationHelper->getNthTOCEntry(i, nullptr).utf8_str();
                 m_pNavigationHelper->getNthTOCEntryPos(i, posCurrent);
                 posBegin = posEnd;
 
@@ -630,7 +623,7 @@ UT_Error IE_Exp_HTML::_writeDocument(bool /*bClipBoard*/, bool /*bTemplateBody*/
         } else
         {
             UT_DEBUGMSG(("Creating single-file HTML document\n"));
-            _createChapter(NULL, "", true);
+            _createChapter(nullptr, "", true);
         }
     }
 
@@ -659,20 +652,20 @@ void IE_Exp_HTML::_createChapter(PD_DocumentRange* range, const std::string &tit
 		std::string outputUri = s;
 		g_free(s);
         outputUri += SEPARATOR + filename;
-        output = UT_go_file_create(outputUri.c_str(), NULL);
+        output = UT_go_file_create(outputUri.c_str(), nullptr);
     }
-    IE_Exp_HTML_OutputWriter *pOutputWriter =
+    IE_Exp_HTML_OutputWriter *pOutputWriter = 
         new IE_Exp_HTML_FileWriter(output);
 //	pOutputWriter->enableQuotedPrintable(m_exp_opt.bMultipart);
-
-    IE_Exp_HTML_DataExporter* pDataExporter =
-        new IE_Exp_HTML_FileExporter(getDoc(),
+    
+    IE_Exp_HTML_DataExporter* pDataExporter = 
+        new IE_Exp_HTML_FileExporter(getDoc(), 
             getFileName());
-
-    IE_Exp_HTML_DocumentWriter* pMainListener =
+    
+    IE_Exp_HTML_DocumentWriter* pMainListener = 
 		m_pWriterFactory->constructDocumentWriter(pOutputWriter);
-
-    IE_Exp_HTML_Listener *pListener = new IE_Exp_HTML_Listener(getDoc(),
+    
+    IE_Exp_HTML_Listener *pListener = new IE_Exp_HTML_Listener(getDoc(), 
         pDataExporter, m_style_tree, m_pNavigationHelper, pMainListener,
         filename.c_str());
     // Time to send some settings to listener
@@ -680,15 +673,15 @@ void IE_Exp_HTML::_createChapter(PD_DocumentRange* range, const std::string &tit
     pListener->set_EmbedCSS(m_exp_opt.bEmbedCSS);
     pListener->set_RenderMathMLToPng(m_exp_opt.bMathMLRenderPNG);
     pListener->set_EmbedImages(m_exp_opt.bEmbedImages);
-
-    IE_Exp_HTML_HeaderFooterListener *pHeaderFooterListener = new
+    
+    IE_Exp_HTML_HeaderFooterListener *pHeaderFooterListener = new 
         IE_Exp_HTML_HeaderFooterListener(getDoc(), pMainListener,
         pListener);
     getDoc()->tellListener(pHeaderFooterListener);
-
+    
     pHeaderFooterListener->doHdrFtr(true);
-
-    if (range!= NULL)
+    
+    if (range!= nullptr)
     {
         getDoc()->tellListenerSubset(pListener, range);
     } else
@@ -697,15 +690,15 @@ void IE_Exp_HTML::_createChapter(PD_DocumentRange* range, const std::string &tit
     }
     pHeaderFooterListener->doHdrFtr(false);
     pListener->endOfDocument();
-
+    
     m_mathmlFlags[filename] = pListener->get_HasMathML();
-
+    
     DELETEP(pHeaderFooterListener);
     DELETEP(pListener);
     DELETEP(pMainListener);
     DELETEP(pDataExporter);
     DELETEP(pOutputWriter);
-
+    
     if (!isIndex)
     {
         gsf_output_close(output);
@@ -714,40 +707,40 @@ void IE_Exp_HTML::_createChapter(PD_DocumentRange* range, const std::string &tit
 
 void IE_Exp_HTML::_createMultipart()
 {
-
+    
     UT_UTF8String buffer;
     UT_UTF8String title;
-
+   
     IE_Exp_HTML_StringWriter *pOutputWriter = new IE_Exp_HTML_StringWriter();
-
-      IE_Exp_HTML_MultipartExporter* pDataExporter =
-        new IE_Exp_HTML_MultipartExporter(getDoc(),
+    
+      IE_Exp_HTML_MultipartExporter* pDataExporter = 
+        new IE_Exp_HTML_MultipartExporter(getDoc(), 
             getFileName(), buffer, title);
-
-    IE_Exp_HTML_DocumentWriter* pMainListener =
+    
+    IE_Exp_HTML_DocumentWriter* pMainListener = 
 		m_pWriterFactory->constructDocumentWriter(pOutputWriter);
-
-    IE_Exp_HTML_Listener *pListener = new IE_Exp_HTML_Listener(getDoc(),
+    
+    IE_Exp_HTML_Listener *pListener = new IE_Exp_HTML_Listener(getDoc(), 
         pDataExporter, m_style_tree, m_pNavigationHelper, pMainListener,
         getFileName());
-
+    
     // Time to send some settings to listener
     pListener->set_EmbedCSS(m_exp_opt.bEmbedCSS);
     pListener->set_RenderMathMLToPng(m_exp_opt.bMathMLRenderPNG);
-
-    IE_Exp_HTML_HeaderFooterListener *pHeaderFooterListener = new
+    
+    IE_Exp_HTML_HeaderFooterListener *pHeaderFooterListener = new 
         IE_Exp_HTML_HeaderFooterListener(getDoc(), pMainListener,
         pListener);
     getDoc()->tellListener(pHeaderFooterListener);
-
+    
     pHeaderFooterListener->doHdrFtr(true);
-
+    
 
     getDoc()->tellListener(pListener);
-
+ 
     pHeaderFooterListener->doHdrFtr(false);
     pListener->endOfDocument();
-
+    
     UT_UTF8String mime;
     if (m_exp_opt.bIs4)
     {
@@ -758,12 +751,12 @@ void IE_Exp_HTML::_createMultipart()
     }
      UT_UTF8String index = pOutputWriter->getString();
      UT_UTF8String header = pDataExporter->generateHeader(index, mime);
-
-
+    
+   
     write(header.utf8_str(), header.byteLength());
     buffer +="--";
     write(buffer.utf8_str(), buffer.byteLength());
-
+    
     DELETEP(pHeaderFooterListener);
     DELETEP(pListener);
     DELETEP(pMainListener);
@@ -773,15 +766,15 @@ void IE_Exp_HTML::_createMultipart()
 
 void IE_Exp_HTML::setWriterFactory(IE_Exp_HTML_WriterFactory* pWriterFactory)
 {
-	if ((m_pWriterFactory != NULL) && (m_bDefaultWriterFactory))
+	if ((m_pWriterFactory != nullptr) && (m_bDefaultWriterFactory))
 	{
 		DELETEP(m_pWriterFactory);
         m_bDefaultWriterFactory = false;
 	}
-
-	if (pWriterFactory == NULL)
+	
+	if (pWriterFactory == nullptr)
 	{
-		m_pWriterFactory =
+		m_pWriterFactory = 
             new IE_Exp_HTML_DefaultWriterFactory(getDoc(),
                                                              this->m_exp_opt);
         m_bDefaultWriterFactory = true;
@@ -791,7 +784,7 @@ void IE_Exp_HTML::setWriterFactory(IE_Exp_HTML_WriterFactory* pWriterFactory)
     }
 }
 
-bool IE_Exp_HTML::hasMathML(const std::string& file)
+bool IE_Exp_HTML::hasMathML(const std::string& file) const
 {
     auto iter = m_mathmlFlags.find(file);
     if (iter != m_mathmlFlags.end())

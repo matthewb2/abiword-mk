@@ -20,15 +20,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
  */
-#ifndef ABI_WIDGET_H
-#define ABI_WIDGET_H
 
-#include "ut_compiler.h"
-ABI_W_NO_CONST_QUAL
+#pragma once
+
 #include <gtk/gtk.h>
-ABI_W_POP
-#include <gsf/gsf-input.h>
-#include <gsf/gsf-output.h>
+#include <gsf/gsf.h>
 
 G_BEGIN_DECLS
 
@@ -459,5 +455,3 @@ G_BEGIN_DECLS
 #endif
 
 G_END_DECLS
-
-#endif /* ABI_WIDGET_H */

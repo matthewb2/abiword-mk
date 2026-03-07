@@ -51,12 +51,12 @@ static void s_updateMailMergeFields(XAP_Frame * pFrame, PD_Document * pDoc);
 
 class XAP_Cocoa_MailMerge_Listener : public IE_MailMerge::IE_MailMerge_Listener
 {
-	IE_MailMerge *		m_Importer;
+	IE_MailMerge&		m_Importer;
 
 	NSMutableArray *	m_DataSet;
 
 public:
-	XAP_Cocoa_MailMerge_Listener(IE_MailMerge * importer, NSMutableArray * dataset) :
+	XAP_Cocoa_MailMerge_Listener(IE_MailMerge& importer, NSMutableArray * dataset) :
 		m_Importer(importer),
 		m_DataSet(dataset)
 	{
@@ -74,7 +74,7 @@ public:
 	}
 	virtual bool fireUpdate()
 	{
-		const std::map<std::string, std::string> & map = m_Importer->getCurrentMapping();
+		const std::map<std::string, std::string> & map = m_Importer.getCurrentMapping();
 
 		NSMutableArray * fieldArray = (NSMutableArray *) [m_DataSet objectAtIndex:0];
 
@@ -236,7 +236,7 @@ static EV_Menu_ItemState s_GetMenuItemState_Fn (AV_View * /*pView*/, XAP_Menu_Id
 		if ([menuItem isEnabled] == NO) {
 			_state |= EV_MIS_Gray;		//	= 0x01,		/* item is or should be gray */
 		}
-		if ([menuItem state] == NSOnState) {
+		if ([menuItem state] == NSControlStateValueOn) {
 			_state |= EV_MIS_Toggled;	//	= 0x02,		/* checkable item should be checked */
 		}
 	}
@@ -284,7 +284,7 @@ static const char * s_GetMenuItemComputedLabel_Fn (const EV_Menu_Label * pLabel,
 
 		m_Tag = 0;
 
-		m_State = NSOffState;
+		m_State = NSControlStateValueOff;
 		m_Enabled = YES;
 
 		m_pAction = 0;
@@ -382,7 +382,7 @@ static const char * s_GetMenuItemComputedLabel_Fn (const EV_Menu_Label * pLabel,
 
 - (void)setState:(int)state
 {
-	m_State = (state == NSOnState) ? NSOnState : NSOffState;
+	m_State = (state == NSControlStateValueOn) ? NSControlStateValueOn : NSControlStateValueOff;
 }
 
 - (int)state
@@ -486,7 +486,7 @@ static const char * s_GetMenuItemComputedLabel_Fn (const EV_Menu_Label * pLabel,
 	ext = [NSString stringWithFormat:@".%@", ext];
 
 	IEFileType ieft = IE_Exp::fileTypeForSuffix([ext UTF8String]);
-	GsfOutput * out = UT_go_file_create([path UTF8String], NULL);
+	GsfOutput * out = UT_go_file_create([path UTF8String], nullptr);
 
 	if (out) {
 		UT_Error error = m_pDocument->saveAs(out, ieft, [expProps UTF8String]);
@@ -624,7 +624,7 @@ static const char * s_GetMenuItemComputedLabel_Fn (const EV_Menu_Label * pLabel,
 						}
 					[dataset addObject:fieldArray];
 
-					XAP_Cocoa_MailMerge_Listener listener(pie, dataset);
+					XAP_Cocoa_MailMerge_Listener listener(*pie, dataset);
 
 					pie->setListener(&listener);
 					pie->mergeFile([path UTF8String]);

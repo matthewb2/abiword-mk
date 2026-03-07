@@ -21,15 +21,15 @@
  */
 
 // Class definition include
-#include <OXML_Element.h>
+#include "OXML_Element.h"
 
 // Internal includes
-#include <OXML_Types.h>
+#include "OXML_Types.h"
 
 // AbiWord includes
-#include <ut_types.h>
-#include <pd_Document.h>
-#include <pt_Types.h>
+#include "ut_types.h"
+#include "pd_Document.h"
+#include "pt_Types.h"
 
 // External includes
 #include <string>
@@ -62,7 +62,7 @@ OXML_SharedElement OXML_Element::getElement(const std::string & id) const
 
 UT_Error OXML_Element::appendElement(const OXML_SharedElement & obj)
 {
-	UT_return_val_if_fail(obj.get() != NULL, UT_ERROR);
+	UT_return_val_if_fail(obj.get() != nullptr, UT_ERROR);
 
 	try {
 		m_children.push_back(obj);
@@ -126,7 +126,7 @@ UT_Error OXML_Element::addToPT(PD_Document * pDocument)
 {
 	UT_Error ret = UT_OK;
 
-	if (pDocument == NULL)
+	if (pDocument == nullptr)
 		return UT_ERROR;
 
 	//	const gchar ** atts = getAttributesWithProps();

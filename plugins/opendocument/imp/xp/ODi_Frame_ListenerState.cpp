@@ -1,3 +1,4 @@
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
 /* AbiSource
  * 
  * Copyright (C) 2005 Daniel d'Andrada T. de Carvalho
@@ -31,11 +32,11 @@
 #include "ODi_Abi_Data.h"
 
 // AbiWord includes
-#include <pt_Types.h>
-#include <pd_Document.h>
-#include <ut_locale.h>
-#include <ut_units.h>
-#include <ie_math_convert.h>
+#include "pt_Types.h"
+#include "pd_Document.h"
+#include "ut_locale.h"
+#include "ut_units.h"
+#include "ie_math_convert.h"
 
 /**
  * Constructor
@@ -51,7 +52,6 @@ ODi_Frame_ListenerState::ODi_Frame_ListenerState(PD_Document* pDocument,
         m_parsedFrameStartTag(false),
         m_inlinedImage(false),
         m_iFrameDepth(0),
-        m_pMathBB(NULL),
         m_bInMath(false),
 		m_bInlineImagePending(false),
 		m_bPositionedImagePending(false),
@@ -112,9 +112,8 @@ void ODi_Frame_ListenerState::startElement (const gchar* pName,
       _drawObject(ppAtts, rAction);
 
     } else if (!strcmp(pName, "math:math")) {
-        
-        DELETEP(m_pMathBB);
-        m_pMathBB = new UT_ByteBuf;
+
+        m_pMathBB.reset(new UT_ByteBuf);
         m_pMathBB->append(reinterpret_cast<const UT_Byte *>("<math xmlns='http://www.w3.org/1998/Math/MathML' display='block'>"), 65);
 
         m_bInMath = true;
@@ -152,15 +151,12 @@ void ODi_Frame_ListenerState::endElement (const gchar* pName,
 				m_mPendingImgProps["alt"] = m_sAltDesc;
 
 			// write out the pending image
-			const UT_sint32 size = m_mPendingImgProps.size()*2+1;
-			const gchar** attribs = (const gchar**)g_malloc(size * sizeof(const gchar*));
-			UT_sint32 i = 0;
-			for (std::map<std::string, std::string>::const_iterator cit = m_mPendingImgProps.begin(); cit != m_mPendingImgProps.end(); cit++)
+			PP_PropertyVector attribs;
+			for (auto cit = m_mPendingImgProps.cbegin(); cit != m_mPendingImgProps.cend(); cit++)
 			{
-				attribs[i++] = reinterpret_cast<const gchar*>((*cit).first.c_str());
-				attribs[i++] = reinterpret_cast<const gchar*>((*cit).second.c_str());
+				attribs.push_back(cit->first);
+				attribs.push_back(cit->second);
 			}
-			attribs[i] = NULL;
 
 			if (m_bInlineImagePending)
 			{
@@ -180,14 +176,13 @@ void ODi_Frame_ListenerState::endElement (const gchar* pName,
 				m_bPositionedImagePending = false;
 			}
 
-			FREEP(attribs);
 			m_sAltTitle = "";
 			m_sAltDesc = "";
 			m_mPendingImgProps.clear();
 		}
 
         if (!m_inlinedImage && (m_iFrameDepth > 0)) {
-            if(!m_pAbiDocument->appendStrux(PTX_EndFrame, NULL)) {
+            if(!m_pAbiDocument->appendStrux(PTX_EndFrame, PP_NOPROPS)) {
                 UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
             } else {
                 m_iFrameDepth--;
@@ -208,33 +203,32 @@ void ODi_Frame_ListenerState::endElement (const gchar* pName,
 
             // Create the data item
             UT_uint32 id = m_pAbiDocument->getUID(UT_UniqueId::Math);
-	    std::string sID = UT_std_string_sprintf("MathLatex%d", id);
+			std::string sID = UT_std_string_sprintf("MathLatex%d", id);
 
             std::string lID;
-	    lID.assign("LatexMath");
+			lID.assign("LatexMath");
      	    lID.append((sID.substr(9,sID.size()-8)).c_str());
 			
-      	    UT_ByteBuf latexBuf;
+      	    UT_ByteBufPtr latexBuf(new UT_ByteBuf);
    	    UT_UTF8String PMathml = (const char*)(m_pMathBB->getPointer(0));
 	    UT_UTF8String PLatex,Pitex;
 
-	    m_pAbiDocument->createDataItem(sID.c_str(), false, m_pMathBB, "", NULL);
-			
+	    m_pAbiDocument->createDataItem(sID.c_str(), false, m_pMathBB, "", nullptr);
+
 	    if(convertMathMLtoLaTeX(PMathml, PLatex) && convertLaTeXtoEqn(PLatex,Pitex))
- 	    {    
+ 	    {
 		// Conversion of MathML to LaTeX and the Equation Form suceeds
-		latexBuf.ins(0,reinterpret_cast<const UT_Byte *>(Pitex.utf8_str()),static_cast<UT_uint32>(Pitex.size()));
-		m_pAbiDocument->createDataItem(lID.c_str(), false,&latexBuf,"", NULL);
+		latexBuf->ins(0, reinterpret_cast<const UT_Byte *>(Pitex.utf8_str()), static_cast<UT_uint32>(Pitex.size()));
+		m_pAbiDocument->createDataItem(lID.c_str(), false, latexBuf, "", nullptr);
     	    }
 
-            const gchar *atts[5] = { NULL, NULL, NULL, NULL, NULL };
-            atts[0] = PT_IMAGE_DATAID;
-            atts[1] = sID.c_str();
-	    atts[2] = static_cast<const gchar *>("latexid");
-	    atts[3] = static_cast<const gchar *>(lID.c_str());
+            const PP_PropertyVector atts = {
+				PT_IMAGE_DATAID, sID,
+				"latexid", lID
+			};
             m_pAbiDocument->appendObject(PTO_Math, atts);
 
-            DELETEP(m_pMathBB);
+            m_pMathBB.reset();
         }
 
         m_bInMath = false;
@@ -335,8 +329,8 @@ void ODi_Frame_ListenerState::_drawImage (const gchar** ppAtts,
 
 void ODi_Frame_ListenerState::_drawInlineImage (const gchar** ppAtts)
 {
-    const gchar* pWidth = NULL;
-    const gchar* pHeight = NULL;
+    const gchar* pWidth = nullptr;
+    const gchar* pHeight = nullptr;
     UT_String dataId;
 
     m_inlinedImage = true;
@@ -371,7 +365,7 @@ void ODi_Frame_ListenerState::_drawInlineImage (const gchar** ppAtts)
 void ODi_Frame_ListenerState::_drawObject (const gchar** ppAtts,
 					   ODi_ListenerStateAction& rAction)
 {
-    const gchar* pChar = NULL;
+    const gchar* pChar = nullptr;
     UT_String dataId; // id of the data item that contains the object.
     
     
@@ -407,7 +401,6 @@ void ODi_Frame_ListenerState::_drawObject (const gchar** ppAtts,
             return;
         }
 		 
-	const gchar* attribs[7];
 
 	std::string extraID;
 	std::string objectID;
@@ -415,11 +408,7 @@ void ODi_Frame_ListenerState::_drawObject (const gchar** ppAtts,
 	extraID.assign("LatexMath");
 	extraID.append(objectID.c_str());
 
-	attribs[4] = static_cast<const gchar *>("latexid");
-	attribs[5] = static_cast<const gchar *>(extraID.c_str());
-	attribs[6] = 0;
 	   
-        UT_String propsBuffer;
         
         pWidth = m_rElementStack.getStartTag(0)->getAttributeValue("svg:width");
         UT_ASSERT(pWidth);
@@ -427,13 +416,14 @@ void ODi_Frame_ListenerState::_drawObject (const gchar** ppAtts,
         pHeight = m_rElementStack.getStartTag(0)->getAttributeValue("svg:height");
         UT_ASSERT(pHeight);  
         
-        UT_String_sprintf(propsBuffer, "width:%s; height:%s", pWidth, pHeight);
+        std::string propsBuffer =
+            UT_std_string_sprintf("width:%s; height:%s", pWidth, pHeight);
         
-        attribs[0] = "props";
-        attribs[1] = propsBuffer.c_str();
-        attribs[2] = "dataid";
-        attribs[3] = static_cast<const gchar *>(dataId.c_str());    
-    
+        PP_PropertyVector attribs = {
+            "props", propsBuffer,
+            "dataid", dataId.c_str(),
+            "latexid", extraID
+        };
         if (!m_pAbiDocument->appendObject ((PTObjectType)pto_Type, attribs)) {
             UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
         }
@@ -503,9 +493,8 @@ static bool _convertBorderThickness(const char* szIncoming, std::string& sConver
  */
 void ODi_Frame_ListenerState::_drawTextBox (const gchar** ppAtts,
                                            ODi_ListenerStateAction& rAction) {
-    const gchar* attribs[3];
-    const gchar* pStyleName = NULL;
-    const ODi_Style_Style* pGraphicStyle = NULL;
+    const gchar* pStyleName = nullptr;
+    const ODi_Style_Style* pGraphicStyle = nullptr;
     std::string props;
     std::string sThickness;
     
@@ -633,10 +622,9 @@ void ODi_Frame_ListenerState::_drawTextBox (const gchar** ppAtts,
         props += "bot-style:1; left-style:1; right-style:1; top-style:1";
     }
 
-    attribs[0] = "props";
-    attribs[1] = props.c_str();
-    attribs[2] = 0;
-		   
+    const PP_PropertyVector attribs = {
+        "props", props
+    };
     if(!m_pAbiDocument->appendStrux(PTX_SectionFrame, attribs)) {
         UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
     } else {
@@ -658,7 +646,7 @@ bool ODi_Frame_ListenerState::_getFrameProperties(std::string& rProps,
     const ODi_Style_Style* pGraphicStyle;
     const std::string* pWrap;
     const std::string* pBackgroundColor;
-    const gchar* pVal = NULL;
+    const gchar* pVal = nullptr;
     
     pStyleName = m_rElementStack.getStartTag(0)->getAttributeValue("draw:style-name");
     UT_ASSERT(pStyleName);
@@ -761,9 +749,9 @@ bool ODi_Frame_ListenerState::_getFrameProperties(std::string& rProps,
     //       and svg:width/height on both <draw:frame> and <draw:text-box>
     
     pVal = UT_getAttribute("fo:min-width", ppAtts);
-    if (pVal == NULL) {
+    if (pVal == nullptr) {
         pVal = m_rElementStack.getStartTag(0)->getAttributeValue("svg:width");
-        if (pVal == NULL) {
+        if (pVal == nullptr) {
             pVal = m_rElementStack.getStartTag(0)->getAttributeValue("fo:min-width");
             if (UT_determineDimension(pVal, DIM_none) == DIM_PERCENT) {
                 // TODO: Do the conversion from percentage to a real
@@ -802,10 +790,9 @@ bool ODi_Frame_ListenerState::_getFrameProperties(std::string& rProps,
     }
 
     pVal = UT_getAttribute("fo:min-height", ppAtts);
-    if (pVal == NULL) 
-    {
+    if (pVal == nullptr) {
         pVal = m_rElementStack.getStartTag(0)->getAttributeValue("svg:height");
-        if (pVal == NULL) {
+        if (pVal == nullptr) {
             pVal = m_rElementStack.getStartTag(0)->getAttributeValue("fo:min-height");
             if (UT_determineDimension(pVal, DIM_none) == DIM_PERCENT) {
                 // TODO: Do the conversion from percentage to a real

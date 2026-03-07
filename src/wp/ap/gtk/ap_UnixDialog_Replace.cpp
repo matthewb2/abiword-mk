@@ -1,3 +1,4 @@
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
  * 
@@ -27,6 +28,7 @@
 #include "ut_assert.h"
 #include "ut_debugmsg.h"
 #include "xap_UnixDialogHelper.h"
+#include "xap_GtkUtils.h"
 
 #include "xap_App.h"
 #include "xap_UnixApp.h"
@@ -46,17 +48,15 @@ XAP_Dialog * AP_UnixDialog_Replace::static_constructor(XAP_DialogFactory * pFact
 AP_UnixDialog_Replace::AP_UnixDialog_Replace(XAP_DialogFactory * pDlgFactory,
 											   XAP_Dialog_Id id)
 	: AP_Dialog_Replace(pDlgFactory,id)
+	, m_comboFind(nullptr)
+	, m_comboReplace(nullptr)
+	, m_checkbuttonMatchCase(nullptr)
+	, m_checkbuttonWholeWord(nullptr)
+	, m_checkbuttonReverseFind(nullptr)
+	, m_buttonFind(nullptr)
+	, m_buttonFindReplace(nullptr)
+	, m_buttonReplaceAll(nullptr)
 {
-	m_windowMain = NULL;
-
-	m_comboFind = NULL;
-	m_comboReplace = NULL;
-	m_checkbuttonMatchCase = NULL;
-	m_checkbuttonWholeWord = NULL;
-	m_checkbuttonReverseFind = NULL;
-	m_buttonFind = NULL;
-	m_buttonFindReplace = NULL;
-	m_buttonReplaceAll = NULL;
 }
 
 AP_UnixDialog_Replace::~AP_UnixDialog_Replace(void)
@@ -143,13 +143,6 @@ static void s_replaceall_clicked(GtkWidget * /*btn*/, GtkWidget * dlg)
 	gtk_dialog_response (GTK_DIALOG(dlg), AP_UnixDialog_Replace::BUTTON_REPLACE_ALL);
 }
 
-static void s_delete_clicked(GtkWidget * widget,
-							 gpointer,
-							 gpointer * /*dlg*/)
-{
-	abiDestroyWidget(widget);
-}
-
 /*****************************************************************/
 
 void AP_UnixDialog_Replace::activate(void)
@@ -157,7 +150,7 @@ void AP_UnixDialog_Replace::activate(void)
 	UT_ASSERT(m_windowMain);
 	ConstructWindowName();
 	gtk_window_set_title (GTK_WINDOW (m_windowMain), m_WindowName);
-	gdk_window_raise(gtk_widget_get_window(m_windowMain));
+	XAP_gtk_window_raise(m_windowMain);
 }
 
 void AP_UnixDialog_Replace::notifyActiveFrame(XAP_Frame * /*pFrame*/)
@@ -185,7 +178,7 @@ void AP_UnixDialog_Replace::runModeless(XAP_Frame * pFrame)
 static UT_UCS4String
 get_combobox_text(GtkWidget* combo)
 {
-	UT_UCS4String ucs = gtk_entry_get_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(combo))));
+	UT_UCS4String ucs = XAP_gtk_entry_get_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(combo))));
 
 	return ucs;
 }
@@ -277,7 +270,7 @@ void AP_UnixDialog_Replace::destroy(void)
 	_storeWindowData();
 	modeless_cleanup();
 	abiDestroyWidget(m_windowMain);
-	m_windowMain = NULL;
+	m_windowMain = nullptr;
 }
 
 /*****************************************************************/
@@ -286,10 +279,10 @@ GtkWidget * AP_UnixDialog_Replace::_constructWindow(void)
 {
 	const XAP_StringSet * pSS = m_pApp->getStringSet();
 
-	char * unixstr = NULL;
+	char * unixstr = nullptr;
 
 	// load the dialog from the UI file
-	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_Replace.ui");
+	GtkBuilder* builder = newDialogBuilderFromResource("ap_UnixDialog_Replace.ui");
 
 	m_windowMain = GTK_WIDGET(gtk_builder_get_object(builder, "ap_UnixDialog_Replace"));
 	m_buttonFind = GTK_WIDGET(gtk_builder_get_object(builder, "btnFind"));
@@ -353,6 +346,7 @@ GtkWidget * AP_UnixDialog_Replace::_constructWindow(void)
 		gtk_widget_hide (m_buttonReplaceAll);
 	}
 
+	connectBasicSignals();
 	g_signal_connect(G_OBJECT(m_windowMain), "response", 
 					 G_CALLBACK(s_response_triggered), this);
 
@@ -395,11 +389,7 @@ GtkWidget * AP_UnixDialog_Replace::_constructWindow(void)
 					   "destroy",
 					   G_CALLBACK(s_destroy_clicked),
 					   (gpointer) this);
-	g_signal_connect(G_OBJECT(m_windowMain),
-					   "delete_event",
-					   G_CALLBACK(s_delete_clicked),
-					   (gpointer) this);
-	
+
 	gtk_widget_queue_resize (m_windowMain);
 
 	g_object_unref(G_OBJECT(builder));

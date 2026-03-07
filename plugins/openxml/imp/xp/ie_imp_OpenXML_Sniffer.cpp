@@ -26,9 +26,6 @@
 // Internal includes
 #include <ie_imp_OpenXML.h>
 
-#include <gsf/gsf-infile.h>
-#include <gsf/gsf-infile-zip.h>
-
 /**
  * Constructor
  * 
@@ -85,8 +82,8 @@ UT_Confidence_t IE_Imp_OpenXML_Sniffer::recognizeContents (GsfInput * input)
 
 	GsfInfile * zip;
 
-	zip = gsf_infile_zip_new (input, NULL);
-	if (zip != NULL)
+	zip = gsf_infile_zip_new (input, nullptr);
+	if (zip != nullptr)
 	{
 		GsfInput* pInput = gsf_infile_child_by_name(zip, "[Content_Types].xml");
 

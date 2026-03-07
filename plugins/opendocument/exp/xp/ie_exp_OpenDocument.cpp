@@ -41,25 +41,14 @@
 #include "ODe_SettingsWriter.h"
 
 // Abiword includes
-#include <ut_assert.h>
-#include <ut_locale.h>
-#include <pd_Document.h>
-#include <pd_DocumentRDF.h>
+#include "ut_assert.h"
+#include "ut_locale.h"
+#include "pd_Document.h"
+#include "pd_DocumentRDF.h"
 #include "ie_exp_DocRangeListener.h"
 #include "pl_ListenerCoupleCloser.h"
 
-// External includes
-#include <gsf/gsf-outfile.h>
-#include <gsf/gsf-output-stdio.h>
-#include <gsf/gsf-outfile-zip.h>
-#include <gsf/gsf-outfile-stdio.h>
-#include <gsf/gsf-output-memory.h>
-#include <gsf/gsf-infile.h>
-#include <gsf/gsf-input.h>
-#include <gsf/gsf-input-stdio.h>
-
-
-#ifdef WIN32
+#ifdef _WIN32
 #include <io.h>
 #endif
 #include <glib.h>
@@ -69,7 +58,7 @@
  * Constructor
  */
 IE_Exp_OpenDocument::IE_Exp_OpenDocument (PD_Document * pDoc)
-  : IE_Exp (pDoc), m_odt(0)
+  : IE_Exp (pDoc), m_odt(nullptr)
 {
 }
 
@@ -83,7 +72,7 @@ IE_Exp_OpenDocument::~IE_Exp_OpenDocument()
 
 GsfOutput* IE_Exp_OpenDocument::_openFile(const char *szFilename)
 {
-  GsfOutput *output = NULL;
+  GsfOutput *output = nullptr;
 
   const std::string & prop = getProperty ("uncompressed");
 
@@ -92,7 +81,7 @@ GsfOutput* IE_Exp_OpenDocument::_openFile(const char *szFilename)
       char *filename = UT_go_filename_from_uri (szFilename);
       if (filename) 
 	{
-	  output = (GsfOutput*)gsf_outfile_stdio_new (filename, NULL);
+	  output = (GsfOutput*)gsf_outfile_stdio_new (filename, nullptr);
 	  g_free (filename);
 	}
     }
@@ -113,7 +102,7 @@ void IE_Exp_OpenDocument::setGSFOutput(GsfOutput * pBuf)
  * This method copies the selection defined by pDocRange to ODT format
  * placed in the ByteBuf bufODT
  */
-UT_Error IE_Exp_OpenDocument::copyToBuffer(PD_DocumentRange * pDocRange,UT_ByteBuf *  bufODT)
+UT_Error IE_Exp_OpenDocument::copyToBuffer(PD_DocumentRange * pDocRange, const UT_ByteBufPtr & bufODT)
 {
     //
     // First export selected range to a tempory document
@@ -159,15 +148,15 @@ UT_Error IE_Exp_OpenDocument::copyToBuffer(PD_DocumentRange * pDocRange,UT_ByteB
     // OK now we have a complete and valid document containing our selected 
     // content. We export this to an in memory GSF buffer
     //
-    IE_Exp * pNewExp = NULL; 
-    char *szTempFileName = NULL;
-    GError *err = NULL;
+    IE_Exp * pNewExp = nullptr; 
+    char *szTempFileName = nullptr;
+    GError *err = nullptr;
     g_file_open_tmp ("XXXXXX", &szTempFileName, &err);
     GsfOutput * outBuf =  gsf_output_stdio_new (szTempFileName,&err);
     IEFileType ftODT = IE_Exp::fileTypeForMimetype("application/vnd.oasis.opendocument.text");
     UT_Error aerr = IE_Exp::constructExporter(outDoc,outBuf,
 					     ftODT,&pNewExp);
-    if(pNewExp == NULL)
+    if(pNewExp == nullptr)
     {
          return aerr;
     }
@@ -187,7 +176,7 @@ UT_Error IE_Exp_OpenDocument::copyToBuffer(PD_DocumentRange * pDocRange,UT_ByteB
 
     GsfInput *  fData = gsf_input_stdio_new(szTempFileName,&err);
     UT_DebugOnly<UT_sint32> siz = gsf_input_size(fData);
-    const UT_Byte * pData = gsf_input_read(fData,gsf_input_size(fData),NULL);
+    const UT_Byte * pData = gsf_input_read(fData,gsf_input_size(fData),nullptr);
     UT_DEBUGMSG(("Writing %d bytes to clipboard \n", (UT_sint32)siz));
     bufODT->append( pData, gsf_input_size(fData));
     
@@ -207,8 +196,8 @@ UT_Error IE_Exp_OpenDocument::_writeDocument(void)
 {
 	ODe_DocumentData docData(getDoc());
 	ODe_AuxiliaryData auxData;
-	ODe_AbiDocListener* pAbiDocListener = NULL;
-	ODe_AbiDocListenerImpl* pAbiDocListenerImpl = NULL;
+	ODe_AbiDocListener* pAbiDocListener = nullptr;
+	ODe_AbiDocListenerImpl* pAbiDocListenerImpl = nullptr;
     
 	UT_return_val_if_fail (getFp(), UT_ERROR);
 
@@ -223,7 +212,7 @@ UT_Error IE_Exp_OpenDocument::_writeDocument(void)
 	  }
 	else
 	  {
-	    GError* error = NULL;
+	    GError* error = nullptr;
 	    m_odt = GSF_OUTFILE (gsf_outfile_zip_new (getFp(), &error));
 	    
 	    if (error)

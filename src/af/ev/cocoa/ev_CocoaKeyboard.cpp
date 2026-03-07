@@ -86,7 +86,7 @@ bool ev_CocoaKeyboard::_dispatchKey(AV_View * pView, UT_uint32 charData, EV_Edit
 				break;
 			case EV_EEMR_COMPLETE:
 				UT_ASSERT(pEM);
-				invokeKeyboardMethod(pView,pEM,0,0); // no char data to offer
+				invokeKeyboardMethod(pView, pEM, nullptr, 0); // no char data to offer
 				retval = true;
 				break;
 			case EV_EEMR_INCOMPLETE:
@@ -164,11 +164,11 @@ bool ev_CocoaKeyboard::keyPressEvent(AV_View* pView, NSEvent* e)
                      [[e characters] UTF8String], state));
 
 	unsigned int modifierFlags = [e modifierFlags];
-	if (modifierFlags & NSShiftKeyMask)
+	if (modifierFlags & NSEventModifierFlagShift)
 		state |= EV_EMS_SHIFT;
-	if (modifierFlags & NSControlKeyMask)
+	if (modifierFlags & NSEventModifierFlagControl)
 		state |= EV_EMS_CONTROL;
-	if (modifierFlags & NSAlternateKeyMask)
+	if (modifierFlags & NSEventModifierFlagOption)
 		state |= EV_EMS_ALT;
 
 	NSString *characters = [e characters];

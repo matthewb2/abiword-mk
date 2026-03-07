@@ -29,8 +29,6 @@
 // like centering them, measuring them, etc.
 #include "xap_CocoaDialog_Utilities.h"
 
-#include "gr_CocoaCairoGraphics.h"
-
 #include "xap_App.h"
 #include "xap_CocoaApp.h"
 #include "xap_CocoaFrame.h"
@@ -84,7 +82,7 @@ void XAP_CocoaDialog_Zoom::runModal(XAP_Frame * pFrame)
 	[m_dlg release];
 	m_dlg = nil;
 
-	m_pFrame = NULL;
+	m_pFrame = nullptr;
 }
 
 

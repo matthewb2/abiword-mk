@@ -85,11 +85,7 @@ GtkWidget * AP_UnixDialog_CollaborationAddAccount::_constructWindow(void)
 	//const XAP_StringSet * pSS = XAP_App::getApp()->getStringSet();
 	
 	// load the dialog from the UI file
-#if GTK_CHECK_VERSION(3,0,0)
 	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_CollaborationAddAccount.ui");
-#else
-	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_CollaborationAddAccount-2.ui");
-#endif
 	
 	// Update our member variables with the important widgets that 
 	// might need to be queried or altered later
@@ -163,7 +159,7 @@ AccountHandler* AP_UnixDialog_CollaborationAddAccount::_getActiveAccountHandler(
 	{
 		gchar * str_data;
 		gpointer* ptr_data;
-		AccountHandler* pHandler = 0;
+		AccountHandler* pHandler = nullptr;
 
 		gtk_tree_model_get (m_model, &iter, 
                           0, &str_data,
@@ -173,7 +169,7 @@ AccountHandler* AP_UnixDialog_CollaborationAddAccount::_getActiveAccountHandler(
 		pHandler = reinterpret_cast<AccountHandler*>(ptr_data);
 		return pHandler;
 	}
-	return 0;
+	return nullptr;
 }
 
 // TODO: this method should probably be moved to AP_Dialog_CollaborationAddAccount

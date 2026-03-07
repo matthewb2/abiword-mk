@@ -34,7 +34,7 @@
 #include <account/xp/AccountHandler.h>
 #include <libxml/tree.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
@@ -70,7 +70,7 @@ public:
 	XAP_Dialog_Id								getDialogAddBuddyId()
 		{ return m_iDialogAddBuddy; }
 
-	#ifdef WIN32
+	#ifdef _WIN32
 	// On Windows, we must share our HMODULE/HINSTANCE so we can do gui
 	void										setInstance(HINSTANCE hModule)
 		{ m_hModule = hModule; }
@@ -89,24 +89,24 @@ public:
 	void										disconnectSession(AbiCollab* pSession);
 	void										disconnectSessions();
 	AbiCollab*									getSession(PD_Document* pDoc);
-	AbiCollab*									getSessionFromDocumentId(const UT_UTF8String& sDocumentId);
-	AbiCollab*									getSessionFromSessionId(const UT_UTF8String& sSessionId);
+	AbiCollab*									getSessionFromDocumentId(const std::string& sDocumentId);
+	AbiCollab*									getSessionFromSessionId(const std::string& sSessionId);
 	const UT_GenericVector<AbiCollab *>&		getSessions(void) const
 		{ return m_vecSessions;}
-	AbiCollab*									startSession(PD_Document* pDoc, UT_UTF8String& sNewSessionId, AccountHandler* pAclAccount,
+	AbiCollab*									startSession(PD_Document* pDoc, std::string& sNewSessionId, AccountHandler* pAclAccount,
 														bool bLocallyOwned,	XAP_Frame* pFrame, const UT_UTF8String& masterDescriptor);
 	void										closeSession(AbiCollab* pSession, bool canConfirm);
 	void										closeSessions();
 	void										joinSessionInitiate(BuddyPtr pBuddy, DocHandle* pDocHandle);
-	void										joinSession(const UT_UTF8String& sSessionId, PD_Document* pDoc,
-														const UT_UTF8String& docUUID, UT_sint32 iRev, UT_sint32 iAuthorId,
+	void										joinSession(const std::string& sSessionId, PD_Document* pDoc,
+														const std::string& docUUID, UT_sint32 iRev, UT_sint32 iAuthorId,
 														BuddyPtr pCollaborator, AccountHandler* pAclAccount, bool bLocallyOwned,
 														XAP_Frame *pFrame);
 	void										joinSession(AbiCollab* pSession, BuddyPtr pCollaborator);
-	void										disjoinSession(const UT_UTF8String& sSessionId);
+	void										disjoinSession(const std::string& sSessionId);
 	bool										isLocallyControlled(PD_Document* pDoc);
 	bool										isInSession(PD_Document* pDoc);
-	bool										isActive(const UT_UTF8String& sSessionId);
+	bool										isActive(const std::string& sSessionId);
 	void										removeBuddy(BuddyPtr pBuddy, bool graceful = true);
 	void										updateAcl(AbiCollab* pSession, AccountHandler* pAccount, const std::vector<std::string> acl);
 	XAP_Frame*									findFrameForSession(AbiCollab* pSession);
@@ -165,7 +165,7 @@ private:
 	XAP_Dialog_Id								m_iDialogEditAccount;
 	XAP_Dialog_Id								m_iDialogAddBuddy;
 
-	#ifdef WIN32
+	#ifdef _WIN32
 	HINSTANCE 									m_hModule;
 	#endif
 

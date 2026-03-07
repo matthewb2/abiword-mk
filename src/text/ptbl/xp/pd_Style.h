@@ -26,7 +26,6 @@
 #include <memory>
 
 #include "ut_types.h"
-#include "ut_vector.h"
 #include "pt_Types.h"
 #include "ut_xml.h"
 #include "pp_Property.h"
@@ -39,7 +38,7 @@ class pt_PieceTable;
 class ABI_EXPORT PD_Style
 {
 public:
-	PD_Style(pt_PieceTable * pPT, PT_AttrPropIndex indexAP, const char * szName = NULL, bool bDisplayed = true);
+	PD_Style(pt_PieceTable * pPT, PT_AttrPropIndex indexAP, const char * szName = nullptr, bool bDisplayed = true);
 	virtual ~PD_Style();
 
 	inline PT_AttrPropIndex		getIndexAP(void) const	{ return m_indexAP; };
@@ -65,8 +64,8 @@ public:
 	bool					addProperties(const PP_PropertyVector & pProperties);
 	bool					setAllAttributes(const PP_PropertyVector & atts);
 	bool					addAttributes(const PP_PropertyVector & pAtts);
-	bool                    getAllProperties( UT_Vector * vProps, UT_sint32 depth) const;
-	bool                    getAllAttributes( UT_Vector * vAttribs, UT_sint32 depth) const;
+	bool                    getAllProperties(PP_PropertyVector & vProps, UT_sint32 depth) const;
+	bool                    getAllAttributes(PP_PropertyVector & vAttribs, UT_sint32 depth) const;
 	size_t getPropertyCount(void) const;
 	size_t getAttributeCount(void) const;
 	bool getNthProperty (int ndx, const gchar *&szName,
@@ -103,7 +102,7 @@ public:
 	PD_BuiltinStyle(pt_PieceTable * pPT, PT_AttrPropIndex indexAP, const char * szName, bool bDisplayed);
 	virtual ~PD_BuiltinStyle();
 
-	virtual bool			isUserDefined(void) const { return (m_indexAP != m_indexAPOrig); };
+	virtual bool			isUserDefined(void) const override { return (m_indexAP != m_indexAPOrig); };
 
 protected:
 	PT_AttrPropIndex		m_indexAPOrig;	// the builtin one

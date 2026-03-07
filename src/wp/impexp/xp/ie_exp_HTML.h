@@ -19,11 +19,9 @@
  * 02110-1301 USA.
  */
 
-#ifndef IE_EXP_HTML_H
-#define IE_EXP_HTML_H
+#pragma once
 
-// External includes
-#include <gsf/gsf-output.h>
+#include <gsf/gsf.h>
 
 class IE_Exp_HTML;
 
@@ -38,21 +36,21 @@ class IE_Exp_HTML;
 #include "xap_Dlg_HTMLOptions.h"
 
 // Abiword includes
-#include <ut_debugmsg.h>
-#include <ut_assert.h>
-#include <ut_string_class.h>
-#include <ut_go_file.h>
-#include <xap_App.h>
-#include <ie_types.h>
-#include <ie_TOC.h>
-#include <ap_Strings.h>
-#include <xap_Dialog_Id.h>
-#include <xap_DialogFactory.h>
-#include <xap_Frame.h>
-#include <xav_View.h>
-#include <ie_exp.h>
-#include <pt_Types.h>
-#include <ut_path.h>
+#include "ut_debugmsg.h"
+#include "ut_assert.h"
+#include "ut_string_class.h"
+#include "ut_go_file.h"
+#include "xap_App.h"
+#include "ie_types.h"
+#include "ie_TOC.h"
+#include "ap_Strings.h"
+#include "xap_Dialog_Id.h"
+#include "xap_DialogFactory.h"
+#include "xap_Frame.h"
+#include "xav_View.h"
+#include "ie_exp.h"
+#include "pt_Types.h"
+#include "ut_path.h"
 
 /* Define if the base unicode char is UCS-4
  */
@@ -68,14 +66,14 @@ public:
 	IE_Exp_HTML_Sniffer ();
 	virtual ~IE_Exp_HTML_Sniffer () {}
 
-	virtual bool recognizeSuffix (const gchar * szSuffix);
-	virtual bool getDlgLabels (const gchar ** szDesc,
+	virtual bool recognizeSuffix(const gchar * szSuffix) override;
+	virtual bool getDlgLabels(const gchar ** szDesc,
 							   const gchar ** szSuffixList,
-							   IEFileType * ft);
-	virtual UT_Error constructExporter (PD_Document * pDocument,
-										IE_Exp ** ppie);
+							   IEFileType * ft) override;
+	virtual UT_Error constructExporter(PD_Document * pDocument,
+										IE_Exp ** ppie) override;
 
-	virtual UT_Confidence_t supportsMIME (const gchar * szMimeType);
+	virtual UT_Confidence_t supportsMIME(const gchar * szMimeType) override;
 };
 
 class IE_Exp_HTML_NavigationHelper;
@@ -87,7 +85,7 @@ public:
 	IE_Exp_HTML (PD_Document * pDocument);
 	virtual ~IE_Exp_HTML ();
 
-	virtual UT_Error copyToBuffer(PD_DocumentRange * pDocRange,UT_ByteBuf *  bufHTML);
+	virtual UT_Error copyToBuffer(PD_DocumentRange * pDocRange,UT_ByteBuf *  bufHTML) override;
 
 	static bool			RecognizeSuffix (const gchar * szSuffix);
 	static UT_Error		StaticConstructor (PD_Document * pDocument,
@@ -114,12 +112,12 @@ private:
 	void _buildStyleTree();
 
 protected:
-	virtual UT_Error	_writeDocument ();
+	virtual UT_Error _writeDocument() override;
 	void				_createChapter(PD_DocumentRange *range, const std::string &title, bool isIndex);
 	void _createMultipart();
 public:
 	virtual UT_Error	_writeDocument (bool bClipBoard, bool bTemplateBody);
-	bool hasMathML(const std::string &file);
+	bool hasMathML(const std::string &file) const;
 	static void printStyleTree(PD_Document *pDocument, UT_ByteBuf& sink);
 private:
     // Returns document writer depending on settings
@@ -136,5 +134,3 @@ private:
 	std::map<std::string, bool> m_mathmlFlags;
 	IE_Exp_HTML_NavigationHelper *m_pNavigationHelper;
 };
-
-#endif /* IE_EXP_HTML_H */

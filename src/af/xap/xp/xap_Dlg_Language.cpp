@@ -56,8 +56,8 @@ XAP_Dialog_Language::XAP_Dialog_Language(XAP_DialogFactory * pDlgFactory, XAP_Di
 	UT_uint32 i;	
 
 	m_answer		   = a_CANCEL;
-	m_pLanguage		   = NULL;
-	m_pLangProperty	   = NULL;
+	m_pLanguage		   = nullptr;
+	m_pLangProperty	   = nullptr;
 	m_bChangedLanguage = false;
 	m_pLangTable = new UT_Language;
 	const gchar ** ppLanguagesTemp = new const gchar * [m_pLangTable->getCount()];	
@@ -160,23 +160,23 @@ UT_Vector* XAP_Dialog_Language::getAvailableDictionaries()
 {
 #ifdef ENABLE_SPELL
 	SpellChecker * checker = SpellManager::instance().getInstance();
-	UT_Vector& vec= checker->getMapping();
-	DictionaryMapping * mapping;
+	const std::vector<DictionaryMapping>& vec = checker->getMapping();
 	UT_Vector* vecRslt = new UT_Vector();
 
-	const UT_uint32 nItems = vec.getItemCount();
+	const UT_uint32 nItems = vec.size();
 
 	for (UT_uint32 iItem = nItems; iItem; --iItem)
 	{
-		mapping = static_cast<DictionaryMapping*>(const_cast<void*>(vec.getNthItem(iItem - 1)));
+		const DictionaryMapping& mapping = vec[iItem - 1];
 
-		if (checker->doesDictionaryExist(mapping->lang.c_str()))
-			vecRslt->addItem( g_strdup(mapping->lang.c_str()));
+		if (checker->doesDictionaryExist(mapping.lang.c_str())) {
+			vecRslt->addItem( g_strdup(mapping.lang.c_str()));
+		}
 	}
 
 	return vecRslt;
 #else
-	return NULL;
+	return nullptr;
 #endif
 }
 

@@ -23,13 +23,10 @@
 #define _ODE_STYLES_H_
 
 // AbiWord includes
-#include <ut_hash.h>
+#include "ut_hash.h"
 
 // Internal includes
 #include "ODe_DefaultStyles.h"
-
-// External includes
-#include <gsf/gsf-output.h>
 
 // Internal classes
 class ODe_Style_Style;

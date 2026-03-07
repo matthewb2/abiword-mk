@@ -1,5 +1,4 @@
 /* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
-
 /* AbiSource
  *
  * Copyright (C) 2008 Firat Kiyak <firatkiyak@gmail.com>
@@ -23,29 +22,31 @@
 #ifndef _OXML_ELEMENT_CELL_H_
 #define _OXML_ELEMENT_CELL_H_
 
+#include <memory>
+
 // Internal includes
-#include <OXML_Element.h>
-#include <OXML_Element_Table.h>
-#include <OXML_Element_Row.h>
-#include <ie_exp_OpenXML.h>
+#include "OXML_Element.h"
 
 // AbiWord includes
-#include <ut_types.h>
-#include <ut_string.h>
-#include <pd_Document.h>
+#include "ut_types.h"
+#include "ut_string.h"
+#include "pd_Document.h"
 
 class OXML_Element_Table;
 class OXML_Element_Row;
+class OXML_Element_Cell;
+
+typedef std::shared_ptr<OXML_Element_Cell> OXML_SharedElement_Cell;
 
 class OXML_Element_Cell : public OXML_Element
 {
 public:
-	OXML_Element_Cell(const std::string & id, OXML_Element_Table* table, OXML_Element_Row* row,
+	OXML_Element_Cell(const std::string & id, OXML_Element_Table* table,
 					  UT_sint32 left, UT_sint32 right, UT_sint32 top, UT_sint32 bottom);
 	virtual ~OXML_Element_Cell();
 
-	virtual UT_Error serialize(IE_Exp_OpenXML* exporter);
-	virtual UT_Error addToPT(PD_Document * pDocument);
+	virtual UT_Error serialize(IE_Exp_OpenXML* exporter) override;
+	virtual UT_Error addToPT(PD_Document * pDocument) override;
 	UT_sint32 getLeft() const
 		{
 			return m_iLeft;
@@ -68,10 +69,7 @@ public:
 	void setTop(UT_sint32 top);
 	void setBottom(UT_sint32 bottom);
 
-	void setRow(OXML_Element_Row* row)
-		{
-			m_row = row;
-		}
+	void setRow(OXML_Element_Row* row);
 
 	void setVerticalMergeStart(bool start);
 	void setHorizontalMergeStart(bool start);
@@ -84,8 +82,8 @@ public:
             return m_startHorizontalMerge;
         }
 
-	void setLastHorizontalContinuationCell(OXML_Element_Cell* cell);
-	void setLastVerticalContinuationCell(OXML_Element_Cell* cell);
+	void setLastHorizontalContinuationCell(const OXML_SharedElement_Cell& cell);
+	void setLastVerticalContinuationCell(const OXML_SharedElement_Cell& cell);
 
 private:
 	virtual UT_Error serializeProperties(IE_Exp_OpenXML* exporter);
@@ -95,8 +93,8 @@ private:
 	OXML_Element_Table* m_table;
 	OXML_Element_Row*   m_row;
 
-	OXML_Element_Cell* m_horizontalTail;
-	OXML_Element_Cell* m_verticalTail;
+	OXML_SharedElement_Cell m_horizontalTail;
+	OXML_SharedElement_Cell m_verticalTail;
 };
 
 #endif //_OXML_ELEMENT_CELL_H_

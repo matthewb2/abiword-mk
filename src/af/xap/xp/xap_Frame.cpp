@@ -27,7 +27,7 @@
 #include "ut_assert.h"
 #include "ut_debugmsg.h"
 #include "ut_vector.h"
-#include "ut_string.h"
+#include "ut_std_string.h"
 #include "ut_growbuf.h"
 #include "ut_timer.h"
 #include "ut_go_file.h"
@@ -63,17 +63,17 @@
 #endif
 
 XAP_Frame::XAP_Frame(XAP_FrameImpl *pFrameImpl)
-	: m_pDoc(0),
-	  m_pView(0),
-	  m_pViewListener(0),
+	: m_pDoc(nullptr),
+	  m_pView(nullptr),
+	  m_pViewListener(nullptr),
 	  m_lid(static_cast<AV_ListenerId>(-1)),
-	  m_pScrollObj(0),
+	  m_pScrollObj(nullptr),
 	  m_nView(0),
 	  m_iUntitled(0),
-	  m_pScrollbarViewListener(0),
+	  m_pScrollbarViewListener(nullptr),
 	  m_lidScrollbarViewListener(static_cast<AV_ListenerId>(-1)),
 	  m_zoomType(z_PAGEWIDTH),
-	  m_pData(0),
+	  m_pData(nullptr),
 	  m_bHideMenuScroll(false),
 	  m_iIdAutoSaveTimer(0),
 	  m_iAutoSavePeriod(0),
@@ -101,16 +101,16 @@ XAP_Frame::XAP_Frame(XAP_FrameImpl *pFrameImpl)
 
 XAP_Frame::XAP_Frame(XAP_Frame * f)
 	: m_pDoc(REFP(f->m_pDoc)),
-	m_pView(0),
-	m_pViewListener(0),
+	m_pView(nullptr),
+	m_pViewListener(nullptr),
 	m_lid(static_cast<AV_ListenerId>(-1)),
-	m_pScrollObj(0),
+	m_pScrollObj(nullptr),
 	m_nView(0),
 	m_iUntitled(f->m_iUntitled),
-	m_pScrollbarViewListener(0),
+	m_pScrollbarViewListener(nullptr),
 	m_lidScrollbarViewListener(static_cast<AV_ListenerId>(-1)),
 	m_zoomType(f->m_zoomType),
-	m_pData(0),
+	m_pData(nullptr),
 	m_bHideMenuScroll(f->m_bHideMenuScroll),
 	m_iIdAutoSaveTimer(0),
 	m_iAutoSavePeriod(f->m_iAutoSavePeriod),
@@ -166,7 +166,7 @@ XAP_Frame::~XAP_Frame(void)
 	if (m_iIdAutoSaveTimer != 0)
 	{
 		UT_Timer *timer = UT_Timer::findTimer(m_iIdAutoSaveTimer);
-		if (timer != 0)
+		if (timer != nullptr)
 		{
 			UT_DEBUGMSG(("Stopping Autosave timer [%d]\n", m_iIdAutoSaveTimer));
 			timer->stop();
@@ -203,47 +203,46 @@ bool XAP_Frame::initialize(const char * /*szKeyBindingsKey*/, const char * /*szK
 	// select which menu bar we should use
 	//////////////////////////////////////////////////////////////////
 
-	const char * szMenuLayoutName = NULL;
-	if ((pApp->getPrefsValue(szMenuLayoutKey,
-				 static_cast<const gchar**>(&szMenuLayoutName))) &&
-	    (szMenuLayoutName) && (*szMenuLayoutName))
+	std::string menuLayoutName;
+	if (pApp->getPrefsValue(szMenuLayoutKey, menuLayoutName) &&
+	    !menuLayoutName.empty()) {
 		;
-	else
-		szMenuLayoutName = szMenuLayoutDefaultValue;
-	m_pFrameImpl->m_szMenuLayoutName = g_strdup(szMenuLayoutName);
-	
+	} else {
+		menuLayoutName = szMenuLayoutDefaultValue;
+	}
+	m_pFrameImpl->m_szMenuLayoutName = g_strdup(menuLayoutName.c_str());
+
 	//////////////////////////////////////////////////////////////////
 	// select language for menu labels
 	//////////////////////////////////////////////////////////////////
 
-	const char * szMenuLabelSetName = NULL;
-	if ((pApp->getPrefsValue(szMenuLabelSetKey,
-				 static_cast<const gchar**>(&szMenuLabelSetName))) &&
-	    (szMenuLabelSetName) && (*szMenuLabelSetName))
+	std::string menuLabelSetName;
+	if (pApp->getPrefsValue(szMenuLabelSetKey, menuLabelSetName) &&
+	    !menuLabelSetName.empty()) {
 		;
-	else
-		szMenuLabelSetName = szMenuLabelSetDefaultValue;
-	m_pFrameImpl->m_szMenuLabelSetName = g_strdup(szMenuLabelSetName);
-	
+	} else {
+		menuLabelSetName = szMenuLabelSetDefaultValue;
+	}
+	m_pFrameImpl->m_szMenuLabelSetName = g_strdup(menuLabelSetName.c_str());
+
 	//////////////////////////////////////////////////////////////////
 	// select which toolbars we should display
 	//////////////////////////////////////////////////////////////////
 
-	const char * szToolbarLayouts = NULL;
-	if ((pApp->getPrefsValue(szToolbarLayoutsKey,
-							 static_cast<const gchar**>(&szToolbarLayouts))) &&
-	    (szToolbarLayouts) && (*szToolbarLayouts))
+	std::string toolbarLayouts;
+	if (pApp->getPrefsValue(szToolbarLayoutsKey, toolbarLayouts) &&
+	    !toolbarLayouts.empty()) {
 		;
-	else
-		szToolbarLayouts = szToolbarLayoutsDefaultValue;
-
+	} else {
+		toolbarLayouts = szToolbarLayoutsDefaultValue;
+	}
 	// take space-delimited list and call addItem() for each name in the list.
-	
+
 	{
 		char * szTemp;
-		szTemp = g_strdup(szToolbarLayouts);
+		szTemp = g_strdup(toolbarLayouts.c_str());
 		UT_ASSERT(szTemp);
-		for (char * p=strtok(szTemp," "); (p); p=strtok(NULL," "))
+		for (char * p=strtok(szTemp," "); (p); p=strtok(nullptr," "))
 		{
 			char * szTempName;
 			szTempName = g_strdup(p);
@@ -251,7 +250,7 @@ bool XAP_Frame::initialize(const char * /*szKeyBindingsKey*/, const char * /*szK
 		}
 		g_free(szTemp);
 	}
-	
+
 	//////////////////////////////////////////////////////////////////
 	// select language for the toolbar labels.
 	// i'm not sure if it would ever make sense to
@@ -260,33 +259,32 @@ bool XAP_Frame::initialize(const char * /*szKeyBindingsKey*/, const char * /*szK
 	// all toolbars will have the same language.
 	//////////////////////////////////////////////////////////////////
 
-	const char * szToolbarLabelSetName = NULL;
-	if ((pApp->getPrefsValue(szToolbarLabelSetKey,
-				 static_cast<const gchar**>(&szToolbarLabelSetName))) &&
-	    (szToolbarLabelSetName) && (*szToolbarLabelSetName))
+	std::string toolbarLabelSetName;
+	if (pApp->getPrefsValue(szToolbarLabelSetKey, toolbarLabelSetName) &&
+	    !toolbarLabelSetName.empty()) {
 		;
-	else
-		szToolbarLabelSetName = szToolbarLabelSetDefaultValue;
-	m_pFrameImpl->m_szToolbarLabelSetName = g_strdup(szToolbarLabelSetName);
-	
+	} else {
+		toolbarLabelSetName = szToolbarLabelSetDefaultValue;
+	}
+	m_pFrameImpl->m_szToolbarLabelSetName = g_strdup(toolbarLabelSetName.c_str());
+
 	//////////////////////////////////////////////////////////////////
 	// select the appearance of the toolbar buttons
 	//////////////////////////////////////////////////////////////////
 
-	const char * szToolbarAppearance = NULL;
-	pApp->getPrefsValue(XAP_PREF_KEY_ToolbarAppearance,
-			    static_cast<const gchar**>(&szToolbarAppearance));
-	UT_ASSERT((szToolbarAppearance) && (*szToolbarAppearance));
-	m_pFrameImpl->m_szToolbarAppearance = g_strdup(szToolbarAppearance);
+	std::string toolbarAppearance;
+	pApp->getPrefsValue(XAP_PREF_KEY_ToolbarAppearance, toolbarAppearance);
+	UT_ASSERT(!toolbarAppearance.empty());
+	m_pFrameImpl->m_szToolbarAppearance = g_strdup(toolbarAppearance.c_str());
 
 	//////////////////////////////////////////////////////////////////
 	// select the auto save options
 	//////////////////////////////////////////////////////////////////
-	UT_String stTmp;
+	std::string stTmp;
 	bool autosave = true;
 
 	pApp->getPrefsValue(XAP_PREF_KEY_AutoSaveFileExt, m_stAutoSaveExt);
-	pApp->getPrefsValueBool(XAP_PREF_KEY_AutoSaveFile, &autosave);
+	pApp->getPrefsValueBool(XAP_PREF_KEY_AutoSaveFile, autosave);
 
 	if (autosave)
 		_createAutoSaveTimer();
@@ -316,38 +314,32 @@ bool XAP_Frame::initialize(const char * /*szKeyBindingsKey*/, const char * /*szK
 	else if( g_ascii_strcasecmp( stTmp.c_str(), "Width" ) == 0 )
 	{
 		m_zoomType = z_PAGEWIDTH;
-		const gchar * szZoom = NULL;
-		pApp->getPrefsValue(XAP_PREF_KEY_ZoomPercentage,
-							  static_cast<const gchar**>(&szZoom));
-		if(szZoom)
-		{
-			iZoom = atoi(szZoom);
-			if(iZoom < XAP_DLG_ZOOM_MINIMUM_ZOOM) 
+		std::string zoom;
+		pApp->getPrefsValue(XAP_PREF_KEY_ZoomPercentage, zoom);
+		if (!zoom.empty()) {
+			iZoom = atoi(zoom.c_str());
+			if (iZoom < XAP_DLG_ZOOM_MINIMUM_ZOOM) {
 				iZoom = 100;
-			else if (iZoom > XAP_DLG_ZOOM_MAXIMUM_ZOOM) 
+			} else if (iZoom > XAP_DLG_ZOOM_MAXIMUM_ZOOM) {
 				iZoom = 100;
-		}
-		else
-		{
+			}
+		} else {
 			iZoom = 100;
 		}
 	}
 	else if( g_ascii_strcasecmp( stTmp.c_str(), "Page" ) == 0 )
 	{
 		m_zoomType = z_WHOLEPAGE;
-		const gchar * szZoom = NULL;
-		pApp->getPrefsValue(XAP_PREF_KEY_ZoomPercentage,
-							  static_cast<const gchar**>(&szZoom));
-		if(szZoom)
-		{
-			iZoom = atoi(szZoom);
-			if(iZoom < XAP_DLG_ZOOM_MINIMUM_ZOOM) 
+		std::string zoom;
+		pApp->getPrefsValue(XAP_PREF_KEY_ZoomPercentage, zoom);
+		if (!zoom.empty()) {
+			iZoom = atoi(zoom.c_str());
+			if (iZoom < XAP_DLG_ZOOM_MINIMUM_ZOOM) {
 				iZoom = 100;
-			else if (iZoom > XAP_DLG_ZOOM_MAXIMUM_ZOOM) 
+			} else if (iZoom > XAP_DLG_ZOOM_MAXIMUM_ZOOM) {
 				iZoom = 100;
-		}
-		else
-		{
+			}
+		} else {
 			iZoom = 100;
 		}
 	}
@@ -356,7 +348,7 @@ bool XAP_Frame::initialize(const char * /*szKeyBindingsKey*/, const char * /*szK
 		iZoom = atoi( stTmp.c_str() );
 
 		// These limits are defined in xap_Dlg_Zoom.h
-		if ((iZoom <= XAP_DLG_ZOOM_MAXIMUM_ZOOM) && (iZoom >= XAP_DLG_ZOOM_MINIMUM_ZOOM)) 
+		if ((iZoom <= XAP_DLG_ZOOM_MAXIMUM_ZOOM) && (iZoom >= XAP_DLG_ZOOM_MINIMUM_ZOOM))
 		{
 			m_zoomType = z_PERCENT;
 			XAP_Frame::setZoomPercentage( iZoom );
@@ -408,7 +400,7 @@ static void autoSaveCallback(UT_Worker *wkr)
 void XAP_Frame::_createAutoSaveTimer()
 {
 	UT_Timer *timer = UT_Timer::static_constructor(autoSaveCallback, this);
-	UT_String stPeriod;
+	std::string stPeriod;
 	
 	bool bFound = XAP_App::getApp()->getPrefsValue(XAP_PREF_KEY_AutoSaveFilePeriod, stPeriod);
 
@@ -428,7 +420,7 @@ void XAP_Frame::_createAutoSaveTimer()
 
 void XAP_Frame::_removeAutoSaveFile()
 {
-	const char *filename = NULL;
+	const char *filename = nullptr;
 	gboolean bURI = UT_go_path_is_uri(m_stAutoSaveNamePrevious.c_str());
 
 	if(bURI)
@@ -504,7 +496,7 @@ void /* static*/ XAP_FrameImpl::viewAutoUpdater(UT_Worker *wkr)
 		pFrameImpl->m_ViewAutoUpdater->stop();
 		pFrameImpl->m_ViewAutoUpdaterID = 0;
 		DELETEP(pFrameImpl->m_ViewAutoUpdater);
-		pView->draw();
+		pView->queueDraw();
 		pG->flush();
 		return;
 	}
@@ -527,12 +519,12 @@ void /* static*/ XAP_FrameImpl::viewAutoUpdater(UT_Worker *wkr)
 		pView->updateLayout();
 		if(!pFrameImpl->m_pFrame->m_bFirstDraw)
 		{
-			pView->draw();
+			pView->queueDraw();
 			pFrameImpl->m_pFrame->m_bFirstDraw = true;
 		}
 		else
 		{
-			pView->updateScreen();
+			pView->updateScreen(true);
 		}
 	}
 	pG->flush();
@@ -565,13 +557,17 @@ AD_Document * XAP_Frame::getCurrentDoc(void) const
 
 const char * XAP_Frame::getFilename(void) const
 {
-	if (m_pDoc == NULL) return NULL;
+	if (m_pDoc == nullptr) {
+		return nullptr;
+	}
 	return m_pDoc->getFilename().c_str();
 }
 
 bool XAP_Frame::isDirty(void) const
 {
-	if (m_pDoc == NULL) return false;
+	if (m_pDoc == nullptr) {
+		return false;
+	}
 	return m_pDoc->isDirty();
 }
 
@@ -608,14 +604,14 @@ const char * XAP_Frame::getViewKey(void) const
 	return buf;
 }
 
-const UT_UTF8String & XAP_Frame::getTitle() const
+const std::string & XAP_Frame::getTitle() const
 {
 	return m_sTitle;
 }
 
 const char * XAP_Frame::getNonDecoratedTitle() const
 {
-	return m_sNonDecoratedTitle.utf8_str();
+	return m_sNonDecoratedTitle.c_str();
 }
 
 void XAP_Frame::setZoomPercentage(UT_uint32 iZoom)
@@ -627,8 +623,7 @@ void XAP_Frame::setZoomPercentage(UT_uint32 iZoom)
 	UT_return_if_fail(pPrefs);
 	XAP_PrefsScheme * pScheme = pPrefs->getCurrentScheme(true);
 	UT_return_if_fail(pScheme);
-	UT_String sZoom;
-	UT_String_sprintf(sZoom,"%d",iZoom);
+	std::string sZoom = UT_std_string_sprintf("%d",iZoom);
 	if(getZoomType() == z_PAGEWIDTH)
 	{
 		pScheme->setValue(XAP_PREF_KEY_ZoomType,"Width");
@@ -653,7 +648,7 @@ UT_uint32 XAP_Frame::getZoomPercentage(void)
 EV_Toolbar *  XAP_Frame::getToolbar(UT_sint32 ibar)
 {
 	if(ibar >= m_pFrameImpl->m_vecToolbars.getItemCount())
-		return NULL;
+		return nullptr;
 	return m_pFrameImpl->m_vecToolbars.getNthItem(ibar);
 }
 
@@ -662,7 +657,7 @@ bool XAP_Frame::repopulateCombos(void)
   //
 // Update the styles combo box.
 //
-	EV_Toolbar * pTbar = NULL;
+	EV_Toolbar * pTbar = nullptr;
 	UT_uint32 ibar = 0;
 	do
 	{
@@ -768,7 +763,7 @@ void XAP_Frame::setAutoSaveFilePeriod(int min)
 	}
 }
 
-void XAP_Frame::setAutoSaveFileExt(const UT_String &stExt)
+void XAP_Frame::setAutoSaveFileExt(const std::string &stExt)
 {
 	m_stAutoSaveExt = stExt;
 }
@@ -783,7 +778,7 @@ XAP_Dialog_MessageBox * XAP_Frame::createMessageBox(XAP_String_Id id,
 
 	XAP_Dialog_MessageBox * pDialog
 		= static_cast<XAP_Dialog_MessageBox *>(pDialogFactory->requestDialog(XAP_DIALOG_ID_MESSAGE_BOX));
-	UT_return_val_if_fail(pDialog, NULL);
+	UT_return_val_if_fail(pDialog, nullptr);
 
 	if (id > 0) {
 		char * szNewMessage = static_cast<char *>(g_try_malloc(sizeof(char) * 256));
@@ -846,22 +841,22 @@ XAP_Dialog_MessageBox::tAnswer XAP_Frame::showMessageBox(const char * szMessage,
 							 XAP_Dialog_MessageBox::tAnswer default_answer)
 {
   XAP_Dialog_MessageBox * pDialog = createMessageBox(0, buttons, default_answer);
-  pDialog->setMessage(szMessage);
+  pDialog->setMessage("%s", szMessage);
   return showMessageBox(pDialog);
 }
 
-UT_String XAP_Frame::makeBackupName(const char* szExt)
+std::string XAP_Frame::makeBackupName(const char* szExt)
 {
-  UT_String ext(szExt ? szExt : m_stAutoSaveExt.c_str());
-  UT_String oldName(m_pDoc->getFilename());
-  UT_String backupName;
+  std::string ext(szExt ? szExt : m_stAutoSaveExt);
+  std::string oldName(m_pDoc->getFilename());
+  std::string backupName;
   UT_DEBUGMSG(("In make Backup name. Old Name is (%s) \n",oldName.c_str()));
   if (oldName.empty())
   {
       const XAP_StringSet * pSS = XAP_App::getApp()->getStringSet();
       std::string sTmp;
       pSS->getValue(XAP_STRING_ID_UntitledDocument, XAP_App::getApp()->getDefaultEncoding(), sTmp);
-      UT_String_sprintf(oldName, sTmp.c_str(), m_iUntitled);
+      oldName = UT_std_string_sprintf(sTmp.c_str(), m_iUntitled);
 
       UT_DEBUGMSG(("Untitled.  We will give it the name [%s]\n", oldName.c_str()));
   }
@@ -871,7 +866,7 @@ UT_String XAP_Frame::makeBackupName(const char* szExt)
   
   backupName = oldName + ext;
 
-  const char* uri = NULL;
+  const char* uri = nullptr;
   gboolean bURI = UT_go_path_is_uri(backupName.c_str());
 
   if(!bURI)
@@ -900,13 +895,13 @@ UT_Error XAP_Frame::backup(const char* szExt, UT_sint32 iEFT)
 
 	if (!m_pDoc)
 	{
-		UT_DEBUGMSG(("File NOT saved! doc is NULL.\n"));
+		UT_DEBUGMSG(("File NOT saved! doc is nullptr.\n"));
 		return UT_OK;
 	}
 
 	m_bBackupInProgress = true;
 
-	UT_String backupName = makeBackupName ( szExt );
+	std::string backupName = makeBackupName ( szExt );
 
 	if (m_stAutoSaveNamePrevious.size() && (backupName != m_stAutoSaveNamePrevious))
 	{
@@ -968,7 +963,7 @@ void XAP_Frame::quickZoom(void)
 		quickZoom( newZoom );
 		break;
 	default:
-		m_pView->updateScreen(false);
+		m_pView->queueDraw();
        ;
    }
 }

@@ -17,21 +17,14 @@
  * 02110-1301 USA.
  */
 
-
-#ifndef UT_STRING_H
-#define UT_STRING_H
+#pragma once
 
 #include <map>
 #include <string>
+
 #include <string.h>
 
-/* pre-emptive dismissal; ut_types.h is needed by just about everything,
- * so even if it's commented out in-file that's still a lot of work for
- * the preprocessor to do...
- */
-#ifndef UT_TYPES_H
 #include "ut_types.h"
-#endif
 
 class UT_GrowBuf;
 
@@ -50,7 +43,6 @@ ABI_EXPORT void  UT_decodeUTF8string(const gchar * p, UT_uint32 len, UT_GrowBuf 
 /// and false if it needed fixing.
 ABI_EXPORT bool  UT_ensureValidXML(std::string & s);
 ABI_EXPORT bool  UT_isValidXML(const char *s);
-ABI_EXPORT bool  UT_validXML(char * s);
 
 /* ABI_EXPORT gchar *  UT_decodeXMLstring(gchar *pcIn);
  * This has moved to ut_xml.cpp as UT_XML::decode ()
@@ -181,16 +173,15 @@ ABI_EXPORT char *UT_strptime (const char *buf, const char *format, struct tm *tm
 
 #endif
 
-/*
+
 #ifdef _WIN32
 #define snprintf _snprintf
 
 #define _(String) (String)
 #define N_(String) (String)
 
+#endif /* WIN32 */
 
-#endif 
-*/
 #if defined (SNPRINTF_MISSING)
   extern int snprintf(char *str, size_t size, const  char  *format, ...);
 #endif
@@ -250,5 +241,3 @@ ABI_EXPORT bool            UT_bidiReorderString(const UT_UCS4Char * pStrIn, UT_u
 ABI_EXPORT bool            UT_bidiGetMirrorChar(UT_UCS4Char c, UT_UCS4Char &mc);
 
 G_END_DECLS
-
-#endif /* UT_STRING_H */

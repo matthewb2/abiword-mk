@@ -1,3 +1,4 @@
+#AUTOMAKE_OPTIONS = subdir-objects
 
 SUBDIRS = af plugins text wp
 
@@ -20,7 +21,7 @@ SUBDIRS += gi-overrides
 endif
 
 if TOOLKIT_COCOA
-main_cpp = $(top_srcdir)/src/wp/main/cocoa/CocoaMain.cpp
+main_cpp = wp/main/cocoa/CocoaMain.cpp
 include $(top_srcdir)/src/wp/main/cocoa/bundle.mk
 
 install-data-hook:
@@ -33,13 +34,17 @@ install-data-hook:
 endif
 
 if TOOLKIT_GTK_ALL
-libabiword_cpp += $(top_srcdir)/src/wp/main/gtk/libabiword.cpp
-main_cpp = $(top_srcdir)/src/wp/main/gtk/UnixMain.cpp
-opt_libs += $(GOFFICE_BUILTIN_LIBS)
+libabiword_cpp += wp/main/gtk/libabiword.cpp
+main_cpp = wp/main/gtk/UnixMain.cpp
+endif
+
+if TOOLKIT_QT
+libabiword_cpp += wp/main/qt/libabiwordQt.cpp
+main_cpp = wp/main/qt/QtMain.cpp
 endif
 
 if TOOLKIT_WIN
-main_cpp = $(top_srcdir)/src/wp/main/win/Win32Main.cpp
+main_cpp = wp/main/win/Win32Main.cpp
 opt_libs += Win32Resources.lo
 platform_ldflags += -mwindows -municode
 resources += Win32Resources.lo
@@ -65,7 +70,7 @@ libabiword_@ABIWORD_SERIES@_la_LDFLAGS = \
 
 if TOOLKIT_COCOA
 libabiword_@ABIWORD_SERIES@_la_LDFLAGS += -headerpad_max_install_names
-endif	
+endif
 
 libabiword_@ABIWORD_SERIES@_la_LIBADD = \
 	plugins/libplugins.la \
@@ -89,6 +94,24 @@ libabiword_@ABIWORD_SERIES@_la_LIBADD += \
 	wp/impexp/gtk/libgtk.la \
 	text/fmt/gtk/libgtk.la
 
+## Resources compilation
+abi-resources.c: wp/main/gtk/resources.xml
+	$(AM_V_GEN) glib-compile-resources \
+                --sourcedir=$(srcdir) --target=$@ \
+                --generate-source --c-name abi $(srcdir)/wp/main/gtk/resources.xml
+
+abi-resources.h: wp/main/gtk/resources.xml
+	$(AM_V_GEN) glib-compile-resources                                  \
+                --sourcedir=$(srcdir) --target=$@ \
+		--generate-header --c-name abi $(srcdir)/wp/main/gtk/resources.xml
+
+BUILT_SOURCES = \
+        abi-resources.c \
+        abi-resources.h
+
+libabiword_cpp += abi-resources.c abi-resources.h
+## End of resources
+
 # headers are GTK only.
 libabiword_@ABIWORD_SERIES@_includedir = @ABIWORD_HEADERSDIR@
 libabiword_@ABIWORD_SERIES@_include_HEADERS = \
@@ -104,13 +127,13 @@ libabiword_@ABIWORD_SERIES@_la_DEPENDENCIES = \
 	$(libabiword_@ABIWORD_SERIES@_la_LIBADD)
 
 libabiword_@ABIWORD_SERIES@_la_SOURCES = \
-	$(top_srcdir)/src/wp/main/xp/abi_ver.cpp \
+	wp/main/xp/abi_ver.cpp \
 	$(libabiword_cpp)
 
 
 # TODO is it possible to track dependencies for that?
 WINDRES_CPPFLAGS = -I$(top_srcdir)/src/af/xap/win -I$(top_srcdir)/src/af/util/win -I$(top_srcdir)/src/wp/ap/win
-Win32Resources.lo: $(top_srcdir)/src/wp/main/win/Win32Main.rc $(libabiword_@ABIWORD_SERIES@_la_OBJECTS)
+Win32Resources.lo: wp/main/win/Win32Main.rc $(libabiword_@ABIWORD_SERIES@_la_OBJECTS)
 	CPPFLAGS="$(WINDRES_CPPFLAGS)" $(top_srcdir)/lt-compile-resource $< $@
 
 bin_PROGRAMS =

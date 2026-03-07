@@ -22,23 +22,22 @@
  * 02110-1301 USA.
  */
 
-#ifndef _ODI_TEXTCONTENT_LISTENERSTATE_H_
-#define _ODI_TEXTCONTENT_LISTENERSTATE_H_
+#pragma once
 
 #include <string>
 #include <map>
 #include <set>
 
+#include <gsf/gsf.h>
+
 // Internal includes
 #include "../../common/xp/ODc_util.h"
 #include "ODi_ListenerState.h"
 
-// AbiWord includes
-#include <ut_types.h>
-#include <ut_stack.h>
+#include "ut_types.h"
+#include "ut_stack.h"
+#include "ut_vector.h"
 
-// External includes
-#include <gsf/gsf.h>
 
 // Internal classes
 class ODi_Office_Styles;
@@ -51,6 +50,8 @@ class PD_Document;
 class pf_Frag_Strux;
 
 #include <list>
+
+#include "pp_Property.h"
 
 /**
  * It parses the regular content of a text document. It is used to parse the
@@ -86,28 +87,28 @@ public:
 
     virtual ~ODi_TextContent_ListenerState();
 
-    void startElement (const gchar* pName, const gchar** ppAtts,
-                       ODi_ListenerStateAction& rAction);
+    virtual void startElement(const gchar* pName, const gchar** ppAtts,
+                       ODi_ListenerStateAction& rAction) override;
 
-    void endElement (const gchar* pName, ODi_ListenerStateAction& rAction);
+    virtual void endElement(const gchar* pName, ODi_ListenerStateAction& rAction) override;
 
-    void charData (const gchar* pBuffer, int length);
+    virtual void charData(const gchar* pBuffer, int length) override;
 
 private:
 
-    void _insertBookmark (const gchar * name, const gchar * type, const gchar* xmlid = 0 );
+    void _insertBookmark (const gchar * name, const gchar * type, const gchar* xmlid = nullptr);
     void _flush ();
     void _startParagraphElement (const gchar* pName,
                                  const gchar** ppParagraphAtts,
                                  ODi_ListenerStateAction& rAction);
     void _endParagraphElement (const gchar* pName,
                                ODi_ListenerStateAction& rAction);
-    bool _pushInlineFmt(const gchar** ppAtts);
+    void _pushInlineFmt(const PP_PropertyVector & ppAtts);
     void _popInlineFmt(void);
-    void _insureInBlock(const gchar ** atts);
-    void _insureInSection(const std::string* pMasterPageName = NULL);
+    void _insureInBlock(const PP_PropertyVector & atts);
+    void _insureInSection(const std::string* pMasterPageName = nullptr);
     void _openAbiSection(const std::string& rProps,
-                         const std::string* pMasterPageName = NULL);
+                         const std::string* pMasterPageName = nullptr);
     void _defineAbiTOCHeadingStyles();
     void _flushPendingParagraphBreak();
     void _insertAnnotation(void);
@@ -148,7 +149,7 @@ private:
         ODI_SECTION_UNDEFINED
     } m_currentODSection;
 
-    UT_GenericVector<const gchar*> m_vecInlineFmt;
+    PP_PropertyVector m_vecInlineFmt;
     UT_NumberStack m_stackFmtStartIndex;
 
     UT_sint8 m_elementParsingLevel;
@@ -216,5 +217,3 @@ private:
     UT_uint32 m_columnsCount;
     UT_uint32 m_columnIndex;
 };
-
-#endif //_ODI_TEXTCONTENT_LISTENERSTATE_H_

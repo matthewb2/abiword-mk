@@ -1,19 +1,19 @@
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- *
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
 
@@ -64,7 +64,7 @@ void AP_Prefs::fullInit(void)
 	// TODO overlay command line arguments onto preferences...
 
 	// group all the prefListener signals into one block change
-	startBlockChange();
+	startBlockChange();	
 
 	loadBuiltinPrefs();
 	overlayEnvironmentPrefs();
@@ -73,7 +73,7 @@ void AP_Prefs::fullInit(void)
 	// stop blocking the signal and send the combined one
 	endBlockChange();
 }
-
+		   
 /*****************************************************************/
 
 const gchar * AP_Prefs::getBuiltinSchemeName(void) const
@@ -93,9 +93,9 @@ bool AP_Prefs::loadBuiltinPrefs(void)
 	// a system library directory (see the canonical
 	// layout).  we let the System Administrator to
 	// override our built-in values.
-
+	
 	const gchar * szBuiltinSchemeName = getBuiltinSchemeName();
-
+	
 	XAP_PrefsScheme * pScheme = new XAP_PrefsScheme(this, szBuiltinSchemeName);
 	if (!pScheme)
 		return false;
@@ -138,36 +138,27 @@ bool AP_Prefs::loadBuiltinPrefs(void)
 		}
 
 		UT_DEBUGMSG(("DEFAULT %s |%s|%s|\n", _t[k].m_szKey, _t[k].m_szValue, xp));
-		bool bOK = pScheme->setValue(_t[k].m_szKey, xp);
+		pScheme->setValue(_t[k].m_szKey, xp);
 		if(bDelete)
 			FREEP(xp);
-		if (!bOK)
-		{
-			goto Failed;
-		}
 	}
 	addScheme(pScheme);					// set the builtin scheme in the base class
 	overlaySystemPrefs();				// so that the base class parser can overlay it.
 
 	return setCurrentScheme(szBuiltinSchemeName);
-
-Failed:
-	DELETEP(pScheme);
-	return false;
 }
 
 void AP_Prefs::overlaySystemPrefs(void)
 {
 	// read system prefs file and overlay builtin values.
-
 	const char** items = localeinfo_combinations("system.profile","","-",0);
 	std::string path;
 	while(*items) {
 	    const char * item = *items++;
-#if 1 //pascal #ifdef _MSC_VER
+#ifdef _MSC_VER
 		const char* subdir = "profiles";
 #else
-		const char* subdir = NULL;
+		const char* subdir = nullptr;
 #endif
 	    if (XAP_App::getApp()->findAbiSuiteAppFile(path, item, subdir))
 			loadSystemDefaultPrefsFile(path.c_str());
@@ -181,7 +172,7 @@ const char * AP_Prefs::getPrefsPathname(void) const
 	{
 		UT_DEBUGMSG(("AP_Prefs::getPrefsPathname: using cmd line value [%s]\n",
 					 AP_Args::m_sUserProfile));
-
+		
 		return AP_Args::m_sUserProfile;
 	}
 	else

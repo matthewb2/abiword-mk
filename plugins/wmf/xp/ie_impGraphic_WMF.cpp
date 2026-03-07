@@ -47,20 +47,17 @@ static int  AbiWord_WMF_seek (void * context,long pos);
 static long AbiWord_WMF_tell (void * context);
 static int  AbiWord_WMF_function (void * context,char * buffer,int length);
 
-typedef struct _bbuf_read_info  bbuf_read_info;
-typedef struct _bbuf_write_info bbuf_write_info;
-
-struct _bbuf_read_info
+struct bbuf_read_info
 {
-	UT_ByteBuf* pByteBuf;
+	UT_ConstByteBufPtr pByteBuf;
 
 	UT_uint32 len;
 	UT_uint32 pos;
 };
 
-struct _bbuf_write_info
+struct bbuf_write_info
 {
-	UT_ByteBuf* pByteBuf;
+	UT_ByteBufPtr pByteBuf;
 };
 
 #define WMF2SVG_MAXPECT (1 << 0)
@@ -95,19 +92,19 @@ bool IE_ImpGraphicWMF_Sniffer::getDlgLabels(const char ** pszDesc,
 UT_Error IE_ImpGraphicWMF_Sniffer::constructImporter(IE_ImpGraphic **ppieg)
 {
 	*ppieg = new IE_ImpGraphic_WMF();
-	if (*ppieg == 0)
+	if (*ppieg == nullptr)
 		return UT_IE_NOMEMORY;
 
 	return UT_OK;
 }
 
 // This creates our FG_Graphic object for a PNG
-UT_Error IE_ImpGraphic_WMF::importGraphic(UT_ByteBuf* pBBwmf, 
-					  FG_Graphic ** ppfg)
+UT_Error IE_ImpGraphic_WMF::importGraphic(const UT_ConstByteBufPtr & pBBwmf,
+                                          FG_ConstGraphicPtr &pfg)
 {
 	UT_Error err = UT_OK;
 
-	*ppfg = 0;
+	pfg.reset();
 	UT_DEBUGMSG(("IE_ImpGraphic_WMF::importGraphic Begin -\n"));
 
 	bool importAsPNG = true;
@@ -118,50 +115,45 @@ UT_Error IE_ImpGraphic_WMF::importGraphic(UT_ByteBuf* pBBwmf,
 
 	if (importAsPNG) {
 
-		UT_ByteBuf * pBBpng = 0;
+		UT_ConstByteBufPtr pBBpng;
 
-		FG_GraphicRaster * pFGR = 0;
-
-		err = convertGraphic(pBBwmf,&pBBpng);
+		err = convertGraphic(pBBwmf, pBBpng);
 		if (err != UT_OK) {
 			UT_DEBUGMSG(("IE_ImpGraphic_WMF::importGraphic Conversion failed...\n"));
 			return err;
 		}
 
-		pFGR = new FG_GraphicRaster();
-		if(pFGR == 0) {
+		FG_GraphicRasterPtr pFGR(new FG_GraphicRaster);
+		if(!pFGR) {
 			UT_DEBUGMSG(("IE_ImpGraphic_WMF::importGraphic Ins. Mem.\n"));
 			err = UT_IE_NOMEMORY;
 		}
 		else if(!pFGR->setRaster_PNG(pBBpng)) {
 			UT_DEBUGMSG(("IE_ImpGraphic_WMF::importGraphic Fake type?\n"));
-			DELETEP(pFGR);
 			err = UT_IE_FAKETYPE;
 		}
 		else {
-			*ppfg = (FG_Graphic *) pFGR;
+			pfg = std::move(pFGR);
 		}
 	} else {
-		UT_ByteBuf *svg = 0;
-		err = convertGraphicToSVG(pBBwmf, &svg);
+		UT_ConstByteBufPtr svg;
+		err = convertGraphicToSVG(pBBwmf, svg);
 		if (err != UT_OK) {
 			UT_DEBUGMSG(("IE_ImpGraphic_WMF::importGraphic Conversion failed...\n"));
 			return err;
 		}
 
-		FG_GraphicVector * pFGR = 0;
-		pFGR = new FG_GraphicVector();
-		if(pFGR == 0) {
+		FG_GraphicVectorPtr pFGR(new FG_GraphicVector);
+		if(!pFGR) {
 			UT_DEBUGMSG(("IE_ImpGraphic_WMF::importGraphic Ins. Mem.\n"));
 			err = UT_IE_NOMEMORY;
 		}
 		else if(!pFGR->setVector_SVG(svg)) {
 			UT_DEBUGMSG(("IE_ImpGraphic_WMF::importGraphic Fake type?\n"));
-			DELETEP(pFGR);
 			err = UT_IE_FAKETYPE;
 		}
 		else {
-			*ppfg = (FG_Graphic *) pFGR;
+			pfg = std::move(pFGR);
 		}
 	}
 
@@ -182,7 +174,7 @@ static int explicit_wmf_error (const char* str, wmf_error_t err)
 	}
 }
 
-UT_Error IE_ImpGraphic_WMF::convertGraphicToSVG(UT_ByteBuf* pBBwmf, UT_ByteBuf** ppBB)
+UT_Error IE_ImpGraphic_WMF::convertGraphicToSVG(const UT_ConstByteBufPtr & pBBwmf, UT_ConstByteBufPtr & pBB)
 {
 	int status = 0;
 
@@ -204,19 +196,19 @@ UT_Error IE_ImpGraphic_WMF::convertGraphicToSVG(UT_ByteBuf* pBBwmf, UT_ByteBuf**
 
 	wmf_error_t err;
 
-	wmf_svg_t* ddata = 0;
+	wmf_svg_t* ddata = nullptr;
 
-	wmfAPI* API = 0;
+	wmfAPI* API = nullptr;
 	wmfD_Rect bbox;
 
 	wmfAPI_Options api_options;
 
 	bbuf_read_info  read_info;
 
-	char *stream = NULL;
+	char *stream = nullptr;
 	unsigned long stream_len = 0;
 
-	*ppBB = 0;
+	pBB.reset();
 
 	flags = 0;
 
@@ -256,7 +248,7 @@ UT_Error IE_ImpGraphic_WMF::convertGraphicToSVG(UT_ByteBuf* pBBwmf, UT_ByteBuf**
  */
 	ddata = WMF_SVG_GetData (API);
 
-	ddata->out = wmf_stream_create(API, NULL);
+	ddata->out = wmf_stream_create(API, nullptr);
 
 	ddata->Description = (char *)Default_Description;
 
@@ -314,17 +306,15 @@ UT_Error IE_ImpGraphic_WMF::convertGraphicToSVG(UT_ByteBuf* pBBwmf, UT_ByteBuf**
 
 	if (status == 0) 
 	{
-		UT_ByteBuf* pBB = new UT_ByteBuf;
-		pBB->append((const UT_Byte*)stream, (UT_uint32)stream_len);
-		*ppBB = pBB;
-		DELETEP(pBBwmf);
+		UT_ByteBufPtr bb(new UT_ByteBuf);
+		bb->append((const UT_Byte*)stream, (UT_uint32)stream_len);
+		pBB = std::move(bb);
 		wmf_free(API, stream);
 		wmf_api_destroy (API);
 		return UT_OK;
 	}
 
 ErrorHandler:
-	DELETEP(pBBwmf);
 	if(API) 
 	{
 		if(stream) 
@@ -336,16 +326,14 @@ ErrorHandler:
 	return UT_ERROR;
 }
 
-UT_Error IE_ImpGraphic_WMF::convertGraphic(UT_ByteBuf* pBBwmf,
-					   UT_ByteBuf** ppBBpng)
+UT_Error IE_ImpGraphic_WMF::convertGraphic(const UT_ConstByteBufPtr & pBBwmf,
+					   UT_ConstByteBufPtr & pBBpng)
 {
-	UT_ByteBuf * pBBpng = 0;
-
 	wmf_error_t err;
 
-	wmf_gd_t * ddata = 0;
+	wmf_gd_t * ddata = nullptr;
 
-	wmfAPI * API = 0;
+	wmfAPI * API = nullptr;
 	wmfAPI_Options api_options;
 
 	wmfD_Rect bbox;
@@ -366,12 +354,8 @@ UT_Error IE_ImpGraphic_WMF::convertGraphic(UT_ByteBuf* pBBwmf,
 		UT_DEBUGMSG(("IE_ImpGraphic_WMF::convertGraphic Bad Arg (1)\n"));
 		return UT_ERROR;
 	}
-   	if (!ppBBpng) {
-		UT_DEBUGMSG(("IE_ImpGraphic_WMF::convertGraphic Bad Arg (2)\n"));
-		return UT_ERROR;
-	}
 
-	*ppBBpng = 0;
+	pBBpng.reset();
 
 	flags = WMF_OPT_IGNORE_NONFATAL | WMF_OPT_FUNCTION;
 
@@ -459,14 +443,14 @@ UT_Error IE_ImpGraphic_WMF::convertGraphic(UT_ByteBuf* pBBwmf,
 
 	ddata->type = wmf_gd_png;
 
-	pBBpng = new UT_ByteBuf;
-	if (pBBpng == 0) {
+	UT_ByteBufPtr bb(new UT_ByteBuf);
+	if (!bb) {
 		UT_DEBUGMSG(("IE_ImpGraphic_WMF::convertGraphic Ins. Mem.\n"));
 		wmf_api_destroy(API);
 		return UT_IE_NOMEMORY;
 	}
 
-	write_info.pByteBuf = pBBpng;
+	write_info.pByteBuf = bb;
 
 	ddata->flags |= WMF_GD_OUTPUT_MEMORY | WMF_GD_OWN_BUFFER;
 
@@ -481,13 +465,11 @@ UT_Error IE_ImpGraphic_WMF::convertGraphic(UT_ByteBuf* pBBwmf,
 	err = wmf_api_destroy(API);
 
 	if (err == wmf_E_None) {
-		*ppBBpng = pBBpng;
+		pBBpng = std::move(bb);
 		return UT_OK;
 	}
 
 	UT_DEBUGMSG(("IE_ImpGraphic_WMF::convertGraphic Err. on destroy\n"));
-
-	DELETEP(pBBpng);
 
 	return UT_ERROR;
 }
@@ -497,7 +479,7 @@ static int AbiWord_WMF_read (void * context)
 {
 	bbuf_read_info * info = (bbuf_read_info *) context;
 
-	const UT_Byte* pByte = 0;
+	const UT_Byte* pByte = nullptr;
 
 	if (info->pos == info->len)
 		return EOF;
@@ -553,7 +535,7 @@ static int AbiWord_WMF_function (void * context,char * buffer,int length)
 ABI_PLUGIN_DECLARE("WMF")
 
 // we use a reference-counted sniffer
-static IE_ImpGraphicWMF_Sniffer * m_impSniffer = 0;
+static IE_ImpGraphicWMF_Sniffer * m_impSniffer = nullptr;
 
 ABI_FAR_CALL
 int abi_plugin_register (XAP_ModuleInfo * mi)
@@ -577,17 +559,17 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-	mi->name = 0;
-	mi->desc = 0;
-	mi->version = 0;
-	mi->author = 0;
-	mi->usage = 0;
+	mi->name = nullptr;
+	mi->desc = nullptr;
+	mi->version = nullptr;
+	mi->author = nullptr;
+	mi->usage = nullptr;
 
 	UT_ASSERT (m_impSniffer);
 
 	IE_ImpGraphic::unregisterImporter (m_impSniffer);
 	delete m_impSniffer;
-	m_impSniffer = 0;
+	m_impSniffer = nullptr;
 
 	return 1;
 }

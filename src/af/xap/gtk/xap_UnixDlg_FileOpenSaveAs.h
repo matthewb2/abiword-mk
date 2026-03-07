@@ -37,7 +37,7 @@ public:
 	XAP_UnixDialog_FileOpenSaveAs(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~XAP_UnixDialog_FileOpenSaveAs(void);
 
-	virtual void			runModal(XAP_Frame * pFrame);
+	virtual void			runModal(XAP_Frame * pFrame) override;
 
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 	gint previewPicture ();
@@ -49,7 +49,7 @@ protected:
 	GdkPixbuf *            pixbufForByteBuf (UT_ByteBuf * pBB);
 	GdkPixbuf *            _loadXPM(UT_ByteBuf * pBB);
 
-	bool					_run_gtk_main(XAP_Frame * pFrame,
+	bool					_run_main_loop(XAP_Frame * pFrame,
 										  GtkWidget * filetypes_pulldown);
 	void 					_notifyError_OKOnly(XAP_Frame * pFrame,
 												XAP_String_Id sid);
