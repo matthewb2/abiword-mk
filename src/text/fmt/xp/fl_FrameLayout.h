@@ -77,7 +77,7 @@ public:
 				   fl_ContainerLayout * pMyContainerLayout);
 	virtual ~fl_FrameLayout();
 
-	virtual bool 	doclistener_changeStrux(const PX_ChangeRecord_StruxChange * pcrxc) override;
+	virtual bool 	doclistener_changeStrux(const PX_ChangeRecord_StruxChange * pcrxc);
 	virtual bool    doclistener_deleteStrux(const PX_ChangeRecord_Strux * pcrx);
 	virtual bool    doclistener_deleteEndFrame(const PX_ChangeRecord_Strux * pcrx);
 	virtual bool    bl_doclistener_insertEndFrame(fl_ContainerLayout*,
@@ -96,18 +96,18 @@ public:
 																	  fl_ContainerLayout* sfhNew));
 
 	void                     miniFormat(void);
-	virtual void		     format(void) override;
-	virtual void		     updateLayout(bool bDoFull) override;
-	virtual void             collapse(void) override;
+	virtual void		     format(void);
+	virtual void		     updateLayout(bool bDoFull);
+	virtual void             collapse(void);
 	void                     localCollapse();
-	virtual void             markAllRunsDirty(void) override;
-	virtual fl_SectionLayout *  getSectionLayout(void) const override;
-	bool                     recalculateFields(UT_uint32 iUpdateCount) override;
-	virtual void		     redrawUpdate(void) override;
-	virtual fp_Container*	 getNewContainer(const fp_Container* = nullptr) override;
+	virtual void             markAllRunsDirty(void);
+	virtual fl_SectionLayout *  getSectionLayout(void)  const;
+	bool                     recalculateFields(UT_uint32 iUpdateCount);
+	virtual void		     redrawUpdate(void);
+	virtual fp_Container*	 getNewContainer(fp_Container* = NULL);
 	PT_DocPosition           getDocPosition(void);
 	UT_uint32                getLength(void);
-	virtual void             setNeedsReformat(fl_ContainerLayout * pCL, UT_uint32 offset = 0) override;
+	virtual void             setNeedsReformat(fl_ContainerLayout * pCL, UT_uint32 offset = 0);
 	void                     setContainerProperties(void);
 	UT_sint32                getBoundingSpace(void) const;
 	FL_FrameType             getFrameType(void) const
@@ -150,8 +150,8 @@ public:
 	void                setParentContainer(fl_ContainerLayout * pCon)
 	        {m_pParentContainer = pCon;}
 private:
-	virtual void		     _lookupProperties(const PP_AttrProp* pAP) override;
-	virtual void		     _lookupMarginProperties(const PP_AttrProp* pAP) override;
+	virtual void		     _lookupProperties(const PP_AttrProp* pAP);
+	virtual void		     _lookupMarginProperties(const PP_AttrProp* pAP);
 	void                     _purgeLayout(void);
 	void                     _createFrameContainer(void);
 	void                     _insertFrameContainer(fp_Container * pNewFC);

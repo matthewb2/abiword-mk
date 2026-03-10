@@ -9,7 +9,7 @@
 
 XAP_EncodingManager *XAP_EncodingManager::get_instance()
 {
-	if (_instance == nullptr)
+	if (_instance == 0)
 	{
 		UT_DEBUGMSG(("Building XAP_EncodingManager\n"));
 		_instance = new XAP_Win32EncodingManager();
@@ -68,7 +68,7 @@ void  XAP_Win32EncodingManager::initialize()
 
 	NativeNonUnicodeEncodingName = Native8BitEncodingName = NativeSystemEncodingName = NativeEncodingName = "CP1252";
 	LanguageISOName = "en";
-	LanguageISOTerritory = nullptr;
+	LanguageISOTerritory = NULL;
 
 	XAP_EncodingManager::initialize();
 

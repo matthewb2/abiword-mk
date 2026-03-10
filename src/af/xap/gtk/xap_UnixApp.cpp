@@ -1,26 +1,26 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
+
 /* AbiSource Application Framework
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2019 Hubert Figuière
- *
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
 
 /*
- * Port to Maemo Development Platform
+ * Port to Maemo Development Platform 
  * Author: INdT - Renato Araujo <renato.filho@indt.org.br>
  */
 
@@ -28,12 +28,12 @@
 #include "config.h"
 #endif
 
-#include <glib.h>
-#include <gtk/gtk.h>
+#include "ut_compiler.h"
 
-#include <glib/gstdio.h>
-#include <gsf/gsf.h>
-#include <goffice/goffice.h>
+#include <glib.h>
+ABI_W_NO_CONST_QUAL
+#include <gtk/gtk.h>
+ABI_W_POP
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -60,19 +60,20 @@
 #include "xap_UnixEncodingManager.h"
 
 #include "gr_UnixCairoGraphics.h"
+#include <glib/gstdio.h>
+#include <gsf/gsf-utils.h>
+#include <goffice/goffice.h>
 
 #include "gr_CairoNullGraphics.h"
-static CairoNull_Graphics * nullgraphics = nullptr;
+static CairoNull_Graphics * nullgraphics = NULL;
 
 /*****************************************************************/
 
-XAP_UnixApp::XAP_UnixApp(const char * szAppName, const char* app_id)
+XAP_UnixApp::XAP_UnixApp(const char * szAppName)
 	: XAP_App(szAppName),
-	  m_dialogFactory(new AP_UnixDialogFactory(this)),
-	  m_controlFactory(new AP_UnixToolbar_ControlFactory()),
-	  m_szTmpFile(nullptr),
-	  // XXX maybe we need better flags as we handle command line
-	  m_gtkApp(gtk_application_new(app_id, G_APPLICATION_FLAGS_NONE))
+	  m_dialogFactory(this),
+	  m_controlFactory(),
+	  m_szTmpFile(NULL)
 {
 	int fc_inited = FcInit();
 	UT_UNUSED(fc_inited); // TODO actually deal with the error here
@@ -121,15 +122,13 @@ XAP_UnixApp::XAP_UnixApp(const char * szAppName, const char* app_id)
 				(CairoNull_Graphics*) XAP_App::getApp()->newGraphics((UT_uint32)GRID_CAIRO_NULL, ai);
 
 			delete nullgraphics;
-			nullgraphics = nullptr;
+			nullgraphics = NULL;
 		}
 	}
 }
 
 XAP_UnixApp::~XAP_UnixApp()
 {
-	delete m_dialogFactory;
-	delete m_controlFactory;
 	removeTmpFile();
 //	FcFini();
 }
@@ -147,7 +146,7 @@ void XAP_UnixApp::removeTmpFile(void)
 			delete [] m_szTmpFile;
 		}
 	}
-	m_szTmpFile = nullptr;
+	m_szTmpFile = NULL;
 }
 
 bool XAP_UnixApp::initialize(const char * szKeyBindingsKey, const char * szKeyBindingsDefaultValue)
@@ -170,17 +169,18 @@ void XAP_UnixApp::shutdown()
 
 void XAP_UnixApp::reallyExit()
 {
-	g_application_quit(G_APPLICATION(m_gtkApp));
+	
+	gtk_main_quit();
 }
 
-XAP_DialogFactory* XAP_UnixApp::getDialogFactory() const
+XAP_DialogFactory * XAP_UnixApp::getDialogFactory()
 {
-	return m_dialogFactory;
+	return &m_dialogFactory;
 }
 
-XAP_Toolbar_ControlFactory * XAP_UnixApp::getControlFactory() const
+XAP_Toolbar_ControlFactory * XAP_UnixApp::getControlFactory()
 {
-	return m_controlFactory;
+	return &m_controlFactory;
 }
 
 void XAP_UnixApp::setWinGeometry(int x, int y, UT_uint32 width, UT_uint32 height,
@@ -267,7 +267,7 @@ void XAP_UnixApp::_setAbiSuiteLibDir()
 {
 	// FIXME: this code sucks hard
 
-	char * buf = nullptr;
+	char * buf = NULL;
 	
 	// see if ABIWORD_DATADIR was set in the environment
 	const char * sz = getenv("ABIWORD_DATADIR");

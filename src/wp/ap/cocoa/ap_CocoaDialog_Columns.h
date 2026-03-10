@@ -2,7 +2,7 @@
 
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2001, 2003-2021 Hubert Figuière
+ * Copyright (C) 2001, 2003 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,14 +20,15 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef AP_CocoaDialog_Columns_H
+#define AP_CocoaDialog_Columns_H
 
 #include "ap_Dialog_Columns.h"
 
 #include "ut_types.h"
 #include "ut_string.h"
 
-class GR_CocoaGraphics;
+class GR_CocoaCairoGraphics;
 
 class XAP_CocoaFrame;
 @class AP_CocoaDialog_ColumnsController;
@@ -62,7 +63,7 @@ public:
 	void			incrSpaceAfter(bool bIncrement);
 
 private:
-	GR_CocoaGraphics* m_pPreviewWidget;
+	GR_CocoaCairoGraphics *	m_pPreviewWidget;
 
 	AP_CocoaDialog_ColumnsController *	m_dlg;
 
@@ -131,3 +132,5 @@ private:
 - (XAP_CocoaNSView*)preview;
 
 @end
+
+#endif /* AP_CocoaDialog_Columns_H */

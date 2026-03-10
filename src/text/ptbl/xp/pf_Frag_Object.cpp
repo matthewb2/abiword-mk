@@ -32,16 +32,16 @@ pf_Frag_Object::pf_Frag_Object(pt_PieceTable * pPT,
                                PT_AttrPropIndex indexAP)
     : pf_Frag(pPT, pf_Frag::PFT_Object, pf_FRAG_OBJECT_LENGTH)
 {
-    m_pObjectSubclass = nullptr;
+	m_pObjectSubclass = NULL;
     m_objectType = objectType;
     m_indexAP = indexAP;
-    const PP_AttrProp * pAP = nullptr;
-    xxx_UT_DEBUGMSG(("Frag Object created indexAP %x \n",m_indexAP));
+    const PP_AttrProp * pAP = NULL;
+	xxx_UT_DEBUGMSG(("Frag Object created indexAP %x \n",m_indexAP));
     m_pPieceTable->getAttrProp(m_indexAP,&pAP);
     UT_return_if_fail (pAP);
-    const gchar* pszType = nullptr;
-    const gchar* pszName = nullptr;
-    const gchar* pszParam = nullptr;
+    const gchar* pszType = NULL;
+    const gchar* pszName = NULL;
+	const gchar* pszParam = NULL;
 
     pAP->getAttribute(static_cast<const gchar *>("type"), pszType);
     pAP->getAttribute(static_cast<const gchar *>("name"), pszName);
@@ -51,7 +51,7 @@ pf_Frag_Object::pf_Frag_Object(pt_PieceTable * pPT,
 
     if (objectType==PTO_Field) 
     {
-		if(pszType == nullptr)
+		if(pszType == NULL)
 		{
 			UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
 			pszType = "test";
@@ -425,10 +425,10 @@ pf_Frag_Object::~pf_Frag_Object()
     		default:
 	    		UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
     	}
-	    m_pObjectSubclass = nullptr;
+	    m_pObjectSubclass = NULL;
 	}
 	delete m_pField;
-	m_pField = nullptr;
+	m_pField = 0;
 }
 
 bool pf_Frag_Object::_isContentEqual(const pf_Frag &f2) const
@@ -439,12 +439,15 @@ bool pf_Frag_Object::_isContentEqual(const pf_Frag &f2) const
 	if(getObjectType() != ((const pf_Frag_Object&)(f2)).getObjectType())
 		return false;
 
+	pf_Frag * pf1 = const_cast<pf_Frag_Object*>(this);
+	pf_Frag * pf2 = const_cast<pf_Frag*>(&f2);
+	
 	if(m_pField)
 	{
-		if(!f2.getField())
+		if(!pf2->getField())
 			return false;
 
-		if(this->getField()->getFieldType() != f2.getField()->getFieldType())
+		if(pf1->getField()->getFieldType() != pf2->getField()->getFieldType())
 			return false;
 	}
 
@@ -482,5 +485,5 @@ po_Bookmark * pf_Frag_Object::getBookmark() const
 	if(m_objectType == PTO_Bookmark)
 		return static_cast<po_Bookmark*>(m_pObjectSubclass);
 	else
-		return nullptr;
+		return 0;
 }

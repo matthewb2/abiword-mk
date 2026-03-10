@@ -18,10 +18,13 @@
  */
 
 #include "ut_types.h"
+#import "xap_CocoaCompat.h"
 #import "xap_Cocoa_NSTableUtils.h"
 
 
 @implementation XAP_StringListDataSource
+
+
 
 - (id)init
 {
@@ -38,15 +41,16 @@
 	[super dealloc];
 }
 
+
 /* NSTableDataSource */
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+- (int)numberOfRowsInTableView:(NSTableView *)tableView
 {
 	UT_UNUSED(tableView);
-	return (NSInteger)[_array count];
+	return [_array count];
 }
 
 
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row
 {
 	UT_UNUSED(tableView);
 	UT_UNUSED(tableColumn);
@@ -70,7 +74,7 @@
 	[str release];
 }
 
-- (NSUInteger)rowWithCString:(const char *)cString
+- (int)rowWithCString:(const char *)cString
 {
 	NSString *string = [[NSString alloc] initWithUTF8String:cString];
 	NSUInteger idx = [_array indexOfObject:string];

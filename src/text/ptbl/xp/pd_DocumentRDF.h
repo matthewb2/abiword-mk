@@ -23,7 +23,6 @@
 #define PD_DOCUMENTRDF_H
 
 #include <string>
-#include <functional>
 #include <list>
 #include <map>
 #include <memory>
@@ -64,7 +63,7 @@ class ABI_EXPORT PD_URI
   public:
     PD_URI( const std::string& v = "" );
     virtual ~PD_URI() {}
-    const std::string& toString() const;
+    virtual std::string toString() const;
     int  length() const
     {
         return m_value.length();
@@ -131,8 +130,8 @@ class ABI_EXPORT PD_Object : public PD_URI
     bool isURI() const;
     bool isBNode() const;
 
-    virtual bool read(std::istream& ss) override;
-    virtual bool write(std::ostream& ss) const override;
+    virtual bool read( std::istream& ss );
+    virtual bool write( std::ostream& ss ) const;
 
   protected:
     std::string m_xsdType;
@@ -156,7 +155,7 @@ typedef std::list< PD_URI > PD_URIList;
 typedef std::multimap< PD_URI, PD_Object > POCol;
 typedef std::list< PD_Object > PD_ObjectList;
 
-struct PD_URIListCompare : public std::function<bool(PD_URI, PD_URI)> {
+struct PD_URIListCompare : public std::binary_function<PD_URI, PD_URI, bool> {
 	bool operator()(PD_URI x, PD_URI y) { return x.toString() < y.toString(); }
 };
 
@@ -221,9 +220,8 @@ class ABI_EXPORT PD_RDFModelIterator
     typedef PD_RDFModelIterator  self_type;
 
     PD_RDFModelIterator();
-    PD_RDFModelIterator(const PD_RDFModelIterator&) = default;
-    PD_RDFModelIterator( PD_RDFModelHandle model, const PP_AttrProp* AP );
     ~PD_RDFModelIterator();
+    PD_RDFModelIterator( PD_RDFModelHandle model, const PP_AttrProp* AP );
 
     self_reference operator++();
     bool operator==( self_constref other );
@@ -475,7 +473,7 @@ class ABI_EXPORT PD_RDFSemanticItem
      * ??? maybe not ??? importFromDataComplete() calls also insert() which links the
      * ??? semanticItem with the document object m_rdf.
      */
-     virtual void importFromData(std::istream& iss, PD_DocumentRDFHandle rdf, PD_DocumentRange * pDocRange = nullptr) = 0;
+     virtual void importFromData( std::istream& iss, PD_DocumentRDFHandle rdf, PD_DocumentRange * pDocRange = 0 ) = 0;
 
     /**
      * Export to a file in whatever format is the most useful for the
@@ -596,7 +594,7 @@ class ABI_EXPORT PD_RDFSemanticItem
      virtual void importFromDataComplete( std::istream& iss,
                                           PD_DocumentRDFHandle rdf,
                                           PD_DocumentRDFMutationHandle m,
-                                          PD_DocumentRange * pDocRange = nullptr);
+                                          PD_DocumentRange * pDocRange = 0 );
 
      std::string bindingAsString( PD_ResultBindings_t::iterator& it, const std::string k );
      std::string optionalBindingAsString( PD_ResultBindings_t::iterator& it, const std::string k );
@@ -693,20 +691,20 @@ class ABI_EXPORT PD_RDFContact : public PD_RDFSemanticItem
     std::string m_phone;
     std::string m_jabberID;
 
-    virtual std::list< std::pair< std::string, std::string> > getImportTypes() const override;
-    virtual std::list< std::pair< std::string, std::string> > getExportTypes() const override;
-    virtual std::string getDefaultExtension() const override;
+    virtual std::list< std::pair< std::string, std::string> > getImportTypes() const;
+    virtual std::list< std::pair< std::string, std::string> > getExportTypes() const;
+    virtual std::string getDefaultExtension() const;
 
   public:
     PD_RDFContact( PD_DocumentRDFHandle rdf, PD_ResultBindings_t::iterator& it );
     virtual ~PD_RDFContact();
 
-    virtual void importFromData(std::istream& iss, PD_DocumentRDFHandle rdf, PD_DocumentRange * pDocRange = nullptr) override;
-    virtual void exportToFile(const std::string& filename = "") const override;
-    virtual std::string getDisplayLabel() const override;
-    virtual void setupStylesheetReplacementMapping(std::map<std::string, std::string>& m) override;
-    virtual PD_RDFSemanticStylesheets stylesheets() const override;
-    virtual std::string className() const override;
+    virtual void importFromData( std::istream& iss, PD_DocumentRDFHandle rdf, PD_DocumentRange * pDocRange = 0 );
+    virtual void exportToFile( const std::string& filename = "" ) const;
+    virtual std::string getDisplayLabel() const;
+    virtual void setupStylesheetReplacementMapping( std::map< std::string, std::string >& m );
+    virtual PD_RDFSemanticStylesheets stylesheets() const;
+    virtual std::string className() const;
 };
 
 
@@ -720,20 +718,20 @@ class ABI_EXPORT PD_RDFEvent : public PD_RDFSemanticItem
     time_t      m_dtstart;
     time_t      m_dtend;
 
-    virtual std::list< std::pair< std::string, std::string> > getImportTypes() const override;
-    virtual std::list< std::pair< std::string, std::string> > getExportTypes() const override;
-    virtual std::string getDefaultExtension() const override;
+    virtual std::list< std::pair< std::string, std::string> > getImportTypes() const;
+    virtual std::list< std::pair< std::string, std::string> > getExportTypes() const;
+    virtual std::string getDefaultExtension() const;
 
   public:
     PD_RDFEvent( PD_DocumentRDFHandle rdf, PD_ResultBindings_t::iterator& it );
     virtual ~PD_RDFEvent();
 
-    virtual void importFromData(std::istream& iss, PD_DocumentRDFHandle rdf, PD_DocumentRange * pDocRange = nullptr) override;
-    virtual void exportToFile(const std::string& filename = "") const override;
-    virtual std::string getDisplayLabel() const override;
-    virtual void setupStylesheetReplacementMapping(std::map< std::string, std::string >& m) override;
-    virtual PD_RDFSemanticStylesheets stylesheets() const override;
-    virtual std::string className() const override;
+    virtual void importFromData( std::istream& iss, PD_DocumentRDFHandle rdf, PD_DocumentRange * pDocRange = 0 );
+    virtual void exportToFile( const std::string& filename = "" ) const;
+    virtual std::string getDisplayLabel() const;
+    virtual void setupStylesheetReplacementMapping( std::map< std::string, std::string >& m );
+    virtual PD_RDFSemanticStylesheets stylesheets() const;
+    virtual std::string className() const;
 };
 
 
@@ -747,21 +745,21 @@ class ABI_EXPORT PD_RDFLocation : public PD_RDFSemanticItem
     PD_Object   m_joiner;
     bool        m_isGeo84;
 
-    virtual std::list< std::pair< std::string, std::string> > getImportTypes() const override;
-    virtual std::list< std::pair< std::string, std::string> > getExportTypes() const override;
-    virtual std::string getDefaultExtension() const override;
+    virtual std::list< std::pair< std::string, std::string> > getImportTypes() const;
+    virtual std::list< std::pair< std::string, std::string> > getExportTypes() const;
+    virtual std::string getDefaultExtension() const;
 
   public:
     PD_RDFLocation( PD_DocumentRDFHandle rdf, PD_ResultBindings_t::iterator& it, bool isGeo84 = false );
     virtual ~PD_RDFLocation();
 
-    virtual void importFromData(std::istream& iss, PD_DocumentRDFHandle rdf, PD_DocumentRange * pDocRange = nullptr) override;
-    virtual void exportToFile(const std::string& filename = "") const override;
-    virtual std::string getDisplayLabel() const override;
-    virtual std::set< std::string > getXMLIDs() const override;
-    virtual void setupStylesheetReplacementMapping(std::map<std::string, std::string>& m) override;
-    virtual PD_RDFSemanticStylesheets stylesheets() const override;
-    virtual std::string className() const override;
+    virtual void importFromData( std::istream& iss, PD_DocumentRDFHandle rdf, PD_DocumentRange * pDocRange = 0 );
+    virtual void exportToFile( const std::string& filename = "" ) const;
+    virtual std::string getDisplayLabel() const;
+    virtual std::set< std::string > getXMLIDs() const;
+    virtual void setupStylesheetReplacementMapping( std::map< std::string, std::string >& m );
+    virtual PD_RDFSemanticStylesheets stylesheets() const;
+    virtual std::string className() const;
 };
 
 
@@ -1003,17 +1001,17 @@ class ABI_EXPORT PD_DocumentRDF : public PD_RDFModel
     bool haveSemItems() const;
     
     // PD_RDFModel methods...
-    virtual PD_ObjectList getObjects( const PD_URI& s, const PD_URI& p ) override;
-    virtual PD_URIList getSubjects( const PD_URI& p, const PD_Object& o ) override;
-    virtual PD_URIList getAllSubjects() override;
-    virtual POCol      getArcsOut( const PD_URI& s ) override;
-    virtual bool       contains( const PD_URI& s, const PD_URI& p, const PD_Object& o ) override;
-    virtual bool       contains( const PD_RDFStatement& st ) override;
-    virtual long       getTripleCount() override;
-    virtual PD_RDFModelIterator begin() override;
-    virtual PD_RDFModelIterator end() override;
-    virtual void dumpModel( const std::string& headerMsg = "dumpModel()" ) override;
-    virtual PD_DocumentRDFMutationHandle createMutation() override;
+    virtual PD_ObjectList getObjects( const PD_URI& s, const PD_URI& p );
+    virtual PD_URIList getSubjects( const PD_URI& p, const PD_Object& o );
+    virtual PD_URIList getAllSubjects();
+    virtual POCol      getArcsOut( const PD_URI& s );
+    virtual bool       contains( const PD_URI& s, const PD_URI& p, const PD_Object& o );
+    virtual bool       contains( const PD_RDFStatement& st );
+    virtual long       getTripleCount();
+    virtual PD_RDFModelIterator begin();
+    virtual PD_RDFModelIterator end();
+    virtual void dumpModel( const std::string& headerMsg = "dumpModel()" );
+    virtual PD_DocumentRDFMutationHandle createMutation();
 
 
     void handleCollabEvent(const gchar** szAtts, const gchar** szProps );
@@ -1064,10 +1062,10 @@ class ABI_EXPORT PD_DocumentRDF : public PD_RDFModel
 
     PD_RDFSemanticItems getAllSemanticObjects( const std::string& classRestriction = "" );
     PD_RDFSemanticItems getSemanticObjects( const std::set< std::string >& xmlids );
-    PD_RDFContacts  getContacts(PD_RDFModelHandle alternateModel = PD_RDFModelHandle(nullptr));
-    PD_RDFEvents    getEvents(PD_RDFModelHandle alternateModel = PD_RDFModelHandle(nullptr));
-    PD_RDFLocations getLocations(PD_RDFModelHandle alternateModel = PD_RDFModelHandle(nullptr));
-    void selectXMLIDs(const std::set<std::string>& xmlids, FV_View* pView = nullptr) const;
+    PD_RDFContacts  getContacts( PD_RDFModelHandle alternateModel = PD_RDFModelHandle((PD_RDFModel*)0) );
+    PD_RDFEvents    getEvents( PD_RDFModelHandle alternateModel = PD_RDFModelHandle((PD_RDFModel*)0) );
+    PD_RDFLocations getLocations( PD_RDFModelHandle alternateModel = PD_RDFModelHandle((PD_RDFModel*)0) );
+    void selectXMLIDs( const std::set< std::string >& xmlids, FV_View* pView = 0 ) const;
 
 
     void showEditorWindow( const PD_RDFSemanticItems& cl );
@@ -1114,7 +1112,7 @@ class ABI_EXPORT PD_DocumentRDF : public PD_RDFModel
   private:
     PD_RDFLocations& addLocations( PD_RDFLocations& ret,
                                    bool isGeo84,
-                                   const std::string& sparql,
+                                   const std::string sparql,
                                    PD_RDFModelHandle alternateModel );
 };
 

@@ -33,7 +33,7 @@
 #include "ut_types.h"
 #endif
 
-#include <string>
+class UT_String;
 
 class AV_View;
 
@@ -42,12 +42,12 @@ class EV_EditMethodCallData;
 class ABI_EXPORT XAP_Log
 {
 public:
-	void log(const std::string &method_name, AV_View *pAV_View, EV_EditMethodCallData *pCallData);
+	void log(const UT_String &method_name, AV_View *pAV_View, EV_EditMethodCallData *pCallData);
 	static XAP_Log *get_instance();
 	virtual ~XAP_Log();
 
 private:
-	XAP_Log(const std::string &logfile);
+	XAP_Log(const UT_String &logfile);
 	FILE *m_pOutput;
 	static XAP_Log *m_pInstance;
 };

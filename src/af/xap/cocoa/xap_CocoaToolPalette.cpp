@@ -3,20 +3,20 @@
 /* AbiSource Application Framework
  * Copyright (C) 2004 AbiSource, Inc.
  * Copyright (C) 2004 Francis James Franklin <fjf@alinameridon.com>
- *
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
 
@@ -29,6 +29,7 @@
 #import "xap_CocoaAppController.h"
 #import "xap_CocoaToolPalette.h"
 #import "xap_CocoaToolbar_Icons.h"
+#import "xap_CocoaCompat.h"
 
 #include "xap_Frame.h"
 #include "xap_Toolbar_LabelSet.h"
@@ -195,7 +196,7 @@ enum _XAP_CocoaTool_Id
 	if (m_Palette)
 	{
 		[m_Palette release];
-		m_Palette = nil;
+		m_Palette = 0;
 	}
 	[super dealloc];
 }
@@ -305,7 +306,7 @@ enum _XAP_CocoaTool_Id
 		content.size.width  = size.width;
 		content.size.height = size.height;
 
-		frame = [NSWindow frameRectForContentRect:content styleMask:(NSWindowStyleMaskTitled|NSWindowStyleMaskClosable|NSWindowStyleMaskUtilityWindow)];
+		frame = [NSWindow frameRectForContentRect:content styleMask:(NSTitledWindowMask|NSClosableWindowMask|NSUtilityWindowMask)];
 		frame.origin.x = current.origin.x;
 		frame.origin.y = static_cast<float>(y - static_cast<int>(frame.size.height));
 		[window setFrame:frame display:YES animate:YES];
@@ -415,8 +416,8 @@ enum _XAP_CocoaTool_Id
 			return nil;
 		}
 		for (UT_sint32 i = 0; i < count; i++) {
-			const char * szName  = nullptr;
-			const char * szValue = nullptr;
+			const char * szName  = NULL;
+			const char * szValue = NULL;
 
 			if (pAP->getNthProperty(i, szName, szValue)) {
 				NSString * name  = [NSString stringWithUTF8String:(szName )];
@@ -456,8 +457,8 @@ enum _XAP_CocoaTool_Id
 			return nil;
 		}
 		for (UT_sint32 i = 0; i < count; i++) {
-			const char * szName  = nullptr;
-			const char * szValue = nullptr;
+			const char * szName  = NULL;
+			const char * szValue = NULL;
 
 			if (style->getNthProperty(i, szName, szValue)) {
 				NSString * name  = [NSString stringWithUTF8String:(szName )];
@@ -528,7 +529,7 @@ enum _XAP_CocoaTool_Id
 	{
 		return [m_Properties objectAtIndex:((unsigned) index)];
 	}
-	return nil; // ??
+	return 0; // ??
 }
 
 - (id)objectValueForTableColumn:(NSTableColumn *)tableColumn
@@ -546,9 +547,9 @@ enum _XAP_CocoaTool_Id
 
 static PD_Style * _getStyle(const PP_AttrProp * pAttrProp, PD_Document * pDoc)
 {
-	PD_Style* pStyle = nullptr;
+	PD_Style * pStyle = 0;
 
-	const gchar* szValue = nullptr;
+	const gchar * szValue = 0;
 
 // This is where the style/name split gets really hairy. This index AP MIGHT be
 // from a style definition in which case the name of the style is PT_NAME_ATTRIBUTE_NAME
@@ -557,7 +558,7 @@ static PD_Style * _getStyle(const PP_AttrProp * pAttrProp, PD_Document * pDoc)
 
 	if (pAttrProp->getAttribute(PT_NAME_ATTRIBUTE_NAME, szValue))
 	{
-		UT_return_val_if_fail (szValue && szValue[0], nullptr);
+		UT_return_val_if_fail (szValue && szValue[0], 0);
 		if (pDoc) {
 			pDoc->getStyle(reinterpret_cast<const char*>(szValue), &pStyle);
 		}
@@ -566,7 +567,7 @@ static PD_Style * _getStyle(const PP_AttrProp * pAttrProp, PD_Document * pDoc)
 	}
     else if(pAttrProp->getAttribute(PT_STYLE_ATTRIBUTE_NAME, szValue))
 	{
-		UT_return_val_if_fail (szValue && szValue[0], nullptr);
+		UT_return_val_if_fail (szValue && szValue[0], 0);
 		if (pDoc) {
 			pDoc->getStyle(reinterpret_cast<const char*>(szValue), &pStyle);
 		}
@@ -598,7 +599,7 @@ static PD_Style * _getStyle(const PP_AttrProp * pAttrProp, PD_Document * pDoc)
 	if (m_PropertyLevels)
 	{
 		[m_PropertyLevels release];
-		m_PropertyLevels = nil;
+		m_PropertyLevels = 0;
 	}
 	[super dealloc];
 }
@@ -611,10 +612,10 @@ static PD_Style * _getStyle(const PP_AttrProp * pAttrProp, PD_Document * pDoc)
 	}
 	if (pView)
 	{
-		const PP_AttrProp* pSpanAP = nullptr;
-		const PP_AttrProp* pBlockAP = nullptr;
-		const PP_AttrProp* pSectionAP = nullptr;
-		const PP_AttrProp* pDocAP = nullptr;
+		const PP_AttrProp * pSpanAP    = 0;
+		const PP_AttrProp * pBlockAP   = 0;
+		const PP_AttrProp * pSectionAP = 0;
+		const PP_AttrProp * pDocAP     = 0;
 
 		if (pView->getAllAttrProp(pSpanAP, pBlockAP, pSectionAP, pDocAP))
 		{
@@ -785,7 +786,7 @@ static PD_Style * _getStyle(const PP_AttrProp * pAttrProp, PD_Document * pDoc)
 {
 	NSPanel * panel = (NSPanel *) [self window];
 
-	[menuItem setState:([panel isVisible] ? NSControlStateValueOn : NSControlStateValueOff)];
+	[menuItem setState:([panel isVisible] ? NSOnState : NSOffState)];
 
 	return YES;
 }
@@ -816,7 +817,7 @@ static XAP_CocoaToolPalette * s_instance = nil;
 		XAP_PrefsScheme *pPrefsScheme = pPrefs->getCurrentScheme();
 		UT_ASSERT(pPrefsScheme);
 		
-		pPrefsScheme->getValueBool(XAP_PREF_KEY_ToolPaletteVisible, visible);
+		pPrefsScheme->getValueBool(XAP_PREF_KEY_ToolPaletteVisible, &visible);
 		if (visible) {
 			[s_instance showWindow:sender];
 		}
@@ -834,16 +835,16 @@ static XAP_CocoaToolPalette * s_instance = nil;
 	if(![super initWithWindowNibName:@"xap_CocoaToolPalette"]) {
 		return nil;
 	}
-	m_ToolChest = nil;
-	m_PaletteView = nil;
-	m_Properties_DataSource = nil;
+	m_ToolChest = 0;
+	m_PaletteView = 0;
+	m_Properties_DataSource = 0;
 
-	m_pMenuActionSet = nullptr;
-	m_pToolbarActionSet = nullptr;
-	m_pEditMethodContainer = nullptr;
-	m_pFontFamilies = nil;
-	m_pCurrentFontFamily = nil;
-	m_Listener = nullptr;
+	m_pMenuActionSet = 0;
+	m_pToolbarActionSet = 0;
+	m_pEditMethodContainer = 0;
+	m_pFontFamilies = 0;
+	m_pCurrentFontFamily = 0;
+	m_Listener = 0;
 
 	XAP_CocoaApp * pCocoaApp = dynamic_cast<XAP_CocoaApp *>(XAP_App::getApp());
 	UT_ASSERT(pCocoaApp);
@@ -880,7 +881,7 @@ static XAP_CocoaToolPalette * s_instance = nil;
 				UT_DEBUGMSG(("XAP_CocoaToolPalette -init: no usable font families?\n"));
 
 				[m_pFontFamilies release];
-				m_pFontFamilies = nil;
+				m_pFontFamilies = 0;
 			}
 		}
 	}
@@ -903,7 +904,7 @@ static XAP_CocoaToolPalette * s_instance = nil;
 	}
 	catch(...)
 	{
-		m_Listener = nullptr;
+		m_Listener = 0;
 	}
 	return self;
 }
@@ -913,24 +914,24 @@ static XAP_CocoaToolPalette * s_instance = nil;
 	if (m_Properties_DataSource)
 	{
 		[m_Properties_DataSource release];
-		m_Properties_DataSource = nil;
+		m_Properties_DataSource = 0;
 	}
 	if (m_PaletteView) {
 		if (![m_PaletteView superview])
 		{
 			[m_PaletteView dealloc];
-			m_PaletteView = nil;
+			m_PaletteView = 0;
 		}
 	}
 	if (m_pFontFamilies)
 	{
 		[m_pFontFamilies release];
-		m_pFontFamilies = nil;
+		m_pFontFamilies = 0;
 	}
 	if (m_pCurrentFontFamily)
 	{
 		[m_pCurrentFontFamily release];
-		m_pCurrentFontFamily = nil;
+		m_pCurrentFontFamily = 0;
 	}
 	DELETEP(m_ToolChest);
 	DELETEP(m_Listener);
@@ -981,7 +982,7 @@ static XAP_CocoaToolPalette * s_instance = nil;
 		[m_PaletteView addPalette:&palette];
 
 		NSRect content = [m_PaletteView frame];
-		NSRect frame = [NSWindow frameRectForContentRect:content styleMask:(NSWindowStyleMaskTitled|NSWindowStyleMaskClosable|NSWindowStyleMaskUtilityWindow)];
+		NSRect frame = [NSWindow frameRectForContentRect:content styleMask:(NSTitledWindowMask|NSClosableWindowMask|NSUtilityWindowMask)];
 
 		NSRect visible_frame = [[oPanel screen] visibleFrame];
 		int x = static_cast<int>(visible_frame.size.width ) + static_cast<int>(visible_frame.origin.x);
@@ -1018,7 +1019,7 @@ static XAP_CocoaToolPalette * s_instance = nil;
 
 	const XAP_StringSet * pSS = XAP_App::getApp()->getStringSet();
 
-	const char* tooltip = nullptr;
+	const char * tooltip = 0;
 
 	for (int i = 0; i < XAP_COCOA_TOOL_ID__COUNT_; i++)
 	{
@@ -1120,7 +1121,7 @@ static XAP_CocoaToolPalette * s_instance = nil;
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
-	[menuItem setState:([oPanel isVisible] ? NSControlStateValueOn : NSControlStateValueOff)];
+	[menuItem setState:([oPanel isVisible] ? NSOnState : NSOffState)];
 
 	return YES;
 }
@@ -1175,10 +1176,10 @@ static XAP_CocoaToolPalette * s_instance = nil;
 
 	UT_DEBUGMSG(("XAP_CocoaToolPalette -setColor: have edit method\n"));
 
-	CGFloat red;
-	CGFloat green;
-	CGFloat blue;
-	CGFloat alpha;
+	XAP_CGFloat red;
+	XAP_CGFloat green;
+	XAP_CGFloat blue;
+	XAP_CGFloat alpha;
 
 	NSColor * color = [[NSColorPanel sharedColorPanel] color];
 
@@ -1328,8 +1329,8 @@ static XAP_CocoaToolPalette * s_instance = nil;
 
 	NSString * fontFamilyName = m_pCurrentFontFamily;
 
-	BOOL bBold   = ([oTB_text_bold   state] == NSControlStateValueOn) ? YES : NO; // current state
-	BOOL bItalic = ([oTB_text_italic state] == NSControlStateValueOn) ? YES : NO;
+	BOOL bBold   = ([oTB_text_bold   state] == NSOnState) ? YES : NO; // current state
+	BOOL bItalic = ([oTB_text_italic state] == NSOnState) ? YES : NO;
 
 	BOOL bSetBold   = NO;
 	BOOL bSetItalic = NO;
@@ -1365,13 +1366,13 @@ static XAP_CocoaToolPalette * s_instance = nil;
 
 	if (bBold != bSetBold)
 	{
-		[oTB_text_bold setState:(bSetBold ? NSControlStateValueOn : NSControlStateValueOff)];
+		[oTB_text_bold setState:(bSetBold ? NSOnState : NSOffState)];
 		[self aTB_click:oTB_text_bold];
 	}
 
 	if (bItalic != bSetItalic)
 	{
-		[oTB_text_italic setState:(bSetItalic ? NSControlStateValueOn : NSControlStateValueOff)];
+		[oTB_text_italic setState:(bSetItalic ? NSOnState : NSOffState)];
 		[self aTB_click:oTB_text_italic];
 	}
 
@@ -1506,8 +1507,8 @@ static XAP_CocoaToolPalette * s_instance = nil;
 
 		// ?? [NSColorPanel setPickerMask:(NSColorPanelRGBModeMask|NSColorPanelWheelModeMask|NSColorPanelGrayModeMask)];
 
-		[colorPanel setAction:nil];
-		[colorPanel setTarget:nil];
+		[colorPanel setAction:0];
+		[colorPanel setTarget:0];
 
 		if (tlbrid == AP_TOOLBAR_ID_COLOR_FORE)
 		{
@@ -1555,7 +1556,7 @@ static XAP_CocoaToolPalette * s_instance = nil;
 		}
 		else
 		{
-			const UT_UCS4Char * pData = nullptr;
+			const UT_UCS4Char * pData = NULL;
 			UT_uint32 dataLength = 0;
 
 			EV_EditMethodCallData emcd(pData,dataLength);
@@ -1755,7 +1756,7 @@ static XAP_CocoaToolPalette * s_instance = nil;
 				continue;
 			}
 
-			const char* szState = nullptr;
+			const char * szState = 0;
 			EV_Toolbar_ItemState tis = pAction->getToolbarItemState(m_pViewCurrent, &szState);
 
 			switch (pAction->getItemType()) {
@@ -1772,7 +1773,7 @@ static XAP_CocoaToolPalette * s_instance = nil;
 			case EV_TBIT_GroupButton:
 			{
 				[m_ToolChest[i].button setEnabled:(EV_TIS_ShouldBeGray(tis) ? NO : YES)];
-				[m_ToolChest[i].button setState:(EV_TIS_ShouldBeToggled(tis) ? NSControlStateValueOn : NSControlStateValueOff)];
+				[m_ToolChest[i].button setState:(EV_TIS_ShouldBeToggled(tis) ? NSOnState : NSOffState)];
 			}
 			break;
 
@@ -1833,8 +1834,8 @@ static XAP_CocoaToolPalette * s_instance = nil;
 
 	if (m_pFrameCurrent) {
 		if (PD_Document * pDoc = static_cast<PD_Document *>(m_pFrameCurrent->getCurrentDoc())) {
-			const char* szName = nullptr;
-			const PD_Style* pStyle = nullptr;
+			const char * szName = 0;
+			const PD_Style * pStyle = 0;
 
 			NSMutableArray * styles = [NSMutableArray arrayWithCapacity:32];
 
@@ -1859,7 +1860,7 @@ static XAP_CocoaToolPalette * s_instance = nil;
 			const EV_Toolbar_Action * pAction = m_pToolbarActionSet->getAction(AP_TOOLBAR_ID_FMT_STYLE);
 			UT_ASSERT(pAction);
 			if (pAction) {
-				const char* szState = nullptr;
+				const char * szState = 0;
 				EV_Toolbar_ItemState tis = pAction->getToolbarItemState(m_pViewCurrent, &szState);
 
 				[oDocumentStyle setEnabled:(EV_TIS_ShouldBeGray(tis) ? NO : YES)];
@@ -1881,7 +1882,7 @@ static XAP_CocoaToolPalette * s_instance = nil;
 		UT_ASSERT(pAction);
 		if (pAction)
 		{
-			const char* szState = nullptr;
+			const char * szState = 0;
 			EV_Toolbar_ItemState tis = pAction->getToolbarItemState(m_pViewCurrent, &szState);
 
 			[oFontName setEnabled:(EV_TIS_ShouldBeGray(tis) ? NO : YES)];
@@ -1904,7 +1905,7 @@ static XAP_CocoaToolPalette * s_instance = nil;
 		UT_ASSERT(pAction);
 		if (pAction)
 		{
-			const char* szState = nullptr;
+			const char * szState = 0;
 			EV_Toolbar_ItemState tis = pAction->getToolbarItemState(m_pViewCurrent, &szState);
 
 			[oFontSize setEnabled:(EV_TIS_ShouldBeGray(tis) ? NO : YES)];
@@ -1947,7 +1948,7 @@ static XAP_CocoaToolPalette * s_instance = nil;
 		UT_ASSERT(pAction);
 		if (pAction)
 		{
-			const char* szState = nullptr;
+			const char * szState = 0;
 			EV_Toolbar_ItemState tis = pAction->getToolbarItemState(m_pViewCurrent, &szState);
 
 			[oZoom setEnabled:(EV_TIS_ShouldBeGray(tis) ? NO : YES)];
@@ -1993,13 +1994,13 @@ static XAP_CocoaToolPalette * s_instance = nil;
 
 		if (pFView->queryCharFormat("color", szColorValue, bExplicitlyDefined, bMixedSelection))
 		{
-			[oSwitch_FG setState:(bExplicitlyDefined ? NSControlStateValueOn : NSControlStateValueOff)];
+			[oSwitch_FG setState:(bExplicitlyDefined ? NSOnState : NSOffState)];
 
 			UT_HashColor hash;
 
-			bool bValid = (hash.setColor(szColorValue.utf8_str()) != nullptr);
+			bool bValid = (hash.setColor(szColorValue.utf8_str()) != 0);
 			if (!bValid) {
-				bValid = (hash.setHashIfValid(szColorValue.utf8_str()) != nullptr);
+				bValid = (hash.setHashIfValid(szColorValue.utf8_str()) != 0);
 			}
 			
 			if (bValid)
@@ -2020,7 +2021,7 @@ static XAP_CocoaToolPalette * s_instance = nil;
 		}
 		if (pFView->queryCharFormat("bgcolor", szColorValue, bExplicitlyDefined, bMixedSelection))
 		{
-			[oSwitch_BG setState:(bExplicitlyDefined ? NSControlStateValueOn : NSControlStateValueOff)];
+			[oSwitch_BG setState:(bExplicitlyDefined ? NSOnState : NSOffState)];
 
 			if (strcmp (szColorValue.utf8_str(), "transparent") == 0)
 			{
@@ -2035,9 +2036,9 @@ static XAP_CocoaToolPalette * s_instance = nil;
 			{
 				UT_HashColor hash;
 
-				bool bValid = (hash.setColor(szColorValue.utf8_str()) != nullptr);
+				bool bValid = (hash.setColor(szColorValue.utf8_str()) != 0);
 				if (!bValid) {
-					bValid = (hash.setHashIfValid(szColorValue.utf8_str()) != nullptr);
+					bValid = (hash.setHashIfValid(szColorValue.utf8_str()) != 0);
 				}
 				if (bValid)
 				{
@@ -2085,8 +2086,8 @@ static XAP_CocoaToolPalette * s_instance = nil;
 	}
 	else if (!frame && !view)
 	{
-		m_pViewCurrent  = nullptr;
-		m_pFrameCurrent = nullptr;
+		m_pViewCurrent  = 0;
+		m_pFrameCurrent = 0;
 
 		// should we sync in this case?
 	}
@@ -2094,8 +2095,8 @@ static XAP_CocoaToolPalette * s_instance = nil;
 	{
 		UT_ASSERT(view && frame);
 
-		m_pViewCurrent  = nullptr;
-		m_pFrameCurrent = nullptr;
+		m_pViewCurrent  = 0;
+		m_pFrameCurrent = 0;
 
 		bSync = true;
 	}
@@ -2149,7 +2150,7 @@ static XAP_CocoaToolPalette * s_instance = nil;
 	 * (c) completely unknown, so we pretend it's a new font family name
 	 */
 
-	NSString* fontFamilyName = nil;
+	NSString * fontFamilyName = 0;
 
 //	XAP_CocoaAppController * pController = (XAP_CocoaAppController *) [NSApp delegate];
 
@@ -2257,8 +2258,8 @@ static XAP_CocoaToolPalette * s_instance = nil;
 	}
 	/* We have a font family name but we need to choose a particular member of the font...
 	 */
-	BOOL bBold   = ([oTB_text_bold   state] == NSControlStateValueOn) ? YES : NO;
-	BOOL bItalic = ([oTB_text_italic state] == NSControlStateValueOn) ? YES : NO;
+	BOOL bBold   = ([oTB_text_bold   state] == NSOnState) ? YES : NO;
+	BOOL bItalic = ([oTB_text_italic state] == NSOnState) ? YES : NO;
 
 	if (bBold && bItalic)
 	{
@@ -2300,14 +2301,14 @@ static XAP_CocoaToolPalette * s_instance = nil;
 
 XAP_CocoaToolPaletteListener::XAP_CocoaToolPaletteListener(XAP_CocoaToolPalette * pPalette) :
 	m_pPalette(pPalette),
-	m_pView(nullptr)
+	m_pView(0)
 {
 	// 
 }
 
 XAP_CocoaToolPaletteListener::~XAP_CocoaToolPaletteListener()
 {
-	setCurrentView(nullptr);
+	setCurrentView(0);
 }
 
 void XAP_CocoaToolPaletteListener::setCurrentView(AV_View * view)
@@ -2318,7 +2319,7 @@ void XAP_CocoaToolPaletteListener::setCurrentView(AV_View * view)
 		{
 			UT_DEBUGMSG(("XAP_CocoaToolPaletteListener::setCurrentView: failed to remove listener!\n"));
 		}
-		m_pView = nullptr;
+		m_pView = 0;
 	}
 	if (view)
 	{
@@ -2342,7 +2343,7 @@ bool XAP_CocoaToolPaletteListener::notify(AV_View * pView, const AV_ChangeMask /
 	return true; // why is this a bool function?
 }
 
-AV_ListenerType XAP_CocoaToolPaletteListener::getType() const
+AV_ListenerType XAP_CocoaToolPaletteListener::getType()
 {
 	return AV_LISTENER_TOOLBAR;
 }

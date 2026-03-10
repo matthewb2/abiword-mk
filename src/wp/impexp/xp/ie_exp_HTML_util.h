@@ -19,26 +19,25 @@
  * 02110-1301 USA.
  */
 
-
-#pragma once
+#ifndef IE_EXP_HTML_UTIL_H
+#define IE_EXP_HTML_UTIL_H
 
 // External includes
 #include <vector>
 #include <string>
 #include <map>
 #include <algorithm>
-
-#include <gsf/gsf.h>
+#include <gsf/gsf-output.h>
 
 // Abiword includes
-#include "ie_TOC.h"
-#include "ie_Table.h"
-#include "pd_Document.h"
-#include "ut_go_file.h"
-#include "ut_string_class.h"
-#include "ut_types.h"
-#include "ut_debugmsg.h"
-#include "ut_base64.h"
+#include <ie_TOC.h>
+#include <ie_Table.h>
+#include <pd_Document.h>
+#include <ut_go_file.h>
+#include <ut_string_class.h>
+#include <ut_types.h>
+#include <ut_debugmsg.h>
+#include <ut_base64.h>
 
 #define MYEOL "\n"
 #define FILES_DIR_NAME "_files"
@@ -62,7 +61,7 @@ extern const char * s_Header[2];
 
 UT_UTF8String s_string_to_url (const UT_String & str);
 UT_UTF8String s_string_to_url (const UT_UTF8String & str);
-bool is_CSS (const char * prop_name, const char ** prop_default = nullptr);
+bool is_CSS (const char * prop_name, const char ** prop_default = 0);
 void s_removeWhiteSpace (const char * text, std::string& utf8str,
                            bool bLowerCase = true);
 // Returns alpha-numeric contents of string
@@ -117,9 +116,9 @@ public:
     IE_Exp_HTML_FileExporter(PD_Document* pDocument,
             const UT_UTF8String &baseName);
 
-    virtual UT_UTF8String saveData(const gchar *szDataId, const gchar* extension) override;
-    virtual UT_UTF8String saveData(const UT_UTF8String &name,
-    const UT_UTF8String &data) override;
+    UT_UTF8String saveData(const gchar *szDataId, const gchar* extension);
+    UT_UTF8String saveData(const UT_UTF8String &name,
+    const UT_UTF8String &data);
 private:
     void _init();
     bool m_bInitialized;
@@ -136,9 +135,9 @@ public:
             UT_UTF8String &buffer,
             const UT_UTF8String &title);
 
-    virtual UT_UTF8String saveData(const gchar *szDataId, const gchar* extension) override;
-    virtual UT_UTF8String saveData(const UT_UTF8String &name,
-        const UT_UTF8String &data) override;
+    UT_UTF8String saveData(const gchar *szDataId, const gchar* extension);
+    UT_UTF8String saveData(const UT_UTF8String &name,
+        const UT_UTF8String &data);
 
     UT_UTF8String generateHeader(const UT_UTF8String &index,
         const UT_UTF8String &mimetype);
@@ -161,7 +160,7 @@ class ABI_EXPORT IE_Exp_HTML_FileWriter : public IE_Exp_HTML_OutputWriter
 {
 public:
     IE_Exp_HTML_FileWriter(GsfOutput *output);
-    virtual void write(const UT_UTF8String &str) override;
+    void write(const UT_UTF8String &str);
 private:
     GsfOutput *m_output;
 };
@@ -170,7 +169,7 @@ class ABI_EXPORT IE_Exp_HTML_StringWriter: public IE_Exp_HTML_OutputWriter
 {
 public:
     IE_Exp_HTML_StringWriter();
-    virtual void write(const UT_UTF8String &str) override;
+    void write(const UT_UTF8String &str);
     UT_UTF8String getString() const { return m_buffer; }
 private:
     UT_UTF8String m_buffer;
@@ -206,3 +205,7 @@ private:
     bool m_bInComment;
     std::string m_buffer;
 };
+
+
+
+#endif

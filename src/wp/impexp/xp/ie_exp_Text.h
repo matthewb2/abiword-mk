@@ -40,14 +40,14 @@ public:
 	IE_Exp_Text_Sniffer ();
 	virtual ~IE_Exp_Text_Sniffer ();
 
-	virtual UT_Confidence_t supportsMIME(const char * szMIME) override;
+	UT_Confidence_t supportsMIME (const char * szMIME);
 
-	virtual bool recognizeSuffix(const char * szSuffix) override;
-	virtual bool getDlgLabels(const char ** szDesc,
+	virtual bool recognizeSuffix (const char * szSuffix);
+	virtual bool getDlgLabels (const char ** szDesc,
 							   const char ** szSuffixList,
-							   IEFileType * ft) override;
-	virtual UT_Error constructExporter(PD_Document * pDocument,
-										IE_Exp ** ppie) override;
+							   IEFileType * ft);
+	virtual UT_Error constructExporter (PD_Document * pDocument,
+										IE_Exp ** ppie);
 };
 
 // The exporter/writer for Plain Text Files with selectable encoding.
@@ -60,12 +60,12 @@ public:
 	IE_Exp_EncodedText_Sniffer ();
 	virtual ~IE_Exp_EncodedText_Sniffer ();
 
-	virtual bool recognizeSuffix(const char * szSuffix) override;
-	virtual bool getDlgLabels(const char ** szDesc,
+	virtual bool recognizeSuffix (const char * szSuffix);
+	virtual bool getDlgLabels (const char ** szDesc,
 							   const char ** szSuffixList,
-							   IEFileType * ft) override;
-	virtual UT_Error constructExporter(PD_Document * pDocument,
-										IE_Exp ** ppie) override;
+							   IEFileType * ft);
+	virtual UT_Error constructExporter (PD_Document * pDocument,
+										IE_Exp ** ppie);
 };
 
 class ABI_EXPORT IE_Exp_Text : public IE_Exp
@@ -77,14 +77,14 @@ public:
 
 protected:
 	virtual PL_Listener *	_constructListener(void);
-	virtual UT_Error _writeDocument(void) override;
+	virtual UT_Error	_writeDocument(void);
 	bool				_doEncodingDialog(const char *szEncoding);
 	void				_setEncoding(const char *szEncoding);
 
  private:
 	PL_Listener *		m_pListener;
 	bool				m_bIsEncoded;
-	std::string m_szEncoding;
+	const char *		m_szEncoding;
 	bool m_bExplicitlySetEncoding;
 	bool				m_bIs16Bit;
 	bool                m_bUnicode;
@@ -103,32 +103,32 @@ public:
 	Text_Listener(PD_Document * pDocument,
 					IE_Exp_Text * pie,
 					bool bToClipboard = false,
-					const char *szEncoding = nullptr,
+					const char *szEncoding = 0,
 					bool bIs16Bit = false,
  				    bool m_bUnicode = false,
 					bool bUseBOM = false,
 					bool bBigEndian = false);
 	virtual ~Text_Listener();
 
-	virtual bool populate(fl_ContainerLayout* sfh,
-								 const PX_ChangeRecord * pcr) override;
+	virtual bool		populate(fl_ContainerLayout* sfh,
+								 const PX_ChangeRecord * pcr);
 
-	virtual bool populateStrux(pf_Frag_Strux* sdh,
+	virtual bool		populateStrux(pf_Frag_Strux* sdh,
 									  const PX_ChangeRecord * pcr,
-									  fl_ContainerLayout* * psfh) override;
+									  fl_ContainerLayout* * psfh);
 
-	virtual bool change(fl_ContainerLayout* sfh,
-							   const PX_ChangeRecord * pcr) override;
+	virtual bool		change(fl_ContainerLayout* sfh,
+							   const PX_ChangeRecord * pcr);
 
-	virtual bool insertStrux(fl_ContainerLayout* sfh,
+	virtual bool		insertStrux(fl_ContainerLayout* sfh,
 									const PX_ChangeRecord * pcr,
 									pf_Frag_Strux* sdh,
 									PL_ListenerId lid,
 									void (* pfnBindHandles)(pf_Frag_Strux* sdhNew,
 															PL_ListenerId lid,
-															fl_ContainerLayout* sfhNew)) override;
+															fl_ContainerLayout* sfhNew));
 
-	virtual bool signal(UT_uint32 iSignal) override;
+	virtual bool		signal(UT_uint32 iSignal);
 
 protected:
 	int			_wctomb(char * pC, int & length, UT_UCS4Char wc) { return m_wctomb.wctomb(pC,length,wc); }

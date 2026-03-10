@@ -33,7 +33,7 @@ class AP_UnixDialog_Annotation: public AP_Dialog_Annotation
 	AP_UnixDialog_Annotation(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_UnixDialog_Annotation(void);
 
-	virtual void			runModal(XAP_Frame * pFrame) override;
+	virtual void			runModal(XAP_Frame * pFrame);
 
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 

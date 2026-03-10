@@ -22,6 +22,11 @@
  * 02110-1301 USA.
  */
 
+#include "ut_compiler.h"
+
+ABI_W_NO_CONST_QUAL
+#include <gtk/gtk.h>
+ABI_W_POP
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -130,7 +135,7 @@ abi_table_resize(AbiTable* table)
 		text = g_strdup_printf("%d x %d %s", table->selected_rows, table->selected_cols, table->szTable);
 	}
 	cells_to_pixels(table->total_cols, table->total_rows, &width, &height);
-	gtk_widget_get_preferred_size(GTK_WIDGET(table->window_label), &size, nullptr);
+	gtk_widget_get_preferred_size(GTK_WIDGET(table->window_label), &size, NULL);
 
 	gtk_label_set_text(table->window_label, text);
 	gtk_window_resize(table->window, width + 1, height + size.height);
@@ -248,14 +253,10 @@ on_motion_notify_event (GtkWidget *window, GdkEventMotion *ev, gpointer user_dat
 	guint selected_cols;
 	guint selected_rows;
 
-	gdouble x, y;
-	x = y = 0.0f;
-	gdk_event_get_coords((GdkEvent*)ev, &x, &y);
-
-	if (x < 0.0f || y < 0.0f)
+	if (ev->x < 0 || ev->y < 0)
 		return TRUE;
-
-	pixels_to_cells(static_cast<guint>(x), static_cast<guint>(y), &selected_cols, &selected_rows);
+	
+	pixels_to_cells(static_cast<guint>(ev->x), static_cast<guint>(ev->y), &selected_cols, &selected_rows);
 
 	if ((selected_cols != table->selected_cols) || (selected_rows != table->selected_rows))
 	{
@@ -295,9 +296,8 @@ emit_selected (AbiTable *table)
 {
 	gtk_widget_hide(GTK_WIDGET(table->window));
 
-	while (g_main_context_pending(nullptr)) {
-		g_main_context_iteration(nullptr, false);
-	}
+	while (gtk_events_pending())
+		gtk_main_iteration();
 
 	if (table->selected_rows > 0 && table->selected_cols > 0)
 		g_signal_emit (G_OBJECT (table),
@@ -312,20 +312,16 @@ on_button_release_event (GtkWidget *, GdkEventButton *ev, gpointer user_data)
 {
 	AbiTable* table = static_cast<AbiTable*>(user_data);
 
-	gdouble x, y;
-	x = y = 0.0f;
-	gdk_event_get_coords((GdkEvent*)ev, &x, &y);
-
 	/* Quick test to know if we're possibly over the button */
-	if (y < 0.0 && x >= 0.0)
+	if (ev->y < 0.0 && ev->x >= 0.0)
 	{
 		GtkRequisition size;
 
-		gtk_widget_get_preferred_size(GTK_WIDGET(table), &size, nullptr);
+		gtk_widget_get_preferred_size(GTK_WIDGET(table), &size, NULL);
 
 		/* And now, precise and slightly slower test.
 		   I wonder if the double test really matters from a speed pov */
-		if (-y < size.height && x < size.width)
+		if (-ev->y < size.height && ev->x < size.width)
 			return TRUE;
 	}
 
@@ -341,11 +337,7 @@ on_leave_event (GtkWidget *area,
 {
 	AbiTable* table = static_cast<AbiTable*>(user_data);
 
-	gdouble x, y;
-	x = y = 0.0f;
-	gdk_event_get_coords((GdkEvent*)event, &x, &y);
-
-	if (gtk_widget_get_visible(GTK_WIDGET(table->window)) && (x < 0 || y < 0))
+	if (gtk_widget_get_visible(GTK_WIDGET(table->window)) && (event->x < 0 || event->y < 0))
 	{
 		table->selected_rows = 0;
 		table->selected_cols = 0;
@@ -360,11 +352,22 @@ on_leave_event (GtkWidget *area,
 }
 
 static gboolean
-popup_grab_on_window (GdkWindow *window)
+popup_grab_on_window (GdkWindow *window,
+					  guint32    activate_time)
 {
-	GdkSeat *seat = gdk_display_get_default_seat(gdk_window_get_display(window));
-	return gdk_seat_grab(seat, window, GDK_SEAT_CAPABILITY_ALL,
-						 FALSE, nullptr, nullptr, nullptr, nullptr) == GDK_GRAB_SUCCESS;
+	GdkEventMask emask = static_cast<GdkEventMask>(GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
+												   GDK_POINTER_MOTION_MASK | GDK_LEAVE_NOTIFY_MASK |
+												   GDK_ENTER_NOTIFY_MASK) ;
+	if ((XAP_gdk_pointer_grab (window, FALSE,emask, nullptr, activate_time) == 0)) {
+		if (XAP_gdk_keyboard_grab (window, FALSE, activate_time) == 0) {
+			return TRUE;
+		} else {
+			XAP_gdk_pointer_ungrab (activate_time);
+			return FALSE;
+		}
+	}
+
+	return FALSE;
 }
 
 static void
@@ -379,11 +382,10 @@ on_pressed(GtkButton* button, gpointer user_data)
 	 * events generated when the window is mapped, such as enter
 	 * notify events on subwidgets. If the grab fails, bail out.
 	 */
-	if (!popup_grab_on_window(gtk_widget_get_window(GTK_WIDGET(button))))
+	if (!popup_grab_on_window (gtk_widget_get_window(GTK_WIDGET(button)),
+							   gtk_get_current_event_time ()))
 		return;
 
-	auto toplevel = gtk_widget_get_toplevel(GTK_WIDGET(table));
-	gtk_window_set_transient_for(table->window, GTK_WINDOW(toplevel));
 	gdk_window_get_origin (gtk_widget_get_window(GTK_WIDGET(table)), &left, &top);
 	gtk_widget_get_allocation(GTK_WIDGET(table), &alloc);
 	gtk_window_move(table->window,
@@ -396,7 +398,8 @@ on_pressed(GtkButton* button, gpointer user_data)
 	/* Now transfer our grabs to the popup window; this
 	 * should always succeed.
 	 */
-	popup_grab_on_window (gtk_widget_get_window(GTK_WIDGET(table->area)));
+	popup_grab_on_window (gtk_widget_get_window(GTK_WIDGET(table->area)),
+			      gtk_get_current_event_time ());
 }
 
 gboolean
@@ -404,10 +407,8 @@ on_key_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
 	AbiTable* table = static_cast<AbiTable*>(user_data);
 	gboolean grew = FALSE;
-	guint keyval = 0;
-	gdk_event_get_keyval((GdkEvent*)event, &keyval);
 
-	switch (keyval)
+	switch (event->keyval)
 	{
 	case GDK_KEY_Up:
 	case GDK_KEY_KP_Up:
@@ -534,11 +535,11 @@ abi_table_dispose (GObject *instance)
 // For some reason I get an alert
 	if(self->szTable) {
 		g_free(self->szTable);
-		self->szTable = nullptr;
+		self->szTable = NULL;
 	}
 	if(self->szCancel) {
 		g_free(self->szCancel);
-		self->szCancel = nullptr;
+		self->szCancel = NULL;
 	}
 
 	g_clear_object(&self->style_context);
@@ -547,7 +548,7 @@ abi_table_dispose (GObject *instance)
 }
 
 static void
-abi_table_class_init (AbiTableClass *klass, gpointer)
+abi_table_class_init (AbiTableClass *klass)
 {
 	GtkWidgetClass *object_class = reinterpret_cast<GtkWidgetClass*>(klass);
 
@@ -559,17 +560,17 @@ abi_table_class_init (AbiTableClass *klass, gpointer)
 			      G_OBJECT_CLASS_TYPE (object_class),
 			      G_SIGNAL_RUN_LAST,
 			      G_STRUCT_OFFSET (AbiTableClass, selected),
-			      nullptr, nullptr,
+			      NULL, NULL,
 			      g_cclosure_user_marshal_VOID__UINT_UINT,
 			      G_TYPE_NONE, 2, G_TYPE_UINT, G_TYPE_UINT);
 }
 
 static void
-abi_table_init (AbiTable* table, gpointer)
+abi_table_init (AbiTable* table)
 {
 	char* text = g_strdup_printf("%d x %d ", init_rows, init_cols);
 
-	table->style_context = XAP_GtkStyle_get_style(nullptr, "GtkTreeView.view"); // "textview.view"
+	table->style_context = XAP_GtkStyle_get_style(NULL, "GtkTreeView.view"); // "textview.view"
 
 	table->button_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
@@ -578,11 +579,11 @@ abi_table_init (AbiTable* table, gpointer)
 
 	table->area = GTK_DRAWING_AREA(gtk_drawing_area_new());
 
-	table->handlers = nullptr;
+	table->handlers = 0;
 	table->window_label = GTK_LABEL(gtk_label_new(text));
 	g_free(text);
-	table->szTable = nullptr;
-	table->szCancel = nullptr;
+	table->szTable = NULL;
+	table->szCancel = NULL;
 	gtk_container_add(GTK_CONTAINER(table->window), GTK_WIDGET(table->window_vbox));
 	gtk_box_pack_end(GTK_BOX(table->window_vbox), GTK_WIDGET(table->window_label), FALSE, FALSE, 0);
 	gtk_box_pack_end(GTK_BOX(table->window_vbox), GTK_WIDGET(table->area), TRUE, TRUE, 0);
@@ -597,7 +598,7 @@ abi_table_init (AbiTable* table, gpointer)
 
 	abi_table_resize(table);
 
-	table->icon = nullptr;
+	table->icon = NULL;
 
 	GdkPixbuf* pixbuf = gdk_pixbuf_new_from_xpm_data((const char **)widget_tb_insert_table_xpm);
 	if (pixbuf) {
@@ -648,15 +649,15 @@ abi_table_get_type (void)
 		static const GTypeInfo info =
 			{
 				sizeof (AbiTableClass),
-				nullptr,		/* base_init */
-				nullptr,		/* base_finalize */
+				NULL,		/* base_init */
+				NULL,		/* base_finalize */
 				reinterpret_cast<GClassInitFunc>(abi_table_class_init),
-				nullptr,		/* class_finalize */
-				nullptr,		/* class_data */
+				NULL,		/* class_finalize */
+				NULL,		/* class_data */
 				sizeof (AbiTable),
 				0,		/* n_preallocs */
 				reinterpret_cast<GInstanceInitFunc>(abi_table_init),
-				nullptr
+				NULL
 			};
 
 		type = g_type_register_static (GTK_TYPE_BUTTON, "AbiTable", &info, static_cast<GTypeFlags>(0));
@@ -669,6 +670,6 @@ abi_table_get_type (void)
 abi_table_new (void)
 {
 	UT_DEBUGMSG(("COnstructing ABITABLE widget \n"));
-	return GTK_WIDGET (g_object_new (abi_table_get_type (), nullptr));
+	return GTK_WIDGET (g_object_new (abi_table_get_type (), NULL));
 }
 

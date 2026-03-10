@@ -62,7 +62,7 @@ public:
 	void                  mouseCopy(UT_sint32 x, UT_sint32 y);
 	void                  mouseRelease(UT_sint32 x, UT_sint32 y);
 	bool                  drawImage(void);
-	void                  getImageFromSelection(UT_sint32 x, UT_sint32 y,PP_AttrProp ** pAP = nullptr );
+	void                  getImageFromSelection(UT_sint32 x, UT_sint32 y,PP_AttrProp ** pAP = NULL );
 	PP_AttrProp *         getImageAPFromXY(UT_sint32 x, UT_sint32 y);
 	PT_DocPosition        getPosFromXY(UT_sint32 x, UT_sint32 y) const;
 	void                  drawCursor(PT_DocPosition newPos);
@@ -75,7 +75,7 @@ public:
 	UT_sint32             getImageSelBoxSize() const; // in device units!
 	void                  setSelectionDrawn(bool bSelectionDrawn);
 protected:
-	virtual void          _mouseDrag(UT_sint32 x, UT_sint32 y) override;
+	virtual void          _mouseDrag(UT_sint32 x, UT_sint32 y);
 private:
 	FV_InlineDragMode     m_iInlineDragMode;
 	GR_Image *            m_pDragImage;

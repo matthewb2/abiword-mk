@@ -20,9 +20,16 @@
 
 /* Pseudoheader to include the right XML headers */
 
-#pragma once
+#ifndef UTXML_H
+#define UTXML_H
 
+/* pre-emptive dismissal; ut_types.h is needed by just about everything,
+ * so even if it's commented out in-file that's still a lot of work for
+ * the preprocessor to do...
+ */
+#ifndef UT_TYPES_H
 #include "ut_types.h"
+#endif
 #include "ut_bytebuf.h"
 
 /* gchar definition moved to ut_types.h */
@@ -191,9 +198,9 @@ public:
   DefaultReader ();
   virtual ~DefaultReader ();
 
-  virtual bool openFile (const char * szFilename) override;
-  virtual UT_uint32 readBytes (char * buffer, UT_uint32 length) override;
-  virtual void closeFile (void) override;
+  virtual bool      openFile (const char * szFilename);
+  virtual UT_uint32 readBytes (char * buffer, UT_uint32 length);
+  virtual void      closeFile (void);
 
 private:
   FILE * in;
@@ -211,9 +218,9 @@ public:
 
   virtual ~UT_XML_BufReader ();
 
-  virtual bool openFile (const char * szFilename) override;
-  virtual UT_uint32 readBytes (char * buffer, UT_uint32 length) override;
-  virtual void closeFile (void) override;
+  virtual bool      openFile (const char * szFilename);
+  virtual UT_uint32 readBytes (char * buffer, UT_uint32 length);
+  virtual void      closeFile (void);
 
 private:
   const char * const m_buffer;
@@ -221,3 +228,5 @@ private:
 
   UT_uint32          m_length;
 };
+
+#endif

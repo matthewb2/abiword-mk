@@ -27,9 +27,9 @@
 
 
 IE_Exp_HTML_StyleTree::IE_Exp_HTML_StyleTree(IE_Exp_HTML_StyleTree * parent, const gchar * _style_name, PD_Style * style) :
-        m_pDocument(nullptr),
+        m_pDocument(0),
         m_parent(parent),
-        m_list(nullptr),
+        m_list(0),
         m_count(0),
         m_max(0),
         m_bInUse(false),
@@ -61,8 +61,8 @@ IE_Exp_HTML_StyleTree::IE_Exp_HTML_StyleTree(IE_Exp_HTML_StyleTree * parent, con
 
     UT_uint32 j = 0;
 
-    const gchar * szName = nullptr;
-    const gchar * szValue = nullptr;
+    const gchar * szName = 0;
+    const gchar * szValue = 0;
 
     std::string name;
     std::string value;
@@ -143,8 +143,8 @@ IE_Exp_HTML_StyleTree::IE_Exp_HTML_StyleTree(IE_Exp_HTML_StyleTree * parent, con
 
 IE_Exp_HTML_StyleTree::IE_Exp_HTML_StyleTree(PD_Document * pDocument) :
         m_pDocument(pDocument),
-        m_parent(nullptr),
-        m_list(nullptr),
+        m_parent(0),
+        m_list(0),
         m_count(0),
         m_max(0),
         m_bInUse(false),
@@ -171,24 +171,22 @@ IE_Exp_HTML_StyleTree::~IE_Exp_HTML_StyleTree()
 
 bool IE_Exp_HTML_StyleTree::add(const gchar * _style_name, PD_Style * style)
 {
-    if (m_list == nullptr)
+    if (m_list == 0)
     {
         m_list = reinterpret_cast<IE_Exp_HTML_StyleTree **> (g_try_malloc(8 * sizeof (IE_Exp_HTML_StyleTree *)));
-        if (m_list == nullptr)
-            return false;
+        if (m_list == 0) return false;
         m_max = 8;
     }
     if (m_count == m_max)
     {
-        IE_Exp_HTML_StyleTree ** more = nullptr;
+        IE_Exp_HTML_StyleTree ** more = 0;
         more = reinterpret_cast<IE_Exp_HTML_StyleTree **> (g_try_realloc(m_list, (m_max + 8) * sizeof (IE_Exp_HTML_StyleTree *)));
-        if (more == nullptr)
-            return false;
+        if (more == 0) return false;
         m_list = more;
         m_max += 8;
     }
 
-    IE_Exp_HTML_StyleTree * tree = nullptr;
+    IE_Exp_HTML_StyleTree * tree = 0;
 
     try
     {
@@ -196,11 +194,10 @@ bool IE_Exp_HTML_StyleTree::add(const gchar * _style_name, PD_Style * style)
     }
     catch (...)
     {
-        tree = nullptr;
+        tree = 0;
     }
 
-    if (tree == nullptr)
-        return false;
+    if (tree == 0) return false;
 
     m_list[m_count++] = tree;
 
@@ -209,7 +206,7 @@ bool IE_Exp_HTML_StyleTree::add(const gchar * _style_name, PD_Style * style)
 
 bool IE_Exp_HTML_StyleTree::add(const gchar * _style_name, PD_Document * pDoc)
 {
-    if ((pDoc == nullptr) || (_style_name == nullptr) || (*_style_name == 0))
+    if ((pDoc == 0) || (_style_name == 0) || (*_style_name == 0))
         return false;
 
     if (m_parent)
@@ -218,24 +215,24 @@ bool IE_Exp_HTML_StyleTree::add(const gchar * _style_name, PD_Document * pDoc)
     if (find(_style_name))
         return true;
 
-    PD_Style * style = nullptr;
+    PD_Style * style = 0;
     pDoc->getStyle(_style_name, &style);
     if (!style)
         return false;
 
-    IE_Exp_HTML_StyleTree * parent = nullptr;
+    IE_Exp_HTML_StyleTree * parent = NULL;
 
     PD_Style * basis = style->getBasedOn();
 
-    const gchar * parent_name = nullptr;
+    const gchar * parent_name = NULL;
     if (basis &&
         basis->getAttribute(PT_NAME_ATTRIBUTE_NAME, parent_name) &&
         strcmp(_style_name, parent_name) != 0)
     {
         parent = const_cast<IE_Exp_HTML_StyleTree*> (find(basis));
-        if (parent == nullptr)
+        if (parent == NULL)
         {
-            const gchar * basis_name = nullptr;
+            const gchar * basis_name = 0;
             basis->getAttribute(PT_NAME_ATTRIBUTE_NAME, basis_name);
             if (!basis_name)
                 return false;
@@ -293,7 +290,7 @@ const IE_Exp_HTML_StyleTree * IE_Exp_HTML_StyleTree::find(const gchar * _style_n
     if (m_style_name == _style_name)
         return this;
 
-    const IE_Exp_HTML_StyleTree * tree = nullptr;
+    const IE_Exp_HTML_StyleTree * tree = 0;
 
     for (UT_uint32 i = 0; i < m_count; i++)
     {
@@ -306,17 +303,17 @@ const IE_Exp_HTML_StyleTree * IE_Exp_HTML_StyleTree::find(const gchar * _style_n
 
 const IE_Exp_HTML_StyleTree * IE_Exp_HTML_StyleTree::find(PD_Style * style) const
 {
-    const gchar * _style_name = nullptr;
+    const gchar * _style_name = 0;
     style->getAttribute(PT_NAME_ATTRIBUTE_NAME, _style_name);
     if (!_style_name)
-        return nullptr;
+        return NULL;
 
     return find(_style_name);
 }
 
 bool IE_Exp_HTML_StyleTree::descends(const gchar * _style_name) const
 {
-    if (m_parent == nullptr)
+    if (m_parent == 0)
         return false;
 
     // the name comparison has to be be case insensitive
@@ -355,12 +352,12 @@ IE_Exp_HTML_StyleListener::IE_Exp_HTML_StyleListener(IE_Exp_HTML_StyleTree* styl
 
 void IE_Exp_HTML_StyleListener::styleCheck(PT_AttrPropIndex api)
 {
-    const PP_AttrProp * pAP = nullptr;
+    const PP_AttrProp * pAP = 0;
     bool bHaveProp = (api ? (m_pStyleTree->getDocument()->getAttrProp(api, &pAP)) : false);
 
     if (bHaveProp && pAP)
     {
-        const gchar * szStyle = nullptr;
+        const gchar * szStyle = NULL;
         bool have_style = pAP->getAttribute(PT_STYLE_ATTRIBUTE_NAME, szStyle);
 
         if (have_style && szStyle)
@@ -392,7 +389,7 @@ bool IE_Exp_HTML_StyleListener::populateStrux(pf_Frag_Strux* /*sdh*/,
 {
     UT_return_val_if_fail(pcr->getType() == PX_ChangeRecord::PXT_InsertStrux, false);
 
-    *psfh = nullptr; // we don't need it.
+    *psfh = 0; // we don't need it.
 
     const PX_ChangeRecord_Strux * pcrx = static_cast<const PX_ChangeRecord_Strux *> (pcr);
 

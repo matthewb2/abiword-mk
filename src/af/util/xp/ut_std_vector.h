@@ -1,6 +1,6 @@
 /* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
 /* AbiSource Program Utilities
- * Copyright (C) 2011-2021 Hubert Figuière
+ * Copyright (C) 2011 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,10 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+
+
+#ifndef __UT_STD_VECTOR_H__
+#define __UT_STD_VECTOR_H__
 
 #include "ut_assert.h"
 
@@ -54,14 +57,4 @@ void UT_std_vector_freeall(V & v, F free_func = g_free)
 	}
 }
 
-#ifdef __OBJC__
-template <class V>
-void UT_std_vector_releaseall(V & v)
-{
-    for (id elem : v) {
-        if (elem) {
-            [elem release];
-        }
-    }
-}
 #endif

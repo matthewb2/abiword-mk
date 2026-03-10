@@ -21,7 +21,8 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef XAP_COCOADIALOG_LANGUAGE_H
+#define XAP_COCOADIALOG_LANGUAGE_H
 
 #import <Cocoa/Cocoa.h>
 
@@ -44,7 +45,7 @@ public:
 
 	const char * getNthLanguage (UT_uint32 n) const
 	{
-		return (n < m_iLangCount) ? ((const char *) m_ppLanguages[n]) : nullptr;
+		return (n < m_iLangCount) ? ((const char *) m_ppLanguages[n]) : 0;
 	}
 	UT_uint32				getLanguageCount() const { return m_iLangCount; }
 
@@ -95,3 +96,5 @@ private:
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex;
 
 @end
+
+#endif /* XAP_COCOADIALOG_LANGUAGE_H */

@@ -45,18 +45,18 @@ public:
 	virtual ~fl_DocListener();
 
 	virtual bool		populate(fl_ContainerLayout* sfh,
-								 const PX_ChangeRecord * pcr) override;
+								 const PX_ChangeRecord * pcr);
 
 	virtual bool		populateStrux(pf_Frag_Strux* sdh,
 									  const PX_ChangeRecord * pcr,
-									  fl_ContainerLayout* * psfh) override;
+									  fl_ContainerLayout* * psfh);
 
 	virtual bool		change(fl_ContainerLayout* sfh,
-							   const PX_ChangeRecord * pcr) override;
+							   const PX_ChangeRecord * pcr);
 
 
-	virtual void		deferNotifications(void) override;
-	virtual void		processDeferredNotifications(void) override;
+	virtual void		deferNotifications(void);
+	virtual void		processDeferredNotifications(void);
 
 	virtual bool		insertStrux(fl_ContainerLayout* sfh,
 									const PX_ChangeRecord * pcr,
@@ -64,11 +64,11 @@ public:
 									PL_ListenerId lid,
 									void (* pfnBindHandles)(pf_Frag_Strux* sdhNew,
 															PL_ListenerId lid,
-															fl_ContainerLayout* sfhNew)) override;
+															fl_ContainerLayout* sfhNew));
 	void                setHoldTableLayout(bool bHold) {m_bHoldTableLayout = bHold;}
 	bool                holdTableLayout(void) { return m_bHoldTableLayout;}
-	virtual bool		signal(UT_uint32 iSignal) override;
-	virtual PLListenerType getType() const override {return PTL_DocLayout;}
+	virtual bool		signal(UT_uint32 iSignal);
+	virtual PLListenerType getType() const {return PTL_DocLayout;}
 
 	const FL_DocLayout* getLayout() const {return (const FL_DocLayout*) m_pLayout;}
 

@@ -21,7 +21,10 @@
 #include "config.h"
 #endif
 
+#include "ut_compiler.h"
+ABI_W_NO_CONST_QUAL
 #include <gtk/gtk.h>
+ABI_W_POP
 
 #include "ut_string.h"
 #include "ut_assert.h"
@@ -56,28 +59,28 @@ static void onAboutDialogActivate (GtkAboutDialog 	* /*about*/,
 void XAP_UnixDialog_About::runModal(XAP_Frame * pFrame)
 {
 	static const gchar *authors[] = {"Abi the Ant <abi@abisource.com>",
-									 nullptr};
+									 NULL};
 
 	static const gchar *documenters[] = {"David Chart <linux@dchart.demon.co.uk>",
-										 nullptr};
+										 NULL};
 
 	static const gchar *copyright = "(c) 1998-2012 Dom Lachowicz and other contributors, GNU GPL v2.0";
 
 	static const gchar *website = "http://www.abisource.com";
 
-	static GdkPixbuf * logo = nullptr;
-	static GtkWidget * dlg = nullptr;
+	static GdkPixbuf * logo = NULL;
+	static GtkWidget * dlg = NULL;
 
 	// TODO Rob: use the more fancy "sidebar.png" logo, just like win32
 	if (!logo) {
 		std::string str (ICONDIR);
 		str += "/hicolor/48x48/apps/abiword.png";
-		logo = gdk_pixbuf_new_from_file (str.c_str(), nullptr); // ignore errors
+		logo = gdk_pixbuf_new_from_file (str.c_str(), NULL); // ignore errors
 	}
 
 	dlg = gtk_about_dialog_new();
 	//JEAN: do we really need the "activate-link" signal?
-	g_signal_connect(dlg, "activate-link", G_CALLBACK(onAboutDialogActivate), nullptr);
+	g_signal_connect(dlg, "activate-link", G_CALLBACK(onAboutDialogActivate), NULL);
 	gtk_about_dialog_set_authors(GTK_ABOUT_DIALOG(dlg), authors);
 	gtk_about_dialog_set_documenters(GTK_ABOUT_DIALOG(dlg), documenters);
 	gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dlg), copyright);
@@ -89,10 +92,10 @@ void XAP_UnixDialog_About::runModal(XAP_Frame * pFrame)
 	gtk_window_set_position(GTK_WINDOW(dlg), GTK_WIN_POS_CENTER);
 	GtkWidget* parent = pFrame ?
 		static_cast<XAP_UnixFrameImpl*>(pFrame->getFrameImpl())->getTopLevelWindow() :
-		nullptr;
+		NULL;
 	if (parent) {
 		gtk_window_set_transient_for(GTK_WINDOW(dlg), GTK_WINDOW(parent));
 	}
 	gtk_dialog_run(GTK_DIALOG(dlg));
-	gtk_widget_destroy(dlg); // TOPLEVEL
+	gtk_widget_destroy(dlg);
 }

@@ -2,7 +2,7 @@
 
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2001-2021 Hubert Figuière
+ * Copyright (C) 2001 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,7 +20,8 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef AP_COCOALEFTRULER_H
+#define AP_COCOALEFTRULER_H
 
 // Class for dealing with the horizontal ruler at the left of
 // a document window.
@@ -49,6 +50,7 @@ public:
 	// cheats for the callbacks
 	void				getWidgetPosition(int * x, int * y);
 	XAP_CocoaNSView * 		getWidget(void) { return m_wLeftRuler; };
+	NSWindow * 	getRootWindow(void);
 
 //	void _ruler_style_changed (void);
 protected:
@@ -59,6 +61,11 @@ protected:
 	virtual void		_drawCellMark(UT_Rect *prDrag, bool bUp);
 #endif
 private:
+	static bool _graphicsUpdateCB(NSRect * aRect, GR_CocoaCairoGraphics *pG, void* param);
+
 	XAP_CocoaNSView *		m_wLeftRuler;
+	NSWindow *	m_rootWindow;
 	AP_CocoaLeftRulerDelegate* m_delegate;
 };
+
+#endif /* AP_COCOALEFTRULER_H */

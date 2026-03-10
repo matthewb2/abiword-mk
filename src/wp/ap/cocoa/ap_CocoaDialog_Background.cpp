@@ -28,6 +28,7 @@
 #include "xap_App.h"
 #include "xap_CocoaApp.h"
 #include "xap_CocoaFrame.h"
+#include "xap_CocoaCompat.h"
 
 #include "ap_CocoaDialog_Background.h"
 #include "ap_Dialog_Id.h"
@@ -69,7 +70,7 @@ void AP_CocoaDialog_Background::runModal(XAP_Frame * /*pFrame*/)
 - (id)initFromNib
 {
 	if (self = [super initWithWindowNibName:@"ap_CocoaDialog_Background"]) {
-		_xap = nullptr;
+		_xap = NULL;
 	}
 	return self;
 }
@@ -150,10 +151,10 @@ void AP_CocoaDialog_Background::runModal(XAP_Frame * /*pFrame*/)
 	UT_UNUSED(sender);
 	NSColor * color = [oColorWell color];
 
-	CGFloat red;
-	CGFloat green;
-	CGFloat blue;
-	CGFloat alpha;
+	XAP_CGFloat red;
+	XAP_CGFloat green;
+	XAP_CGFloat blue;
+	XAP_CGFloat alpha;
 
 	[color getRed:&red green:&green blue:&blue alpha:&alpha]; // TODO: is color necessarily RGBA? if not, could be a problem...
 

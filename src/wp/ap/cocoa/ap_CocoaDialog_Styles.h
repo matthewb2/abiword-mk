@@ -1,6 +1,6 @@
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2001, 2003, 2005, 2009-2021 Hubert Figuière
+ * Copyright (C) 2001, 2003, 2005, 2009 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,8 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef AP_CocoaDialog_Styles_H
+#define AP_CocoaDialog_Styles_H
 
 #import <Cocoa/Cocoa.h>
 #include "ap_Dialog_Columns.h"
@@ -29,7 +30,7 @@
 #include "ap_Dialog_Styles.h"
 
 
-class GR_CocoaGraphics;
+class GR_CocoaCairoGraphics;
 class XAP_CocoaFrame;
 @class AP_CocoaDialog_StylesController;
 @class AP_CocoaDialog_StylesModifyController;
@@ -97,8 +98,8 @@ private:
 	virtual const char * getCurrentStyle (void) const;
 	virtual void setDescription (const char * desc) const;
 
-	GR_CocoaGraphics* m_pParaPreviewWidget;
-	GR_CocoaGraphics* m_pCharPreviewWidget;
+	GR_CocoaCairoGraphics	* 		m_pParaPreviewWidget;
+	GR_CocoaCairoGraphics	* 		m_pCharPreviewWidget;
 
 	virtual void setModifyDescription( const char * desc);
 	bool        _populateModify(void);
@@ -107,10 +108,22 @@ private:
 	gchar    m_basedonName[40];
 	gchar    m_followedbyName[40];
 	gchar    m_styleType[40];
-	GR_CocoaGraphics* m_pAbiPreviewWidget;
+	GR_CocoaCairoGraphics	* 		m_pAbiPreviewWidget;
 	int m_whichRow;
 	StyleType m_whichType;
 	bool m_bIsNew;
 	AP_CocoaDialog_StylesController* m_dlg;
 	AP_CocoaDialog_StylesModifyController* m_modifyDlg;
 };
+
+
+
+
+#endif /* AP_CocoaDialog_Styles_H */
+
+
+
+
+
+
+

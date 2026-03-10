@@ -26,7 +26,7 @@
 #include "ut_assert.h"
 #include "ut_debugmsg.h"
 
-#include "gr_CocoaGraphics.h"
+#include "gr_CocoaCairoGraphics.h"
 #include "xap_Dialog_Id.h"
 #include "xap_CocoaApp.h"
 #include "xap_CocoaFrame.h"
@@ -55,8 +55,8 @@ AP_CocoaDialog_Lists::AP_CocoaDialog_Lists(XAP_DialogFactory * pDlgFactory,
 	: AP_Dialog_Lists(pDlgFactory,dlgid)
 {
 	Current_Dialog = this;
-	m_pPreviewWidget = nullptr;
-	m_pAutoUpdateLists = nullptr;
+	m_pPreviewWidget = NULL;
+	m_pAutoUpdateLists = NULL;
 	m_bDontUpdate = false;
 }
 
@@ -69,7 +69,7 @@ XAP_Dialog * AP_CocoaDialog_Lists::static_constructor(XAP_DialogFactory * pFacto
 
 AP_CocoaDialog_Lists::~AP_CocoaDialog_Lists(void)
 {
-	if(m_pPreviewWidget != nullptr)
+	if(m_pPreviewWidget != NULL)
 		DELETEP (m_pPreviewWidget);
 }
 
@@ -78,10 +78,11 @@ void AP_CocoaDialog_Lists::runModal( XAP_Frame * /*pFrame*/)
 {
 	FL_ListType  savedListType;
 	setModal();
+	NSWindow* window;
 	m_dlg = [[AP_CocoaDialog_ListsController alloc] initFromNib];
 	[m_dlg setXAPOwner:this];
 
-	NSWindow* window = m_dlg.window;
+	window = [m_dlg window];
 
 	clearDirty();
 
@@ -95,23 +96,23 @@ void AP_CocoaDialog_Lists::runModal( XAP_Frame * /*pFrame*/)
 	savedListType = getNewListType();
 
 
-	XAP_CocoaNSView* preview = m_dlg.preview;
+	NSView* preview = [m_dlg preview];
 	UT_ASSERT([preview isKindOfClass:[XAP_CocoaNSView class]]);
-	GR_CocoaAllocInfo ai(preview);
-	m_pPreviewWidget = (GR_CocoaGraphics*)XAP_App::getApp()->newGraphics(ai);
+	GR_CocoaCairoAllocInfo ai((XAP_CocoaNSView*)preview);
+	m_pPreviewWidget = (GR_CocoaCairoGraphics*)XAP_App::getApp()->newGraphics(ai);
 
 	// let the widget materialize
 
-	NSRect rect = preview.bounds;
+	NSRect rect = [preview bounds];
 	_createPreviewFromGC(m_pPreviewWidget,
 						 (UT_uint32) rect.size.width,
 						 (UT_uint32) rect.size.height);
-	preview.drawable = getListsPreview();
+
 //
 // Restore our value
 //
 	setNewListType(savedListType);
-	previewInvalidate();
+	previewExposed();
 	[NSApp runModalForWindow:window];
 //
 //  We've finished here.
@@ -132,7 +133,7 @@ void AP_CocoaDialog_Lists::runModeless (XAP_Frame * /*pFrame*/)
 	UT_sint32 sid = (UT_sint32) getDialogId ();
 	m_pApp->rememberModelessId(sid, (XAP_Dialog_Modeless *) m_pDialog);
 
-	NSPanel* window = (NSPanel*)m_dlg.window;
+	NSPanel * window = (NSPanel *) [m_dlg window];
 
 	// Populate the dialog
 	updateDialog();
@@ -143,18 +144,17 @@ void AP_CocoaDialog_Lists::runModeless (XAP_Frame * /*pFrame*/)
 	[window orderFront:m_dlg];
 
 	// make a new Cocoa GC
-	XAP_CocoaNSView* preview = [m_dlg preview];
+	NSView* preview = [m_dlg preview];
 	UT_ASSERT([preview isKindOfClass:[XAP_CocoaNSView class]]);
-	GR_CocoaAllocInfo ai(preview);
-	m_pPreviewWidget = static_cast<GR_CocoaGraphics*>(XAP_App::getApp()->newGraphics(ai));
+	GR_CocoaCairoAllocInfo ai((XAP_CocoaNSView*)preview);
+	m_pPreviewWidget = static_cast<GR_CocoaCairoGraphics*>(XAP_App::getApp()->newGraphics(ai));
 
 	// let the widget materialize
 
-	NSRect bounds = preview.bounds;
+	NSRect bounds = [preview bounds];
 	_createPreviewFromGC(m_pPreviewWidget,
 						 (UT_uint32) bounds.size.width,
 						 (UT_uint32) bounds.size.height);
-	preview.drawable = getListsPreview();
 
 	// Next construct a timer for auto-updating the dialog
 	m_pAutoUpdateLists = UT_Timer::static_constructor(autoupdateLists,this);
@@ -185,7 +185,7 @@ void AP_CocoaDialog_Lists::autoupdateLists(UT_Worker * pWorker)
 		{
 			pDialog->m_bAutoUpdate_happening_now = true;
 			pDialog->updateDialog();
-			pDialog->previewInvalidate();
+			pDialog->previewExposed();
 			pDialog->m_bAutoUpdate_happening_now = false;
 		}
 	}
@@ -196,7 +196,7 @@ void AP_CocoaDialog_Lists::setFoldLevelInGUI(void)
 	[m_dlg selectFolding:getCurrentFold()];
 }
 
-bool AP_CocoaDialog_Lists::isPageLists(void) const
+bool AP_CocoaDialog_Lists::isPageLists(void)
 {
 	if(isModal())
 	{
@@ -206,7 +206,7 @@ bool AP_CocoaDialog_Lists::isPageLists(void) const
 	return [m_dlg selectedTab] == 0;
 }
 
-void AP_CocoaDialog_Lists::previewInvalidate(void)
+void AP_CocoaDialog_Lists::previewExposed(void)
 {
 	if(m_pPreviewWidget)
 	{
@@ -254,7 +254,7 @@ void AP_CocoaDialog_Lists::notifyActiveFrame(XAP_Frame */*pFrame*/)
 	[[m_dlg window] setTitle:[NSString stringWithUTF8String:getWindowName()]];
 	m_bDontUpdate = false;
 	updateDialog();
-	previewInvalidate();
+	previewExposed();
 }
 
 void  AP_CocoaDialog_Lists::typeChanged(int type)
@@ -287,7 +287,7 @@ void  AP_CocoaDialog_Lists::typeChanged(int type)
 	{
 		fillUncustomizedValues(); // Set defaults
 		loadXPDataIntoLocal(); // load them into the widget
-		previewInvalidate(); // Show current setting
+		previewExposed(); // Show current setting
 	}
 }
 
@@ -345,7 +345,7 @@ void  AP_CocoaDialog_Lists::setXPFromLocal(void)
 void  AP_CocoaDialog_Lists::applyClicked(void)
 {
 	setXPFromLocal();
-	previewInvalidate();
+	previewExposed();
 	Apply();
 	if(isModal())
 	{
@@ -373,7 +373,7 @@ void AP_CocoaDialog_Lists::updateDialog(void)
 {
 	if(!isDirty())
 	{
-		updateFromDocument();
+	        updateFromDocument();
 	}
 	else
 	{
@@ -392,6 +392,8 @@ void AP_CocoaDialog_Lists::setAllSensitivity(void)
 
 void AP_CocoaDialog_Lists::_fillFontMenu(NSPopUpButton* menu)
 {
+	int i;
+	int nfonts;
 	const XAP_StringSet * pSS = m_pApp->getStringSet();
 
 	[menu removeAllItems];
@@ -399,9 +401,9 @@ void AP_CocoaDialog_Lists::_fillFontMenu(NSPopUpButton* menu)
 
 	NSArray * list = [[[NSFontManager sharedFontManager] availableFontFamilies] 
 	                      sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-	NSUInteger nfonts = list.count;
+	nfonts = [list count];
 
-	for (NSUInteger i = 0; i < nfonts; i++)
+	for(i = 0; i < nfonts; i++)
 	{
 		[menu addItemWithTitle:[list objectAtIndex:i]];
 		[[menu lastItem] setTag:(i + 1)];
@@ -634,7 +636,7 @@ void AP_CocoaDialog_Lists::_gatherData(void)
 {
 	UT_sint32 maxWidth = getBlock()->getFirstContainer()->getContainer()->getWidth();
 
-	float fmaxWidthIN = ((float) maxWidth / GR_CocoaGraphics::_getScreenResolution()) - 0.6;
+	float fmaxWidthIN = ((float) maxWidth / GR_CocoaCairoGraphics::_getScreenResolution()) - 0.6;
 	setiLevel(1);
 	float f = [m_dlg->_textAlignData floatValue];
 	if(f >   fmaxWidthIN)
@@ -688,7 +690,6 @@ void AP_CocoaDialog_Lists::_gatherData(void)
 - (void)discardXAP
 {
 	_xap = nil;
-	_preview.drawable = nil;
 }
 
 - (void)windowDidLoad
@@ -782,7 +783,7 @@ void AP_CocoaDialog_Lists::_gatherData(void)
 	}
 }
 
-- (NSInteger)listAction
+- (int)listAction
 {
 	return [_listActionMatrix selectedColumn];
 }
@@ -806,7 +807,7 @@ void AP_CocoaDialog_Lists::_gatherData(void)
 
 
 // return the tab that is selected.
-- (NSInteger)selectedTab
+- (int)selectedTab
 {
 	return [_mainTab indexOfTabViewItem: [_mainTab selectedTabViewItem]];
 }
@@ -865,7 +866,7 @@ void AP_CocoaDialog_Lists::_gatherData(void)
 	_xap->setListTypeFromWidget(); // Use this to set m_newListType
 	_xap->fillUncustomizedValues(); // Use defaults to start.
 	_xap->loadXPDataIntoLocal(); // Load them into our member variables
-	_xap->previewInvalidate();
+	_xap->previewExposed();
 }
 
 - (IBAction)textAlignAction:(id)sender
@@ -896,7 +897,7 @@ void AP_CocoaDialog_Lists::_gatherData(void)
 	}
   	_xap->setDirty();
 	_xap->setXPFromLocal(); // Update member Variables
-	_xap->previewInvalidate();
+	_xap->previewExposed();
 }
 
 

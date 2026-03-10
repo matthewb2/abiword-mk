@@ -38,12 +38,12 @@ class ABI_EXPORT AP_Preview_Abi : public XAP_Preview
 public:
 
 	AP_Preview_Abi(GR_Graphics * gc, UT_uint32 iWidth,  UT_uint32 iHeight,
-				   XAP_Frame * pFrame, PreViewMode previewMode, PD_Document * pDoc = nullptr);
+				   XAP_Frame * pFrame, PreViewMode previewMode, PD_Document * pDoc = NULL);
 	virtual ~AP_Preview_Abi(void);
 
 	FV_View * getView(void) const;
 	PD_Document * getDoc(void) const;
-	virtual void drawImmediate(const UT_Rect* clip = nullptr) override;
+	virtual void draw(const UT_Rect *clip=NULL);
 
 protected:
 

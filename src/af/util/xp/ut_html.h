@@ -35,12 +35,12 @@
 class ABI_EXPORT UT_HTML : public UT_XML
 {
 public:
-	UT_HTML (const char * szEncoding = nullptr);
+	UT_HTML (const char * szEncoding = 0);
 
 	~UT_HTML ();
 
-	virtual UT_Error parse (const char * szFilename) override;
-	virtual UT_Error parse (const char * buffer, UT_uint32 length) override;
+	UT_Error parse (const char * szFilename);
+	UT_Error parse (const char * buffer, UT_uint32 length);
 
 private:
 	std::string m_encoding;

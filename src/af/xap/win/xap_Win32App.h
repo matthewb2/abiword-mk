@@ -46,26 +46,26 @@ public:
 	XAP_Win32App(HINSTANCE hInstance, const char * szAppName);
 	virtual ~XAP_Win32App(void);
 
-	virtual const char * getDefaultEncoding () const override;
+	virtual const char * getDefaultEncoding () const;
 
 	static const WCHAR * getWideString (const char * p_str);
 	static const char * getUTF8String (const WCHAR * p_str);
 
-	virtual bool							initialize(const char * szKeyBindingsKey, const char * szKeyBindingsDefaultValue) override;
-	virtual XAP_Frame *						newFrame(void) override = 0;
-	virtual void							reallyExit(void) override;
+	virtual bool							initialize(const char * szKeyBindingsKey, const char * szKeyBindingsDefaultValue);
+	virtual XAP_Frame *						newFrame(void) = 0;
+	virtual void							reallyExit(void);
 
 	virtual HINSTANCE						getInstance() const;
 
-	virtual XAP_DialogFactory* getDialogFactory(void) const override;
-	virtual XAP_Toolbar_ControlFactory* getControlFactory(void) const override;
-	virtual const XAP_StringSet *			getStringSet(void) const override = 0;
-	virtual const char *					getAbiSuiteAppDir(void) const override = 0;
-	virtual void							copyToClipboard(PD_DocumentRange * pDocRange, bool bUseClipboard = true) override = 0;
-	virtual void							pasteFromClipboard(PD_DocumentRange * pDocRange, bool, bool) override = 0;
-	virtual bool canPasteFromClipboard(void) const override = 0;
-	virtual void							cacheCurrentSelection(AV_View *) override = 0;
-	virtual const char *					getUserPrivateDirectory(void) const override;
+	virtual XAP_DialogFactory *				getDialogFactory(void);
+	virtual XAP_Toolbar_ControlFactory *	getControlFactory(void);
+	virtual const XAP_StringSet *			getStringSet(void) const = 0;
+	virtual const char *					getAbiSuiteAppDir(void) const = 0;
+	virtual void							copyToClipboard(PD_DocumentRange * pDocRange, bool bUseClipboard = true) = 0;
+	virtual void							pasteFromClipboard(PD_DocumentRange * pDocRange, bool, bool) = 0;
+	virtual bool							canPasteFromClipboard(void) = 0;
+	virtual void							cacheCurrentSelection(AV_View *) = 0;
+	virtual const char *					getUserPrivateDirectory(void) const;
 
 	virtual HICON							getIcon(void) = 0;
 	virtual HICON							getSmallIcon(void) = 0;
@@ -74,25 +74,25 @@ public:
 
 	void									enableAllTopLevelWindows(bool);
 	virtual UT_sint32 				setupWindowFromPrefs(UT_sint32 iCmdShow, HWND hwndFrame);
-    virtual XAP_App::BidiSupportType        theOSHasBidiSupport() const override {return m_eBidiOS;}
+    virtual XAP_App::BidiSupportType        theOSHasBidiSupport() const {return m_eBidiOS;}
 
-	virtual void getDefaultGeometry(UT_uint32& width,
-                                        UT_uint32& height,
-                                        UT_uint32& flags) const override;
+	void									getDefaultGeometry(UT_uint32& width,
+															   UT_uint32& height,
+															   UT_uint32& flags);
 
 	void                                    setHKL(HKL hkl) {m_hkl = hkl;}
 	HKL                                     getHKL()const {return m_hkl;}
 	void                                    setKbdLanguage(HKL hkl);
 
 protected:
-	UT_uint32								_getExeDir(LPWSTR pDirBuf, UT_uint32 iBufLen);
+	UT_uint32								_getExeDir(LPWSTR pDirBuf, UT_uint32 iBufLen) const;
 	void									_setAbiSuiteLibDir(void);
 	void									_setBidiOS(void);
-	virtual const char* _getKbdLanguage() override;
+	virtual const char *                    _getKbdLanguage();
 
 	HINSTANCE								m_hInstance;
-	AP_Win32DialogFactory* m_dialogFactory;
-	AP_Win32Toolbar_ControlFactory*	m_controlFactory;
+	AP_Win32DialogFactory					m_dialogFactory;
+	AP_Win32Toolbar_ControlFactory			m_controlFactory;
 
 	XAP_Win32Slurp *						m_pSlurp;
 	static char m_buffer[MAX_CONVBUFFER*6];

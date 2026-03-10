@@ -140,11 +140,11 @@ void AP_CocoaDialog_Insert_DateTime::_populateWindowData(void)
 	// this constant comes from ap_Dialog_Insert_DateTime.h
     char szCurrentDateTime[CURRENT_DATE_TIME_SIZE];
 	
-    time_t tim = time(nullptr);
+    time_t tim = time(NULL);
 	
     struct tm *pTime = localtime(&tim);
 
-    for (i = 0; InsertDateTimeFmts[i] != nullptr; i++)
+    for (i = 0; InsertDateTimeFmts[i] != NULL; i++)
 	{
         strftime(szCurrentDateTime, CURRENT_DATE_TIME_SIZE, InsertDateTimeFmts[i], pTime);
 

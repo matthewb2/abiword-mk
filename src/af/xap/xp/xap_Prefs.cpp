@@ -1,21 +1,20 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
 /* AbiSource Application Framework
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (c) 2020 Hubert Figuière
- *
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
 
@@ -30,8 +29,7 @@
 
 #include "ut_debugmsg.h"
 #include "ut_growbuf.h"
-#include "ut_std_string.h"
-#include "ut_std_vector.h"
+#include "ut_string.h"
 #include "ut_string_class.h"
 #ifdef _WIN32
 #include <ut_Win32LocaleString.h>
@@ -44,6 +42,13 @@ struct xmlToIdMapping {
 	const char *m_name;
 	int m_type;
 };
+
+static  UT_sint32 compareStrings(const void * ppS1, const void * ppS2)
+{
+	const char * sz1 = static_cast<const char *>(ppS1);
+	const char * sz2 = static_cast<const char *>(ppS2);
+	return g_ascii_strcasecmp(sz1, sz2);
+}
 
 enum
 {
@@ -75,96 +80,193 @@ static struct xmlToIdMapping s_Tokens[] =
 /*****************************************************************/
 
 XAP_PrefsScheme::XAP_PrefsScheme( XAP_Prefs *pPrefs, const gchar * szSchemeName)
-	: m_szName(szSchemeName ? szSchemeName : "")
-    , m_pPrefs(pPrefs)
+	: m_hash(41)
 {
+	m_pPrefs = pPrefs;
+	m_uTick = 0;
+	m_bValidSortedKeys = false;
+
+	if (szSchemeName && *szSchemeName)
+		m_szName = g_strdup(szSchemeName);
+	else
+		m_szName = NULL;
 }
 
 XAP_PrefsScheme::~XAP_PrefsScheme(void)
 {
+	FREEP(m_szName);
+
+	// loop through and g_free the values
+	UT_GenericVector<gchar*> * pVec = m_hash.enumerate ();
+
+	UT_uint32 cnt = pVec->size();
+
+	for (UT_uint32 i = 0 ; i < cnt; i++)
+	  {
+	    char * val = pVec->getNthItem (i);
+	    FREEP(val);
+	  }
+
+	DELETEP(pVec);
 }
 
-const std::string& XAP_PrefsScheme::getSchemeName(void) const
+const gchar * XAP_PrefsScheme::getSchemeName(void) const
 {
 	return m_szName;
 }
 
-void XAP_PrefsScheme::setSchemeName(const gchar* szNewSchemeName)
+bool XAP_PrefsScheme::setSchemeName(const gchar * szNewSchemeName)
 {
-	m_szName = (szNewSchemeName ? szNewSchemeName : "");
+	FREEP(m_szName);
+	return (NULL != (m_szName = g_strdup(szNewSchemeName)));
 }
 
-void XAP_PrefsScheme::setValue(const std::string& key, const std::string& value)
+bool XAP_PrefsScheme::setValue(const gchar * szKey, const gchar * szValue)
 {
-	auto iter = m_hash.find(key);
-	if (iter == m_hash.end()) {
-		m_hash.insert({key, value});
-	} else {
-		if (iter->second == value) {
-			return;
-		}
-		iter->second = value;
+	++m_uTick;
+	gchar * pEntry = m_hash.pick(szKey);
+	if (pEntry)
+	{
+		if (strcmp(szValue,pEntry) == 0)
+			return true;				// equal values, no changes required
+		
+		m_hash.set (szKey, g_strdup (szValue));
+		FREEP(pEntry);
 	}
-	m_pPrefs->_markPrefChange(key);
+	else
+	{
+		// otherwise, need to add a new entry
+		m_hash.insert(szKey, g_strdup(szValue));
+		m_bValidSortedKeys = false;
+	}
+
+	m_pPrefs->_markPrefChange( szKey );
+
+	return true;
 }
 
-void XAP_PrefsScheme::setValueBool(const std::string& key, bool bValue)
+bool XAP_PrefsScheme::setValueBool(const gchar * szKey, bool bValue)
 {
-	setValue(key, (bValue) ? "1" : "0");
+	return setValue(szKey, reinterpret_cast<const gchar*>((bValue) ? "1" : "0"));
 }
 
-void XAP_PrefsScheme::setValueInt(const std::string& key, int nValue)
+bool XAP_PrefsScheme::setValueInt(const gchar * szKey, const int nValue)
 {
 	gchar szValue[32];
-	snprintf(szValue, 32, "%d", nValue);
-	setValue(key, szValue);
+	sprintf(szValue, "%d", nValue);
+	return setValue(szKey, szValue);
 }
 
-bool XAP_PrefsScheme::getValue(const std::string& key, std::string &value) const
+bool XAP_PrefsScheme::getValue(const gchar * szKey, const gchar ** pszValue) const
 {
-    auto iter = m_hash.find(key);
-    if (iter == m_hash.end()) {
-        return false;
-    }
+	gchar *pEntry = m_hash.pick(szKey);
+	if (!pEntry)
+		return false;
 
-    value = iter->second;
+	if (pszValue)
+		*pszValue = pEntry;
 	return true;
 }
 
-bool XAP_PrefsScheme::getValueInt(const std::string& key, int& nValue) const
+bool XAP_PrefsScheme::getValue(const UT_String &stKey, UT_String &stValue) const
 {
-    std::string value;
-	if (!getValue(key, value)) {
+	gchar *pEntry = m_hash.pick(stKey);
+	if (!pEntry)
 		return false;
-    }
 
-	nValue = atoi(value.c_str());
+	stValue = pEntry;
 	return true;
 }
 
-bool XAP_PrefsScheme::getValueBool(const std::string& key, bool& bValue) const
+bool XAP_PrefsScheme::getValue(const char* szKey, std::string &stValue) const
 {
-	bValue = false;				// assume something
-
-	std::string value;
-	if (!getValue(key, value) || value.empty()) {
+	const char *pEntry = m_hash.pick(szKey);
+	if (!pEntry)
 		return false;
-    }
 
-	switch (value[0])
+	stValue = pEntry;
+	return true;
+}
+
+bool XAP_PrefsScheme::getValueInt(const gchar * szKey, int& nValue) const
+{
+	const gchar * szValue = NULL;
+	if (!getValue(szKey,&szValue))
+		return false;				// bogus keyword ??
+
+	if (!szValue || !*szValue)
+		return false;				// no value for known keyword ??
+		
+	nValue = atoi(szValue);
+	return true;
+}
+
+bool XAP_PrefsScheme::getValueBool(const gchar * szKey, bool * pbValue) const
+{
+	*pbValue = false;				// assume something
+	
+	const gchar * szValue = NULL;
+	if (!getValue(szKey,&szValue))
+		return false;				// bogus keyword ??
+
+	if (!szValue || !*szValue)
+		return false;				// no value for known keyword ??
+
+	switch (szValue[0])
 	{
 	case '1':
 	case 't':
 	case 'T':
 	case 'y':
 	case 'Y':
-		bValue = true;
+		*pbValue = true;
 		return true;
 
 	default:
-		bValue = false;
+		*pbValue = false;
 		return true;
 	}
+}
+
+bool XAP_PrefsScheme::getNthValue(UT_uint32 k, const gchar ** pszKey, const gchar ** pszValue)
+{
+	if (k >= static_cast<UT_uint32>(m_hash.size()))
+		return false;
+//
+// Output prefs in alphabetic Order.
+//
+
+	if (!m_bValidSortedKeys) {
+		UT_GenericVector<const UT_String*> * vecD = m_hash.keys();
+		UT_GenericVector<const char*> vecKeys(vecD->getItemCount(), 4, true);
+		UT_sint32 i=0;
+		m_sortedKeys.clear();
+		for(i=0; i< vecD->getItemCount(); i++)
+		{
+			m_sortedKeys.addItem(vecD->getNthItem(i)->c_str());
+		}
+		m_sortedKeys.qsort(compareStrings);
+		m_bValidSortedKeys = true;
+		delete vecD;
+	}	
+		
+	const char * szKey = NULL;
+	const char * szValue = NULL;
+	szKey = m_sortedKeys.getNthItem(k);
+	szValue = m_hash.pick(szKey);
+	if(szValue && *szValue)
+	{
+		*pszKey = szKey;
+		*pszValue = szValue;
+		return true;
+	}
+	else
+	{
+		*pszKey = NULL;
+		*pszValue = NULL;
+		return false;
+	}
+	return false;
 }
 
 /*****************************************************************/
@@ -196,84 +298,113 @@ void XAP_Prefs::setUseEnvLocale(bool bUse)
 
 /*****************************************************************/
 
-UT_uint32 XAP_Prefs::getMaxRecent(void) const
+UT_sint32 XAP_Prefs::getMaxRecent(void) const
 {
-	return m_maxRecent;
+	return m_iMaxRecent;
 }
 
-void XAP_Prefs::setMaxRecent(UT_uint32 k)
+void XAP_Prefs::setMaxRecent(UT_sint32 k)
 {
-	UT_ASSERT_HARMLESS(k <= XAP_PREF_LIMIT_MaxRecent);
+	UT_ASSERT_HARMLESS(k<=XAP_PREF_LIMIT_MaxRecent);
 
-	if (k > XAP_PREF_LIMIT_MaxRecent) {
+	if (k > XAP_PREF_LIMIT_MaxRecent)
 		k = XAP_PREF_LIMIT_MaxRecent;
-	}
 
-	m_maxRecent = k;
+	m_iMaxRecent = k;
 }
 
-UT_uint32 XAP_Prefs::getRecentCount(void) const
+UT_sint32 XAP_Prefs::getRecentCount(void) const
 {
-	return m_vecRecent.size();
+	return m_vecRecent.getItemCount();
 }
 
-const char* XAP_Prefs::getRecent(UT_uint32 k) const
+const char * XAP_Prefs::getRecent(UT_sint32 k) const
 {
 	// NB: k is one-based
-	UT_return_val_if_fail(k > 0, nullptr);
-	UT_return_val_if_fail(k <= m_maxRecent, nullptr);
+	UT_return_val_if_fail(k <= m_iMaxRecent, NULL);
 
-	if (k <= m_vecRecent.size()) {
-		return m_vecRecent.at(k - 1).c_str();
+	const char * pRecent = NULL;
+	
+	if (k <= m_vecRecent.getItemCount())
+	{
+		pRecent = reinterpret_cast<const char *>(m_vecRecent.getNthItem(k - 1));
 	}
 
-	return nullptr;
+	return pRecent;
 }
-
+	
 void XAP_Prefs::addRecent(const char * szRecent)
 {
+	char * sz;
+	bool bFound = false;
+
 	UT_return_if_fail(szRecent);
 
-	if (m_maxRecent == 0) {
+	if (m_iMaxRecent == 0)
 		return;		// NOOP
-	}
 
-	if(m_bIgnoreThisOne) {
+	if(m_bIgnoreThisOne)
+	{
 		m_bIgnoreThisOne = false;
 		return;
 	}
-	// was it already here?
-	for (auto iter = m_vecRecent.begin(); iter != m_vecRecent.end(); ++iter) {
-		if (*iter == szRecent) {
+	// was it already here? 
+	for (UT_sint32 i=0; i<m_vecRecent.getItemCount(); i++)
+	{
+		sz = m_vecRecent.getNthItem(i);
+		UT_continue_if_fail(sz);
+
+		if ((sz==szRecent) || !strcmp(sz, szRecent))
+		{
 			// yep, we're gonna move it up
-			m_vecRecent.erase(iter);
+			m_vecRecent.deleteNthItem(i);
+			bFound = true;
 			break;
 		}
 	}
 
-	m_vecRecent.insert(m_vecRecent.begin(), szRecent);
+	if (!bFound)
+	{
+		// nope.  make a new copy to store
+		sz = g_strdup(szRecent);
+	}
+
+	m_vecRecent.insertItemAt(sz, 0);
 	_pruneRecent();
 }
 
-void XAP_Prefs::removeRecent(UT_uint32 k)
+void XAP_Prefs::removeRecent(UT_sint32 k)
 {
-	UT_return_if_fail(k > 0);
-	UT_return_if_fail(k <= getRecentCount());
+	UT_return_if_fail(k>0);
+	UT_return_if_fail(k<=getRecentCount());
 
-	m_vecRecent.erase(m_vecRecent.begin() + (k - 1));
+	char * sz = m_vecRecent.getNthItem(k-1);
+	FREEP(sz);
+
+	m_vecRecent.deleteNthItem(k-1);
 }
 
 void XAP_Prefs::_pruneRecent(void)
 {
-	UT_uint32 count = getRecentCount();
+	UT_sint32 i;
+	UT_sint32 count = getRecentCount();
 
-	if (m_maxRecent == 0) {
-		m_vecRecent.clear();
-	} else if (count > m_maxRecent) {
-		// prune entries past m_maxRecent
-		for (UT_uint32 i = count; i > m_maxRecent; i--) {
-			removeRecent(i);
+	if (m_iMaxRecent == 0)
+	{
+		// nuke the whole thing
+		for (i = count; i > 0 ; i--)
+		{
+			char * sz = m_vecRecent.getNthItem(i-1);
+			FREEP(sz);
 		}
+
+		m_vecRecent.clear();
+	}
+	else if (count > m_iMaxRecent)
+	{
+		// prune entries past m_iMaxRecent
+		for (i = count; i > m_iMaxRecent; i--)
+			removeRecent(i);
 	}
 }
 /*****************************************************************/
@@ -319,8 +450,9 @@ bool XAP_Prefs::getGeometry(UT_sint32 *posx, UT_sint32 *posy, UT_uint32 *width, 
 void XAP_Prefs::log(const char * where, const char * what, XAPPrefsLog_Level level)
 {
 	UT_return_if_fail(where && what);
+	char b[50];
 
-	time_t t = time(nullptr);
+	time_t t = time(NULL);
 
 	// we are inserting the log entries as comments, so we have to
 	// ensure we have no "--" in there (it anoys the parser)
@@ -329,55 +461,61 @@ void XAP_Prefs::log(const char * where, const char * what, XAPPrefsLog_Level lev
 	UT_UTF8String sDashdash = "--";
 	UT_UTF8String sDash = "-";
 
-	while(strstr(sWhat.utf8_str(), "--")) {
+	while(strstr(sWhat.utf8_str(), "--"))
+	{
 		sWhat.escape(sDashdash, sDash);
 	}
-
-	while(strstr(sWhere.utf8_str(), "--")) {
+	
+	while(strstr(sWhere.utf8_str(), "--"))
+	{
 		sWhere.escape(sDashdash, sDash);
 	}
 
-	char b[50];
 	strftime(b, 50, "<!-- [%c] ", localtime(&t));
-	std::string s(b);
 
-	switch(level) {
-	case Warning:
-		s += "warning: ";
-		break;
+	UT_UTF8String * s = new UT_UTF8String(b);
+	UT_return_if_fail(s);
 
-	case Error:
-		s += "error:   ";
-		break;
-	case Log:
-	default:
-		s += "message: ";
+	switch(level)
+	{
+		case Warning:
+			*s += "warning: ";
+			break;
+
+		case Error:
+			*s += "error:   ";
+			break;
+		case Log:
+		default:
+			*s += "message: ";
 	}
 
 	sWhere.escapeXML();
 	sWhat.escapeXML();
+	
+	*s += sWhere;
+	*s += " - ";
+	*s += sWhat;
+	*s += " -->";
 
-	s += sWhere.utf8_str();
-	s += " - ";
-	s += sWhat.utf8_str();
-	s += " -->";
-
-	m_vecLog.push_back(s);
+	m_vecLog.addItem(s);
 }
 
 
 /*****************************************************************/
 
-XAP_Prefs::XAP_Prefs()
-	: m_bAutoSavePrefs(atoi(XAP_PREF_DEFAULT_AutoSavePrefs) ? true : false)
-	, m_bUseEnvLocale(atoi(XAP_PREF_DEFAULT_UseEnvLocale) ? true : false)
-	, m_currentScheme(nullptr)
-	, m_builtinScheme(nullptr)
-	, m_maxRecent(atoi(XAP_PREF_DEFAULT_MaxRecent))
-	, m_bInChangeBlock(false)
-	, m_geom({0, 0, 0, 0, 0})
-	, m_bIgnoreThisOne(false)
+XAP_Prefs::XAP_Prefs() 
+	: m_ahashChanges( 20 )
 {
+	m_bAutoSavePrefs = (atoi(XAP_PREF_DEFAULT_AutoSavePrefs) ? true : false);
+	m_bUseEnvLocale = (atoi(XAP_PREF_DEFAULT_UseEnvLocale) ? true : false);
+	m_currentScheme = NULL;
+	m_builtinScheme = NULL;
+	m_iMaxRecent = atoi(XAP_PREF_DEFAULT_MaxRecent);
+	m_bInChangeBlock = false;
+	m_bIgnoreThisOne = false;
+	memset(&m_geom, 0, sizeof(m_geom));
+
 	// NOTE: since constructors cannot report g_try_malloc
 	// NOTE: failures (and since it is virtual back
 	// NOTE: to the application), our creator must call
@@ -390,109 +528,118 @@ XAP_Prefs::XAP_Prefs()
 
 XAP_Prefs::~XAP_Prefs(void)
 {
-	UT_std_vector_purgeall(m_vecSchemes);
-	UT_std_vector_purgeall(m_vecPluginSchemes);
+	UT_VECTOR_PURGEALL(XAP_PrefsScheme *, m_vecSchemes);
+	UT_VECTOR_PURGEALL(XAP_PrefsScheme *, m_vecPluginSchemes);
+	UT_VECTOR_FREEALL(char *, m_vecRecent);
+	UT_VECTOR_PURGEALL(tPrefsListenersPair *, m_vecPrefsListeners);
+	UT_VECTOR_PURGEALL(UT_UTF8String *, m_vecLog);
 }
 
 /*****************************************************************/
 
-XAP_PrefsScheme* XAP_Prefs::_getNthScheme(UT_uint32 k, const std::vector<XAP_PrefsScheme *> &vecSchemes) const
+XAP_PrefsScheme * XAP_Prefs::_getNthScheme(UT_uint32 k, const UT_GenericVector<XAP_PrefsScheme *> &vecSchemes) const
 {
-	UT_uint32 kLimit = vecSchemes.size();
-	if (k < kLimit) {
-		return vecSchemes.at(k);
-	}
-	return nullptr;
+	UT_uint32 kLimit = vecSchemes.getItemCount();
+	if (k < kLimit)
+		return vecSchemes.getNthItem(k);
+	else
+		return NULL;
 }
 
-XAP_PrefsScheme* XAP_Prefs::getNthScheme(UT_uint32 k) const
+XAP_PrefsScheme * XAP_Prefs::getNthScheme(UT_uint32 k) const
 {
 	return _getNthScheme(k, m_vecSchemes);
 }
 
-XAP_PrefsScheme* XAP_Prefs::getNthPluginScheme(UT_uint32 k) const
+XAP_PrefsScheme * XAP_Prefs::getNthPluginScheme(UT_uint32 k) const
 {
 	return _getNthScheme(k, m_vecPluginSchemes);
 }
 
-XAP_PrefsScheme* XAP_Prefs::getScheme(const gchar * szSchemeName) const
+XAP_PrefsScheme * XAP_Prefs::getScheme(const gchar * szSchemeName) const
 {
-	UT_uint32 kLimit = m_vecSchemes.size();
+	UT_uint32 kLimit = m_vecSchemes.getItemCount();
+	UT_uint32 k;
 
-	for (UT_uint32 k = 0; k < kLimit; k++) {
+	for (k=0; k<kLimit; k++)
+	{
 		XAP_PrefsScheme * p = getNthScheme(k);
-		if (!p) {
+		if(!p)
+		{
 			UT_ASSERT_HARMLESS(p);
 			continue;
 		}
-		if (p->getSchemeName() == szSchemeName) {
+		if (strcmp(static_cast<const char*>(szSchemeName),static_cast<const char*>(p->getSchemeName())) == 0)
 			return p;
-		}
 	}
 
-	return nullptr;
+	return NULL;
 }
 
-XAP_PrefsScheme* XAP_Prefs::getPluginScheme(const gchar * szSchemeName) const
+XAP_PrefsScheme * XAP_Prefs::getPluginScheme(const gchar * szSchemeName) const
 {
-	UT_uint32 kLimit = m_vecPluginSchemes.size();
+	UT_uint32 kLimit = m_vecPluginSchemes.getItemCount();
+	UT_uint32 k;
 
-	for (UT_uint32 k = 0; k < kLimit; k++) {
+	for (k=0; k<kLimit; k++)
+	{
 		XAP_PrefsScheme * p = getNthPluginScheme(k);
-		if (!p) {
+		if(!p)
+		{
 			UT_ASSERT_HARMLESS(p);
 			continue;
 		}
-		if (p->getSchemeName() == szSchemeName) {
+		if (strcmp(static_cast<const char*>(szSchemeName),static_cast<const char*>(p->getSchemeName())) == 0)
 			return p;
-		}
 	}
 
-	return nullptr;
+	return NULL;
 }
 
-void XAP_Prefs::addScheme(XAP_PrefsScheme * pNewScheme)
+bool XAP_Prefs::addScheme(XAP_PrefsScheme * pNewScheme)
 {
 	const gchar * szBuiltinSchemeName = getBuiltinSchemeName();
-	const std::string& thisSchemeName = pNewScheme->getSchemeName();
-
-	if (thisSchemeName == szBuiltinSchemeName) {
-		UT_ASSERT(m_builtinScheme == nullptr);
+	const gchar * szThisSchemeName = pNewScheme->getSchemeName();
+	
+	if (strcmp(static_cast<const char*>(szThisSchemeName), static_cast<const char*>(szBuiltinSchemeName)) == 0)
+	{
+		UT_ASSERT(m_builtinScheme == NULL);
 		m_builtinScheme = pNewScheme;
 	}
-
-	m_vecSchemes.push_back(pNewScheme);
+	
+	return (m_vecSchemes.addItem(pNewScheme) == 0);
 }
 
-void XAP_Prefs::addPluginScheme(XAP_PrefsScheme * pNewScheme)
+bool XAP_Prefs::addPluginScheme(XAP_PrefsScheme * pNewScheme)
 {
-	m_vecPluginSchemes.push_back(pNewScheme);
-}
-
-XAP_PrefsScheme * XAP_Prefs::getCurrentScheme() const
-{
-	return m_currentScheme;
+	return (m_vecPluginSchemes.addItem(pNewScheme) == 0);
 }
 
 XAP_PrefsScheme * XAP_Prefs::getCurrentScheme(bool bCreate)
 {
-	if (bCreate) {
-		// the builtin scheme is not updatable,
+	if (bCreate)
+	{
+		// the builtin scheme is not updatable, 
 		// so we may need to create one that is
-		if (m_currentScheme->getSchemeName() == "_builtin_") {
+		if ( !strcmp(static_cast<const char*>(m_currentScheme->getSchemeName()), "_builtin_") ) 
+		{
+	
 
-			const gchar* new_name = "_custom_";
+		const gchar new_name[] = "_custom_";
 
-			if (setCurrentScheme(new_name))	{
+			if (setCurrentScheme(new_name))
+			{
 				// unused _custom_ scheme is lying around, so recycle it
 				UT_ASSERT_HARMLESS(UT_TODO);
 
 				// HYP: reset the current scheme's hash table contents?
 				// ALT: replace the existing scheme with new empty one
-			} else {
+			}
+			else
+			{
 				// we need to create it
 				XAP_PrefsScheme * pNewScheme = new XAP_PrefsScheme(this, new_name);
-				UT_ASSERT(pNewScheme);
+				UT_ASSERT(pNewScheme);	
 				addScheme(pNewScheme);
 				setCurrentScheme(new_name);
 			}
@@ -522,65 +669,86 @@ bool XAP_Prefs::setCurrentScheme(const gchar * szSchemeName)
 static const gchar DEBUG_PREFIX[] = "DeBuG";  // case insensitive
 static const gchar NO_PREF_VALUE[] = "";
 
-bool XAP_Prefs::getPrefsValue(const std::string& key, std::string& value, bool bAllowBuiltin) const
+bool XAP_Prefs::getPrefsValue(const gchar * szKey, const gchar ** pszValue, bool bAllowBuiltin) const
 {
 	// a convenient routine to get a name/value pair from the current scheme
-	UT_return_val_if_fail(m_currentScheme, false);
 
-	if (m_currentScheme->getValue(key, value)) {
+	UT_return_val_if_fail(m_currentScheme,false);
+
+	if (m_currentScheme->getValue(szKey,pszValue))
 		return true;
-	}
-	if (bAllowBuiltin && m_builtinScheme->getValue(key, value)) {
+	if (bAllowBuiltin && m_builtinScheme->getValue(szKey,pszValue))
 		return true;
-	}
-	// It is legal for there to be arbitrary preference tags that start with
+	// It is legal for there to be arbitrary preference tags that start with 
 	// "Debug", and Abi apps won't choke.  The idea is that developers can use
 	// these to selectively trigger development-time behaviors.
-	if (g_ascii_strncasecmp(key.c_str(), DEBUG_PREFIX, sizeof(DEBUG_PREFIX) - 1) == 0) {
-		value = NO_PREF_VALUE;
+	if (g_ascii_strncasecmp(szKey, DEBUG_PREFIX, sizeof(DEBUG_PREFIX) - 1) == 0)
+	{
+		*pszValue = NO_PREF_VALUE;
 		return true;
 	}
 
 	return false;
 }
 
-bool XAP_Prefs::getPrefsValueBool(const std::string& key, bool& bValue, bool bAllowBuiltin) const
+bool XAP_Prefs::getPrefsValue(const UT_String &stKey, UT_String &stValue, bool bAllowBuiltin) const
 {
-	// a convenient routine to get a name/value pair from the current scheme
-	UT_return_val_if_fail(m_currentScheme, false);
+	UT_return_val_if_fail(m_currentScheme,false);
 
-	if (m_currentScheme->getValueBool(key, bValue)) {
+	if (m_currentScheme->getValue(stKey, stValue))
 		return true;
-	}
-	if (bAllowBuiltin && m_builtinScheme->getValueBool(key, bValue)) {
+	if (bAllowBuiltin && m_builtinScheme->getValue(stKey, stValue))
 		return true;
-	}
-	// It is legal for there to be arbitrary preference tags that start with
+	
+	// It is legal for there to be arbitrary preference tags that start with 
 	// "Debug", and Abi apps won't choke.  The idea is that developers can use
 	// these to selectively trigger development-time behaviors.
-	if (g_ascii_strncasecmp(key.c_str(), DEBUG_PREFIX, sizeof(DEBUG_PREFIX) - 1) == 0) {
-		bValue = false;
+	if (g_ascii_strncasecmp(stKey.c_str(), DEBUG_PREFIX, sizeof(DEBUG_PREFIX) - 1) == 0)
+	{
+		stValue = NO_PREF_VALUE;
 		return true;
 	}
 
 	return false;
 }
 
-bool XAP_Prefs::getPrefsValueInt(const std::string &key, int& nValue, bool bAllowBuiltin) const
+bool XAP_Prefs::getPrefsValueBool(const gchar * szKey, bool * pbValue, bool bAllowBuiltin) const
 {
 	// a convenient routine to get a name/value pair from the current scheme
-	UT_return_val_if_fail(m_currentScheme, false);
 
-	if (m_currentScheme->getValueInt(key, nValue)) {
+	UT_return_val_if_fail(m_currentScheme,false);
+
+	if (m_currentScheme->getValueBool(szKey,pbValue))
 		return true;
-	}
-	if (bAllowBuiltin && m_builtinScheme->getValueInt(key, nValue)) {
+	if (bAllowBuiltin && m_builtinScheme->getValueBool(szKey,pbValue))
 		return true;
-	}
-	// It is legal for there to be arbitrary preference tags that start with
+	// It is legal for there to be arbitrary preference tags that start with 
 	// "Debug", and Abi apps won't choke.  The idea is that developers can use
 	// these to selectively trigger development-time behaviors.
-	if (g_ascii_strncasecmp(key.c_str(), DEBUG_PREFIX, sizeof(DEBUG_PREFIX) - 1) == 0) {
+	if (g_ascii_strncasecmp(szKey, DEBUG_PREFIX, sizeof(DEBUG_PREFIX) - 1) == 0)
+	{
+		*pbValue = false;
+		return true;
+	}
+
+	return false;
+}
+
+bool XAP_Prefs::getPrefsValueInt(const gchar * szKey, int& nValue, bool bAllowBuiltin) const
+{
+	// a convenient routine to get a name/value pair from the current scheme
+
+	UT_return_val_if_fail(m_currentScheme,false);
+
+	if (m_currentScheme->getValueInt(szKey,nValue))
+		return true;
+	if (bAllowBuiltin && m_builtinScheme->getValueInt(szKey,nValue))
+		return true;
+	// It is legal for there to be arbitrary preference tags that start with 
+	// "Debug", and Abi apps won't choke.  The idea is that developers can use
+	// these to selectively trigger development-time behaviors.
+	if (g_ascii_strncasecmp(szKey, DEBUG_PREFIX, sizeof(DEBUG_PREFIX) - 1) == 0)
+	{
 		nValue = -1;
 		return true;
 	}
@@ -605,12 +773,12 @@ void XAP_Prefs::startElement(const gchar *name, const gchar **atts)
 		return;
 	}
 	UT_DEBUGMSG(("Looking for %s \n",name));
-	XAP_PrefsScheme * pNewScheme = nullptr; // must be freed
+	XAP_PrefsScheme * pNewScheme = NULL; // must be freed
 	
 	if (!m_parserState.m_parserStatus)		// eat if already had an error
 		return;
 
-	xmlToIdMapping * id = nullptr;
+	xmlToIdMapping * id = NULL;
 	id = static_cast<xmlToIdMapping *>(bsearch (static_cast<const void*>(name), static_cast<const void*>(s_Tokens),
 									sizeof(s_Tokens)/sizeof(xmlToIdMapping),
 									sizeof (xmlToIdMapping),
@@ -662,7 +830,7 @@ void XAP_Prefs::startElement(const gchar *name, const gchar **atts)
 			}
 			
 			const gchar ** a = atts;
-			const gchar * pName = nullptr;
+			const gchar * pName = NULL;
 			
 			while (a && *a)
 			{
@@ -786,7 +954,7 @@ void XAP_Prefs::startElement(const gchar *name, const gchar **atts)
 
 			//		bool bIsNamed = false;
 		
-		pNewScheme = new XAP_PrefsScheme(this, nullptr);
+		pNewScheme = new XAP_PrefsScheme(this, NULL);
 		if (!pNewScheme)
 			goto MemoryError;
 		
@@ -813,21 +981,23 @@ void XAP_Prefs::startElement(const gchar *name, const gchar **atts)
 					goto IgnoreThisScheme;
 				}
 
-				pNewScheme->setSchemeName(a[1]);
+				if (!pNewScheme->setSchemeName(a[1]))
+					goto MemoryError;
 
 				UT_DEBUGMSG(("Found Preferences scheme [%s].\n",a[1]));
 			}
 			else
 			{
-				pNewScheme->setValue(a[0], a[1]);
+				if (!pNewScheme->setValue(a[0],a[1]))
+					goto MemoryError;
 			}
 
 			a += 2;
 		}
 
-		addScheme(pNewScheme);
-
-		pNewScheme = nullptr;				// we don't own it anymore
+		if (!addScheme(pNewScheme))
+			goto MemoryError;
+		pNewScheme = NULL;				// we don't own it anymore
 		break;
 		}
 		case TT_PLUGIN:
@@ -837,7 +1007,7 @@ void XAP_Prefs::startElement(const gchar *name, const gchar **atts)
 
 			//		bool bIsNamed = false;
 		
-		pNewScheme = new XAP_PrefsScheme(this, nullptr);
+		pNewScheme = new XAP_PrefsScheme(this, NULL);
 		if (!pNewScheme)
 			goto MemoryError;
 		
@@ -856,21 +1026,23 @@ void XAP_Prefs::startElement(const gchar *name, const gchar **atts)
 					goto IgnoreThisScheme;
 				}
 
-				pNewScheme->setSchemeName(a[1]);
+				if (!pNewScheme->setSchemeName(a[1]))
+					goto MemoryError;
 
 				UT_DEBUGMSG(("Found Preferences Plugin scheme [%s].\n",a[1]));
 			}
 			else
 			{
-				pNewScheme->setValue(a[0], a[1]);
+				if (!pNewScheme->setValue(a[0],a[1]))
+					goto MemoryError;
 			}
 
 			a += 2;
 		}
 
-		addPluginScheme(pNewScheme);
-
-		pNewScheme = nullptr;				// we don't own it anymore
+		if (!addPluginScheme(pNewScheme))
+			goto MemoryError;
+		pNewScheme = NULL;				// we don't own it anymore
 		break;
 		}
 		case TT_RECENT:
@@ -881,25 +1053,35 @@ void XAP_Prefs::startElement(const gchar *name, const gchar **atts)
 		// <Recent max="4" name1="v1" name2="v2" ... />
 
 		const gchar ** a = atts;
-		while (*a) {
+		while (*a)
+		{
 			UT_ASSERT(a[1] && *a[1]);	// require a value for each attribute keyword
 
-			if (strcmp(a[0], "max") == 0) {
-				m_maxRecent = atoi(a[1]);
-			} else if (strncmp(a[0], "name", 4) == 0) {
+			if (strcmp(static_cast<const char*>(a[0]), "max") == 0)
+			{
+				m_iMaxRecent = atoi(static_cast<const char*>(a[1]));
+			}
+			else if (strncmp(static_cast<const char*>(a[0]), "name", 4) == 0)
+			{
+				// NOTE: taking advantage of the fact that gchar == char
+				UT_ASSERT((sizeof(gchar) == sizeof(char)));
+				gchar * sz;
+
 				// see bug 10709 - Non-URI paths aren't displayed correctly in the file menu
 				// this provides a seamless migration
 
-				std::string recent;
-				if (UT_go_path_is_uri(a[1])) {
-					recent = a[1];
-				} else {
-					gchar* uri = UT_go_filename_to_uri(a[1]);
-					recent = uri;
-					g_free (uri);
-				}
+				char * uri;
+				if (UT_go_path_is_uri (a[1]))
+				  uri = g_strdup (a[1]);
+				else
+				  uri = UT_go_filename_to_uri (a[1]);
 
-				m_vecRecent.push_back(recent);
+				sz = g_strdup(uri);
+
+				g_free (uri);
+
+				// NOTE: we keep the copied string in the vector
+				m_vecRecent.addItem(sz);
 			}
 
 			a += 2;
@@ -1021,7 +1203,7 @@ bool XAP_Prefs::loadPrefsFile(void)
 	m_parserState.m_parserStatus = true;
 	m_parserState.m_bFoundAbiPreferences = false;
 	m_parserState.m_bFoundSelect = false;
-	m_parserState.m_szSelectedSchemeName = nullptr;
+	m_parserState.m_szSelectedSchemeName = NULL;
 	m_parserState.m_bFoundRecent = false;
 	m_parserState.m_bFoundGeometry = false;
 	m_parserState.m_bFoundFonts = false;
@@ -1086,7 +1268,7 @@ bool XAP_Prefs::savePrefsFile(void)
 {
 	bool bResult = false;			// assume failure
 	const char * szFilename;
-	FILE * fp = nullptr;
+	FILE * fp = NULL;
 #ifdef _WIN32
 	UT_Win32LocaleString str;
 #endif
@@ -1176,11 +1358,11 @@ bool XAP_Prefs::savePrefsFile(void)
 					"\t    autosaveprefs=\"%d\"\n"
 					"\t    useenvlocale=\"%d\"\n"
 					"\t/>\n"),
-				m_currentScheme->getSchemeName().c_str(),
+				m_currentScheme->getSchemeName(),
 				static_cast<UT_uint32>(m_bAutoSavePrefs),
 				static_cast<UT_uint32>(m_bUseEnvLocale));
 
-		UT_uint32 kLimit = m_vecSchemes.size();
+		UT_uint32 kLimit = m_vecSchemes.getItemCount();
 		UT_uint32 k;
 
 		const gchar * szBuiltinSchemeName = getBuiltinSchemeName();
@@ -1194,7 +1376,7 @@ bool XAP_Prefs::savePrefsFile(void)
 				continue;
 			}
 
-			const std::string& thisSchemeName = p->getSchemeName();
+			const gchar * szThisSchemeName = p->getSchemeName();
 			bool bIsBuiltin = (p == m_builtinScheme);
 
 			if (bIsBuiltin)
@@ -1210,9 +1392,14 @@ bool XAP_Prefs::savePrefsFile(void)
 						szBuiltinSchemeName);
 			}
 
-			fprintf(fp, "\n\t<Scheme\n\t\tname=\"%s\"\n", thisSchemeName.c_str());
+			fprintf(fp,"\n\t<Scheme\n\t\tname=\"%s\"\n",szThisSchemeName);
 
-			for (auto entry : *p) {
+			const gchar * szKey;
+			const gchar * szValue;
+			UT_uint32 j;
+
+			for (j=0;(p->getNthValue(j, &szKey, &szValue)) ; j++)
+			{
 				bool need_print;
 				need_print = false;
 				if (bIsBuiltin)
@@ -1224,11 +1411,12 @@ bool XAP_Prefs::savePrefsFile(void)
 				{
 					// for non-builtin sets, we only print the values which are different
 					// from the builtin set.
-					std::string builtinValue = NO_PREF_VALUE;
-					m_builtinScheme->getValue(entry.first, builtinValue);
-					if (entry.second != builtinValue ||
+					const gchar * szBuiltinValue = NO_PREF_VALUE;
+					m_builtinScheme->getValue(szKey,&szBuiltinValue);
+					if (strcmp(static_cast<const char*>(szValue),static_cast<const char*>(szBuiltinValue)) != 0 ||
 						// Always print debug values
-						strncmp(entry.first.c_str(), DEBUG_PREFIX, sizeof(DEBUG_PREFIX) - 1) == 0)
+					strncmp(static_cast<const char*>(szKey), static_cast<const char*>(DEBUG_PREFIX),
+						sizeof(DEBUG_PREFIX) - 1) == 0)
 					{
 						need_print = true;
 					}
@@ -1242,9 +1430,9 @@ bool XAP_Prefs::savePrefsFile(void)
 					// UTF-8 the next time the application reads the
 					// prefs file.
 					UT_GrowBuf gb;
-					UT_decodeUTF8string(entry.second.c_str(), entry.second.size(), &gb);
+					UT_decodeUTF8string(szValue, strlen(szValue), &gb);
 					UT_uint32 length = gb.getLength();
-					fprintf(fp, "\t\t%s=\"", entry.first.c_str());
+					fprintf(fp,"\t\t%s=\"",szKey);
 					for (UT_uint32 udex=0; udex<length; ++udex)
 					{
 						UT_UCSChar ch = *(gb.getPointer(udex));
@@ -1273,28 +1461,35 @@ bool XAP_Prefs::savePrefsFile(void)
 		}
 
 		// add Plugin Scheme (plugin specific preferences) if they exist
-		kLimit = m_vecPluginSchemes.size();
-		for (k = 0; k < kLimit; k++) {
+		kLimit = m_vecPluginSchemes.getItemCount();
+		for (k=0; k<kLimit; k++)
+		{
 			XAP_PrefsScheme * p = getNthPluginScheme(k);
-			if (!p) {
+			if(!p)
+			{
 				UT_ASSERT_HARMLESS(p);
 				continue;
 			}
 
-			const std::string& thisSchemeName = p->getSchemeName();
-			fprintf(fp, "\n\t<Plugin\n\t\tname=\"%s\"\n", thisSchemeName.c_str());
+			const gchar * szThisSchemeName = p->getSchemeName();
+			fprintf(fp,"\n\t<Plugin\n\t\tname=\"%s\"\n",szThisSchemeName);
 
-			for (auto entry : *p) {
-					// the value is UTF-8.  Convert to Unicode and then
+			const gchar * szKey;
+			const gchar * szValue;
+			UT_uint32 j;
+
+			for (j=0;(p->getNthValue(j, &szKey, &szValue)) ; j++)
+			{
+					// szValue is UTF-8.  Convert to Unicode and then
 					// do XML-encoding of XML-special characters and
 					// non-ASCII characters.  The printed value
 					// strings will get XML parsing and conversion to
 					// UTF-8 the next time the application reads the
 					// prefs file.
 					UT_GrowBuf gb;
-					UT_decodeUTF8string(entry.second.c_str(), entry.second.size(), &gb);
+					UT_decodeUTF8string(szValue, strlen(szValue), &gb);
 					UT_uint32 length = gb.getLength();
-					fprintf(fp, "\t\t%s=\"", entry.first.c_str());
+					fprintf(fp,"\t\t%s=\"",szKey);
 					for (UT_uint32 udex=0; udex<length; ++udex)
 					{
 						UT_UCSChar ch = *(gb.getPointer(udex));
@@ -1317,46 +1512,49 @@ bool XAP_Prefs::savePrefsFile(void)
 					}
 					fputs("\"\n", fp);
 			}
-
+				
 			fprintf(fp,"\t\t/>\n");
 		}
 		// end Plugin preferences
 
-		fprintf(fp,"\n\t<Recent\n\t\tmax=\"%u\"\n", m_maxRecent);
+		fprintf(fp,"\n\t<Recent\n\t\tmax=\"%d\"\n",
+				static_cast<UT_uint32>(m_iMaxRecent));
 
-		kLimit = m_vecRecent.size();
+		kLimit = m_vecRecent.getItemCount();
 
 		for (k=0; k<kLimit; k++)
 		{
-			const char* szRecent = getRecent(k + 1);
-			if (!szRecent) {
-				UT_DEBUGMSG(("getRecent returned nullptr\n"));
-				continue;
-			}
-			auto entry = UT_escapeXML(szRecent);
+			const char * szRecent = getRecent(k+1);
+			UT_UTF8String utf8string( szRecent );
+			utf8string.escapeXML();
 
-			fprintf(fp, "\t\tname%d=\"%s\"\n", k + 1, entry.c_str());
+			fprintf(fp,"\t\tname%d=\"%s\"\n",k+1,utf8string.utf8_str());
 		}
-
+				
 		fprintf(fp,"\t\t/>\n");
 
 		fprintf(fp,"\n\t<Geometry\n");
-		fprintf(fp,"\t\twidth=\"%u\"\n", m_geom.m_width);
-		fprintf(fp,"\t\theight=\"%u\"\n", m_geom.m_height);
-		fprintf(fp,"\t\tposx=\"%d\"\n", m_geom.m_posx);
-		fprintf(fp,"\t\tposy=\"%d\"\n", m_geom.m_posy);
-		fprintf(fp,"\t\tflags=\"%d\"\n", m_geom.m_flags);
+		fprintf(fp,"\t\twidth=\"%u\"\n", m_geom.m_width); 
+		fprintf(fp,"\t\theight=\"%u\"\n", m_geom.m_height); 
+		fprintf(fp,"\t\tposx=\"%d\"\n", m_geom.m_posx); 
+		fprintf(fp,"\t\tposy=\"%d\"\n", m_geom.m_posy); 
+		fprintf(fp,"\t\tflags=\"%d\"\n", m_geom.m_flags); 
 		fprintf(fp,"\t\t/>\n");
 	}
+	
+	{
+		// now the log
+		fprintf(fp, "\n\t<Log>\n");
 
-	// now the log
-	fprintf(fp, "\n\t<Log>\n");
-
-	for (auto line : m_vecLog) {
-		fprintf(fp,"\t%s\n", line.c_str());
+		UT_uint32 kLimit = m_vecLog.getItemCount();
+		for (UT_uint32 k = 0; k < kLimit; ++k)
+		{
+			UT_UTF8String * s = (UT_UTF8String *) m_vecLog.getNthItem(k);
+			fprintf(fp,"\t%s\n", s->utf8_str());
+		}
+	
+		fprintf(fp, "\t</Log>\n");
 	}
-
-	fprintf(fp, "\t</Log>\n");
 
 	{
 		fprintf(fp, "\n\t<Fonts include=\"%d\">\n", m_fonts.getIncludeFlag());
@@ -1371,13 +1569,13 @@ bool XAP_Prefs::savePrefsFile(void)
 				"\n\t     include=\"0\" - exclude the listed fonts from the system font list"
 				"\n\t-->");
 
-		const std::vector<std::string> & v = m_fonts.getFonts();
+		const std::vector<UT_UTF8String> & v = m_fonts.getFonts();
 		
-		for (std::vector<std::string>::const_iterator k = v.begin(); 
+		for (std::vector<UT_UTF8String>::const_iterator k = v.begin(); 
 			 k != v.end() ; ++k)
 		{
 			fprintf(fp,"\n\t\t<Face name=\"%s\"/>",
-					(*k).c_str());
+					(*k).utf8_str());
 		}
 
 		fprintf(fp, "\n\t</Fonts>\n");
@@ -1422,10 +1620,10 @@ void XAP_Prefs::_startElement_SystemDefaultFile(const gchar *name, const gchar *
 
 			// we ignore "name=<schemename>" just incase they copied and
 			// pasted a user-profile into the system file.
-
-			if (strcmp(a[0], "name") != 0) {
-				m_builtinScheme->setValue(a[0], a[1]);
-			}
+			
+			if (strcmp(static_cast<const char*>(a[0]), "name") != 0)
+				if (!m_builtinScheme->setValue(a[0],a[1]))
+					goto MemoryError;
 
 			a += 2;
 		}
@@ -1434,6 +1632,13 @@ void XAP_Prefs::_startElement_SystemDefaultFile(const gchar *name, const gchar *
 	{
 		UT_DEBUGMSG(("Ignoring tag [%s] in system default preferences file.\n",name));
 	}
+
+	return;								// success
+
+MemoryError:
+	UT_DEBUGMSG(("Memory error parsing preferences file.\n"));
+	m_parserState.m_parserStatus = false;			// cause parser driver to bail
+	return;
 }
 
 /*****************************************************************/
@@ -1466,35 +1671,56 @@ Cleanup:
 
 void XAP_Prefs::addListener	  ( PrefsListener pFunc, void *data )
 {
-	m_prefsListeners.push_back(tPrefsListenersPair(pFunc, data));
+	tPrefsListenersPair *pPair = new tPrefsListenersPair;	
+
+	UT_return_if_fail(pPair);
+	UT_ASSERT(pFunc);
+
+	pPair->m_pFunc = pFunc;
+	pPair->m_pData = data;
+
+	m_vecPrefsListeners.addItem(pPair);
 }
 
 // optional parameter, data.  If given (i.e., != 0), will try to match data,
 // otherwise, will delete all calls to pFunc
 void XAP_Prefs::removeListener ( PrefsListener pFunc, void *data )
 {
-	for (PrefsListenersList::iterator iter = m_prefsListeners.begin();
-		 iter != m_prefsListeners.end(); )
+	UT_sint32 index;
+	tPrefsListenersPair *pPair;
+
+	for ( index = 0; index < m_vecPrefsListeners.getItemCount(); index++ )
 	{
-		const tPrefsListenersPair & pPair = *iter;
-		if ( pPair.m_pFunc == pFunc && (!data || pPair.m_pData == data) ) {
-			iter = m_prefsListeners.erase(iter);
-		}
-		else {
-			++iter;
+		pPair = m_vecPrefsListeners.getNthItem(index);
+		UT_ASSERT_HARMLESS(pPair);
+		if ( pPair ) {
+			if ( pPair->m_pFunc == pFunc && (!data || pPair->m_pData == data) ) {
+				m_vecPrefsListeners.deleteNthItem(index);
+				delete pPair;
+			}
 		}
 	}
 }
 
-void XAP_Prefs::_markPrefChange(const std::string& key)
+void XAP_Prefs::_markPrefChange( const gchar *szKey )
 {
-	if (m_bInChangeBlock) {
-		m_ahashChanges.insert(key);
+	if ( m_bInChangeBlock )
+	{
+		const void * uth_e = m_ahashChanges.pick(szKey );
+
+		if ( uth_e ) 
+			uth_e = reinterpret_cast<const void *>(1);
+		else
+			m_ahashChanges.insert(szKey, reinterpret_cast<void *>(1));	
+
 		// notify later
-	} else {
-		XAP_PrefsChangeSet changes;
-		changes.insert(key);
-		_sendPrefsSignal(changes);
+	}
+	else
+	{
+		UT_StringPtrMap	changes(3);
+		changes.insert(szKey, reinterpret_cast<void *>(1));	
+
+		_sendPrefsSignal(&changes);
 	}
 }
 
@@ -1505,25 +1731,25 @@ void XAP_Prefs::startBlockChange()
 
 void XAP_Prefs::endBlockChange()
 {
-	if ( m_bInChangeBlock )
+	if ( m_bInChangeBlock ) 
 	{
 		m_bInChangeBlock = false;
-		_sendPrefsSignal( m_ahashChanges );
+		_sendPrefsSignal( &m_ahashChanges );
 	}
 }
 
-void XAP_Prefs::_sendPrefsSignal(const XAP_PrefsChangeSet& hash)
+void XAP_Prefs::_sendPrefsSignal( UT_StringPtrMap *hash  )
 {
-	for (PrefsListenersList::const_iterator iter = m_prefsListeners.begin();
-		 iter != m_prefsListeners.end(); ++iter)
+	UT_sint32	index;
+	for ( index = 0; index < m_vecPrefsListeners.getItemCount(); index++ )
 	{
-		const tPrefsListenersPair & p = *iter;
+		tPrefsListenersPair *p = m_vecPrefsListeners.getNthItem( index );
 
-		UT_ASSERT_HARMLESS(p.m_pFunc);
-		if(!p.m_pFunc)
+		UT_ASSERT_HARMLESS(p && p->m_pFunc);
+		if(!p || !p->m_pFunc)
 			continue;
-
-		(p.m_pFunc)(this, &hash, p.m_pData);
+	
+		(p->m_pFunc)(this, hash, p->m_pData);
 	}
 }
 
@@ -1531,11 +1757,11 @@ bool XAP_FontSettings::isOnExcludeList (const char * name) const
 {
 	if (m_bInclude)
 		return false;
-
+	
 	if (!m_vecFonts.size())
 		return false;
 
-	std::vector<std::string>::const_iterator i =
+	std::vector<UT_UTF8String>::const_iterator i =
 		std::find(m_vecFonts.begin(), m_vecFonts.end(), name);
 
 	return i != m_vecFonts.end();

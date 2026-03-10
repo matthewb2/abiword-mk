@@ -35,7 +35,7 @@
 /*****************************************************************/
 
 EV_EditMethodCallData::EV_EditMethodCallData()
-	:  m_pData(nullptr),
+	:  m_pData(0),
 	   m_dataLength(0),
 	   m_bAllocatedData(false),
 	   m_xPos(0),
@@ -44,7 +44,7 @@ EV_EditMethodCallData::EV_EditMethodCallData()
 }
 
 EV_EditMethodCallData::EV_EditMethodCallData(const UT_String& stScriptName)
-	: m_pData(nullptr),
+	: m_pData(0),
 	  m_dataLength(0),
 	  m_bAllocatedData(false),
 	  m_xPos(0),
@@ -119,17 +119,17 @@ EV_EditMethod::EV_EditMethod(const char * szName, EV_EditMethod_pFn fn, EV_EditM
 							 const char * szDescription)
 	: m_szName(szName),
 	  m_fn(fn),
-	  m_CtxtFn(nullptr),
+	  m_CtxtFn(0),
 	  m_emt(emt),
 	  m_szDescription(szDescription),
-	  m_context(nullptr)
+	  m_context(0)
 {
 }
 
 EV_EditMethod::EV_EditMethod(const char * szName, EV_EditMethod_pCtxtFn fn, EV_EditMethodType emt,
 							 const char * szDescription, void * context)
 	: m_szName(szName),
-	  m_fn(nullptr),
+	  m_fn(0),
 	  m_CtxtFn(fn),
 	  m_emt(emt),
 	  m_szDescription(szDescription),
@@ -222,9 +222,9 @@ static int ev_compar (const void * a, const void * b)
 EV_EditMethod * EV_EditMethodContainer::findEditMethodByName(const char * szName) const
 {
 	if (!szName)
-		return nullptr;
+		return 0;
 
-	EV_EditMethod *mthd = nullptr;
+	EV_EditMethod *mthd = NULL;
 
 	// TODO: make this also use a hashtable + bsearch
 
@@ -260,15 +260,15 @@ EV_EditMethod * EV_EditMethodContainer::findEditMethodByName(const char * szName
 	{
 		xxx_UT_DEBUGMSG(("Looking at method %d \n",k));
 		EV_EditMethod * pem = m_vecDynamicEditMethods.getNthItem(k);
-		if(pem == nullptr)
+		if(pem == NULL)
 			continue;
-		if(pem->getName() == nullptr)
+		if(pem->getName() == NULL)
 			continue;
 		if (strcmp(szName,pem->getName()) == 0)
 			return pem;
 	}
 
-	return nullptr;
+	return 0;
 }
 
 /*****************************************************************/
@@ -286,7 +286,7 @@ bool ev_EditMethod_invoke (const EV_EditMethod * pEM,
   // no controlling view == bad joo joo - return false
   // Actually allow this for plugins invoked from the command line
   //
-  AV_View * pView = nullptr;
+  AV_View * pView = NULL;
   XAP_Frame * pFrame = XAP_App::getApp()->getLastFocussedFrame();
   if(!pFrame)
   {
@@ -348,7 +348,7 @@ bool ev_EditMethod_invoke (const UT_String& methodName, const UT_UCS4String & da
 
 bool ev_EditMethod_exists (const char * methodName)
 {
-  return ( ev_EditMethod_lookup ( methodName ) != nullptr ) ;
+  return ( ev_EditMethod_lookup ( methodName ) != NULL ) ;
 }
 
 bool ev_EditMethod_exists (const UT_String & methodName)

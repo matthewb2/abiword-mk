@@ -39,21 +39,21 @@
 #ifdef DEBUG
 int AP_Args::m_iDumpstrings = 0;
 #endif
-const char * AP_Args::m_sGeometry = nullptr;
-const char * AP_Args::m_sToFormat = nullptr;
-const char * AP_Args::m_sPrintTo = nullptr;
+const char * AP_Args::m_sGeometry = NULL;
+const char * AP_Args::m_sToFormat = NULL;
+const char * AP_Args::m_sPrintTo = NULL;
 int AP_Args::m_iVerbose = 1;
-const char ** AP_Args::m_sPluginArgs = nullptr;
-const char ** AP_Args::m_sFiles = nullptr;
+const char ** AP_Args::m_sPluginArgs = NULL;
+const char ** AP_Args::m_sFiles = NULL;
 int AP_Args::m_iVersion = 0;
 int AP_Args::m_iHelp = 0;
-const char * AP_Args::m_sMerge = nullptr;
-const char * AP_Args::m_impProps=nullptr;
-const char * AP_Args::m_expProps=nullptr;
-const char * AP_Args::m_sUserProfile = nullptr;
-const char * AP_Args::m_sFileExtension = nullptr;
+const char * AP_Args::m_sMerge = NULL;
+const char * AP_Args::m_impProps=NULL;
+const char * AP_Args::m_expProps=NULL;
+const char * AP_Args::m_sUserProfile = NULL;
+const char * AP_Args::m_sFileExtension = NULL;
 int AP_Args::m_iToThumb = 0;
-const char * AP_Args::m_sName = nullptr; // name of output file
+const char * AP_Args::m_sName = NULL; // name of output file
 const char *  AP_Args::m_sThumbXY = "100x120"; // number of pixels in thumbnail by default
 
 
@@ -62,21 +62,21 @@ static GOptionEntry _entries[] = {
         {"to", 't', 0, G_OPTION_ARG_STRING, &AP_Args::m_sToFormat, "Target format of the file (abw, zabw, rtf, txt, utf8, html, ...), depends on available filter plugins", "FORMAT"},
         {"verbose", '\0', 0, G_OPTION_ARG_INT, &AP_Args::m_iVerbose, "Set verbosity level (0, 1, 2), with 2 being the most verbose", "LEVEL"},
         {"print", 'p',0, G_OPTION_ARG_STRING, &AP_Args::m_sPrintTo, "Print this file to printer","'Printer name' or '-' for default printer"},
-        {"plugin", 'E', 0, G_OPTION_ARG_STRING_ARRAY, &AP_Args::m_sPluginArgs, "Execute plugin NAME instead of the main application", nullptr},
+        {"plugin", 'E', 0, G_OPTION_ARG_STRING_ARRAY, &AP_Args::m_sPluginArgs, "Execute plugin NAME instead of the main application", NULL},
         {"merge", 'm', 0, G_OPTION_ARG_STRING, &AP_Args::m_sMerge, "Mail-merge", "FILE"},
         {"imp-props", 'i', 0, G_OPTION_ARG_STRING, &AP_Args::m_impProps, "Importer Arguments", "CSS String"},
         {"exp-props", 'e', 0, G_OPTION_ARG_STRING, &AP_Args::m_expProps, "Exporter Arguments", "CSS String"},
         {"thumb", '\0', 0, G_OPTION_ARG_INT, &AP_Args::m_iToThumb, "Make a thumb nail of the first page",""},
         {"sizeXY",'S', 0, G_OPTION_ARG_STRING, &AP_Args::m_sThumbXY, "Size of PNG thumb nail in pixels","VALxVAL"},
-        {"to-name",'o', 0, G_OPTION_ARG_STRING, &AP_Args::m_sName, "Name of output file",nullptr},
-        {"import-extension", '\0', 0, G_OPTION_ARG_STRING, &AP_Args::m_sFileExtension, "Override document type detection by specifying a file extension", nullptr},
-        {"userprofile", 'u', 0, G_OPTION_ARG_STRING, &AP_Args::m_sUserProfile, "Use specified user profile.",nullptr},
-        {"version", '\0', 0, G_OPTION_ARG_NONE, &AP_Args::m_iVersion, "Print AbiWord version", nullptr},
-        { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &AP_Args::m_sFiles, nullptr,  "[FILE...]" },
+        {"to-name",'o', 0, G_OPTION_ARG_STRING, &AP_Args::m_sName, "Name of output file",NULL},
+        {"import-extension", '\0', 0, G_OPTION_ARG_STRING, &AP_Args::m_sFileExtension, "Override document type detection by specifying a file extension", NULL},
+        {"userprofile", 'u', 0, G_OPTION_ARG_STRING, &AP_Args::m_sUserProfile, "Use specified user profile.",NULL},
+        {"version", '\0', 0, G_OPTION_ARG_NONE, &AP_Args::m_iVersion, "Print AbiWord version", NULL},
+        { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &AP_Args::m_sFiles, NULL,  "[FILE...]" },
 #ifdef DEBUG
-        {"dumpstrings", 'd', 0, G_OPTION_ARG_NONE, &AP_Args::m_iDumpstrings, "Dump strings to file", nullptr},
+        {"dumpstrings", 'd', 0, G_OPTION_ARG_NONE, &AP_Args::m_iDumpstrings, "Dump strings to file", NULL},
 #endif
-        {nullptr, 0, 0, G_OPTION_ARG_NONE, nullptr, nullptr, nullptr }
+        {NULL, 0, 0, G_OPTION_ARG_NONE, NULL, NULL, NULL }
 };
 
 
@@ -86,7 +86,7 @@ AP_Args::AP_Args(XAP_Args * pArgs, const char * /*szAppName*/, AP_App * pApp)
 	m_pApp(pApp)
 {
 	m_context = g_option_context_new ("- commandline options");
-	g_option_context_add_main_entries (m_context, _entries, nullptr);
+	g_option_context_add_main_entries (m_context, _entries, NULL);
 }
 
 AP_Args::~AP_Args()
@@ -142,11 +142,11 @@ void AP_Args::parseOptions()
 	GError *err;
 	gboolean ret;
 
-	err = nullptr;
+	err = NULL;
 	ret = g_option_context_parse (m_context, &XArgs->m_argc, &XArgs->m_argv, &err);
 	if (!ret || err) {
 		fprintf (stderr, "%s\n", err->message);
-		g_error_free (err); err = nullptr;
+		g_error_free (err); err = NULL;
 		return;
 	}
 #ifdef _WIN32
@@ -216,7 +216,7 @@ bool AP_Args::doWindowlessArgs(bool & bSuccessful)
 		#ifdef TOOLKIT_WIN
 #define ABI_WIDE_STRING(t) Z(t)
 #define Z(t) L##t
-			MessageBoxW(nullptr, ABI_WIDE_STRING(PACKAGE_VERSION), L"Version", MB_OK);
+			MessageBoxW(NULL, ABI_WIDE_STRING(PACKAGE_VERSION), L"Version", MB_OK);
 		#endif
 		exit(0);
  	}

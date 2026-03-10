@@ -1,4 +1,3 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
  *
@@ -21,28 +20,25 @@
 #ifndef AP_UNIXDIALOG_REPLACE_H
 #define AP_UNIXDIALOG_REPLACE_H
 
-#include "xap_UnixDialog.h"
 #include "ap_Dialog_Replace.h"
 
 class XAP_UnixFrame;
 
 /*****************************************************************/
 
-class AP_UnixDialog_Replace
-  : public AP_Dialog_Replace
-  , public XAP_UnixDialog
+class AP_UnixDialog_Replace: public AP_Dialog_Replace
 {
 public:
 	AP_UnixDialog_Replace(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_UnixDialog_Replace(void);
 
 
-	virtual void			runModal(XAP_Frame * /*pFrame*/) override {};
-	virtual void			runModeless(XAP_Frame * pFrame) override;
-	virtual void			notifyActiveFrame(XAP_Frame *pFrame) override;
-	virtual void			notifyCloseFrame(XAP_Frame * /*pFrame*/) override {};
-	virtual void			destroy(void) override;
-	virtual void			activate(void) override;
+	virtual void			runModal(XAP_Frame * /*pFrame*/){};
+	virtual void			runModeless(XAP_Frame * pFrame);
+	virtual void			notifyActiveFrame(XAP_Frame *pFrame);
+	virtual void			notifyCloseFrame(XAP_Frame * /*pFrame*/){};
+	virtual void			destroy(void);
+	virtual void			activate(void);
 
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 
@@ -68,7 +64,7 @@ public:
 
 protected:
 
-	virtual void			_updateLists() override;
+	virtual void			_updateLists();
 
 private:
 
@@ -82,6 +78,8 @@ private:
 	void			_updateList(GtkWidget* combo, UT_GenericVector<UT_UCS4Char*>* list);
 
 	// pointers to widgets we need to query/set
+	GtkWidget * m_windowMain;
+
 	GtkWidget *	m_buttonFind;
 	GtkWidget *	m_buttonFindReplace;
 	GtkWidget *	m_buttonReplaceAll;

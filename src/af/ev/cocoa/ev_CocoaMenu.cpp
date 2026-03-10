@@ -2,7 +2,7 @@
 
 /* AbiSource Program Utilities
  * Copyright (C) 1998-2000 AbiSource, Inc.
- * Copyright (C) 2001-2004, 2007, 2009-2021 Hubert Figuiere
+ * Copyright (C) 2001-2004, 2007, 2009 Hubert Figuiere
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -34,6 +34,7 @@
 #include "xap_CocoaApp.h"
 #include "xap_CocoaFrame.h"
 #include "xap_CocoaFrameImpl.h"
+#import "xap_CocoaCompat.h"
 #include "xap_CocoaDialog_Utilities.h"
 #include "xap_CocoaToolPalette.h"
 #include "xap_Types.h"
@@ -127,7 +128,7 @@ bool EV_CocoaMenuPopup::refreshMenu(AV_View * /*pView*/)
 	bool bEnabled = true;
 	bool bChecked = false;
 
-	const char * szLabel = nullptr;
+	const char * szLabel = 0;
 
 	m_menu->validateMenuItem(menuid, bEnabled, bChecked, szLabel);
 
@@ -135,7 +136,7 @@ bool EV_CocoaMenuPopup::refreshMenu(AV_View * /*pView*/)
 	{
 		[menuItem setTitle:(m_menu->convertToString(szLabel))];
 	}
-	[menuItem setState:(bChecked ? NSControlStateValueOn : NSControlStateValueOff)];
+	[menuItem setState:(bChecked ? NSOnState : NSOffState)];
 
 	return bEnabled ? YES : NO;
 }
@@ -328,11 +329,11 @@ bool EV_CocoaMenuPopup::refreshMenu(AV_View * /*pView*/)
 EV_CocoaMenu::EV_CocoaMenu(const char * szMenuLayoutName, const char * szMenuLabelSetName, bool bContextMenu) 
 : EV_Menu(XAP_App::getApp(), XAP_App::getApp()->getEditMethodContainer(), 
 		  szMenuLayoutName, szMenuLabelSetName),
-	m_menuTarget(nil),
-	m_fontTarget(nil),
+	m_menuTarget(0),
+	m_fontTarget(0),
 	m_AppMenuCurrent(static_cast<XAP_CocoaAppMenu_Id>(0)),
-	m_menuStack(nullptr),
-	m_buffer(nullptr),
+	m_menuStack(0),
+	m_buffer(0),
 	m_maxlen(0),
 	m_bContextMenu(bContextMenu),
 	m_bAddSeparator(false)
@@ -461,7 +462,7 @@ void EV_CocoaMenu::buildAppMenu()
 		addToAppMenu(menuid, pAction, pLabel, flags);
 	}
 	MenuStack_clear(); // shouldn't be anything in it, but maybe
-	m_menuStack = nullptr;
+	m_menuStack = 0;
 }
 
 void EV_CocoaMenu::addToAppMenu(XAP_Menu_Id menuid, const EV_Menu_Action * pAction, 
@@ -655,7 +656,7 @@ bool EV_CocoaMenu::menuEvent(XAP_Menu_Id menuid)
 
 	XAP_Frame * frame = XAP_App::getApp()->getLastFocussedFrame();
 
-	AV_View * view = frame ? frame->getCurrentView() : nullptr;
+	AV_View * view = frame ? frame->getCurrentView() : 0;
 
 	return invokeMenuMethod(view, pEM, script_name);
 }
@@ -669,7 +670,7 @@ void EV_CocoaMenu::validateMenuItem(XAP_Menu_Id menuid, bool & bEnabled, bool & 
 
 	XAP_Frame * pFrame = pApp->getLastFocussedFrame();
 
-	AV_View * pView = pFrame ? pFrame->getCurrentView() : nullptr;
+	AV_View * pView = pFrame ? pFrame->getCurrentView() : 0;
 
 	const EV_Menu_ActionSet * pMenuActionSet = pApp->getMenuActionSet();
 	if (!pMenuActionSet)
@@ -716,7 +717,7 @@ void EV_CocoaMenu::validateMenuItem(XAP_Menu_Id menuid, bool & bEnabled, bool & 
 			{
 				if (!(pEM->getType() & EV_EMT_APP_METHOD))
 				{
-					bEnabled = (pView != nullptr);
+					bEnabled = (pView != NULL);
 				}
 			}
 			else
@@ -734,7 +735,7 @@ void EV_CocoaMenu::validateMenuItem(XAP_Menu_Id menuid, bool & bEnabled, bool & 
 		}
 		break;
 	case EV_MLF_BeginSubMenu:
-		bEnabled = (pView != nullptr);
+		bEnabled = (pView != 0);
 		if (menuid == AP_MENU_ID_FILE_RECENT)
 		{
 			if (!pAction->getMenuItemState(pView))
@@ -853,15 +854,15 @@ NSString* EV_CocoaMenu::_getItemCmd (const char * mnemonic, unsigned int & modif
 	modifiers = 0;
 	char * p;
 	if (strstr (mnemonic, "Alt+")) {
-		modifiers |= NSEventModifierFlagOption;
+		modifiers |= NSAlternateKeyMask;
 	}
-	if (strstr (mnemonic, "Ctrl+") != nullptr) {
-		modifiers |= NSEventModifierFlagCommand;
+	if (strstr (mnemonic, "Ctrl+") != NULL) {
+		modifiers |= NSCommandKeyMask;
 	}
-	if (strstr (mnemonic, "Shift+") != nullptr) {
+	if (strstr (mnemonic, "Shift+") != NULL) {
 		needsShift = true;
 	}
-	if ((modifiers & NSEventModifierFlagCommand) == 0) {
+	if ((modifiers & NSCommandKeyMask) == 0) {
 		p = (char *)mnemonic;
 	}
 	else {
@@ -875,11 +876,11 @@ NSString* EV_CocoaMenu::_getItemCmd (const char * mnemonic, unsigned int & modif
 
 		*keyRefKey = static_cast<UT_uint32>(c);
 
-		if (modifiers & NSEventModifierFlagOption)
+		if (modifiers & NSAlternateKeyMask)
 			*keyRefKey |= EV_COCOAMENU_MODALTERNATE;
-		if (modifiers & NSEventModifierFlagCommand)
+		if (modifiers & NSCommandKeyMask)
 			*keyRefKey |= EV_COCOAMENU_MODCOMMAND;
-		if (modifiers & NSEventModifierFlagShift)
+		if (modifiers & NSShiftKeyMask)
 			*keyRefKey |= EV_COCOAMENU_MODSHIFT;
 	}
 	NSString *shortcut = nil;
@@ -953,13 +954,13 @@ NSString* EV_CocoaMenu::_getItemCmd (const char * mnemonic, unsigned int & modif
 {
 	m_KeyRef.key = static_cast<UT_uint32>(c);
 
-	if (modifierFlags & NSEventModifierFlagShift)
+	if (modifierFlags & NSShiftKeyMask    )
 		m_KeyRef.key |= EV_COCOAMENU_MODSHIFT;
-	if (modifierFlags & NSEventModifierFlagControl)
+	if (modifierFlags & NSControlKeyMask  )
 		m_KeyRef.key |= EV_COCOAMENU_MODCONTROL;
-	if (modifierFlags & NSEventModifierFlagOption)
+	if (modifierFlags & NSAlternateKeyMask)
 		m_KeyRef.key |= EV_COCOAMENU_MODALTERNATE;
-	if (modifierFlags & NSEventModifierFlagCommand)
+	if (modifierFlags & NSCommandKeyMask  )
 		m_KeyRef.key |= EV_COCOAMENU_MODCOMMAND; // I suspect that this one is necessarily true...
 
 	return (m_MenuBar->lookupCommandKey (&m_KeyRef) ? YES : NO);
@@ -1103,9 +1104,9 @@ void EV_CocoaMenuBar::addCommandKey (const struct EV_CocoaCommandKeyRef * keyRef
 	}
 	
 	if (bVisible)
-		[self setState:NSControlStateValueOn];
+		[self setState:NSOnState];
 	else
-		[self setState:NSControlStateValueOff];
+		[self setState:NSOffState];
 }
 
 @end
@@ -1139,9 +1140,9 @@ void EV_CocoaMenuBar::addCommandKey (const struct EV_CocoaCommandKeyRef * keyRef
 	NSWindow * window = static_cast<XAP_CocoaFrameImpl *>(m_pFrame->getFrameImpl())->getTopLevelWindow();
 
 	if ([window isKeyWindow])
-		[self setState:NSControlStateValueOn];
+		[self setState:NSOnState];
 	else
-		[self setState:NSControlStateValueOff];
+		[self setState:NSOffState];
 }
 
 @end
@@ -1238,7 +1239,7 @@ EV_CocoaDockMenu * EV_CocoaMenuBar::synthesizeDockMenu(const UT_Vector & vecDocs
 				[pMenuItem setTarget:pMenuItem];
 				if (pFrame->getCurrentView()->isActive())
 				{
-					[pMenuItem setState:NSControlStateValueOn];
+					[pMenuItem setState:NSOnState];
 				}
 				[pDockMenu addItem:pMenuItem];
 				[pMenuItem release];

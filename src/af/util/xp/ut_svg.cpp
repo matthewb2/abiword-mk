@@ -43,10 +43,10 @@ UT_svg::UT_svg(GR_Graphics* pG,ParseMode ePM) :
 	m_bIsText(false),
 	m_bIsTSpan(false),
 	m_bHasTSpan(false),
-	cb_userdata(nullptr),
-	cb_start(nullptr),
-	cb_end(nullptr),
-	cb_text(nullptr)
+	cb_userdata(0),
+	cb_start(0),
+	cb_end(0),
+	cb_text(0)
 {
 	// flags like m_bIsText need to be set in _recognizeContent()
 }
@@ -71,14 +71,13 @@ const char * UT_svg::getAttribute (const char * name,const char ** atts)
   if (*name == 0)
     {
       UT_DEBUGMSG(("SVG: UT_svg::getAttribute passed empty string as name!"));
-      return nullptr;
+      return (0);
     }
-  if (*atts == nullptr)
-    return nullptr; // no attributes?
+  if (*atts == 0) return (0); // no attributes?
 
   char c = *name;
   const char ** attr = atts;
-  const char * attr_value = nullptr;
+  const char * attr_value = 0;
 
   while (*attr)
     {
@@ -125,7 +124,7 @@ bool UT_SVG_getDimensions(const UT_ConstByteBufPtr & pBB, GR_Graphics* pG,
 bool UT_SVG_recognizeContent(const char* szBuf,UT_uint32 iNumbytes)
 {
   UT_UNUSED(iNumbytes);
-  return (strstr(szBuf, "<svg") != nullptr || strstr(szBuf, "<!DOCTYPE svg") != nullptr);
+  return (strstr(szBuf, "<svg") != NULL || strstr(szBuf, "<!DOCTYPE svg") != NULL);
 }
 
 static bool _recognizeContent(const char* buffer,UT_uint32 buflen,UT_svg* data)
@@ -152,9 +151,9 @@ static void _css_length (const char *str,GR_Graphics* pG,
 
    	if (dim != DIM_PX && dim != DIM_none)
 	{
-		if (pG == nullptr)
+		if (pG == 0)
 		{
-			*iDisplayLength = static_cast<UT_sint32>((UT_convertToInches(str) * 72.0) + 0.05);
+			*iDisplayLength = static_cast<UT_sint32>((UT_convertToInches(str) * 72.0) + 0.05);    //pascal isn't here 0.5 ?
 		}
 		else
 		{
@@ -311,8 +310,7 @@ void UT_svg::charData (const gchar * str, int len) // non-terminated string
 {
 	if (m_bContinue == false) return;
 
-	if ((m_ePM != pm_parse) || (cb_text == nullptr))
-		return;
+	if ((m_ePM!=pm_parse) || (cb_text==0)) return;
 
 	if ((m_bIsText && (m_bHasTSpan==false)) || m_bIsTSpan)
 	{
@@ -592,7 +590,7 @@ static bool BNF_number (const char ** pptr, float * number) // number
 {
 	const char * ptr = *pptr;
 	const char * number_start = ptr;
-	const char * number_end = nullptr;
+	const char * number_end = 0;
 
 	bool bValid = false;
 
@@ -716,14 +714,13 @@ static bool BNF_number (const char ** pptr, float * number) // number
  * @param the "transform" attribute
  *
  * @return Returns \b false if there is parse error; otherwise \b true, even if \b transformAttribute is
- *         \b nullptr (equivalent to no transform).
+ *         \b NULL (equivalent to no transform).
  */
 bool UT_SVGMatrix::applyTransform (UT_SVGMatrix * currentMatrix,const char * transformAttribute)
 {
   bool bParseError = false;
 
-  if (transformAttribute == nullptr)
-    return !bParseError;
+  if (transformAttribute == 0) return !bParseError;
 
   UT_ASSERT(currentMatrix);
 

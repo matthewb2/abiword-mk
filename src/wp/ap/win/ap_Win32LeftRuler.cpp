@@ -1,19 +1,19 @@
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
  */
 
@@ -43,8 +43,8 @@ static wchar_t s_LeftRulerWndClassName[256];
 AP_Win32LeftRuler::AP_Win32LeftRuler(XAP_Frame * pFrame)
 	: AP_LeftRuler(pFrame)
 {
-	m_pG = nullptr;
-	m_hwndLeftRuler = nullptr;
+	m_pG = NULL;
+	m_hwndLeftRuler = NULL;
 }
 
 AP_Win32LeftRuler::~AP_Win32LeftRuler(void)
@@ -65,7 +65,7 @@ void AP_Win32LeftRuler::setView(AV_View * pView)
 	DELETEP(m_pG);
 	GR_Win32AllocInfo ai(GetDC(m_hwndLeftRuler), m_hwndLeftRuler);
 	GR_Win32Graphics * pG = (GR_Win32Graphics *)XAP_App::getApp()->newGraphics(ai);
-	
+
 	m_pG = pG;
 	UT_return_if_fail (m_pG);
 
@@ -78,15 +78,15 @@ bool AP_Win32LeftRuler::registerClass(XAP_Win32App * app)
 {
 	ATOM a;
 	UT_Win32LocaleString str;
- 	
+
 	str.fromASCII (app->getApplicationName());
 	// register class for the left ruler
 	swprintf(s_LeftRulerWndClassName, L"%sLeftRuler",  str.c_str());
 
 	a = UT_RegisterClassEx(CS_DBLCLKS | CS_OWNDC, AP_Win32LeftRuler::_LeftRulerWndProc, app->getInstance(),
-						   nullptr, LoadCursor(nullptr, IDC_ARROW), GetSysColorBrush(COLOR_BTNFACE), nullptr,
-						   nullptr, s_LeftRulerWndClassName);
-	
+						   NULL, LoadCursor(NULL, IDC_ARROW), GetSysColorBrush(COLOR_BTNFACE), NULL,
+						   NULL, s_LeftRulerWndClassName);
+
 	UT_ASSERT_HARMLESS(a);
 
 	return true;
@@ -96,24 +96,24 @@ HWND AP_Win32LeftRuler::createWindow(HWND hwndContainer,
 									UT_uint32 left, UT_uint32 top,
 									UT_uint32 height)
 {
-		
+
 	XAP_Win32App * app = static_cast<XAP_Win32App *>(XAP_App::getApp());
-	m_hwndLeftRuler = UT_CreateWindowEx(0, s_LeftRulerWndClassName, nullptr,
+	m_hwndLeftRuler = UT_CreateWindowEx(0, s_LeftRulerWndClassName, NULL,
 									 WS_CHILD | WS_VISIBLE,
 									 left, top, s_iFixedWidth, height,
-									 hwndContainer, nullptr, app->getInstance(), nullptr);
-	UT_return_val_if_fail (m_hwndLeftRuler, nullptr);
+									 hwndContainer, NULL, app->getInstance(), NULL);
+	UT_return_val_if_fail (m_hwndLeftRuler,0);
 	SWL(m_hwndLeftRuler, this);
-	
-	
+
+
 	DELETEP(m_pG);
 	GR_Win32AllocInfo ai(GetDC(m_hwndLeftRuler), m_hwndLeftRuler);
 	GR_Win32Graphics * pG = (GR_Win32Graphics *)XAP_App::getApp()->newGraphics(ai);
 
 	m_pG = pG;
-	UT_return_val_if_fail (pG, nullptr);
+	UT_return_val_if_fail (pG, 0);
 	pG->init3dColors();
-	
+
 	RECT rSize;
 	GetClientRect(m_hwndLeftRuler,&rSize);
 	setHeight(rSize.bottom);
@@ -135,7 +135,7 @@ static EV_EditModifierState s_GetEMS(WPARAM fwKeys)
 
 	return ems;
 }
-	
+
 LRESULT CALLBACK AP_Win32LeftRuler::_LeftRulerWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
 	// this is a static member function.
@@ -146,7 +146,7 @@ LRESULT CALLBACK AP_Win32LeftRuler::_LeftRulerWndProc(HWND hwnd, UINT iMsg, WPAR
 		return UT_DefWindowProc(hwnd, iMsg, wParam, lParam);
 
 	GR_Win32Graphics * pG = static_cast<GR_Win32Graphics *>(pRuler->m_pG);
-		
+
 	switch (iMsg)
 	{
 	case WM_LBUTTONDOWN:
@@ -156,7 +156,7 @@ LRESULT CALLBACK AP_Win32LeftRuler::_LeftRulerWndProc(HWND hwnd, UINT iMsg, WPAR
 			pG->handleSetCursorMessage();
 		}
 		return 0;
-		
+
 	case WM_MBUTTONDOWN:
 		SetCapture(hwnd);
 		pRuler->mousePress(s_GetEMS(wParam),EV_EMB_BUTTON2,pG->tlu(LOWORD(lParam)),pG->tlu(HIWORD(lParam)));
@@ -164,7 +164,7 @@ LRESULT CALLBACK AP_Win32LeftRuler::_LeftRulerWndProc(HWND hwnd, UINT iMsg, WPAR
 			pG->handleSetCursorMessage();
 		}
 		return 0;
-		
+
 	case WM_RBUTTONDOWN:
 		SetCapture(hwnd);
 		pRuler->mousePress(s_GetEMS(wParam),EV_EMB_BUTTON3,pG->tlu(LOWORD(lParam)),pG->tlu(HIWORD(lParam)));
@@ -172,7 +172,7 @@ LRESULT CALLBACK AP_Win32LeftRuler::_LeftRulerWndProc(HWND hwnd, UINT iMsg, WPAR
 			pG->handleSetCursorMessage();
 		}
 		return 0;
-		
+
 	case WM_MOUSEMOVE:
 		pRuler->mouseMotion(s_GetEMS(wParam),pG->tlu(signedLoWord(lParam)),pG->tlu(signedHiWord(lParam)));
 		return 0;
@@ -186,7 +186,7 @@ LRESULT CALLBACK AP_Win32LeftRuler::_LeftRulerWndProc(HWND hwnd, UINT iMsg, WPAR
 		pRuler->mouseRelease(s_GetEMS(wParam),EV_EMB_BUTTON2,pG->tlu(signedLoWord(lParam)),pG->tlu(signedHiWord(lParam)));
 		ReleaseCapture();
 		return 0;
-		
+
 	case WM_RBUTTONUP:
 		pRuler->mouseRelease(s_GetEMS(wParam),EV_EMB_BUTTON3,pG->tlu(signedLoWord(lParam)),pG->tlu(signedHiWord(lParam)));
 		ReleaseCapture();

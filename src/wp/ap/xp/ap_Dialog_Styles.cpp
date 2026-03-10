@@ -1,7 +1,6 @@
 /* -*- mode: C++; tab-width: 4; c-basic-offset: 4;  indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2021 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -55,9 +54,9 @@ AP_Dialog_Styles::AP_Dialog_Styles(XAP_DialogFactory * pDlgFactory, XAP_Dialog_I
 {
 
 	m_answer = a_OK;
-	m_pParaPreview = nullptr;
-	m_pCharPreview = nullptr;
-	m_pAbiPreview = nullptr;
+	m_pParaPreview = NULL;
+	m_pCharPreview = NULL;
+	m_pAbiPreview = NULL;
 }
 
 AP_Dialog_Styles::~AP_Dialog_Styles(void)
@@ -117,11 +116,11 @@ void AP_Dialog_Styles::fillVecFromCurrentPoint(void)
  */
 void AP_Dialog_Styles::fillVecWithProps(const gchar * szStyle, bool bReplaceAttributes = true)
 {
-	PD_Style * pStyle = nullptr;
+	PD_Style * pStyle = NULL;
 	m_vecAllProps.clear();
 	if( bReplaceAttributes)
 		m_vecAllAttribs.clear();
-	if(szStyle == nullptr || ! getDoc()->getStyle(szStyle,&pStyle))
+	if(szStyle == NULL || ! getDoc()->getStyle(szStyle,&pStyle))
 	{
 		return;
 	}
@@ -148,7 +147,7 @@ void AP_Dialog_Styles::fillVecWithProps(const gchar * szStyle, bool bReplaceAttr
 	for(i = 0; i < nParaFlds; i++)
 	{
 		const gchar * szName = paraFields[i];
-		const gchar * szValue = nullptr;
+		const gchar * szValue = NULL;
 		pStyle->getProperty(szName,szValue);
 		if(szValue) {
 			PP_addOrSetAttribute(szName, szValue, m_vecAllProps);
@@ -160,7 +159,7 @@ void AP_Dialog_Styles::fillVecWithProps(const gchar * szStyle, bool bReplaceAttr
 	for(i = 0; i < nCharFlds; i++)
 	{
 		const gchar * szName = charFields[i];
-		const gchar * szValue = nullptr;
+		const gchar * szValue = NULL;
 		pStyle->getProperty(szName,szValue);
 		if(szValue)
 		{
@@ -177,7 +176,7 @@ void AP_Dialog_Styles::fillVecWithProps(const gchar * szStyle, bool bReplaceAttr
 		for(i = 0; i < nattribs; i++)
 		{
 			const gchar * szName = attribs[i];
-			const gchar * szValue = nullptr;
+			const gchar * szValue = NULL;
 			pStyle->getAttributeExpand(szName,szValue);
 			if(szValue) {
 				PP_addOrSetAttribute(szName, szValue, m_vecAllAttribs);
@@ -202,19 +201,19 @@ const gchar * AP_Dialog_Styles::getVecVal(const UT_Vector *v, const gchar * szPr
 {
 	UT_sint32 i = v->getItemCount();
 	if(i <= 0)
-		return nullptr;
+		return NULL;
 	UT_sint32 j;
-	const gchar * pszV = nullptr;
+	const gchar * pszV = NULL;
 	for(j= 0; j<i ;j=j+2)
 	{
 		pszV = (const gchar *) v->getNthItem(j);
-		if( (pszV != nullptr) && (strcmp( pszV,szProp) == 0))
+		if( (pszV != NULL) && (strcmp( pszV,szProp) == 0))
 			break;
 	}
 	if( j < i )
 		return  (const gchar *) v->getNthItem(j+1);
 	else
-		return nullptr;
+		return NULL;
 }
 
 /*!
@@ -322,11 +321,11 @@ void AP_Dialog_Styles::ModifyFont(void)
 	const std::string & sDecoration = PP_getAttribute("text-decoration", m_vecAllProps);
 	if (!sDecoration.empty())
 	{
-		bUnderline2 = (strstr(sDecoration.c_str(), "underline") != nullptr);
-		bOverline2 = (strstr(sDecoration.c_str(), "overline") != nullptr);
-		bStrikeOut2 = (strstr(sDecoration.c_str(), "line-through") != nullptr);
-		bTopline2 = (strstr(sDecoration.c_str(), "topline") != nullptr);
-		bBottomline2 = (strstr(sDecoration.c_str(), "bottomline") != nullptr);
+		bUnderline2 = (strstr(sDecoration.c_str(), "underline") != NULL);
+		bOverline2 = (strstr(sDecoration.c_str(), "overline") != NULL);
+		bStrikeOut2 = (strstr(sDecoration.c_str(), "line-through") != NULL);
+		bTopline2 = (strstr(sDecoration.c_str(), "topline") != NULL);
+		bBottomline2 = (strstr(sDecoration.c_str(), "bottomline") != NULL);
 	}
 	pDialog->setFontDecoration(bUnderline2,bOverline2,bStrikeOut2,bTopline2,bBottomline2);
 /*
@@ -334,7 +333,7 @@ void AP_Dialog_Styles::ModifyFont(void)
 	s = UT_getAttribute("dir", props_in);
 	if (s)
 	{
-	     bDirection = (strstr(s, "rtl") != nullptr);
+	     bDirection = (strstr(s, "rtl") != NULL);
 	}
 	pDialog->setDirection(bDirection);
 */
@@ -692,12 +691,13 @@ void AP_Dialog_Styles::ModifyParagraph(void)
  */
 void AP_Dialog_Styles::updateCurrentStyle(void)
 {
-	if(m_pAbiPreview == nullptr)
+	if(m_pAbiPreview == NULL)
 		return;
+	UT_sint32 i = 0;
 	if(m_vecAllProps.empty()) {
 		return;
 	}
-	PD_Style * pStyle = nullptr;
+	PD_Style * pStyle = NULL;
 	getLDoc()->getStyle("tmp", &pStyle);
 //
 // clear out old description
@@ -710,13 +710,16 @@ void AP_Dialog_Styles::updateCurrentStyle(void)
 	setModifyDescription (m_curStyleDesc.c_str());
 	const std::string & szBasedon = PP_getAttribute("basedon", m_vecAllAttribs);
 	std::string fullProps;
-	PD_Style * pBasedon = nullptr;
-	if (!szBasedon.empty() && m_pDoc->getStyle(szBasedon.c_str(), &pBasedon))
+	PD_Style * pBasedon = NULL;
+	if(!szBasedon.empty() && m_pDoc->getStyle(szBasedon.c_str(), &pBasedon))
 	{
-		PP_PropertyVector vecProps;
-		pBasedon->getAllProperties(vecProps, 0);
-		for (PP_PropertyVector::size_type i = 0; i < vecProps.size(); i += 2)	{
-			UT_std_string_setProperty(fullProps, vecProps[i], vecProps[i + 1]);
+		UT_Vector vecProps;
+		pBasedon->getAllProperties(&vecProps,0);
+		for(i=0; i<vecProps.getItemCount(); i+=2)
+		{
+			std::string sProp = (const char*)vecProps.getNthItem(i);
+			std::string sVal = (const char*)vecProps.getNthItem(i+1);
+			UT_std_string_setProperty(fullProps,sProp,sVal);
 		}
 	}
 //
@@ -724,7 +727,7 @@ void AP_Dialog_Styles::updateCurrentStyle(void)
 //
 	UT_std_string_addPropertyString(fullProps, m_curStyleDesc);
 
-	if( pStyle == nullptr)
+	if( pStyle == NULL)
 	{
 		const PP_PropertyVector attrib = {
 			PT_NAME_ATTRIBUTE_NAME, "tmp",
@@ -745,7 +748,7 @@ void AP_Dialog_Styles::updateCurrentStyle(void)
 	}
 	getLView()->setPoint(m_posFocus+1);
 	getLView()->setStyle("tmp");
-	invalidatePreview();
+	drawLocal();
 }
 
 
@@ -769,12 +772,12 @@ bool AP_Dialog_Styles::createNewStyle(const gchar * szName)
 //
 // Append the new style to the main document
 //
-	PD_Style * pStyle = nullptr;
+	PD_Style * pStyle = NULL;
 
 	UT_return_val_if_fail (szName, false);
 
 	getDoc()->getStyle("szName", &pStyle);
-	if(pStyle != nullptr)
+	if(pStyle != NULL)
 		return false;
 //
 // Assemble the attributes we need for this new style
@@ -812,7 +815,7 @@ bool AP_Dialog_Styles::applyModifiedStyleToDoc(void)
 // Set the style in the main document
 //
 	const gchar * szStyle = getCurrentStyle();
-	if(szStyle == nullptr)
+	if(szStyle == NULL)
 		return false;
 //
 // This creates a new indexAP from the attributes/properties here.
@@ -957,10 +960,11 @@ PD_Document * AP_Dialog_Styles::getLDoc(void) const
 /*!
  * This updates the mini-Abi in the second pane preview.
  */
-void  AP_Dialog_Styles::invalidatePreview(void)
+void  AP_Dialog_Styles::drawLocal(void)
 {
-    if (m_pAbiPreview) {
-        m_pAbiPreview->queueDraw();
+    if(m_pAbiPreview)
+    {
+	m_pAbiPreview->draw();
     }
 }
 
@@ -1016,7 +1020,7 @@ void AP_Dialog_Styles::_populateAbiPreview(bool isNew)
 	static std::string szFGColor;
 	UT_RGBColor FGColor(0,0,0);
 	UT_RGBColor BGColor(255,255,255);
-	const UT_RGBColor * pageCol = nullptr;
+	const UT_RGBColor * pageCol = NULL;
 	getLView()->setStyle("Normal");
 
 	PP_PropertyVector props_in;
@@ -1062,7 +1066,7 @@ void AP_Dialog_Styles::_populateAbiPreview(bool isNew)
 // Second Paragraph in focus. Our Vectors containing the current settings have
 // been filled from calls in the platform layer.
 //
-	PD_Style * pStyle = nullptr;
+	PD_Style * pStyle = NULL;
 	getLDoc()->getStyle("tmp", &pStyle);
 
 	m_curStyleDesc = PP_makePropString(m_vecAllProps);
@@ -1071,7 +1075,7 @@ void AP_Dialog_Styles::_populateAbiPreview(bool isNew)
 //
 	setModifyDescription (m_curStyleDesc.c_str());
 	xxx_UT_DEBUGMSG(("Style desc is %s \n",m_curStyleDesc.c_str()));
-	if( pStyle == nullptr)
+	if( pStyle == NULL)
 	{
 		if(m_curStyleDesc.empty()) {
 			m_curStyleDesc = "font-style:normal";
@@ -1156,8 +1160,8 @@ void AP_Dialog_Styles::event_paraPreviewUpdated (const gchar * pageLeftMargin,
 	AP_Dialog_Paragraph::tIndentState tIndent = AP_Dialog_Paragraph::indent_NONE;
 	AP_Dialog_Paragraph::tSpacingState tSpacing = AP_Dialog_Paragraph::spacing_MULTIPLE;
 
-	const char * sz = nullptr;
-	const char * pPlusFound = nullptr;
+	const char * sz = NULL;
+	const char * pPlusFound = NULL;
 
 	UT_return_if_fail (m_pParaPreview);
 
@@ -1220,7 +1224,7 @@ void AP_Dialog_Styles::event_paraPreviewUpdated (const gchar * pageLeftMargin,
 							   tSpacing);
 
 	// force a redraw
-	m_pParaPreview->queueDraw();
+	m_pParaPreview->draw();
 }
 
 /*!
@@ -1232,7 +1236,7 @@ void AP_Dialog_Styles::event_charPreviewUpdated (void) const
 
 	// force a redraw
 	m_pCharPreview->setVecProperties( &m_mapCharProps);
-	m_pCharPreview->queueDraw();
+	m_pCharPreview->draw();
 }
 
 /*!
@@ -1241,8 +1245,8 @@ void AP_Dialog_Styles::event_charPreviewUpdated (void) const
  */
 void AP_Dialog_Styles::_populatePreviews(bool isModify)
 {
-	PD_Style * pStyle = nullptr;
-	const char * szStyle = nullptr;
+	PD_Style * pStyle = NULL;
+	const char * szStyle = NULL;
 	const static gchar * paraFields[] = {"text-align", "text-indent", "margin-left", "margin-right", "margin-top", "margin-bottom", "line-height","tabstops","start-value","list-delim", "list-style","field-font","list-decimal","field-color", "keep-together","keep-with-next","orphans","widows","dom-dir"};
 	const size_t nParaFlds = sizeof(paraFields)/sizeof(paraFields[0]);
 	const gchar * paraValues [nParaFlds];
@@ -1278,14 +1282,14 @@ void AP_Dialog_Styles::_populatePreviews(bool isModify)
 		for(i = 0; i < nParaFlds; i++)
 		{
 			const gchar * szName = paraFields[i];
-			const gchar * szValue = nullptr;
+			const gchar * szValue = NULL;
 			pStyle->getProperty(szName,szValue);
-			if (szValue == nullptr)
+			if (szValue == NULL)
 			{
 				pStyle->getPropertyExpand(szName,szValue);
-				if (szValue == nullptr)
+				if (szValue == NULL)
 				{
-					paraValues[i] = nullptr;
+					paraValues[i] = 0;
 					continue;
 				}
 				else
@@ -1313,12 +1317,12 @@ void AP_Dialog_Styles::_populatePreviews(bool isModify)
 		for(i = 0; i < nCharFlds; i++)
 		{
 			const gchar * szName = charFields[i];
-			const gchar * szValue = nullptr;
+			const gchar * szValue = NULL;
 			pStyle->getProperty(szName,szValue);
-			if (szValue == nullptr)
+			if (szValue == NULL)
 			{
 				pStyle->getPropertyExpand(szName,szValue);
-				if (szValue == nullptr)
+				if (szValue == NULL)
 				{
 					continue;
 				}

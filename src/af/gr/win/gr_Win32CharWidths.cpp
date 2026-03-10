@@ -122,7 +122,7 @@ void GR_Win32CharWidths::setCharWidthsOfRange(HDC hdc, UT_UCSChar c0, UT_UCSChar
 					SIZE Size;
 					char str[sizeof(UT_UCSChar)];
 					int iConverted = WideCharToMultiByte(CP_ACP, 0, (LPCWSTR) &k, 1,
-														 str, sizeof(str), nullptr, nullptr);
+														 str, sizeof(str), NULL, NULL);
 					GetTextExtentPoint32A(hdc, str, iConverted, &Size);
 					setWidth(k, Size.cx);
 				}
@@ -196,17 +196,17 @@ void GR_Win32CharWidths::setCharWidthsOfRange(HDC hdc, UT_UCSChar c0, UT_UCSChar
 									  FORMAT_MESSAGE_ALLOCATE_BUFFER | 
 									  FORMAT_MESSAGE_FROM_SYSTEM | 
 									  FORMAT_MESSAGE_IGNORE_INSERTS,
-									  nullptr,
+									  NULL,
 									  iErrorCode,
 									  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
 									  (LPWSTR) &lpMsgBuf,
 									  0,
-									  nullptr 
+									  NULL 
 									  );
 						// Process any inserts in lpMsgBuf.
 						// ...
 						// Display the string.
-						//MessageBox( nullptr, (LPCTSTR)lpMsgBuf, "Error", MB_OK | MB_ICONINFORMATION );
+						//MessageBox( NULL, (LPCTSTR)lpMsgBuf, "Error", MB_OK | MB_ICONINFORMATION );
 						UT_DEBUGMSG(("char width error: %s\n", lpMsgBuf));
 						// Free the buffer.
 						LocalFree( lpMsgBuf );
@@ -253,8 +253,8 @@ bool GR_Win32CharWidths::_doesGlyphExist(UT_UCS4Char g)
 void GR_Win32CharWidths::_retrieveFontInfo(HDC hdc)
 {
 	// retrieve CMAP table for this font
-	DWORD iTableSize = GetFontData(hdc, CMAP, 0, nullptr, 0);
-	char * buff = nullptr, * p;
+	DWORD iTableSize = GetFontData(hdc, CMAP, 0, NULL, 0);
+	char * buff = NULL, * p;
 	UT_uint16 i, j, k;
 	UT_uint16 iTCount;
 	

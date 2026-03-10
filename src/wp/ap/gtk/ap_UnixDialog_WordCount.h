@@ -1,4 +1,3 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 2000 AbiSource, Inc.
  * Copyright (C) 2005,2011 Hubert Figuiere
@@ -24,7 +23,6 @@
 
 #include <string>
 
-#include "xap_UnixDialog.h"
 #include "ap_Dialog_WordCount.h"
 #include "ut_timer.h"
 
@@ -32,18 +30,16 @@ class XAP_UnixFrame;
 
 /*****************************************************************/
 
-class AP_UnixDialog_WordCount
-	: public AP_Dialog_WordCount
-	, public XAP_UnixDialog
+class AP_UnixDialog_WordCount: public AP_Dialog_WordCount
 {
 public:
 	AP_UnixDialog_WordCount(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_UnixDialog_WordCount(void);
 
-	virtual void runModeless(XAP_Frame * pFrame) override;
-	virtual void destroy(void) override;
-	virtual void activate(void) override;
-	virtual void notifyActiveFrame(XAP_Frame *pFrame) override;
+	virtual void			runModeless(XAP_Frame * pFrame);
+	virtual void			destroy(void);
+	virtual void			activate(void);
+	virtual void			notifyActiveFrame(XAP_Frame *pFrame);
 
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 
@@ -53,8 +49,8 @@ public:
 	void			event_WindowDelete(void);
 
 protected:
-	virtual XAP_Widget *getWidget(xap_widget_id wid) override;
-	virtual void constructDialog(void) override;
+	virtual XAP_Widget *getWidget(xap_widget_id wid);
+	virtual void constructDialog(void);
 
 	static void s_response(GtkWidget * wid, gint id, AP_UnixDialog_WordCount * me ) ;
 
@@ -64,6 +60,7 @@ protected:
 	static void                     autoupdateWC(UT_Worker * pTimer);
 
 	// pointers to widgets we need to query/set
+	GtkWidget * m_windowMain;
 
 	// Labels for the Word Count data
 	GtkWidget * m_labelWCount;

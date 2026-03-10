@@ -50,7 +50,7 @@ XAP_CocoaClipboard::~XAP_CocoaClipboard()
 void XAP_CocoaClipboard::prepareForText(void)
 {
 	NSPasteboard* pb = _getPasteboard();
-	[pb declareTypes:[NSArray arrayWithObjects:NSPasteboardTypeRTF, NSPasteboardTypeString, nil] owner:nil];
+	[pb declareTypes:[NSArray arrayWithObjects:NSRTFPboardType, NSStringPboardType, nil] owner:nil];
 }
 
 bool XAP_CocoaClipboard::addData(const char* format, void* pData, UT_sint32 iNumBytes)
@@ -58,10 +58,10 @@ bool XAP_CocoaClipboard::addData(const char* format, void* pData, UT_sint32 iNum
 	NSPasteboard* pb = _getPasteboard();
 	NSData* data = [[NSData alloc] initWithBytes:pData length:iNumBytes];
 	if (strcmp(format, XAP_CLIPBOARD_RTF) == 0) {
-		[pb setData:data forType:NSPasteboardTypeRTF];
+		[pb setData:data forType:NSRTFPboardType];
 	}
 	else if (strcmp(format, XAP_CLIPBOARD_TEXTPLAIN_8BIT) == 0) {
-		[pb setData:data forType:NSPasteboardTypeString];
+		[pb setData:data forType:NSStringPboardType];
 	}
 	[data release];
 	return true;
@@ -139,13 +139,13 @@ NSString *XAP_CocoaClipboard::_abi2ns_cbType(const char *cbType)
 	NSString *pbType = nil;
 	
 	if (strcmp(cbType, XAP_CLIPBOARD_RTF) == 0) {
-		pbType = NSPasteboardTypeRTF;
+		pbType = NSRTFPboardType;
 	}
 	else if (strcmp(cbType, XAP_CLIPBOARD_TEXTPLAIN_8BIT) == 0) {
-		pbType = NSPasteboardTypeString;
+		pbType = NSStringPboardType;
 	}
 	else if (strcmp(cbType, XAP_CLIPBOARD_IMAGE) == 0) {
-		pbType = NSPasteboardTypeTIFF;
+		pbType = NSTIFFPboardType;
 	}
 	return pbType;
 }

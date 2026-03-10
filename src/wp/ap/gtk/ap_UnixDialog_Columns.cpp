@@ -1,6 +1,6 @@
 /* AbiWord
  * Copyright (C) 1998-2000 AbiSource, Inc.
- * Copyright (c) 2009-2021 Hubert Figuière
+ * Copyright (c) 2009 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -34,7 +34,6 @@
 // like centering them, measuring them, etc.
 #include "xap_UnixDialogHelper.h"
 #include "xap_GtkSignalBlocker.h"
-#include "xap_GtkUtils.h"
 
 #include "xap_App.h"
 #include "xap_UnixApp.h"
@@ -111,7 +110,7 @@ bool findIconDataByName(const char * szName, const char *** pIconData, UT_uint32
 
 bool label_button_with_abi_pixmap( GtkWidget * button, const char * szIconName)
 {
-        const char ** pIconData = nullptr;
+        const char ** pIconData = NULL;
 	UT_uint32 sizeofIconData = 0;		// number of cells in the array
 	bool bFound = findIconDataByName(szIconName, &pIconData, &sizeofIconData);
 	if (!bFound)
@@ -142,24 +141,24 @@ XAP_Dialog * AP_UnixDialog_Columns::static_constructor(XAP_DialogFactory * pFact
 AP_UnixDialog_Columns::AP_UnixDialog_Columns(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id)
 	: AP_Dialog_Columns(pDlgFactory,id)
 {
-	m_windowMain = nullptr;
+	m_windowMain = NULL;
 
-	m_wlineBetween = nullptr;
-	m_wtoggleOne = nullptr;
-	m_wtoggleTwo = nullptr;
-	m_wpreviewArea = nullptr;
-	m_pPreviewWidget = nullptr;
-	m_wtoggleThree = nullptr;
-	m_wSpin = nullptr;
+	m_wlineBetween = NULL;
+	m_wtoggleOne = NULL;
+	m_wtoggleTwo = NULL;
+	m_wpreviewArea = NULL;
+	m_pPreviewWidget = NULL;
+	m_wtoggleThree = NULL;
+	m_wSpin = NULL;
 	m_spinHandlerID = 0;
-	m_windowMain = nullptr;
+	m_windowMain = NULL;
 	m_iSpaceAfter = 0;
 	m_iSpaceAfterID =0;
-	m_wSpaceAfterSpin = nullptr;
+	m_wSpaceAfterSpin = NULL;
 	m_iMaxColumnHeight = 0;
 	m_iMaxColumnHeightID = 0;
-	m_wMaxColumnHeightSpin = nullptr;
-	m_checkOrder = nullptr;
+	m_wMaxColumnHeightSpin = NULL;
+	m_checkOrder = NULL;
 }
 
 AP_UnixDialog_Columns::~AP_UnixDialog_Columns(void)
@@ -232,15 +231,14 @@ static void s_line_clicked(GtkWidget * widget, AP_UnixDialog_Columns * dlg)
 static gboolean s_preview_draw(GtkWidget * widget, gpointer /* data */, AP_UnixDialog_Columns * dlg)
 {
 	UT_return_val_if_fail(widget && dlg, FALSE);
-	dlg->event_previewDraw();
+	dlg->event_previewExposed();
 	return FALSE;
 }
 
 static gboolean s_window_draw(GtkWidget * widget, gpointer /* data */, AP_UnixDialog_Columns * dlg)
 {
 	UT_return_val_if_fail(widget && dlg, FALSE);
-// We shouldn't need to do this, the widget machinery should do this.
-//	dlg->event_previewInvalidate();
+	dlg->event_previewExposed();
 	return FALSE;
 }
 
@@ -273,17 +271,17 @@ void AP_UnixDialog_Columns::runModal(XAP_Frame * pFrame)
 
     {
 		XAP_GtkSignalBlocker b(G_OBJECT(m_wSpaceAfterEntry), m_iSpaceAfterID);
-		XAP_gtk_entry_set_text( GTK_ENTRY(m_wSpaceAfterEntry),getSpaceAfterString() );
+		gtk_entry_set_text( GTK_ENTRY(m_wSpaceAfterEntry),getSpaceAfterString() );
 	}
 
 	{
 		XAP_GtkSignalBlocker b(G_OBJECT(m_wMaxColumnHeightEntry), m_iMaxColumnHeightID);
-		XAP_gtk_entry_set_text( GTK_ENTRY(m_wMaxColumnHeightEntry),getHeightString() );
+		gtk_entry_set_text( GTK_ENTRY(m_wMaxColumnHeightEntry),getHeightString() );
 	}
 
 	// *** this is how we add the gc for Column Preview ***
 	// attach a new graphics context to the drawing area
-	UT_return_if_fail(m_wpreviewArea && XAP_HAS_NATIVE_WINDOW(m_wpreviewArea));
+	UT_return_if_fail(m_wpreviewArea && gtk_widget_get_window(m_wpreviewArea));
 
 	// make a new Unix GC
 	DELETEP (m_pPreviewWidget);
@@ -352,7 +350,7 @@ void AP_UnixDialog_Columns::doHeightSpin(void)
 	m_iMaxColumnHeight = val;
 	incrementMaxHeight(bIncrement);
 	//g_signal_handler_block(G_OBJECT(m_wMaxColumnHeightEntry), m_iMaxColumnHeightID);
-	XAP_gtk_entry_set_text( GTK_ENTRY(m_wMaxColumnHeightEntry),getHeightString() );
+	gtk_entry_set_text( GTK_ENTRY(m_wMaxColumnHeightEntry),getHeightString() );
 	//g_signal_handler_unblock(G_OBJECT(m_wMaxColumnHeightEntry), m_iMaxColumnHeightID);
 }
 
@@ -369,7 +367,7 @@ void  AP_UnixDialog_Columns::doSpaceAfterSpin(void)
 	m_iSpaceAfter = val;
 	incrementSpaceAfter(bIncrement);
 	//g_signal_handler_block(G_OBJECT(m_wSpaceAfterEntry), m_iSpaceAfterID);
-	XAP_gtk_entry_set_text( GTK_ENTRY(m_wSpaceAfterEntry),getSpaceAfterString() );
+	gtk_entry_set_text( GTK_ENTRY(m_wSpaceAfterEntry),getSpaceAfterString() );
 	//g_signal_handler_unblock(G_OBJECT(m_wSpaceAfterEntry),m_iSpaceAfterID);
 }
 
@@ -393,7 +391,7 @@ void AP_UnixDialog_Columns::readSpin(void)
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_wtoggleThree),FALSE);
 	}
 	setColumns( val );
-	m_pColumnsPreview->queueDraw();
+	m_pColumnsPreview->draw();
 }
 
 void AP_UnixDialog_Columns::event_Toggle( UT_uint32 icolumns)
@@ -440,7 +438,7 @@ void AP_UnixDialog_Columns::event_Toggle( UT_uint32 icolumns)
 	g_signal_handler_unblock(G_OBJECT(m_wtoggleThree),
 							   m_threeHandlerID);
 	setColumns( icolumns );
-	m_pColumnsPreview->queueDraw();
+	m_pColumnsPreview->draw();
 }
 
 
@@ -453,28 +451,28 @@ void AP_UnixDialog_Columns::event_OK(void)
 
 void AP_UnixDialog_Columns::doMaxHeightEntry(void)
 {
-	const char * szHeight = XAP_gtk_entry_get_text(GTK_ENTRY(m_wMaxColumnHeightEntry));
+	const char * szHeight = gtk_entry_get_text(GTK_ENTRY(m_wMaxColumnHeightEntry));
 	if(UT_determineDimension(szHeight,DIM_none) != DIM_none)
 	{
 		setMaxHeight(szHeight);
 
 		XAP_GtkSignalBlocker b(G_OBJECT(m_wMaxColumnHeightEntry), m_iMaxColumnHeightID);
 		int pos = gtk_editable_get_position(GTK_EDITABLE(m_wMaxColumnHeightEntry));
-		XAP_gtk_entry_set_text( GTK_ENTRY(m_wMaxColumnHeightEntry),getHeightString() );
+		gtk_entry_set_text( GTK_ENTRY(m_wMaxColumnHeightEntry),getHeightString() );
 		gtk_editable_set_position(GTK_EDITABLE(m_wMaxColumnHeightEntry), pos);
 	}
 }
 
 void AP_UnixDialog_Columns::doSpaceAfterEntry(void)
 {
-	const char * szAfter = XAP_gtk_entry_get_text(GTK_ENTRY(m_wSpaceAfterEntry));
+	const char * szAfter = gtk_entry_get_text(GTK_ENTRY(m_wSpaceAfterEntry));
 	if(UT_determineDimension(szAfter,DIM_none) != DIM_none)
 	{
 		setSpaceAfter(szAfter);
 
 		XAP_GtkSignalBlocker b(G_OBJECT(m_wSpaceAfterEntry), m_iSpaceAfterID);
 		int pos = gtk_editable_get_position(GTK_EDITABLE(m_wSpaceAfterEntry));
-		XAP_gtk_entry_set_text( GTK_ENTRY(m_wSpaceAfterEntry),getSpaceAfterString() );
+		gtk_entry_set_text( GTK_ENTRY(m_wSpaceAfterEntry),getSpaceAfterString() );
 		gtk_editable_set_position(GTK_EDITABLE(m_wSpaceAfterEntry), pos);
 	}
 }
@@ -484,16 +482,10 @@ void AP_UnixDialog_Columns::event_Cancel(void)
 	m_answer = AP_Dialog_Columns::a_CANCEL;
 }
 
-void AP_UnixDialog_Columns::event_previewInvalidate(void)
+void AP_UnixDialog_Columns::event_previewExposed(void)
 {
-	if(m_pColumnsPreview)
-	       m_pColumnsPreview->queueDraw();
-}
-
-void AP_UnixDialog_Columns::event_previewDraw(void)
-{
-	if(m_pColumnsPreview)
-	       m_pColumnsPreview->drawImmediate();
+        if(m_pColumnsPreview)
+	       m_pColumnsPreview->draw();
 }
 
 /*****************************************************************/
@@ -504,7 +496,7 @@ GtkWidget * AP_UnixDialog_Columns::_constructWindow(void)
 	GtkWidget * windowColumns;
 
 	const XAP_StringSet * pSS = m_pApp->getStringSet();
-	//	gchar * unixstr = nullptr;	// used for conversions
+	//	gchar * unixstr = NULL;	// used for conversions
 	std::string s;
 	pSS->getValueUTF8(AP_STRING_ID_DLG_Column_ColumnTitle,s);
 	
@@ -546,13 +538,13 @@ void AP_UnixDialog_Columns::_constructWindowContents(GtkWidget * windowColumns)
 	             "row-spacing", 6,
 	             "column-spacing", 12,
 	             "border-width", 5,
-	             nullptr);
+	             NULL);
 	gtk_widget_show (grid);
 	gtk_box_pack_start(GTK_BOX (windowColumns), grid, FALSE, FALSE, 6);
 
 	pSS->getValueUTF8(AP_STRING_ID_DLG_Column_Number,s);
 	s = "<b>" + s + "</b>";
-	lbColFrame = gtk_label_new(nullptr);
+	lbColFrame = gtk_label_new(NULL);
 	gtk_label_set_markup(GTK_LABEL(lbColFrame), s.c_str());
 	gtk_widget_show(lbColFrame);
 	gtk_grid_attach(GTK_GRID(grid), lbColFrame, 0, 0, 2, 1);
@@ -565,7 +557,7 @@ void AP_UnixDialog_Columns::_constructWindowContents(GtkWidget * windowColumns)
 	gtk_grid_attach(GTK_GRID(grid), wToggleOne, 0, 1, 1, 1);
 	pSS->getValueUTF8(AP_STRING_ID_DLG_Column_One,s);
 	wLabelOne = gtk_widget_new (GTK_TYPE_LABEL, "label", s.c_str(),
-                                    "xalign", 0.0, "yalign", 0.5, nullptr);
+                                    "xalign", 0.0, "yalign", 0.5, NULL);
 	gtk_widget_show(wLabelOne );
 	gtk_grid_attach(GTK_GRID(grid), wLabelOne, 1, 1, 1, 1);
 
@@ -578,7 +570,7 @@ void AP_UnixDialog_Columns::_constructWindowContents(GtkWidget * windowColumns)
 
 	pSS->getValueUTF8(AP_STRING_ID_DLG_Column_Two,s);
 	wLabelTwo = gtk_widget_new(GTK_TYPE_LABEL, "label", s.c_str(),
-                                   "xalign", 0.0, "yalign", 0.5, nullptr);
+                                   "xalign", 0.0, "yalign", 0.5, NULL);
 	gtk_widget_show(wLabelTwo );
 	gtk_grid_attach(GTK_GRID(grid), wLabelTwo, 1, 2, 1, 1);
 
@@ -592,13 +584,13 @@ void AP_UnixDialog_Columns::_constructWindowContents(GtkWidget * windowColumns)
 	pSS->getValueUTF8(AP_STRING_ID_DLG_Column_Three,s);
         
 	wLabelThree = gtk_widget_new(GTK_TYPE_LABEL, "label", s.c_str(),
-                                   "xalign", 0.0, "yalign", 0.5, nullptr);
+                                   "xalign", 0.0, "yalign", 0.5, NULL);
 	gtk_widget_show(wLabelThree);
 	gtk_grid_attach(GTK_GRID(grid), wLabelThree, 1, 3, 1, 1);
 
 	pSS->getValueUTF8(AP_STRING_ID_DLG_Column_Preview,s);
 	s = "<b>" + s + "</b>";
-	lbPrevFrame = gtk_label_new(nullptr);
+	lbPrevFrame = gtk_label_new(NULL);
 	gtk_label_set_markup(GTK_LABEL(lbPrevFrame), s.c_str());
 	gtk_widget_show(lbPrevFrame);
 	gtk_grid_attach(GTK_GRID(grid), lbPrevFrame, 3, 0, 2, 1);
@@ -654,7 +646,7 @@ void AP_UnixDialog_Columns::_constructWindowContents(GtkWidget * windowColumns)
 
 	pSS->getValueUTF8(AP_STRING_ID_DLG_Column_Number_Cols,s);
 	SpinLabel = gtk_widget_new (GTK_TYPE_LABEL, "label", s.c_str(),
-                                    "xalign", 0.0, "yalign", 0.5, nullptr);
+                                    "xalign", 0.0, "yalign", 0.5, NULL);
 	gtk_widget_show(SpinLabel);
 	gtk_widget_set_margin_top(SpinLabel, 12);
 	gtk_grid_attach(GTK_GRID(grid), SpinLabel, 0, 7, 2, 1);
@@ -674,7 +666,7 @@ void AP_UnixDialog_Columns::_constructWindowContents(GtkWidget * windowColumns)
                                                      "label", s.c_str(),
                                                      "xalign", 0.0,
                                                      "yalign", 0.5,
-                                                     nullptr);
+                                                     NULL);
 	gtk_widget_show(SpinLabelAfter);
 	gtk_grid_attach(GTK_GRID(grid), SpinLabelAfter, 0, 8, 2, 1);
 
@@ -696,7 +688,7 @@ void AP_UnixDialog_Columns::_constructWindowContents(GtkWidget * windowColumns)
           = gtk_widget_new(GTK_TYPE_LABEL,
                            "label", s.c_str(),
                            "xalign", 0.0, "yalign", 0.5,
-                           nullptr);
+                           NULL);
 	gtk_widget_show(SpinLabelColumnSize);
 	gtk_grid_attach(GTK_GRID(grid), SpinLabelColumnSize, 0, 9, 2, 1);
 

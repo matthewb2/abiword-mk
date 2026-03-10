@@ -2,7 +2,6 @@
 
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2016-2021 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -46,7 +45,7 @@
 
 bool pt_PieceTable::appendStrux(PTStruxType pts, const PP_PropertyVector & attributes, pf_Frag_Strux ** ppfs_ret)
 {
-	pf_Frag_Strux * pfs = nullptr;
+	pf_Frag_Strux * pfs = NULL;
 	if(!_makeStrux(pts, attributes, pfs) || !pfs)
 		return false;
 
@@ -63,7 +62,7 @@ bool pt_PieceTable::appendStrux(PTStruxType pts, const PP_PropertyVector & attri
 
 	pf_Frag * pfPrev = m_fragments.getLast();
 	bool bDoInsertFmt = false;
-	if(pfPrev != nullptr && pfPrev->getType() == pf_Frag::PFT_Strux)
+	if(pfPrev != NULL && pfPrev->getType() == pf_Frag::PFT_Strux)
 	{
 		pf_Frag_Strux * pfsPrev = static_cast<pf_Frag_Strux *>(pfPrev);
 		if(pfsPrev->getStruxType() == PTX_Block)
@@ -110,7 +109,7 @@ pf_Frag_Strux* pt_PieceTable::_findLastStruxOfType( pf_Frag * pfStart,
                                                     PTStruxType* stopConditions,
                                                     bool bSkipEmbededSections )
 {
-	UT_return_val_if_fail( pfStart, nullptr );
+	UT_return_val_if_fail( pfStart, NULL );
 
 	pf_Frag * pf = pfStart;
     PTStruxType* stopConditionsBegin = stopConditions;
@@ -132,7 +131,7 @@ pf_Frag_Strux* pt_PieceTable::_findLastStruxOfType( pf_Frag * pfStart,
             if( stopConditionsEnd !=
                 std::find( stopConditionsBegin, stopConditionsEnd, eStruxType ))
             {
-                return nullptr;
+                return 0;
             }
             
 			if(bSkipEmbededSections)
@@ -219,7 +218,7 @@ pf_Frag_Strux* pt_PieceTable::_findLastStruxOfType( pf_Frag * pfStart,
 			pf = pf->getPrev();
 	}
 
-	return nullptr;
+	return 0;
 }
 
 
@@ -228,7 +227,7 @@ pf_Frag_Strux* pt_PieceTable::_findLastStruxOfType( pf_Frag * pfStart,
                                                     PTStruxType pst,
                                                     bool bSkipEmbededSections )
 {
-	UT_return_val_if_fail( pfStart, nullptr );
+	UT_return_val_if_fail( pfStart, NULL );
     PTStruxType stopCondition[] = { PTX_StruxDummy };
     return _findLastStruxOfType( pfStart, pst, stopCondition, bSkipEmbededSections );
 }
@@ -252,7 +251,7 @@ bool pt_PieceTable::appendLastStruxFmt(PTStruxType pst, const PP_PropertyVector 
 	UT_return_val_if_fail (m_pts==PTS_Loading,false);
 
 	// Only a strux can be appended to an empty document
-	UT_return_val_if_fail (nullptr != m_fragments.getFirst(), false);
+	UT_return_val_if_fail (NULL != m_fragments.getFirst(), false);
 	if (!m_fragments.getFirst())
 		return false;
 
@@ -325,7 +324,7 @@ bool pt_PieceTable::appendStruxFmt(pf_Frag_Strux * pfs, const PP_PropertyVector 
 	UT_return_val_if_fail (m_pts==PTS_Loading,false);
 
 	// Only a strux can be appended to an empty document
-	UT_return_val_if_fail (nullptr != m_fragments.getFirst(), false);
+	UT_return_val_if_fail (NULL != m_fragments.getFirst(), false);
 	if (!m_fragments.getFirst())
 		return false;
 
@@ -355,7 +354,7 @@ bool pt_PieceTable::appendFmt(const PP_PropertyVector & vecAttributes)
 	UT_return_val_if_fail (m_pts==PTS_Loading, false);
 
 	// Only a strux can be appended to an empty document
-	UT_return_val_if_fail (nullptr != m_fragments.getFirst(),false);
+	UT_return_val_if_fail (NULL != m_fragments.getFirst(),false);
 
 	// create a new Attribute/Property structure in the table
 	// and set the current index to it.  the next span of text
@@ -376,7 +375,7 @@ bool pt_PieceTable::appendSpan(const UT_UCSChar * pbuf, UT_uint32 length)
 	UT_return_val_if_fail (m_pts==PTS_Loading, false);
 
 	// Only a strux can be appended to an empty document
-	UT_return_val_if_fail (nullptr != m_fragments.getFirst(),false);
+	UT_return_val_if_fail (NULL != m_fragments.getFirst(),false);
 
 	// append the text data to the end of the buffer.
 
@@ -391,7 +390,7 @@ bool pt_PieceTable::appendSpan(const UT_UCSChar * pbuf, UT_uint32 length)
 	// (perhaps the parser was a bit lazy in chunking up the data).
 
 	pf_Frag * pfLast = m_fragments.getLast();
-	if ((pfLast != nullptr) && (pfLast->getType() == pf_Frag::PFT_Text))
+	if ((pfLast != NULL) && (pfLast->getType() == pf_Frag::PFT_Text))
 	{
 		pf_Frag_Text * pfLastText = static_cast<pf_Frag_Text *>(pfLast);
 		if (   (pfLastText->getIndexAP() == loading.m_indexCurrentInlineAP)
@@ -404,7 +403,7 @@ bool pt_PieceTable::appendSpan(const UT_UCSChar * pbuf, UT_uint32 length)
 
 	// could not coalesce, so create a new fragment for this text span.
 
-	pf_Frag_Text * pft = new pf_Frag_Text(this,bi,length,loading.m_indexCurrentInlineAP,nullptr);
+	pf_Frag_Text * pft = new pf_Frag_Text(this,bi,length,loading.m_indexCurrentInlineAP,NULL);
 	if (!pft)
 		return false;
 
@@ -419,7 +418,7 @@ bool pt_PieceTable::appendSpan(const UT_UCSChar * pbuf, UT_uint32 length)
 
 bool pt_PieceTable::appendObject(PTObjectType pto, const PP_PropertyVector & attributes)
 {
-	pf_Frag_Object * pfo = nullptr;
+	pf_Frag_Object * pfo = NULL;
 	if(!_makeObject(pto,attributes,pfo) || !pfo)
 		return false;
 
@@ -430,7 +429,7 @@ bool pt_PieceTable::appendObject(PTObjectType pto, const PP_PropertyVector & att
 		UT_uint32 iXID = 0;
 		if(!pXID.empty())
 		{
-			iXID = atoi(pXID.c_str());
+			iXID = stoi(pXID);
 			pfo->setXID(iXID);
 		}
 	}
@@ -441,7 +440,7 @@ bool pt_PieceTable::appendObject(PTObjectType pto, const PP_PropertyVector & att
 
 bool pt_PieceTable::appendFmtMark(void)
 {
-	pf_Frag_FmtMark * pff = nullptr;
+	pf_Frag_FmtMark * pff = NULL;
 	if (!_makeFmtMark(pff) || !pff)
 		return false;
 
@@ -454,7 +453,7 @@ bool pt_PieceTable::insertStruxBeforeFrag(pf_Frag * pF, PTStruxType pts,
 {
 	UT_return_val_if_fail(pF , false);
 
-	pf_Frag_Strux * pfs = nullptr;
+	pf_Frag_Strux * pfs = NULL;
 	if(!_makeStrux(pts, attributes, pfs) || !pfs)
 		return false;
 
@@ -464,7 +463,7 @@ bool pt_PieceTable::insertStruxBeforeFrag(pf_Frag * pF, PTStruxType pts,
 		UT_uint32 iXID = 0;
 		if(!pXID.empty())
 		{
-			iXID = atoi(pXID.c_str());
+			iXID = stoi(pXID);
 			pfs->setXID(iXID);
 		}
 	}
@@ -488,7 +487,7 @@ bool pt_PieceTable::insertSpanBeforeFrag(pf_Frag * pf, const UT_UCSChar * p, UT_
 	UT_return_val_if_fail (m_pts==PTS_Loading, false);
 
 	// Only a strux can be appended to an empty document
-	UT_return_val_if_fail (nullptr != m_fragments.getFirst(),false);
+	UT_return_val_if_fail (NULL != m_fragments.getFirst(),false);
 
 	// cannot insert before first fragment (i.e., span cannot start a document)
 	UT_return_val_if_fail(pf && pf->getPrev() && pf != m_fragments.getFirst(), false);
@@ -501,7 +500,7 @@ bool pt_PieceTable::insertSpanBeforeFrag(pf_Frag * pf, const UT_UCSChar * p, UT_
 	// update the fragment and/or the fragment list.
 	// return true if successful.
 
-	pf_Frag_Text * pft = nullptr;
+	pf_Frag_Text * pft = NULL;
 
 	// see if the fragement before this one is a text frag ...
 	if (pf->getPrev()->getType() == pf_Frag::PFT_Text)
@@ -530,14 +529,14 @@ bool pt_PieceTable::insertSpanBeforeFrag(pf_Frag * pf, const UT_UCSChar * p, UT_
 	// fragment into the list.  first we construct a new text fragment
 	// for the data that we inserted.
 
-	pf_Frag_Text * pftNew = new pf_Frag_Text(this,bi,length,loading.m_indexCurrentInlineAP,nullptr);
+	pf_Frag_Text * pftNew = new pf_Frag_Text(this,bi,length,loading.m_indexCurrentInlineAP,NULL);
 	if (!pftNew)
 		return false;
 
 	m_fragments.insertFragBefore(pf,pftNew);
 
 	// no need to check for the new frag being continguous with the
-	// one on its right -- it cannot be, since the insertion occurred in
+	// one on its right -- it cannot be, since the insertion occured in
 	// oposite order than the fargments have in the buffer
 
 	return true;
@@ -549,7 +548,7 @@ bool pt_PieceTable::insertObjectBeforeFrag(pf_Frag * pF, PTObjectType pto,
 	// cannot insert before first fragment
 	UT_return_val_if_fail(pF && pF->getPrev() && pF != m_fragments.getFirst(), false);
 
-	pf_Frag_Object * pfo = nullptr;
+	pf_Frag_Object * pfo = NULL;
 	if(!_makeObject(pto, attributes, pfo) || !pfo)
 		return false;
 
@@ -559,7 +558,7 @@ bool pt_PieceTable::insertObjectBeforeFrag(pf_Frag * pF, PTObjectType pto,
 		UT_uint32 iXID = 0;
 		if(!pXID.empty())
 		{
-			iXID = atoi(pXID.c_str());
+			iXID = stoi(pXID);
 			pfo->setXID(iXID);
 		}
 	}
@@ -573,7 +572,7 @@ bool pt_PieceTable::insertFmtMarkBeforeFrag(pf_Frag * pF)
 	// cannot insert before first fragment
 	UT_return_val_if_fail(pF && pF->getPrev() && pF != m_fragments.getFirst(), false);
 
-	pf_Frag_FmtMark * pff = nullptr;
+	pf_Frag_FmtMark * pff = NULL;
 	if (!_makeFmtMark(pff) || !pff)
 		return false;
 
@@ -587,7 +586,7 @@ bool pt_PieceTable::insertFmtMarkBeforeFrag(pf_Frag * pF, const PP_PropertyVecto
 	// cannot insert before first fragment
 	UT_return_val_if_fail(pF && pF->getPrev() && pF != m_fragments.getFirst(), false);
 
-	pf_Frag_FmtMark * pff = nullptr;
+	pf_Frag_FmtMark * pff = NULL;
 	if (!_makeFmtMark(pff,attributes) || !pff)
 		return false;
 
@@ -643,7 +642,7 @@ bool pt_PieceTable::_makeObject(PTObjectType pto, const PP_PropertyVector & attr
 	UT_return_val_if_fail (m_pts==PTS_Loading, false);
 
 	// Only a strux can be appended to an empty document
-	UT_return_val_if_fail (nullptr != m_fragments.getFirst(), false);
+	UT_return_val_if_fail (NULL != m_fragments.getFirst(), false);
 
 	// first, store the attributes and properties and get an index to them.
 
@@ -663,7 +662,7 @@ bool pt_PieceTable::_makeFmtMark(pf_Frag_FmtMark * &pff)
 	UT_return_val_if_fail (m_pts==PTS_Loading,false);
 
 	// Only a strux can be appended to an empty document
-	UT_return_val_if_fail (nullptr != m_fragments.getFirst(),false);
+	UT_return_val_if_fail (NULL != m_fragments.getFirst(),false);
 
 	pff = new pf_Frag_FmtMark(this,loading.m_indexCurrentInlineAP);
 	if (!pff)
@@ -679,7 +678,7 @@ bool pt_PieceTable::_makeFmtMark(pf_Frag_FmtMark * &pff, const PP_PropertyVector
 	UT_return_val_if_fail (m_pts==PTS_Loading,false);
 
 	// Only a strux can be appended to an empty document
-	UT_return_val_if_fail (nullptr != m_fragments.getFirst(), false);
+	UT_return_val_if_fail (NULL != m_fragments.getFirst(), false);
 	if(attributes.empty())
 		{
 			return _makeFmtMark(pff);

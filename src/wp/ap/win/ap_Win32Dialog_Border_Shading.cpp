@@ -69,27 +69,22 @@ XAP_Dialog * AP_Win32Dialog_Border_Shading::static_constructor(XAP_DialogFactory
 AP_Win32Dialog_Border_Shading::AP_Win32Dialog_Border_Shading(XAP_DialogFactory * pDlgFactory,
 										             XAP_Dialog_Id id)
 	: AP_Dialog_Border_Shading(pDlgFactory,id),
-	m_hBitmapBottom(nullptr),
-	m_hBitmapTop(nullptr),
-	m_hBitmapRight(nullptr),
-	m_hBitmapLeft(nullptr),
-	m_pPreviewWidget(nullptr),
-	m_hwndComboEx(nullptr)
-{
-}
-
+	m_hBitmapBottom(NULL),	
+	m_hBitmapTop(NULL), 
+	m_hBitmapRight(NULL),
+	m_hBitmapLeft(NULL),
+	m_pPreviewWidget(NULL),
+	m_hwndComboEx(NULL)
+{		
+}   
+    
 AP_Win32Dialog_Border_Shading::~AP_Win32Dialog_Border_Shading(void)
 {
-	if (m_pPreviewWidget)
-          delete m_pPreviewWidget;
-	if (m_hBitmapBottom)
-          DeleteObject(m_hBitmapBottom);
-	if (m_hBitmapTop)
-          DeleteObject(m_hBitmapTop);
-	if (m_hBitmapRight)
-          DeleteObject(m_hBitmapRight);
-	if (m_hBitmapLeft)
-          DeleteObject(m_hBitmapLeft);
+	if (m_pPreviewWidget) delete m_pPreviewWidget;			
+	if (m_hBitmapBottom) DeleteObject(m_hBitmapBottom);		
+	if (m_hBitmapTop) DeleteObject(m_hBitmapTop);		
+	if (m_hBitmapRight) DeleteObject(m_hBitmapRight);		
+	if (m_hBitmapLeft) DeleteObject(m_hBitmapLeft);		
 }
 
 void AP_Win32Dialog_Border_Shading::runModeless(XAP_Frame * pFrame)
@@ -135,16 +130,16 @@ HWND AP_Win32Dialog_Border_Shading::_createComboboxEx(
 	dwStyle|=WS_CHILD|WS_VISIBLE;
 	return CreateWindowExW(0,
 						WC_COMBOBOXEXW,
-						nullptr,
-						dwStyle,
+						0,    
+						dwStyle, 
 						rc.left,
-						rc.top,
-						rc.right,
-						rc.bottom,
-						hParent,
+						rc.top, 
+						rc.right, 
+						rc.bottom, 
+						hParent,    
 						reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)),
-						hInst,
-						nullptr);
+						hInst,     
+						0);          
 }
 
 // 8/7/2010 Maleesh - Convenience constant
@@ -262,17 +257,17 @@ BOOL AP_Win32Dialog_Border_Shading::_onInitDialog(HWND hWnd, WPARAM /*wParam*/, 
 	HBITMAP tmp_bmp2 = XAP_Win32DialogHelper::s_loadBitmap(hWnd, 0, "BORDER_STYLE_DOTTED",  BORDER_STYLE_BITMAP_WIDTH, BORDER_STYLE_BITMAP_HEIGHT, Color); 
 	HBITMAP tmp_bmp3 = XAP_Win32DialogHelper::s_loadBitmap(hWnd, 0, "BORDER_STYLE_DASHED",  BORDER_STYLE_BITMAP_WIDTH, BORDER_STYLE_BITMAP_HEIGHT, Color); 
 
-	ImageList_Add(hImageList, tmp_bmp0, nullptr);
-	ImageList_Add(hImageList, tmp_bmp1, nullptr);
-	ImageList_Add(hImageList, tmp_bmp2, nullptr);
-	ImageList_Add(hImageList, tmp_bmp3, nullptr);
+	ImageList_Add(hImageList, tmp_bmp0, NULL);
+	ImageList_Add(hImageList, tmp_bmp1, NULL);
+	ImageList_Add(hImageList, tmp_bmp2, NULL);
+	ImageList_Add(hImageList, tmp_bmp3, NULL);
 
 	SendMessage(m_hwndComboEx, CBEM_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(hImageList));
 
-	_insertItemToComboboxEx(m_hwndComboEx, nullptr, 0, 0);
-	_insertItemToComboboxEx(m_hwndComboEx, nullptr, 1, 1);
-	_insertItemToComboboxEx(m_hwndComboEx, nullptr, 2, 2);
-	_insertItemToComboboxEx(m_hwndComboEx, nullptr, 3, 3);
+	_insertItemToComboboxEx(m_hwndComboEx, NULL, 0, 0);
+	_insertItemToComboboxEx(m_hwndComboEx, NULL, 1, 1);
+	_insertItemToComboboxEx(m_hwndComboEx, NULL, 2, 2);
+	_insertItemToComboboxEx(m_hwndComboEx, NULL, 3, 3);
 
 	centerDialog();
 	return 1; 
@@ -334,7 +329,7 @@ BOOL AP_Win32Dialog_Border_Shading::_onCommand(HWND hWnd, WPARAM wParam, LPARAM 
 				m_borderButton.setColour(cc.rgbResult);
 
 				/*Force redraw*/
-				InvalidateRect(GetDlgItem(hWnd, AP_RID_DIALOG_BORDERSHADING_BTN_BORDER_COLOR), nullptr, FALSE);
+				InvalidateRect(GetDlgItem(hWnd, AP_RID_DIALOG_BORDERSHADING_BTN_BORDER_COLOR), NULL, FALSE);
 				event_previewExposed();	
 			}
 			return 1;
@@ -353,7 +348,7 @@ BOOL AP_Win32Dialog_Border_Shading::_onCommand(HWND hWnd, WPARAM wParam, LPARAM 
 					setBorderThickness(thickness.utf8_str().utf8_str());
 
 					/*Force redraw*/
-					InvalidateRect(GetDlgItem(hWnd, AP_RID_DIALOG_BORDERSHADING_BTN_BORDER_COLOR), nullptr, FALSE);
+					InvalidateRect(GetDlgItem(hWnd, AP_RID_DIALOG_BORDERSHADING_BTN_BORDER_COLOR), NULL, FALSE);
 					event_previewExposed();	
 				}
 			}
@@ -396,7 +391,7 @@ BOOL AP_Win32Dialog_Border_Shading::_onCommand(HWND hWnd, WPARAM wParam, LPARAM 
 				m_shadingButton.setColour(cc.rgbResult);
 
 				/*Force redraw*/
-				InvalidateRect(GetDlgItem(hWnd, AP_RID_DIALOG_BORDERSHADING_BTN_SHADING_COLOR), nullptr, FALSE);
+				InvalidateRect(GetDlgItem(hWnd, AP_RID_DIALOG_BORDERSHADING_BTN_SHADING_COLOR), NULL, FALSE);
 				event_previewExposed();	
 			}
 			return 1;
@@ -427,7 +422,7 @@ BOOL AP_Win32Dialog_Border_Shading::_onCommand(HWND hWnd, WPARAM wParam, LPARAM 
 					setShadingOffset(offset.utf8_str().utf8_str());
 
 					/*Force redraw*/
-					InvalidateRect(GetDlgItem(hWnd, AP_RID_DIALOG_BORDERSHADING_BTN_SHADING_COLOR), nullptr, FALSE);
+					InvalidateRect(GetDlgItem(hWnd, AP_RID_DIALOG_BORDERSHADING_BTN_SHADING_COLOR), NULL, FALSE);
 					event_previewExposed();	
 				}
 			}
@@ -455,7 +450,7 @@ BOOL AP_Win32Dialog_Border_Shading::_onCommand(HWND hWnd, WPARAM wParam, LPARAM 
 void AP_Win32Dialog_Border_Shading::event_previewExposed(void)
 {
 	if(m_pBorderShadingPreview)
-		m_pBorderShadingPreview->queueDraw();
+		m_pBorderShadingPreview->draw();
 }
 
 void AP_Win32Dialog_Border_Shading::setShadingColorInGUI(const UT_RGBColor & clr)
@@ -464,7 +459,7 @@ void AP_Win32Dialog_Border_Shading::setShadingColorInGUI(const UT_RGBColor & clr
 
 	m_shadingButton.setColour(RGB(clr.m_red,clr.m_grn,clr.m_blu));
  	/* force redraw */
-	InvalidateRect(GetDlgItem(m_hDlg, AP_RID_DIALOG_BORDERSHADING_BTN_SHADING_COLOR), nullptr, FALSE);
+ 	InvalidateRect(GetDlgItem(m_hDlg, AP_RID_DIALOG_BORDERSHADING_BTN_SHADING_COLOR), NULL, FALSE);
 }
 
 void AP_Win32Dialog_Border_Shading::setShadingPatternInGUI(const std::string & sPattern)
@@ -490,7 +485,7 @@ void AP_Win32Dialog_Border_Shading::setBorderColorInGUI(const UT_RGBColor & clr)
 
 	m_borderButton.setColour(RGB(clr.m_red,clr.m_grn,clr.m_blu));
  	/* force redraw */
-	InvalidateRect(GetDlgItem(m_hDlg, AP_RID_DIALOG_BORDERSHADING_BTN_BORDER_COLOR), nullptr, FALSE);
+ 	InvalidateRect(GetDlgItem(m_hDlg, AP_RID_DIALOG_BORDERSHADING_BTN_BORDER_COLOR), NULL, FALSE);
 }
 
 void AP_Win32Dialog_Border_Shading::setBorderThicknessInGUI(const std::string & sThick)
@@ -522,7 +517,7 @@ void AP_Win32Dialog_Border_Shading::setShadingEnable(bool enable)
 	EnableWindow(GetDlgItem(m_hDlg, AP_RID_DIALOG_BORDERSHADING_TEXT_SHADING_OFFSET), enable);
 
 	/* force redraw */
-	InvalidateRect(GetDlgItem(m_hDlg, AP_RID_DIALOG_BORDERSHADING_BTN_SHADING_COLOR), nullptr, FALSE);
+	InvalidateRect(GetDlgItem(m_hDlg, AP_RID_DIALOG_BORDERSHADING_BTN_SHADING_COLOR), NULL, FALSE);
 	event_previewExposed();	
 }
 
@@ -560,7 +555,7 @@ void AP_Win32Dialog_Border_Shading::notifyActiveFrame(XAP_Frame *pFrame)
 		setDialogTitle(m_WindowName);
 
 		SetWindowLongPtrW(m_hDlg, GWLP_HWNDPARENT, (LONG_PTR)static_cast<XAP_Win32FrameImpl*>(pFrame->getFrameImpl())->getTopLevelWindow());
-		SetWindowPos(m_hDlg, nullptr, 0, 0, 0, 0,
+		SetWindowPos(m_hDlg, NULL, 0, 0, 0, 0,
 						SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
 	}
 }

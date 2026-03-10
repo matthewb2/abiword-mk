@@ -29,8 +29,8 @@
 XAP_Dialog_History::XAP_Dialog_History(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id):
 	XAP_Dialog_NonPersistent(pDlgFactory,id),
 	m_answer(a_CANCEL),
-	m_pDoc(nullptr),
-	m_pSS(nullptr),
+	m_pDoc(NULL),
+	m_pSS(NULL),
 	m_iId(0)
 {
 	m_pSS = XAP_App::getApp()->getStringSet();
@@ -38,20 +38,20 @@ XAP_Dialog_History::XAP_Dialog_History(XAP_DialogFactory * pDlgFactory, XAP_Dial
 
 const char * XAP_Dialog_History::getWindowLabel() const
 {
-	UT_return_val_if_fail(m_pSS, nullptr);
+	UT_return_val_if_fail(m_pSS, NULL);
 	return m_pSS->getValue(XAP_STRING_ID_DLG_History_WindowLabel);
 }
 
 const char *  XAP_Dialog_History::getListTitle() const
 {
-	UT_return_val_if_fail(m_pSS, nullptr);
+	UT_return_val_if_fail(m_pSS, NULL);
 	return m_pSS->getValue(XAP_STRING_ID_DLG_History_List_Title);
 }
 
 
 const char * XAP_Dialog_History::getHeaderLabel(UT_uint32 indx) const
 {
-	UT_return_val_if_fail(m_pSS, nullptr);
+	UT_return_val_if_fail(m_pSS, NULL);
 	switch(indx)
 	{
 		case 0: return m_pSS->getValue(XAP_STRING_ID_DLG_History_Path);
@@ -65,13 +65,13 @@ const char * XAP_Dialog_History::getHeaderLabel(UT_uint32 indx) const
 	}
 
 	UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
-	return nullptr;
+	return NULL;
 }
 
 
 char * XAP_Dialog_History::getHeaderValue(UT_uint32 indx) const
 {
-	UT_return_val_if_fail(m_pDoc, nullptr);
+	UT_return_val_if_fail(m_pDoc, NULL);
 	
 	UT_String S;
 	time_t tT;
@@ -90,19 +90,19 @@ char * XAP_Dialog_History::getHeaderValue(UT_uint32 indx) const
 		case 2:
 			{
 				const UT_UUID * pUUID = m_pDoc->getDocUUID();
-				UT_return_val_if_fail(pUUID, nullptr);
+				UT_return_val_if_fail(pUUID, NULL);
 				
 				tT = pUUID->getTime();
 				tM = localtime(&tT);
 				s = (char*)g_try_malloc(30);
 				if(!s)
-					return nullptr;
+					return NULL;
 
 				size_t len = strftime(s,30,"%c",tM);
 				if(!len)
 				{
 					FREEP(s);
-					return nullptr;
+					return NULL;
 				}
 
 				return s;
@@ -114,13 +114,13 @@ char * XAP_Dialog_History::getHeaderValue(UT_uint32 indx) const
 				tM = localtime(&tT);
 				s = (char*)g_try_malloc(30);
 				if(!s)
-					return nullptr;
+					return NULL;
 
 				size_t len = strftime(s,30,"%c",tM);
 				if(!len)
 				{
 					FREEP(s);
-					return nullptr;
+					return NULL;
 				}
 				return s;
 			}
@@ -142,13 +142,13 @@ char * XAP_Dialog_History::getHeaderValue(UT_uint32 indx) const
 	}
 
 	UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
-	return nullptr;
+	return NULL;
 }
 
 
 const char * XAP_Dialog_History::getButtonLabel(UT_uint32 indx) const
 {
-	UT_return_val_if_fail(m_pSS, nullptr);
+	UT_return_val_if_fail(m_pSS, NULL);
 
 	switch(indx)
 	{
@@ -160,13 +160,13 @@ const char * XAP_Dialog_History::getButtonLabel(UT_uint32 indx) const
 	}
 
 	UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
-	return nullptr;
+	return NULL;
 }
 
 
 const char * XAP_Dialog_History::getListHeader(UT_uint32 column) const
 {
-	UT_return_val_if_fail(m_pSS, nullptr);
+	UT_return_val_if_fail(m_pSS, NULL);
 
 	switch(column)
 	{
@@ -178,7 +178,7 @@ const char * XAP_Dialog_History::getListHeader(UT_uint32 column) const
 	}
 
 	UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
-	return nullptr;
+	return NULL;
 }
 
 UT_uint32 XAP_Dialog_History::getListItemCount() const
@@ -190,7 +190,7 @@ UT_uint32 XAP_Dialog_History::getListItemCount() const
 
 char * XAP_Dialog_History::getListValue(UT_uint32 item, UT_uint32 column) const
 {
-	UT_return_val_if_fail(m_pDoc, nullptr);
+	UT_return_val_if_fail(m_pDoc, NULL);
 
 	UT_String S;
 	time_t tT;
@@ -209,13 +209,13 @@ char * XAP_Dialog_History::getListValue(UT_uint32 item, UT_uint32 column) const
 				tM = localtime(&tT);
 				s = (char*)g_try_malloc(30);
 				if(!s)
-					return nullptr;
+					return NULL;
 
 				size_t len = strftime(s,30,"%c",tM);
 				if(!len)
 				{
 					FREEP(s);
-					return nullptr;
+					return NULL;
 				}
 
 				return s;
@@ -223,7 +223,7 @@ char * XAP_Dialog_History::getListValue(UT_uint32 item, UT_uint32 column) const
 
 		case 2:
 			{
-				UT_return_val_if_fail(m_pSS, nullptr);
+				UT_return_val_if_fail(m_pSS, NULL);
 
 				const char * pszS;
 				if(m_pDoc->getHistoryNthAutoRevisioned(item))
@@ -231,7 +231,7 @@ char * XAP_Dialog_History::getListValue(UT_uint32 item, UT_uint32 column) const
 				else
 					pszS = m_pSS->getValue(XAP_STRING_ID_DLG_MB_No);
 					
-				UT_return_val_if_fail(pszS, nullptr);
+				UT_return_val_if_fail(pszS, NULL);
 
 				return g_strdup(pszS);
 			}
@@ -240,7 +240,7 @@ char * XAP_Dialog_History::getListValue(UT_uint32 item, UT_uint32 column) const
 	}
 
 	UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
-	return nullptr;
+	return NULL;
 }
 
 

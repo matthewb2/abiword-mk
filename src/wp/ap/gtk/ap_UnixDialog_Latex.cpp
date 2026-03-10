@@ -1,4 +1,3 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t; -*- */
 /* AbiWord
  * Copyright (C) 2005 Martin Sevior
  * 
@@ -33,9 +32,15 @@
 #include "ap_Dialog_Id.h"
 #include "ap_UnixDialog_Latex.h"
 #include "xap_Dlg_MessageBox.h"
-#ifdef HAVE_GO_MATH_EDITOR_NEW
 #include <goffice/goffice.h>
-#endif
+
+
+static gboolean s_delete_clicked(GtkWidget * /*widget*/, GdkEvent * /*event*/, AP_UnixDialog_Latex * dlg)
+{
+	UT_ASSERT(dlg);
+	dlg->event_WindowDelete();
+	return TRUE;
+}
 
 static void s_close_clicked(GtkWidget * /*widget*/,AP_UnixDialog_Latex * dlg)
 {
@@ -60,11 +65,12 @@ XAP_Dialog * AP_UnixDialog_Latex::static_constructor(XAP_DialogFactory * pFactor
 	return new AP_UnixDialog_Latex(pFactory,id);
 }
 
-AP_UnixDialog_Latex::AP_UnixDialog_Latex(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id)
-  : AP_Dialog_Latex(pDlgFactory, id),
-  m_wClose(nullptr),
-  m_wInsert(nullptr),
-  m_wText(nullptr)
+AP_UnixDialog_Latex::AP_UnixDialog_Latex(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id) : 
+  AP_Dialog_Latex(pDlgFactory,id),
+  m_wClose(NULL), 
+  m_wInsert(NULL),
+  m_wText(NULL),
+  m_windowMain(NULL)
 {
   UT_DEBUGMSG(("Constructing Latex dialog %p \n",this));
 }
@@ -80,7 +86,7 @@ void  AP_UnixDialog_Latex::activate(void)
 	
 	ConstructWindowName();
 
-	XAP_gtk_window_raise(m_windowMain);
+	gdk_window_raise (gtk_widget_get_window(m_windowMain));
 }
 
 void AP_UnixDialog_Latex::runModeless(XAP_Frame * pFrame)
@@ -125,10 +131,10 @@ void AP_UnixDialog_Latex::destroy(void)
 {
 	m_answer = AP_Dialog_Latex::a_CANCEL;	
 	modeless_cleanup();
-	if (m_windowMain != nullptr)
+	if (m_windowMain != NULL)
 	{
-		gtk_widget_destroy(m_windowMain); // TOPLEVEL
-		m_windowMain = nullptr;
+		gtk_widget_destroy(m_windowMain);
+		m_windowMain = NULL;
 	}
 }
 
@@ -152,7 +158,7 @@ bool AP_UnixDialog_Latex::getLatexFromGUI(void)
 	//
 	// Get the chars from the widget
 	//
-	gchar * sz = nullptr;
+	gchar * sz = NULL;
 #ifdef HAVE_GO_MATH_EDITOR_NEW
 	m_compact = go_math_editor_get_inline(GO_MATH_EDITOR(m_wText));
 	sz = go_math_editor_get_itex(GO_MATH_EDITOR(m_wText));
@@ -190,7 +196,7 @@ void AP_UnixDialog_Latex::constructDialog(void)
 	                m_wText);
 #else
 	// load the dialog from the UI file
-	GtkBuilder* builder = newDialogBuilderFromResource("ap_UnixDialog_Latex.ui");
+	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_Latex.ui");
 
     // Update our member variables with the important widgets that
     // might need to be queried or altered later
@@ -215,7 +221,9 @@ void AP_UnixDialog_Latex::constructDialog(void)
 	ConstructWindowName();
 	gtk_window_set_title (GTK_WINDOW(m_windowMain), m_sWindowName.utf8_str());
 
-	connectBasicSignals();
+	g_signal_connect(G_OBJECT(m_windowMain), "delete_event",
+					   G_CALLBACK(s_delete_clicked),
+					   reinterpret_cast<gpointer>(this));
 	g_signal_connect(G_OBJECT(m_windowMain), "destroy",
 					   G_CALLBACK(s_destroy_clicked),
 					   reinterpret_cast<gpointer>(this));
@@ -226,6 +234,8 @@ void AP_UnixDialog_Latex::constructDialog(void)
 	g_signal_connect(G_OBJECT(m_wInsert), "clicked",
 					   G_CALLBACK(s_insert_clicked),
 					   reinterpret_cast<gpointer>(this));
+
+	gtk_widget_show_all (m_windowMain);
 
 #ifndef HAVE_GO_MATH_EDITOR_NEW
 	g_object_unref(G_OBJECT(builder));

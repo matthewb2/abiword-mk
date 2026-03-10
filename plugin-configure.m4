@@ -1,47 +1,222 @@
 
-gda_pkgs='libgda >= 1.2.0 libgnomedb >= 1.2.0'
-gda_deps="no"
+openwriter_pkgs="$gsf_req"
+openwriter_deps="no"
 
-if test "$enable_gda" != ""; then
+if test "$enable_openwriter" != ""; then
 
-PKG_CHECK_EXISTS([ $gda_pkgs ], 
+PKG_CHECK_EXISTS([ $openwriter_pkgs ], 
 [
-	AC_MSG_CHECKING([for gtk toolkit])
-	if test "$TOOLKIT" = "gtk"; then
-	  AC_MSG_RESULT([yes])
-	  gda_deps="yes"
-	else
-	  AC_MSG_RESULT([no])
-	  if test "$enable_gda" = "auto"; then
-	    AC_MSG_WARN([gda plugin: only supported with gtk])
-	  else
-	    AC_MSG_ERROR([gda plugin: only supported with gtk])
-	  fi
-	fi
+	openwriter_deps="yes"
 ], [
-	test "$enable_gda" = "auto" && AC_MSG_WARN([gda plugin: dependencies not satisfied - $gda_pkgs])
+	test "$enable_openwriter" = "auto" && AC_MSG_WARN([openwriter plugin: dependencies not satisfied - $openwriter_pkgs])
 ])
 
 fi
 
-if test "$enable_gda" = "yes" || \
-   test "$gda_deps" = "yes"; then
+if test "$enable_openwriter" = "yes" || \
+   test "$openwriter_deps" = "yes"; then
 
-if test "$enable_gda_builtin" = "yes"; then
-AC_MSG_ERROR([gda plugin: static linking not supported])
+PKG_CHECK_MODULES(OPENWRITER,[ $openwriter_pkgs ])
+
+test "$enable_openwriter" = "auto" && PLUGINS="$PLUGINS openwriter"
+
+OPENWRITER_CFLAGS="$OPENWRITER_CFLAGS "'${PLUGIN_CFLAGS}'
+OPENWRITER_LIBS="$OPENWRITER_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_openwriter_builtin" = "yes"; then
+	OPENWRITER_CFLAGS="$OPENWRITER_CFLAGS -DABI_PLUGIN_BUILTIN"
 fi
 
-PKG_CHECK_MODULES(GDA,[ $gda_pkgs ])
+fi
 
-test "$enable_gda" = "auto" && PLUGINS="$PLUGINS gda"
+AC_SUBST([OPENWRITER_CFLAGS])
+AC_SUBST([OPENWRITER_LIBS])
 
-GDA_CFLAGS="$GDA_CFLAGS "'${PLUGIN_CFLAGS}'
-GDA_LIBS="$GDA_LIBS "'${PLUGIN_LIBS}'
+
+grammar_pkgs='link-grammar >= 4.2.1'
+grammar_deps="no"
+
+dnl make sure we enable grammar only if spell is enabled. At least in auto mode.
+if test "$enable_grammar" != "" && test  "$abi_cv_spell" = "yes"; then
+
+PKG_CHECK_EXISTS([ $grammar_pkgs ], 
+[
+	grammar_deps="yes"
+], [
+	test "$enable_grammar" = "auto" && AC_MSG_WARN([grammar plugin: dependencies not satisfied - $grammar_pkgs])
+])
 
 fi
 
-AC_SUBST([GDA_CFLAGS])
-AC_SUBST([GDA_LIBS])
+if test "$enable_grammar" = "yes" || \
+   test "$grammar_deps" = "yes"; then
+
+if test "$enable_grammar_builtin" = "yes"; then
+AC_MSG_ERROR([grammar plugin: static linking not supported])
+fi
+
+PKG_CHECK_MODULES(GRAMMAR,[ $grammar_pkgs ])
+PKG_CHECK_EXISTS([ link-grammar >= 5.1.0 ], 
+[
+	AC_DEFINE([HAVE_LINK_GRAMMAR_51],[1],["have link-grammar 5.1.0 or later"])
+])
+
+test "$enable_grammar" = "auto" && PLUGINS="$PLUGINS grammar"
+
+GRAMMAR_CFLAGS="$GRAMMAR_CFLAGS "'${PLUGIN_CFLAGS}'
+GRAMMAR_LIBS="$GRAMMAR_LIBS "'${PLUGIN_LIBS}'
+
+fi
+
+AC_SUBST([GRAMMAR_CFLAGS])
+AC_SUBST([GRAMMAR_LIBS])
+
+
+wpg_pkgs="$gsf_req libwpg-0.2 >= 0.2.0 libwpd-0.9 >= 0.9.0 libwpd-stream-0.9 >= 0.9.0"
+wpg_deps="no"
+
+if test "$enable_wpg" != ""; then
+
+PKG_CHECK_EXISTS([ $wpg_pkgs ], 
+[
+	wpg_deps="yes"
+], [
+	test "$enable_wpg" = "auto" && AC_MSG_WARN([wpg plugin: dependencies not satisfied - $wpg_pkgs])
+])
+
+fi
+
+if test "$enable_wpg" = "yes" || \
+   test "$wpg_deps" = "yes"; then
+
+if test "$enable_wpg_builtin" = "yes"; then
+AC_MSG_ERROR([wpg plugin: static linking not supported])
+fi
+
+PKG_CHECK_MODULES(WPG, [ $wpg_pkgs ])
+
+test "$enable_wpg" = "auto" && PLUGINS="$PLUGINS wpg"
+
+WPG_CFLAGS="$WPG_CFLAGS "'${PLUGIN_CFLAGS}'
+WPG_LIBS="$WPG_LIBS "'${PLUGIN_LIBS}'
+
+fi
+
+AC_SUBST([WPG_CFLAGS])
+AC_SUBST([WPG_LIBS])
+
+
+GIMP_CFLAGS=
+GIMP_LIBS=
+
+if test "$enable_gimp" != ""; then
+
+test "$enable_gimp" = "auto" && PLUGINS="$PLUGINS gimp"
+
+GIMP_CFLAGS="$GIMP_CFLAGS "'${PLUGIN_CFLAGS}'
+GIMP_LIBS="$GIMP_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_gimp_builtin" = "yes"; then
+	GIMP_CFLAGS="$GIMP_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([GIMP_CFLAGS])
+AC_SUBST([GIMP_LIBS])
+
+
+aiksaurus_pkgs="aiksaurus-1.0"
+aiksaurus_gtk_pkgs="aiksaurusgtk3-1.0"
+aiksaurus_deps="no"
+
+if test "$enable_aiksaurus" != ""; then
+
+PKG_CHECK_EXISTS([ $aiksaurus_pkgs ], 
+[
+  aiksaurus_deps="yes"
+], [
+	test "$enable_aiksaurus" = "auto" && AC_MSG_WARN([aiksaurus plugin: dependencies not satisfied - $aiksaurus_pkgs])
+])
+
+fi
+
+if test "$enable_aiksaurus" = "yes" || \
+   test "$aiksaurus_deps" = "yes"; then
+
+use_builtin_aiksaurus_gtk="no"
+if test "$TOOLKIT" = "gtk"; then
+PKG_CHECK_EXISTS([ $aiksaurus_gtk_pkgs ], 
+[
+  aiksaurus_pkgs="$aiksaurus_pkgs $aiksaurus_gtk_pkgs"
+], [use_builtin_aiksaurus_gtk="yes"])
+fi
+
+if test "$enable_aiksaurus_builtin" = "yes"; then
+AC_MSG_ERROR([aiksaurus plugin: static linking not supported])
+fi
+
+PKG_CHECK_MODULES(AIKSAURUS,[ $aiksaurus_pkgs ])
+
+  
+test "$enable_aiksaurus" = "auto" && PLUGINS="$PLUGINS aiksaurus"
+
+AIKSAURUS_CFLAGS="$AIKSAURUS_CFLAGS "'${PLUGIN_CFLAGS}'
+AIKSAURUS_LIBS="$AIKSAURUS_LIBS "'${PLUGIN_LIBS}'
+
+fi
+
+AM_CONDITIONAL([WITH_BUILTIN_AIKSAURUS_GTK],[ test "x$use_builtin_aiksaurus_gtk" = "xyes" ])
+
+AC_SUBST([AIKSAURUS_CFLAGS])
+AC_SUBST([AIKSAURUS_LIBS])
+
+command_deps="no"
+
+if test "$enable_command" != ""; then
+    if test "$TOOLKIT" != "gtk"; then
+		command_deps="no"
+		AC_MSG_WARN([command plugin: only supported on UNIX/gtk platforms])
+	else 
+		# stolen from the original plugin.m4 in abiword-plugins
+		AC_CHECK_HEADER(readline/readline.h,[
+				AC_CHECK_HEADER(readline/history.h,[
+						AC_CHECK_LIB(readline,readline,[
+								command_deps="yes"
+						],[     AC_CHECK_LIB(readline,rl_initialize,[
+										command_deps="yes"
+
+								],,)
+						],)
+				])
+		])
+	fi
+fi
+
+if test "$enable_command" = "yes" || \
+   test "$command_deps" = "yes"; then
+
+if test "$enable_command_builtin" = "yes"; then
+AC_MSG_ERROR([command plugin: static linking not supported])
+fi
+
+AC_MSG_CHECKING([command plugin: for readline and friends])
+if test "$command_deps" != "yes"; then
+	AC_MSG_ERROR([no])
+else
+	AC_MSG_RESULT([yes])
+        COMMAND_LIBS="-lreadline -lhistory $COMMAND_LIBS"
+fi
+
+test "$enable_command" = "auto" && PLUGINS="$PLUGINS command"
+
+COMMAND_CFLAGS="$COMMAND_CFLAGS "'${PLUGIN_CFLAGS}'
+COMMAND_LIBS="$COMMAND_LIBS "'${PLUGIN_LIBS}'
+
+fi
+
+AC_SUBST([COMMAND_CFLAGS])
+AC_SUBST([COMMAND_LIBS])
 
 
 goffice_req=
@@ -101,153 +276,178 @@ AC_SUBST([GOFFICE_CFLAGS])
 AC_SUBST([GOFFICE_LIBS])
 
 
-ISCII_CFLAGS=
-ISCII_LIBS=
+sdw_pkgs="$gsf_req"
+sdw_deps="no"
 
-if test "$enable_iscii" != ""; then
+if test "$enable_sdw" != ""; then
 
-test "$enable_iscii" = "auto" && PLUGINS="$PLUGINS iscii"
-
-ISCII_CFLAGS="$ISCII_CFLAGS "'${PLUGIN_CFLAGS}'
-ISCII_LIBS="$ISCII_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_iscii_builtin" = "yes"; then
-	ISCII_CFLAGS="$ISCII_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([ISCII_CFLAGS])
-AC_SUBST([ISCII_LIBS])
-
-
-GDICT_CFLAGS=
-GDICT_LIBS=
-gdict_deps="no"
-
-if test "$enable_gdict" != ""; then
-
-AC_MSG_CHECKING([for unix/gtk platform])
-if test "$TOOLKIT" = "gtk"; then
-  AC_MSG_RESULT([yes])
-  gdict_deps="yes"
-else
-  AC_MSG_RESULT([no])
-  if test "$enable_gdict" = "auto"; then
-    AC_MSG_WARN([gdict plugin: only supported on UNIX/gtk platforms])
-  else
-    AC_MSG_ERROR([gdict plugin: only supported on UNIX/gtk platforms])
-  fi
-fi
-
-fi
-
-if test "$enable_gdict" = "yes" || \
-   test "$gdict_deps" = "yes"; then
-
-AC_TYPE_PID_T
-
-test "$enable_gdict" = "auto" && PLUGINS="$PLUGINS gdict"
-
-GDICT_CFLAGS="$GDICT_CFLAGS "'${PLUGIN_CFLAGS} -DUSE_FORK_AND_EXEC_METHOD=1'
-GDICT_LIBS='${PLUGIN_LIBS}'
-
-if test "$enable_gdict_builtin" != ""; then
-	GDICT_CFLAGS="$GDICT_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([GDICT_CFLAGS])
-AC_SUBST([GDICT_LIBS])
-
-
-GOOGLE_CFLAGS=
-GOOGLE_LIBS=
-
-if test "$enable_google" != ""; then
-
-test "$enable_google" = "auto" && PLUGINS="$PLUGINS google"
-
-GOOGLE_CFLAGS="$GOOGLE_CFLAGS "'${PLUGIN_CFLAGS}'
-GOOGLE_LIBS="$GOOGLE_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_google_builtin" = "yes"; then
-	GOOGLE_CFLAGS="$GOOGLE_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([GOOGLE_CFLAGS])
-AC_SUBST([GOOGLE_LIBS])
-
-
-openwriter_pkgs="$gsf_req"
-openwriter_deps="no"
-
-if test "$enable_openwriter" != ""; then
-
-PKG_CHECK_EXISTS([ $openwriter_pkgs ], 
+PKG_CHECK_EXISTS([ $sdw_pkgs ], 
 [
-	openwriter_deps="yes"
+	sdw_deps="yes"
 ], [
-	test "$enable_openwriter" = "auto" && AC_MSG_WARN([openwriter plugin: dependencies not satisfied - $openwriter_pkgs])
+	test "$enable_sdw" = "auto" && AC_MSG_WARN([sdw plugin: dependencies not satisfied - $sdw_pkgs])
 ])
 
 fi
 
-if test "$enable_openwriter" = "yes" || \
-   test "$openwriter_deps" = "yes"; then
+if test "$enable_sdw" = "yes" || \
+   test "$sdw_deps" = "yes"; then
 
-PKG_CHECK_MODULES(OPENWRITER,[ $openwriter_pkgs ])
+PKG_CHECK_MODULES(SDW,[ $sdw_pkgs ])
 
-test "$enable_openwriter" = "auto" && PLUGINS="$PLUGINS openwriter"
+test "$enable_sdw" = "auto" && PLUGINS="$PLUGINS sdw"
 
-OPENWRITER_CFLAGS="$OPENWRITER_CFLAGS "'${PLUGIN_CFLAGS}'
-OPENWRITER_LIBS="$OPENWRITER_LIBS "'${PLUGIN_LIBS}'
+SDW_CFLAGS="$SDW_CFLAGS "'${PLUGIN_CFLAGS}'
+SDW_LIBS="$SDW_LIBS "'${PLUGIN_LIBS}'
 
-if test "$enable_openwriter_builtin" = "yes"; then
-	OPENWRITER_CFLAGS="$OPENWRITER_CFLAGS -DABI_PLUGIN_BUILTIN"
+if test "$enable_sdw_builtin" = "yes"; then
+	SDW_CFLAGS="$SDW_CFLAGS -DABI_PLUGIN_BUILTIN"
 fi
 
 fi
 
-AC_SUBST([OPENWRITER_CFLAGS])
-AC_SUBST([OPENWRITER_LIBS])
+AC_SUBST([SDW_CFLAGS])
+AC_SUBST([SDW_LIBS])
 
 
-applix_pkgs="$gsf_req"
-applix_deps="no"
+PAINT_CFLAGS=
+PAINT_LIBS=
 
-if test "$enable_applix" != ""; then
+if test "$enable_paint" != ""; then
 
-PKG_CHECK_EXISTS([ $applix_pkgs ], 
+test "$enable_paint" = "auto" && PLUGINS="$PLUGINS paint"
+
+# TODO check for libpng
+if test "$TOOLKIT" = "win"; then
+	PAINT_LIBS="-lgdi32 $PNG_LIBS"
+	PAINT_CFLAGS="$PAINT_CFLAGS $PNG_CFLAGS"
+fi
+
+PAINT_CFLAGS="$PAINT_CFLAGS "'${PLUGIN_CFLAGS}'
+PAINT_LIBS="$PAINT_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_paint_builtin" = "yes"; then
+	PAINT_CFLAGS="$PAINT_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([PAINT_CFLAGS])
+AC_SUBST([PAINT_LIBS])
+
+
+PASSEPARTOUT_CFLAGS=
+PASSEPARTOUT_LIBS=
+
+if test "$enable_passepartout" != ""; then
+
+test "$enable_passepartout" = "auto" && PLUGINS="$PLUGINS passepartout"
+
+PASSEPARTOUT_CFLAGS="$PASSEPARTOUT_CFLAGS "'${PLUGIN_CFLAGS}'
+PASSEPARTOUT_LIBS="$PASSEPARTOUT_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_passepartout_builtin" = "yes"; then
+	PASSEPARTOUT_CFLAGS="$PASSEPARTOUT_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([PASSEPARTOUT_CFLAGS])
+AC_SUBST([PASSEPARTOUT_LIBS])
+
+
+#opendocument_pkgs="$gsf_req redland >= 1.0.10 rasqal >= 0.9.17"
+
+opendocument_pkgs="$gsf_req"
+opendocument_optional_pkgs="redland >= 1.0.10 rasqal >= 0.9.17"
+opendocument_deps="no"
+
+if test "$enable_opendocument" != ""; then
+
+PKG_CHECK_EXISTS([ $opendocument_pkgs ], 
 [
-	applix_deps="yes"
+	opendocument_deps="yes"
 ], [
-	test "$enable_applix" = "auto" && AC_MSG_WARN([applix plugin: dependencies not satisfied - $applix_pkgs])
+	test "$enable_opendocument" = "auto" && AC_MSG_WARN([opendocument plugin: dependencies not satisfied - $opendocument_pkgs])
+])
+
+PKG_CHECK_EXISTS([ $opendocument_optional_pkgs ], 
+[ opendocument_pkgs="$opendocument_pkgs $opendocument_optional_pkgs" ])
+
+fi
+
+if test "$enable_opendocument" = "yes" || \
+   test "$opendocument_deps" = "yes"; then
+
+PKG_CHECK_MODULES(OPENDOCUMENT,[ $opendocument_pkgs ])
+
+test "$enable_opendocument" = "auto" && PLUGINS="$PLUGINS opendocument"
+
+OPENDOCUMENT_CFLAGS="$OPENDOCUMENT_CFLAGS "'${PLUGIN_CFLAGS}'
+OPENDOCUMENT_LIBS="$OPENDOCUMENT_LIBS "'${PLUGIN_LIBS} -lz'
+
+if test "$enable_opendocument_builtin" = "yes"; then
+	OPENDOCUMENT_CFLAGS="$OPENDOCUMENT_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([OPENDOCUMENT_CFLAGS])
+AC_SUBST([OPENDOCUMENT_LIBS])
+
+
+wml_pkgs="$gsf_req"
+wml_deps="no"
+
+if test "$enable_wml" != ""; then
+
+PKG_CHECK_EXISTS([ $wml_pkgs ], 
+[
+	wml_deps="yes"
+], [
+	test "$enable_wml" = "auto" && AC_MSG_WARN([wml plugin: dependencies not satisfied - $wml_pkgs])
 ])
 
 fi
 
-if test "$enable_applix" = "yes" || \
-   test "$applix_deps" = "yes"; then
+if test "$enable_wml" = "yes" || \
+   test "$wml_deps" = "yes"; then
 
-PKG_CHECK_MODULES(APPLIX,[ $applix_pkgs ])
+PKG_CHECK_MODULES(WML,[ $wml_pkgs ])
 
-test "$enable_applix" = "auto" && PLUGINS="$PLUGINS applix"
+test "$enable_wml" = "auto" && PLUGINS="$PLUGINS wml"
 
-APPLIX_CFLAGS="$APPLIX_CFLAGS "'${PLUGIN_CFLAGS}'
-APPLIX_LIBS="$APPLIX_LIBS "'${PLUGIN_LIBS}'
+WML_CFLAGS="$WML_CFLAGS "'${PLUGIN_CFLAGS}'
+WML_LIBS="$WML_LIBS "'${PLUGIN_LIBS}'
 
-if test "$enable_applix_builtin" = "yes"; then
-	APPLIX_CFLAGS="$APPLIX_CFLAGS -DABI_PLUGIN_BUILTIN"
+if test "$enable_wml_builtin" = "yes"; then
+	WML_CFLAGS="$WML_CFLAGS -DABI_PLUGIN_BUILTIN"
 fi
 
 fi
 
-AC_SUBST([APPLIX_CFLAGS])
-AC_SUBST([APPLIX_LIBS])
+AC_SUBST([WML_CFLAGS])
+AC_SUBST([WML_LIBS])
+
+
+EML_CFLAGS=
+EML_LIBS=
+
+if test "$enable_eml" != ""; then
+
+test "$enable_eml" = "auto" && PLUGINS="$PLUGINS eml"
+
+EML_CFLAGS="$EML_CFLAGS "'${PLUGIN_CFLAGS}'
+EML_LIBS="$EML_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_eml_builtin" = "yes"; then
+	EML_CFLAGS="$EML_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([EML_CFLAGS])
+AC_SUBST([EML_LIBS])
 
 
 #
@@ -352,6 +552,322 @@ AM_CONDITIONAL([ABI_XHTML_MHT], test "$mht_cv_inter7eps" = "yes")
 AM_CONDITIONAL([ABI_XHTML_TIDY], test "$mht_cv_libtidy" = "yes")
 
 
+GDICT_CFLAGS=
+GDICT_LIBS=
+gdict_deps="no"
+
+if test "$enable_gdict" != ""; then
+
+AC_MSG_CHECKING([for unix/gtk platform])
+if test "$TOOLKIT" = "gtk"; then
+  AC_MSG_RESULT([yes])
+  gdict_deps="yes"
+else
+  AC_MSG_RESULT([no])
+  if test "$enable_gdict" = "auto"; then
+    AC_MSG_WARN([gdict plugin: only supported on UNIX/gtk platforms])
+  else
+    AC_MSG_ERROR([gdict plugin: only supported on UNIX/gtk platforms])
+  fi
+fi
+
+fi
+
+if test "$enable_gdict" = "yes" || \
+   test "$gdict_deps" = "yes"; then
+
+AC_TYPE_PID_T
+
+test "$enable_gdict" = "auto" && PLUGINS="$PLUGINS gdict"
+
+GDICT_CFLAGS="$GDICT_CFLAGS "'${PLUGIN_CFLAGS} -DUSE_FORK_AND_EXEC_METHOD=1'
+GDICT_LIBS='${PLUGIN_LIBS}'
+
+if test "$enable_gdict_builtin" != ""; then
+	GDICT_CFLAGS="$GDICT_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([GDICT_CFLAGS])
+AC_SUBST([GDICT_LIBS])
+
+
+S5_CFLAGS=
+S5_LIBS=
+
+if test "$enable_s5" != ""; then
+
+test "$enable_s5" = "auto" && PLUGINS="$PLUGINS s5"
+
+S5_CFLAGS="$S5_CFLAGS "'${PLUGIN_CFLAGS}'
+S5_LIBS="$S5_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_s5_builtin" = "yes"; then
+	S5_CFLAGS="$S5_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([S5_CFLAGS])
+AC_SUBST([S5_LIBS])
+
+
+BABELFISH_CFLAGS=
+BABELFISH_LIBS=
+
+if test "$enable_babelfish" != ""; then
+
+test "$enable_babelfish" = "auto" && PLUGINS="$PLUGINS babelfish"
+
+BABELFISH_CFLAGS="$BABELFISH_CFLAGS "'${PLUGIN_CFLAGS}'
+BABELFISH_LIBS="$BABELFISH_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_babelfish_builtin" = "yes"; then
+	BABELFISH_CFLAGS="$BABELFISH_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([BABELFISH_CFLAGS])
+AC_SUBST([BABELFISH_LIBS])
+
+
+ots_pkgs="libots-1 >= 0.5.0"
+ots_deps="no"
+
+if test "$enable_ots" != ""; then
+
+PKG_CHECK_EXISTS([ $ots_pkgs ], 
+[
+	ots_deps="yes"
+], [
+	test "$enable_ots" = "auto" && AC_MSG_WARN([ots plugin: dependencies not satisfied - $ots_pkgs])
+])
+
+fi
+
+if test "$enable_ots" = "yes" || \
+   test "$ots_deps" = "yes"; then
+
+test "$enable_ots" = "auto" && PLUGINS="$PLUGINS ots"
+
+if test "$enable_ots_builtin" = "yes"; then
+AC_MSG_ERROR([ots plugin: static linking not supported])
+fi
+
+PKG_CHECK_MODULES(OTS,[ $ots_pkgs ])
+
+OTS_CFLAGS="$OTS_CFLAGS "'${PLUGIN_CFLAGS}'
+OTS_LIBS="$OTS_LIBS "'${PLUGIN_LIBS}'
+
+fi
+
+AC_SUBST([OTS_CFLAGS])
+AC_SUBST([OTS_LIBS])
+
+
+BMP_CFLAGS=
+BMP_LIBS=
+bmp_deps="no"
+
+if test "$enable_bmp" != ""; then
+
+   bmp_deps="yes"
+
+fi
+
+if test "$enable_bmp" = "yes" || \
+   test "$bmp_deps" = "yes"; then
+
+# TODO check for libpng, well abiword links to it anyways
+
+BMP_CFLAGS="$BMP_CFLAGS $PNG_CFLAGS "'${PLUGIN_CFLAGS}'
+BMP_LIBS="$BMP_LIBS $PNG_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_bmp_builtin" = "yes"; then
+	BMP_CFLAGS="$BMP_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+test "$enable_bmp" = "auto" && PLUGINS="$PLUGINS bmp"
+
+fi
+
+AC_SUBST([BMP_CFLAGS])
+AC_SUBST([BMP_LIBS])
+
+
+AC_ARG_WITH([psiconv-config],
+	[AS_HELP_STRING([--with-psiconv-config=DIR], [use psiconv-config in DIR])],
+[
+	AC_PATH_PROG(psiconvconfig, psiconv-config, , "$withval")
+], [
+	AC_PATH_PROG(psiconvconfig, psiconv-config)
+])
+
+# The required psiconv version, as reported by psiconv-config
+psiconv_major_req=0
+psiconv_minor_req=9
+psiconv_micro_req=4
+psion_deps="no"
+
+if test "$enable_psion" != ""; then
+
+	if test "$psiconvconfig" = ""; then
+		if test "$enable_psion" = "yes"; then
+		  AC_MSG_ERROR([psiconv plugin: program psiconv-config not found in path])
+		else
+		  AC_MSG_WARN([psiconv plugin: program psiconv-config not found in path])
+		fi
+	else
+		IFS_old="$IFS"
+		IFS='.'
+		set -- `$psiconvconfig --version`
+		psiconv_major_found="${1}"
+		psiconv_minor_found="${2}"
+		psiconv_micro_found="${3}"
+		IFS="$IFS_old"
+		if test "$psiconv_major_found" -gt "$psiconv_major_req"; then
+			psion_deps="yes"
+		elif test "$psiconv_major_found" -eq "$psiconv_major_req" &&
+		     test "$psiconv_minor_found" -gt "$psiconv_minor_req"; then
+			psion_deps="yes"
+		elif test "$psiconv_major_found" -eq "$psiconv_major_req" &&
+		     test "$psiconv_minor_found" -eq "$psiconv_minor_req" &&
+		     test "$psiconv_micro_found" -ge "$psiconv_micro_req"; then
+			psion_deps="yes"
+		fi
+	fi
+fi
+
+if test "$enable_psion" = "yes" || \
+   test "$psion_deps" = "yes"; then
+
+if test "$enable_psion_builtin" = "yes"; then
+AC_MSG_ERROR([psion plugin: static linking not supported])
+fi
+
+AC_MSG_CHECKING([for psiconv >= ${psiconv_major_req}.${psiconv_minor_req}.${psiconv_micro_req}])
+if test "$psion_deps" = "yes"; then
+	AC_MSG_RESULT([version ${psiconv_major_found}.${psiconv_minor_found}.${psiconv_micro_found} (ok)])
+	PSION_CFLAGS=`$psiconvconfig --cflags`
+	PSION_LIBS=`$psiconvconfig --libs`
+else
+	AC_MSG_ERROR([version ${psiconv_major_found}.${psiconv_minor_found}.${psiconv_micro_found} (too old!)])
+fi
+
+test "$enable_psion" = "auto" && PLUGINS="$PLUGINS psion"
+
+PSION_CFLAGS="$PSION_CFLAGS $PNG_CFLAGS "'${PLUGIN_CFLAGS}'
+PSION_LIBS="$PSION_LIBS $PNG_LIBS -lgsf-1 "'${PLUGIN_LIBS}'
+
+fi
+
+AC_SUBST([PSION_CFLAGS])
+AC_SUBST([PSION_LIBS])
+
+
+gda_pkgs='libgda >= 1.2.0 libgnomedb >= 1.2.0'
+gda_deps="no"
+
+if test "$enable_gda" != ""; then
+
+PKG_CHECK_EXISTS([ $gda_pkgs ], 
+[
+	AC_MSG_CHECKING([for gtk toolkit])
+	if test "$TOOLKIT" = "gtk"; then
+	  AC_MSG_RESULT([yes])
+	  gda_deps="yes"
+	else
+	  AC_MSG_RESULT([no])
+	  if test "$enable_gda" = "auto"; then
+	    AC_MSG_WARN([gda plugin: only supported with gtk])
+	  else
+	    AC_MSG_ERROR([gda plugin: only supported with gtk])
+	  fi
+	fi
+], [
+	test "$enable_gda" = "auto" && AC_MSG_WARN([gda plugin: dependencies not satisfied - $gda_pkgs])
+])
+
+fi
+
+if test "$enable_gda" = "yes" || \
+   test "$gda_deps" = "yes"; then
+
+if test "$enable_gda_builtin" = "yes"; then
+AC_MSG_ERROR([gda plugin: static linking not supported])
+fi
+
+PKG_CHECK_MODULES(GDA,[ $gda_pkgs ])
+
+test "$enable_gda" = "auto" && PLUGINS="$PLUGINS gda"
+
+GDA_CFLAGS="$GDA_CFLAGS "'${PLUGIN_CFLAGS}'
+GDA_LIBS="$GDA_LIBS "'${PLUGIN_LIBS}'
+
+fi
+
+AC_SUBST([GDA_CFLAGS])
+AC_SUBST([GDA_LIBS])
+
+
+OPML_CFLAGS=
+OPML_LIBS=
+
+if test "$enable_opml" != ""; then
+
+test "$enable_opml" = "auto" && PLUGINS="$PLUGINS opml"
+
+OPML_CFLAGS="$OPML_CFLAGS "'${PLUGIN_CFLAGS}'
+OPML_LIBS="$OPML_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_opml_builtin" = "yes"; then
+	OPML_CFLAGS="$OPML_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([OPML_CFLAGS])
+AC_SUBST([OPML_LIBS])
+
+
+garble_pkgs="libgsf-1 >= 1.12 libxml-2.0 >= 2.4.0"
+garble_deps="no"
+
+if test "$enable_garble" != ""; then
+
+PKG_CHECK_EXISTS([ $garble_pkgs ], 
+[
+	garble_deps="yes"
+], [
+	test "$enable_garble" = "auto" && AC_MSG_WARN([garble plugin: dependencies not satisfied - $garble_pkgs])
+])
+
+fi
+
+if test "$enable_garble" = "yes" || \
+   test "$garble_deps" = "yes"; then
+
+AC_HEADER_TIME
+
+PKG_CHECK_MODULES(GARBLE,[ $garble_pkgs ])
+
+test "$enable_garble" = "auto" && PLUGINS="$PLUGINS garble"
+
+GARBLE_CFLAGS="$GARBLE_CFLAGS $PNG_CFLAGS "'${PLUGIN_CFLAGS}'
+GARBLE_LIBS="$GARBLE_LIBS $PNG_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_garble_builtin" = "yes"; then
+	GARBLE_CFLAGS="$GARBLE_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([GARBLE_CFLAGS])
+AC_SUBST([GARBLE_LIBS])
+
+
 HRTEXT_CFLAGS=
 HRTEXT_LIBS=
 
@@ -370,6 +886,308 @@ fi
 
 AC_SUBST([HRTEXT_CFLAGS])
 AC_SUBST([HRTEXT_LIBS])
+
+
+PRESENTATION_CFLAGS=
+PRESENTATION_LIBS=
+
+if test "$enable_presentation" != ""; then
+
+test "$enable_presentation" = "auto" && PLUGINS="$PLUGINS presentation"
+
+PRESENTATION_CFLAGS="$PRESENTATION_CFLAGS "'${PLUGIN_CFLAGS}'
+PRESENTATION_LIBS="$PRESENTATION_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_presentation_builtin" = "yes"; then
+	PRESENTATION_CFLAGS="$PRESENTATION_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([PRESENTATION_CFLAGS])
+AC_SUBST([PRESENTATION_LIBS])
+
+
+FREETRANSLATION_CFLAGS=
+FREETRANSLATION_LIBS=
+
+if test "$enable_freetranslation" != ""; then
+
+test "$enable_freetranslation" = "auto" && PLUGINS="$PLUGINS freetranslation"
+
+FREETRANSLATION_CFLAGS="$FREETRANSLATION_CFLAGS "'${PLUGIN_CFLAGS}'
+FREETRANSLATION_LIBS="$FREETRANSLATION_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_freetranslation_builtin" = "yes"; then
+	FREETRANSLATION_CFLAGS="$FREETRANSLATION_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([FREETRANSLATION_CFLAGS])
+AC_SUBST([FREETRANSLATION_LIBS])
+
+
+xslfo_pkgs="$gsf_req"
+xslfo_deps="no"
+
+if test "$enable_xslfo" != ""; then
+
+PKG_CHECK_EXISTS([ $xslfo_pkgs ], 
+[
+	xslfo_deps="yes"
+], [
+	test "$enable_xslfo" = "auto" && AC_MSG_WARN([xslfo plugin: dependencies not satisfied - $xslfo_pkgs])
+])
+
+fi
+
+if test "$enable_xslfo" = "yes" || \
+   test "$xslfo_deps" = "yes"; then
+
+PKG_CHECK_MODULES(XSLFO,[ $xslfo_pkgs ])
+
+test "$enable_xslfo" = "auto" && PLUGINS="$PLUGINS xslfo"
+
+XSLFO_CFLAGS="$XSLFO_CFLAGS "'${PLUGIN_CFLAGS}'
+XSLFO_LIBS="$XSLFO_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_xslfo_builtin" = "yes"; then
+	XSLFO_CFLAGS="$XSLFO_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([XSLFO_CFLAGS])
+AC_SUBST([XSLFO_LIBS])
+
+
+wordperfect_pkgs="libwpg-0.2 >= 0.2.0 libwpd-0.9 >= 0.9.0 libwpd-stream-0.9 >= 0.9.0 $gsf_req"
+wordperfect_wps_pkgs='libwps-0.2 >= 0.1.0'
+wordperfect_deps="no"
+
+WORDPERFECT_CFLAGS=
+WORDPERFECT_LIBS=
+WPS_DEFINE=
+
+if test "$enable_wordperfect" != ""; then
+
+PKG_CHECK_EXISTS([ $wordperfect_pkgs ], 
+[
+	wordperfect_deps="yes"
+], [
+	test "$enable_wordperfect" = "auto" && AC_MSG_WARN([wordperfect plugin: dependencies not satisfied - $wordperfect_pkgs])
+])
+
+fi
+
+if test "$enable_wordperfect" = "yes" || \
+   test "$wordperfect_deps" = "yes"; then
+
+if test "$enable_wordperfect_builtin" = "yes"; then
+AC_MSG_ERROR([wordperfect plugin: static linking not supported])
+fi
+
+wp_deps_pkgs="$wordperfect_pkgs"
+
+PKG_CHECK_EXISTS([ $wordperfect_wps_pkgs ],
+[
+	wp_deps_pkgs="$wp_deps_pkgs $wordperfect_wps_pkgs"
+	WPS_DEFINE=" -DHAVE_LIBWPS"
+])
+
+PKG_CHECK_MODULES(WORDPERFECT,[ $wp_deps_pkgs ])
+
+test "$enable_wordperfect" = "auto" && PLUGINS="$PLUGINS wordperfect"
+
+WORDPERFECT_CFLAGS="$WORDPERFECT_CFLAGS "'${PLUGIN_CFLAGS}'"$WPS_DEFINE"
+WORDPERFECT_LIBS="$WORDPERFECT_LIBS "'${PLUGIN_LIBS}'
+
+fi
+
+AC_SUBST([WORDPERFECT_CFLAGS])
+AC_SUBST([WORDPERFECT_LIBS])
+
+
+applix_pkgs="$gsf_req"
+applix_deps="no"
+
+if test "$enable_applix" != ""; then
+
+PKG_CHECK_EXISTS([ $applix_pkgs ], 
+[
+	applix_deps="yes"
+], [
+	test "$enable_applix" = "auto" && AC_MSG_WARN([applix plugin: dependencies not satisfied - $applix_pkgs])
+])
+
+fi
+
+if test "$enable_applix" = "yes" || \
+   test "$applix_deps" = "yes"; then
+
+PKG_CHECK_MODULES(APPLIX,[ $applix_pkgs ])
+
+test "$enable_applix" = "auto" && PLUGINS="$PLUGINS applix"
+
+APPLIX_CFLAGS="$APPLIX_CFLAGS "'${PLUGIN_CFLAGS}'
+APPLIX_LIBS="$APPLIX_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_applix_builtin" = "yes"; then
+	APPLIX_CFLAGS="$APPLIX_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([APPLIX_CFLAGS])
+AC_SUBST([APPLIX_LIBS])
+
+
+loadbindings_pkgs="$gsf_req"
+loadbindings_deps="no"
+
+if test "$enable_loadbindings" != ""; then
+
+PKG_CHECK_EXISTS([ $loadbindings_pkgs ], 
+[
+	loadbindings_deps="yes"
+], [
+	test "$enable_loadbindings" = "auto" && AC_MSG_WARN([loadbindings plugin: dependencies not satisfied - $loadbindings_pkgs])
+])
+
+fi
+
+if test "$enable_loadbindings" = "yes" || \
+   test "$loadbindings_deps" = "yes"; then
+
+PKG_CHECK_MODULES(LOADBINDINGS,[ $loadbindings_pkgs ])
+
+test "$enable_loadbindings" = "auto" && PLUGINS="$PLUGINS loadbindings"
+
+LOADBINDINGS_CFLAGS="$LOADBINDINGS_CFLAGS "'${PLUGIN_CFLAGS}'
+LOADBINDINGS_LIBS="$LOADBINDINGS_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_loadbindings_builtin" = "yes"; then
+	LOADBINDINGS_CFLAGS="$LOADBINDINGS_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([LOADBINDINGS_CFLAGS])
+AC_SUBST([LOADBINDINGS_LIBS])
+
+
+docbook_pkgs="$gsf_req"
+docbook_deps="no"
+
+if test "$enable_docbook" != ""; then
+
+PKG_CHECK_EXISTS([ $docbook_pkgs ], 
+[
+	docbook_deps="yes"
+], [
+	test "$enable_docbook" = "auto" && AC_MSG_WARN([docbook plugin: dependencies not satisfied - $docbook_pkgs])
+])
+
+fi
+
+if test "$enable_docbook" = "yes" || \
+   test "$docbook_deps" = "yes"; then
+
+AC_HEADER_TIME
+
+PKG_CHECK_MODULES(DOCBOOK,[ $docbook_pkgs ])
+
+test "$enable_docbook" = "auto" && PLUGINS="$PLUGINS docbook"
+
+DOCBOOK_CFLAGS="$DOCBOOK_CFLAGS "'${PLUGIN_CFLAGS}'
+DOCBOOK_LIBS="$DOCBOOK_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_docbook_builtin" = "yes"; then
+	DOCBOOK_CFLAGS="$DOCBOOK_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([DOCBOOK_CFLAGS])
+AC_SUBST([DOCBOOK_LIBS])
+
+
+MIF_CFLAGS=
+MIF_LIBS=
+
+if test "$enable_mif" != ""; then
+
+test "$enable_mif" = "auto" && PLUGINS="$PLUGINS mif"
+
+MIF_CFLAGS="$MIF_CFLAGS "'${PLUGIN_CFLAGS}'
+MIF_LIBS="$MIF_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_mif_builtin" = "yes"; then
+	MIF_CFLAGS="$MIF_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([MIF_CFLAGS])
+AC_SUBST([MIF_LIBS])
+
+
+pdf_pkgs="$gsf_req"
+pdf_deps="no"
+
+PDF_CFLAGS=
+PDF_LIBS=
+
+if test "$enable_pdf" != ""; then
+
+PKG_CHECK_EXISTS([ $pdf_pkgs ], 
+[
+	pdf_deps="yes"
+], [
+	test "$enable_pdf" = "auto" && AC_MSG_WARN([pdf plugin: dependencies not satisfied - $pdf_pkgs])
+])
+
+fi
+
+if test "$enable_pdf" = "yes" || \
+   test "$pdf_deps" = "yes"; then
+
+PKG_CHECK_MODULES(PDF,[ $pdf_pkgs ])
+
+test "$enable_pdf" = "auto" && PLUGINS="$PLUGINS pdf"
+
+PDF_CFLAGS="$PDF_CFLAGS "'${PLUGIN_CFLAGS}'
+PDF_LIBS="$PDF_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_pdf_builtin" = "yes"; then
+	PDF_CFLAGS="$PDF_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([PDF_CFLAGS])
+AC_SUBST([PDF_LIBS])
+
+
+GOOGLE_CFLAGS=
+GOOGLE_LIBS=
+
+if test "$enable_google" != ""; then
+
+test "$enable_google" = "auto" && PLUGINS="$PLUGINS google"
+
+GOOGLE_CFLAGS="$GOOGLE_CFLAGS "'${PLUGIN_CFLAGS}'
+GOOGLE_LIBS="$GOOGLE_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_google_builtin" = "yes"; then
+	GOOGLE_CFLAGS="$GOOGLE_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([GOOGLE_CFLAGS])
+AC_SUBST([GOOGLE_LIBS])
 
 
 clarisworks_pkgs="$gsf_req"
@@ -404,76 +1222,6 @@ fi
 
 AC_SUBST([CLARISWORKS_CFLAGS])
 AC_SUBST([CLARISWORKS_LIBS])
-
-
-openxml_pkgs="libgsf-1 >= 1.14.4"
-openxml_deps="no"
-
-if test "$enable_openxml" != ""; then
-
-PKG_CHECK_EXISTS([ $openxml_pkgs ], 
-[
-	openxml_deps="yes"
-	], [
-	test "$enable_openxml" = "auto" && AC_MSG_WARN([openxml plugin: dependencies not satisfied - $openxml_pkgs])
-])
-
-AC_SUBST(ABIWORD_OMMLXSLTDIR, "${ABIWORD_DATADIR}/omml_xslt")
-
-fi
-
-if test "$enable_openxml" = "yes" || \
-   test "$openxml_deps" = "yes"; then
-
-PKG_CHECK_MODULES(OPENXML,[ $openxml_pkgs ])
-
-test "$enable_openxml" = "auto" && PLUGINS="$PLUGINS openxml"
-
-OPENXML_CFLAGS="$OPENXML_CFLAGS "'${PLUGIN_CFLAGS}'
-OPENXML_LIBS="$OPENXML_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_openxml_builtin" = "yes"; then
-	OPENXML_CFLAGS="$OPENXML_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([OPENXML_CFLAGS])
-AC_SUBST([OPENXML_LIBS])
-
-
-t602_pkgs="$gsf_req"
-t602_deps="no"
-
-if test "$enable_t602" != ""; then
-
-PKG_CHECK_EXISTS([ $t602_pkgs ], 
-[
-	t602_deps="yes"
-], [
-	test "$enable_t602" = "auto" && AC_MSG_WARN([t602 plugin: dependencies not satisfied - $t602_pkgs])
-])
-
-fi
-
-if test "$enable_t602" = "yes" || \
-   test "$t602_deps" = "yes"; then
-
-PKG_CHECK_MODULES(T602,[ $t602_pkgs ])
-
-test "$enable_t602" = "auto" && PLUGINS="$PLUGINS t602"
-
-T602_CFLAGS="$T602_CFLAGS "'${PLUGIN_CFLAGS}'
-T602_LIBS="$T602_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_t602_builtin" = "yes"; then
-	T602_CFLAGS="$T602_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([T602_CFLAGS])
-AC_SUBST([T602_LIBS])
 
 
 LATEX_CFLAGS=
@@ -516,277 +1264,38 @@ AC_SUBST([LATEX_CFLAGS])
 AC_SUBST([LATEX_LIBS])
 
 
-grammar_pkgs='link-grammar >= 4.2.1'
-grammar_deps="no"
+t602_pkgs="$gsf_req"
+t602_deps="no"
 
-dnl make sure we enable grammar only if spell is enabled. At least in auto mode.
-if test "$enable_grammar" != "" && test  "$abi_cv_spell" = "yes"; then
+if test "$enable_t602" != ""; then
 
-PKG_CHECK_EXISTS([ $grammar_pkgs ], 
+PKG_CHECK_EXISTS([ $t602_pkgs ], 
 [
-	grammar_deps="yes"
+	t602_deps="yes"
 ], [
-	test "$enable_grammar" = "auto" && AC_MSG_WARN([grammar plugin: dependencies not satisfied - $grammar_pkgs])
+	test "$enable_t602" = "auto" && AC_MSG_WARN([t602 plugin: dependencies not satisfied - $t602_pkgs])
 ])
 
 fi
 
-if test "$enable_grammar" = "yes" || \
-   test "$grammar_deps" = "yes"; then
+if test "$enable_t602" = "yes" || \
+   test "$t602_deps" = "yes"; then
 
-if test "$enable_grammar_builtin" = "yes"; then
-AC_MSG_ERROR([grammar plugin: static linking not supported])
-fi
+PKG_CHECK_MODULES(T602,[ $t602_pkgs ])
 
-PKG_CHECK_MODULES(GRAMMAR,[ $grammar_pkgs ])
-PKG_CHECK_EXISTS([ link-grammar >= 5.1.0 ], 
-[
-	AC_DEFINE([HAVE_LINK_GRAMMAR_51],[1],["have link-grammar 5.1.0 or later"])
-])
+test "$enable_t602" = "auto" && PLUGINS="$PLUGINS t602"
 
-test "$enable_grammar" = "auto" && PLUGINS="$PLUGINS grammar"
+T602_CFLAGS="$T602_CFLAGS "'${PLUGIN_CFLAGS}'
+T602_LIBS="$T602_LIBS "'${PLUGIN_LIBS}'
 
-GRAMMAR_CFLAGS="$GRAMMAR_CFLAGS "'${PLUGIN_CFLAGS}'
-GRAMMAR_LIBS="$GRAMMAR_LIBS "'${PLUGIN_LIBS}'
-
-fi
-
-AC_SUBST([GRAMMAR_CFLAGS])
-AC_SUBST([GRAMMAR_LIBS])
-
-
-EML_CFLAGS=
-EML_LIBS=
-
-if test "$enable_eml" != ""; then
-
-test "$enable_eml" = "auto" && PLUGINS="$PLUGINS eml"
-
-EML_CFLAGS="$EML_CFLAGS "'${PLUGIN_CFLAGS}'
-EML_LIBS="$EML_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_eml_builtin" = "yes"; then
-	EML_CFLAGS="$EML_CFLAGS -DABI_PLUGIN_BUILTIN"
+if test "$enable_t602_builtin" = "yes"; then
+	T602_CFLAGS="$T602_CFLAGS -DABI_PLUGIN_BUILTIN"
 fi
 
 fi
 
-AC_SUBST([EML_CFLAGS])
-AC_SUBST([EML_LIBS])
-
-
-epub_pkgs="libgsf-1 >= 1.14.4"
-epub_deps="no"
-
-if test "$enable_epub" != ""; then
-
-PKG_CHECK_EXISTS([ $epub_pkgs ], 
-[
-	epub_deps="yes"
-	], [
-	test "$enable_epub" = "auto" && AC_MSG_WARN([epub plugin: dependencies not satisfied - $epub_pkgs])
-])
-
-fi
-
-if test "$enable_epub" = "yes" || \
-   test "$epub_deps" = "yes"; then
-
-PKG_CHECK_MODULES(EPUB,[ $epub_pkgs ])
-
-test "$enable_epub" = "auto" && PLUGINS="$PLUGINS epub"
-
-EPUB_CFLAGS="$EPUB_CFLAGS "'${PLUGIN_CFLAGS}'
-EPUB_LIBS="$EPUB_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_epub_builtin" = "yes"; then
-	EPUB_CFLAGS="$EPUB_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([EPUB_CFLAGS])
-AC_SUBST([EPUB_LIBS])
-
-
-#opendocument_pkgs="$gsf_req redland >= 1.0.10 rasqal >= 0.9.17"
-
-opendocument_pkgs="$gsf_req"
-opendocument_optional_pkgs="redland >= 1.0.10 rasqal >= 0.9.17"
-opendocument_deps="no"
-
-if test "$enable_opendocument" != ""; then
-
-PKG_CHECK_EXISTS([ $opendocument_pkgs ], 
-[
-	opendocument_deps="yes"
-], [
-	test "$enable_opendocument" = "auto" && AC_MSG_WARN([opendocument plugin: dependencies not satisfied - $opendocument_pkgs])
-])
-
-PKG_CHECK_EXISTS([ $opendocument_optional_pkgs ], 
-[ opendocument_pkgs="$opendocument_pkgs $opendocument_optional_pkgs" ])
-
-fi
-
-if test "$enable_opendocument" = "yes" || \
-   test "$opendocument_deps" = "yes"; then
-
-PKG_CHECK_MODULES(OPENDOCUMENT,[ $opendocument_pkgs ])
-
-test "$enable_opendocument" = "auto" && PLUGINS="$PLUGINS opendocument"
-
-OPENDOCUMENT_CFLAGS="$OPENDOCUMENT_CFLAGS "'${PLUGIN_CFLAGS}'
-OPENDOCUMENT_LIBS="$OPENDOCUMENT_LIBS "'${PLUGIN_LIBS} -lz'
-
-if test "$enable_opendocument_builtin" = "yes"; then
-	OPENDOCUMENT_CFLAGS="$OPENDOCUMENT_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([OPENDOCUMENT_CFLAGS])
-AC_SUBST([OPENDOCUMENT_LIBS])
-
-
-rsvg_pkgs="librsvg-2.0 >= 2.0 glib-2.0"
-rsvg_deps="no"
-
-if test "$TOOLKIT" = "gtk"; then
- 
- if test "$enable_rsvg" = "auto"; then
-   AC_MSG_WARN([rsvg plugin: not needed with gtk])
- fi
- enable_rsvg=""
-fi
-
-if test "$enable_rsvg" != ""; then
-
-PKG_CHECK_EXISTS([ $rsvg_pkgs ], 
-[
-	rsvg_deps="yes"
-], [
-	test "$enable_rsvg" = "auto" && AC_MSG_WARN([rsvg plugin: dependencies not satisfied - $rsvg_pkgs])
-])
-
-fi
-
-if test "$enable_rsvg" = "yes" || \
-   test "$rsvg_deps" = "yes"; then
-
-if test "$enable_rsvg_builtin" = "yes"; then
-AC_MSG_ERROR([rsvg plugin: static linking not supported])
-fi
-
-PKG_CHECK_MODULES(RSVG,[ $rsvg_pkgs ])
-
-test "$enable_rsvg" = "auto" && PLUGINS="$PLUGINS rsvg"
-
-RSVG_CFLAGS="$RSVG_CFLAGS "'${PLUGIN_CFLAGS}'
-RSVG_LIBS="$RSVG_LIBS "'${PLUGIN_LIBS}'
-
-fi
-
-AC_SUBST([RSVG_CFLAGS])
-AC_SUBST([RSVG_LIBS])
-
-
-wpg_pkgs="$gsf_req libwpg-0.2 >= 0.2.0 libwpd-0.9 >= 0.9.0 libwpd-stream-0.9 >= 0.9.0"
-wpg_deps="no"
-
-if test "$enable_wpg" != ""; then
-
-PKG_CHECK_EXISTS([ $wpg_pkgs ], 
-[
-	wpg_deps="yes"
-], [
-	test "$enable_wpg" = "auto" && AC_MSG_WARN([wpg plugin: dependencies not satisfied - $wpg_pkgs])
-])
-
-fi
-
-if test "$enable_wpg" = "yes" || \
-   test "$wpg_deps" = "yes"; then
-
-if test "$enable_wpg_builtin" = "yes"; then
-AC_MSG_ERROR([wpg plugin: static linking not supported])
-fi
-
-PKG_CHECK_MODULES(WPG, [ $wpg_pkgs ])
-
-test "$enable_wpg" = "auto" && PLUGINS="$PLUGINS wpg"
-
-WPG_CFLAGS="$WPG_CFLAGS "'${PLUGIN_CFLAGS}'
-WPG_LIBS="$WPG_LIBS "'${PLUGIN_LIBS}'
-
-fi
-
-AC_SUBST([WPG_CFLAGS])
-AC_SUBST([WPG_LIBS])
-
-
-BMP_CFLAGS=
-BMP_LIBS=
-bmp_deps="no"
-
-if test "$enable_bmp" != ""; then
-
-   bmp_deps="yes"
-
-fi
-
-if test "$enable_bmp" = "yes" || \
-   test "$bmp_deps" = "yes"; then
-
-# TODO check for libpng, well abiword links to it anyways
-
-BMP_CFLAGS="$BMP_CFLAGS $PNG_CFLAGS "'${PLUGIN_CFLAGS}'
-BMP_LIBS="$BMP_LIBS $PNG_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_bmp_builtin" = "yes"; then
-	BMP_CFLAGS="$BMP_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-test "$enable_bmp" = "auto" && PLUGINS="$PLUGINS bmp"
-
-fi
-
-AC_SUBST([BMP_CFLAGS])
-AC_SUBST([BMP_LIBS])
-
-
-pdb_pkgs="$gsf_req"
-pdb_deps="no"
-
-if test "$enable_pdb" != ""; then
-
-PKG_CHECK_EXISTS([ $pdb_pkgs ], 
-[
-	pdb_deps="yes"
-], [
-	test "$enable_pdb" = "auto" && AC_MSG_WARN([pdb plugin: dependencies not satisfied - $pdb_pkgs])
-])
-
-fi
-
-if test "$enable_pdb" = "yes" || \
-   test "$pdb_deps" = "yes"; then
-
-PKG_CHECK_MODULES(PDB,[ $pdb_pkgs ])
-
-test "$enable_pdb" = "auto" && PLUGINS="$PLUGINS pdb"
-
-PDB_CFLAGS="$PDB_CFLAGS "'${PLUGIN_CFLAGS}'
-PDB_LIBS="$PDB_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_pdb_builtin" = "yes"; then
-	PDB_CFLAGS="$PDB_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([PDB_CFLAGS])
-AC_SUBST([PDB_LIBS])
+AC_SUBST([T602_CFLAGS])
+AC_SUBST([T602_LIBS])
 
 
 collab_req="libgsf-1 >= 1.12 libxml-2.0 >= 2.4.0"
@@ -967,7 +1476,7 @@ if test "$enable_collab_backend_sugar" = "yes"; then
 	COLLAB_RCFLAGS="$COLLAB_RCFLAGS -DABICOLLAB_HANDLER_SUGAR"
 fi
 if test "$enable_collab_backend_service" = "yes"; then
-	COLLAB_CFLAGS="$COLLAB_CFLAGS -DABICOLLAB_HANDLER_SERVICE -DSOUP24 -DASIO_ENABLE_BOOST"
+	COLLAB_CFLAGS="$COLLAB_CFLAGS -DABICOLLAB_HANDLER_SERVICE -DSOUP24"
 	COLLAB_RCFLAGS="$COLLAB_RCFLAGS -DABICOLLAB_HANDLER_SERVICE"
 fi
 if test "$enable_collab_backend_sipsimple" = "yes"; then
@@ -1009,41 +1518,94 @@ AC_SUBST([COLLAB_RCFLAGS])
 AC_SUBST([COLLAB_LIBS])
 
 
-pdf_pkgs="$gsf_req"
-pdf_deps="no"
+mswrite_pkgs="$gsf_req"
+mswrite_deps="no"
 
-PDF_CFLAGS=
-PDF_LIBS=
+if test "$enable_mswrite" != ""; then
 
-if test "$enable_pdf" != ""; then
-
-PKG_CHECK_EXISTS([ $pdf_pkgs ], 
+PKG_CHECK_EXISTS([ $mswrite_pkgs ], 
 [
-	pdf_deps="yes"
+	mswrite_deps="yes"
 ], [
-	test "$enable_pdf" = "auto" && AC_MSG_WARN([pdf plugin: dependencies not satisfied - $pdf_pkgs])
+	test "$enable_mswrite" = "auto" && AC_MSG_WARN([mswrite plugin: dependencies not satisfied - $mswrite_pkgs])
 ])
 
 fi
 
-if test "$enable_pdf" = "yes" || \
-   test "$pdf_deps" = "yes"; then
+if test "$enable_mswrite" = "yes" || \
+   test "$mswrite_deps" = "yes"; then
 
-PKG_CHECK_MODULES(PDF,[ $pdf_pkgs ])
+PKG_CHECK_MODULES(MSWRITE,[ $mswrite_pkgs ])
 
-test "$enable_pdf" = "auto" && PLUGINS="$PLUGINS pdf"
+test "$enable_mswrite" = "auto" && PLUGINS="$PLUGINS mswrite"
 
-PDF_CFLAGS="$PDF_CFLAGS "'${PLUGIN_CFLAGS}'
-PDF_LIBS="$PDF_LIBS "'${PLUGIN_LIBS}'
+MSWRITE_CFLAGS="$MSWRITE_CFLAGS "'${PLUGIN_CFLAGS}'
+MSWRITE_LIBS="$MSWRITE_LIBS "'${PLUGIN_LIBS}'
 
-if test "$enable_pdf_builtin" = "yes"; then
-	PDF_CFLAGS="$PDF_CFLAGS -DABI_PLUGIN_BUILTIN"
+if test "$enable_mswrite_builtin" = "yes"; then
+	MSWRITE_CFLAGS="$MSWRITE_CFLAGS -DABI_PLUGIN_BUILTIN"
 fi
 
 fi
 
-AC_SUBST([PDF_CFLAGS])
-AC_SUBST([PDF_LIBS])
+AC_SUBST([MSWRITE_CFLAGS])
+AC_SUBST([MSWRITE_LIBS])
+
+
+ISCII_CFLAGS=
+ISCII_LIBS=
+
+if test "$enable_iscii" != ""; then
+
+test "$enable_iscii" = "auto" && PLUGINS="$PLUGINS iscii"
+
+ISCII_CFLAGS="$ISCII_CFLAGS "'${PLUGIN_CFLAGS}'
+ISCII_LIBS="$ISCII_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_iscii_builtin" = "yes"; then
+	ISCII_CFLAGS="$ISCII_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([ISCII_CFLAGS])
+AC_SUBST([ISCII_LIBS])
+
+
+openxml_pkgs="libgsf-1 >= 1.14.4"
+openxml_deps="no"
+
+if test "$enable_openxml" != ""; then
+
+PKG_CHECK_EXISTS([ $openxml_pkgs ], 
+[
+	openxml_deps="yes"
+	], [
+	test "$enable_openxml" = "auto" && AC_MSG_WARN([openxml plugin: dependencies not satisfied - $openxml_pkgs])
+])
+
+AC_SUBST(ABIWORD_OMMLXSLTDIR, "${ABIWORD_DATADIR}/omml_xslt")
+
+fi
+
+if test "$enable_openxml" = "yes" || \
+   test "$openxml_deps" = "yes"; then
+
+PKG_CHECK_MODULES(OPENXML,[ $openxml_pkgs ])
+
+test "$enable_openxml" = "auto" && PLUGINS="$PLUGINS openxml"
+
+OPENXML_CFLAGS="$OPENXML_CFLAGS "'${PLUGIN_CFLAGS}'
+OPENXML_LIBS="$OPENXML_LIBS "'${PLUGIN_LIBS}'
+
+if test "$enable_openxml_builtin" = "yes"; then
+	OPENXML_CFLAGS="$OPENXML_CFLAGS -DABI_PLUGIN_BUILTIN"
+fi
+
+fi
+
+AC_SUBST([OPENXML_CFLAGS])
+AC_SUBST([OPENXML_LIBS])
 
 
 WIKIPEDIA_CFLAGS=
@@ -1066,40 +1628,38 @@ AC_SUBST([WIKIPEDIA_CFLAGS])
 AC_SUBST([WIKIPEDIA_LIBS])
 
 
-garble_pkgs="libgsf-1 >= 1.12 libxml-2.0 >= 2.4.0"
-garble_deps="no"
+pdb_pkgs="$gsf_req"
+pdb_deps="no"
 
-if test "$enable_garble" != ""; then
+if test "$enable_pdb" != ""; then
 
-PKG_CHECK_EXISTS([ $garble_pkgs ], 
+PKG_CHECK_EXISTS([ $pdb_pkgs ], 
 [
-	garble_deps="yes"
+	pdb_deps="yes"
 ], [
-	test "$enable_garble" = "auto" && AC_MSG_WARN([garble plugin: dependencies not satisfied - $garble_pkgs])
+	test "$enable_pdb" = "auto" && AC_MSG_WARN([pdb plugin: dependencies not satisfied - $pdb_pkgs])
 ])
 
 fi
 
-if test "$enable_garble" = "yes" || \
-   test "$garble_deps" = "yes"; then
+if test "$enable_pdb" = "yes" || \
+   test "$pdb_deps" = "yes"; then
 
-AC_HEADER_TIME
+PKG_CHECK_MODULES(PDB,[ $pdb_pkgs ])
 
-PKG_CHECK_MODULES(GARBLE,[ $garble_pkgs ])
+test "$enable_pdb" = "auto" && PLUGINS="$PLUGINS pdb"
 
-test "$enable_garble" = "auto" && PLUGINS="$PLUGINS garble"
+PDB_CFLAGS="$PDB_CFLAGS "'${PLUGIN_CFLAGS}'
+PDB_LIBS="$PDB_LIBS "'${PLUGIN_LIBS}'
 
-GARBLE_CFLAGS="$GARBLE_CFLAGS $PNG_CFLAGS "'${PLUGIN_CFLAGS}'
-GARBLE_LIBS="$GARBLE_LIBS $PNG_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_garble_builtin" = "yes"; then
-	GARBLE_CFLAGS="$GARBLE_CFLAGS -DABI_PLUGIN_BUILTIN"
+if test "$enable_pdb_builtin" = "yes"; then
+	PDB_CFLAGS="$PDB_CFLAGS -DABI_PLUGIN_BUILTIN"
 fi
 
 fi
 
-AC_SUBST([GARBLE_CFLAGS])
-AC_SUBST([GARBLE_LIBS])
+AC_SUBST([PDB_CFLAGS])
+AC_SUBST([PDB_LIBS])
 
 
 mathview_pkgs='mathview-frontend-libxml2 >= 0.7.5'
@@ -1159,189 +1719,6 @@ AC_PROG_YACC
 AC_SUBST([MATHVIEW_CFLAGS])
 AC_SUBST([MATHVIEW_LIBS])
 
-command_deps="no"
-
-if test "$enable_command" != ""; then
-    if test "$TOOLKIT" != "gtk"; then
-		command_deps="no"
-		AC_MSG_WARN([command plugin: only supported on UNIX/gtk platforms])
-	else 
-		# stolen from the original plugin.m4 in abiword-plugins
-		AC_CHECK_HEADER(readline/readline.h,[
-				AC_CHECK_HEADER(readline/history.h,[
-						AC_CHECK_LIB(readline,readline,[
-								command_deps="yes"
-						],[     AC_CHECK_LIB(readline,rl_initialize,[
-										command_deps="yes"
-
-								],,)
-						],)
-				])
-		])
-	fi
-fi
-
-if test "$enable_command" = "yes" || \
-   test "$command_deps" = "yes"; then
-
-if test "$enable_command_builtin" = "yes"; then
-AC_MSG_ERROR([command plugin: static linking not supported])
-fi
-
-AC_MSG_CHECKING([command plugin: for readline and friends])
-if test "$command_deps" != "yes"; then
-	AC_MSG_ERROR([no])
-else
-	AC_MSG_RESULT([yes])
-        COMMAND_LIBS="-lreadline -lhistory $COMMAND_LIBS"
-fi
-
-test "$enable_command" = "auto" && PLUGINS="$PLUGINS command"
-
-COMMAND_CFLAGS="$COMMAND_CFLAGS "'${PLUGIN_CFLAGS}'
-COMMAND_LIBS="$COMMAND_LIBS "'${PLUGIN_LIBS}'
-
-fi
-
-AC_SUBST([COMMAND_CFLAGS])
-AC_SUBST([COMMAND_LIBS])
-
-
-AC_ARG_WITH([psiconv-config],
-	[AS_HELP_STRING([--with-psiconv-config=DIR], [use psiconv-config in DIR])],
-[
-	AC_PATH_PROG(psiconvconfig, psiconv-config, , "$withval")
-], [
-	AC_PATH_PROG(psiconvconfig, psiconv-config)
-])
-
-# The required psiconv version, as reported by psiconv-config
-psiconv_major_req=0
-psiconv_minor_req=9
-psiconv_micro_req=4
-psion_deps="no"
-
-if test "$enable_psion" != ""; then
-
-	if test "$psiconvconfig" = ""; then
-		if test "$enable_psion" = "yes"; then
-		  AC_MSG_ERROR([psiconv plugin: program psiconv-config not found in path])
-		else
-		  AC_MSG_WARN([psiconv plugin: program psiconv-config not found in path])
-		fi
-	else
-		IFS_old="$IFS"
-		IFS='.'
-		set -- `$psiconvconfig --version`
-		psiconv_major_found="${1}"
-		psiconv_minor_found="${2}"
-		psiconv_micro_found="${3}"
-		IFS="$IFS_old"
-		if test "$psiconv_major_found" -gt "$psiconv_major_req"; then
-			psion_deps="yes"
-		elif test "$psiconv_major_found" -eq "$psiconv_major_req" &&
-		     test "$psiconv_minor_found" -gt "$psiconv_minor_req"; then
-			psion_deps="yes"
-		elif test "$psiconv_major_found" -eq "$psiconv_major_req" &&
-		     test "$psiconv_minor_found" -eq "$psiconv_minor_req" &&
-		     test "$psiconv_micro_found" -ge "$psiconv_micro_req"; then
-			psion_deps="yes"
-		fi
-	fi
-fi
-
-if test "$enable_psion" = "yes" || \
-   test "$psion_deps" = "yes"; then
-
-if test "$enable_psion_builtin" = "yes"; then
-AC_MSG_ERROR([psion plugin: static linking not supported])
-fi
-
-AC_MSG_CHECKING([for psiconv >= ${psiconv_major_req}.${psiconv_minor_req}.${psiconv_micro_req}])
-if test "$psion_deps" = "yes"; then
-	AC_MSG_RESULT([version ${psiconv_major_found}.${psiconv_minor_found}.${psiconv_micro_found} (ok)])
-	PSION_CFLAGS=`$psiconvconfig --cflags`
-	PSION_LIBS=`$psiconvconfig --libs`
-else
-	AC_MSG_ERROR([version ${psiconv_major_found}.${psiconv_minor_found}.${psiconv_micro_found} (too old!)])
-fi
-
-test "$enable_psion" = "auto" && PLUGINS="$PLUGINS psion"
-
-PSION_CFLAGS="$PSION_CFLAGS $PNG_CFLAGS "'${PLUGIN_CFLAGS}'
-PSION_LIBS="$PSION_LIBS $PNG_LIBS -lgsf-1 "'${PLUGIN_LIBS}'
-
-fi
-
-AC_SUBST([PSION_CFLAGS])
-AC_SUBST([PSION_LIBS])
-
-
-GIMP_CFLAGS=
-GIMP_LIBS=
-
-if test "$enable_gimp" != ""; then
-
-test "$enable_gimp" = "auto" && PLUGINS="$PLUGINS gimp"
-
-GIMP_CFLAGS="$GIMP_CFLAGS "'${PLUGIN_CFLAGS}'
-GIMP_LIBS="$GIMP_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_gimp_builtin" = "yes"; then
-	GIMP_CFLAGS="$GIMP_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([GIMP_CFLAGS])
-AC_SUBST([GIMP_LIBS])
-
-
-aiksaurus_pkgs="aiksaurus-1.0"
-aiksaurus_gtk_pkgs="aiksaurusgtk3-1.0"
-aiksaurus_deps="no"
-
-if test "$enable_aiksaurus" != ""; then
-
-PKG_CHECK_EXISTS([ $aiksaurus_pkgs ], 
-[
-  aiksaurus_deps="yes"
-], [
-	test "$enable_aiksaurus" = "auto" && AC_MSG_WARN([aiksaurus plugin: dependencies not satisfied - $aiksaurus_pkgs])
-])
-
-fi
-
-if test "$enable_aiksaurus" = "yes" || \
-   test "$aiksaurus_deps" = "yes"; then
-
-use_builtin_aiksaurus_gtk="no"
-if test "$TOOLKIT" = "gtk"; then
-PKG_CHECK_EXISTS([ $aiksaurus_gtk_pkgs ], 
-[
-  aiksaurus_pkgs="$aiksaurus_pkgs $aiksaurus_gtk_pkgs"
-], [use_builtin_aiksaurus_gtk="yes"])
-fi
-
-if test "$enable_aiksaurus_builtin" = "yes"; then
-AC_MSG_ERROR([aiksaurus plugin: static linking not supported])
-fi
-
-PKG_CHECK_MODULES(AIKSAURUS,[ $aiksaurus_pkgs ])
-
-  
-test "$enable_aiksaurus" = "auto" && PLUGINS="$PLUGINS aiksaurus"
-
-AIKSAURUS_CFLAGS="$AIKSAURUS_CFLAGS "'${PLUGIN_CFLAGS}'
-AIKSAURUS_LIBS="$AIKSAURUS_LIBS "'${PLUGIN_LIBS}'
-
-fi
-
-AM_CONDITIONAL([WITH_BUILTIN_AIKSAURUS_GTK],[ test "x$use_builtin_aiksaurus_gtk" = "xyes" ])
-
-AC_SUBST([AIKSAURUS_CFLAGS])
-AC_SUBST([AIKSAURUS_LIBS])
-
 
 URLDICT_CFLAGS=
 URLDICT_LIBS=
@@ -1361,40 +1738,6 @@ fi
 
 AC_SUBST([URLDICT_CFLAGS])
 AC_SUBST([URLDICT_LIBS])
-
-
-wml_pkgs="$gsf_req"
-wml_deps="no"
-
-if test "$enable_wml" != ""; then
-
-PKG_CHECK_EXISTS([ $wml_pkgs ], 
-[
-	wml_deps="yes"
-], [
-	test "$enable_wml" = "auto" && AC_MSG_WARN([wml plugin: dependencies not satisfied - $wml_pkgs])
-])
-
-fi
-
-if test "$enable_wml" = "yes" || \
-   test "$wml_deps" = "yes"; then
-
-PKG_CHECK_MODULES(WML,[ $wml_pkgs ])
-
-test "$enable_wml" = "auto" && PLUGINS="$PLUGINS wml"
-
-WML_CFLAGS="$WML_CFLAGS "'${PLUGIN_CFLAGS}'
-WML_LIBS="$WML_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_wml_builtin" = "yes"; then
-	WML_CFLAGS="$WML_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([WML_CFLAGS])
-AC_SUBST([WML_LIBS])
 
 
 AC_ARG_WITH([libwmf-config],
@@ -1467,188 +1810,6 @@ AC_SUBST([WMF_CFLAGS])
 AC_SUBST([WMF_LIBS])
 
 
-sdw_pkgs="$gsf_req"
-sdw_deps="no"
-
-if test "$enable_sdw" != ""; then
-
-PKG_CHECK_EXISTS([ $sdw_pkgs ], 
-[
-	sdw_deps="yes"
-], [
-	test "$enable_sdw" = "auto" && AC_MSG_WARN([sdw plugin: dependencies not satisfied - $sdw_pkgs])
-])
-
-fi
-
-if test "$enable_sdw" = "yes" || \
-   test "$sdw_deps" = "yes"; then
-
-PKG_CHECK_MODULES(SDW,[ $sdw_pkgs ])
-
-test "$enable_sdw" = "auto" && PLUGINS="$PLUGINS sdw"
-
-SDW_CFLAGS="$SDW_CFLAGS "'${PLUGIN_CFLAGS}'
-SDW_LIBS="$SDW_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_sdw_builtin" = "yes"; then
-	SDW_CFLAGS="$SDW_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([SDW_CFLAGS])
-AC_SUBST([SDW_LIBS])
-
-
-mswrite_pkgs="$gsf_req"
-mswrite_deps="no"
-
-if test "$enable_mswrite" != ""; then
-
-PKG_CHECK_EXISTS([ $mswrite_pkgs ], 
-[
-	mswrite_deps="yes"
-], [
-	test "$enable_mswrite" = "auto" && AC_MSG_WARN([mswrite plugin: dependencies not satisfied - $mswrite_pkgs])
-])
-
-fi
-
-if test "$enable_mswrite" = "yes" || \
-   test "$mswrite_deps" = "yes"; then
-
-PKG_CHECK_MODULES(MSWRITE,[ $mswrite_pkgs ])
-
-test "$enable_mswrite" = "auto" && PLUGINS="$PLUGINS mswrite"
-
-MSWRITE_CFLAGS="$MSWRITE_CFLAGS "'${PLUGIN_CFLAGS}'
-MSWRITE_LIBS="$MSWRITE_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_mswrite_builtin" = "yes"; then
-	MSWRITE_CFLAGS="$MSWRITE_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([MSWRITE_CFLAGS])
-AC_SUBST([MSWRITE_LIBS])
-
-
-loadbindings_pkgs="$gsf_req"
-loadbindings_deps="no"
-
-if test "$enable_loadbindings" != ""; then
-
-PKG_CHECK_EXISTS([ $loadbindings_pkgs ], 
-[
-	loadbindings_deps="yes"
-], [
-	test "$enable_loadbindings" = "auto" && AC_MSG_WARN([loadbindings plugin: dependencies not satisfied - $loadbindings_pkgs])
-])
-
-fi
-
-if test "$enable_loadbindings" = "yes" || \
-   test "$loadbindings_deps" = "yes"; then
-
-PKG_CHECK_MODULES(LOADBINDINGS,[ $loadbindings_pkgs ])
-
-test "$enable_loadbindings" = "auto" && PLUGINS="$PLUGINS loadbindings"
-
-LOADBINDINGS_CFLAGS="$LOADBINDINGS_CFLAGS "'${PLUGIN_CFLAGS}'
-LOADBINDINGS_LIBS="$LOADBINDINGS_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_loadbindings_builtin" = "yes"; then
-	LOADBINDINGS_CFLAGS="$LOADBINDINGS_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([LOADBINDINGS_CFLAGS])
-AC_SUBST([LOADBINDINGS_LIBS])
-
-
-ots_pkgs="libots-1 >= 0.5.0"
-ots_deps="no"
-
-if test "$enable_ots" != ""; then
-
-PKG_CHECK_EXISTS([ $ots_pkgs ], 
-[
-	ots_deps="yes"
-], [
-	test "$enable_ots" = "auto" && AC_MSG_WARN([ots plugin: dependencies not satisfied - $ots_pkgs])
-])
-
-fi
-
-if test "$enable_ots" = "yes" || \
-   test "$ots_deps" = "yes"; then
-
-test "$enable_ots" = "auto" && PLUGINS="$PLUGINS ots"
-
-if test "$enable_ots_builtin" = "yes"; then
-AC_MSG_ERROR([ots plugin: static linking not supported])
-fi
-
-PKG_CHECK_MODULES(OTS,[ $ots_pkgs ])
-
-OTS_CFLAGS="$OTS_CFLAGS "'${PLUGIN_CFLAGS}'
-OTS_LIBS="$OTS_LIBS "'${PLUGIN_LIBS}'
-
-fi
-
-AC_SUBST([OTS_CFLAGS])
-AC_SUBST([OTS_LIBS])
-
-
-PRESENTATION_CFLAGS=
-PRESENTATION_LIBS=
-
-if test "$enable_presentation" != ""; then
-
-test "$enable_presentation" = "auto" && PLUGINS="$PLUGINS presentation"
-
-PRESENTATION_CFLAGS="$PRESENTATION_CFLAGS "'${PLUGIN_CFLAGS}'
-PRESENTATION_LIBS="$PRESENTATION_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_presentation_builtin" = "yes"; then
-	PRESENTATION_CFLAGS="$PRESENTATION_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([PRESENTATION_CFLAGS])
-AC_SUBST([PRESENTATION_LIBS])
-
-
-PAINT_CFLAGS=
-PAINT_LIBS=
-
-if test "$enable_paint" != ""; then
-
-test "$enable_paint" = "auto" && PLUGINS="$PLUGINS paint"
-
-# TODO check for libpng
-if test "$TOOLKIT" = "win"; then
-	PAINT_LIBS="-lgdi32 $PNG_LIBS"
-	PAINT_CFLAGS="$PAINT_CFLAGS $PNG_CFLAGS"
-fi
-
-PAINT_CFLAGS="$PAINT_CFLAGS "'${PLUGIN_CFLAGS}'
-PAINT_LIBS="$PAINT_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_paint_builtin" = "yes"; then
-	PAINT_CFLAGS="$PAINT_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([PAINT_CFLAGS])
-AC_SUBST([PAINT_LIBS])
-
-
 hancom_pkgs="$gsf_req"
 hancom_deps="no"
 
@@ -1683,241 +1844,38 @@ AC_SUBST([HANCOM_CFLAGS])
 AC_SUBST([HANCOM_LIBS])
 
 
-PASSEPARTOUT_CFLAGS=
-PASSEPARTOUT_LIBS=
+epub_pkgs="libgsf-1 >= 1.14.4"
+epub_deps="no"
 
-if test "$enable_passepartout" != ""; then
+if test "$enable_epub" != ""; then
 
-test "$enable_passepartout" = "auto" && PLUGINS="$PLUGINS passepartout"
-
-PASSEPARTOUT_CFLAGS="$PASSEPARTOUT_CFLAGS "'${PLUGIN_CFLAGS}'
-PASSEPARTOUT_LIBS="$PASSEPARTOUT_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_passepartout_builtin" = "yes"; then
-	PASSEPARTOUT_CFLAGS="$PASSEPARTOUT_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([PASSEPARTOUT_CFLAGS])
-AC_SUBST([PASSEPARTOUT_LIBS])
-
-
-xslfo_pkgs="$gsf_req"
-xslfo_deps="no"
-
-if test "$enable_xslfo" != ""; then
-
-PKG_CHECK_EXISTS([ $xslfo_pkgs ], 
+PKG_CHECK_EXISTS([ $epub_pkgs ], 
 [
-	xslfo_deps="yes"
-], [
-	test "$enable_xslfo" = "auto" && AC_MSG_WARN([xslfo plugin: dependencies not satisfied - $xslfo_pkgs])
+	epub_deps="yes"
+	], [
+	test "$enable_epub" = "auto" && AC_MSG_WARN([epub plugin: dependencies not satisfied - $epub_pkgs])
 ])
 
 fi
 
-if test "$enable_xslfo" = "yes" || \
-   test "$xslfo_deps" = "yes"; then
+if test "$enable_epub" = "yes" || \
+   test "$epub_deps" = "yes"; then
 
-PKG_CHECK_MODULES(XSLFO,[ $xslfo_pkgs ])
+PKG_CHECK_MODULES(EPUB,[ $epub_pkgs ])
 
-test "$enable_xslfo" = "auto" && PLUGINS="$PLUGINS xslfo"
+test "$enable_epub" = "auto" && PLUGINS="$PLUGINS epub"
 
-XSLFO_CFLAGS="$XSLFO_CFLAGS "'${PLUGIN_CFLAGS}'
-XSLFO_LIBS="$XSLFO_LIBS "'${PLUGIN_LIBS}'
+EPUB_CFLAGS="$EPUB_CFLAGS "'${PLUGIN_CFLAGS}'
+EPUB_LIBS="$EPUB_LIBS "'${PLUGIN_LIBS}'
 
-if test "$enable_xslfo_builtin" = "yes"; then
-	XSLFO_CFLAGS="$XSLFO_CFLAGS -DABI_PLUGIN_BUILTIN"
+if test "$enable_epub_builtin" = "yes"; then
+	EPUB_CFLAGS="$EPUB_CFLAGS -DABI_PLUGIN_BUILTIN"
 fi
 
 fi
 
-AC_SUBST([XSLFO_CFLAGS])
-AC_SUBST([XSLFO_LIBS])
-
-
-MIF_CFLAGS=
-MIF_LIBS=
-
-if test "$enable_mif" != ""; then
-
-test "$enable_mif" = "auto" && PLUGINS="$PLUGINS mif"
-
-MIF_CFLAGS="$MIF_CFLAGS "'${PLUGIN_CFLAGS}'
-MIF_LIBS="$MIF_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_mif_builtin" = "yes"; then
-	MIF_CFLAGS="$MIF_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([MIF_CFLAGS])
-AC_SUBST([MIF_LIBS])
-
-
-S5_CFLAGS=
-S5_LIBS=
-
-if test "$enable_s5" != ""; then
-
-test "$enable_s5" = "auto" && PLUGINS="$PLUGINS s5"
-
-S5_CFLAGS="$S5_CFLAGS "'${PLUGIN_CFLAGS}'
-S5_LIBS="$S5_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_s5_builtin" = "yes"; then
-	S5_CFLAGS="$S5_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([S5_CFLAGS])
-AC_SUBST([S5_LIBS])
-
-
-FREETRANSLATION_CFLAGS=
-FREETRANSLATION_LIBS=
-
-if test "$enable_freetranslation" != ""; then
-
-test "$enable_freetranslation" = "auto" && PLUGINS="$PLUGINS freetranslation"
-
-FREETRANSLATION_CFLAGS="$FREETRANSLATION_CFLAGS "'${PLUGIN_CFLAGS}'
-FREETRANSLATION_LIBS="$FREETRANSLATION_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_freetranslation_builtin" = "yes"; then
-	FREETRANSLATION_CFLAGS="$FREETRANSLATION_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([FREETRANSLATION_CFLAGS])
-AC_SUBST([FREETRANSLATION_LIBS])
-
-
-wordperfect_pkgs="libwpg-0.2 >= 0.2.0 libwpd-0.9 >= 0.9.0 libwpd-stream-0.9 >= 0.9.0 $gsf_req"
-wordperfect_wps_pkgs='libwps-0.2 >= 0.1.0'
-wordperfect_deps="no"
-
-WORDPERFECT_CFLAGS=
-WORDPERFECT_LIBS=
-WPS_DEFINE=
-
-if test "$enable_wordperfect" != ""; then
-
-PKG_CHECK_EXISTS([ $wordperfect_pkgs ], 
-[
-	wordperfect_deps="yes"
-], [
-	test "$enable_wordperfect" = "auto" && AC_MSG_WARN([wordperfect plugin: dependencies not satisfied - $wordperfect_pkgs])
-])
-
-fi
-
-if test "$enable_wordperfect" = "yes" || \
-   test "$wordperfect_deps" = "yes"; then
-
-if test "$enable_wordperfect_builtin" = "yes"; then
-AC_MSG_ERROR([wordperfect plugin: static linking not supported])
-fi
-
-wp_deps_pkgs="$wordperfect_pkgs"
-
-PKG_CHECK_EXISTS([ $wordperfect_wps_pkgs ],
-[
-	wp_deps_pkgs="$wp_deps_pkgs $wordperfect_wps_pkgs"
-	WPS_DEFINE=" -DHAVE_LIBWPS"
-])
-
-PKG_CHECK_MODULES(WORDPERFECT,[ $wp_deps_pkgs ])
-
-test "$enable_wordperfect" = "auto" && PLUGINS="$PLUGINS wordperfect"
-
-WORDPERFECT_CFLAGS="$WORDPERFECT_CFLAGS "'${PLUGIN_CFLAGS}'"$WPS_DEFINE"
-WORDPERFECT_LIBS="$WORDPERFECT_LIBS "'${PLUGIN_LIBS}'
-
-fi
-
-AC_SUBST([WORDPERFECT_CFLAGS])
-AC_SUBST([WORDPERFECT_LIBS])
-
-
-docbook_pkgs="$gsf_req"
-docbook_deps="no"
-
-if test "$enable_docbook" != ""; then
-
-PKG_CHECK_EXISTS([ $docbook_pkgs ], 
-[
-	docbook_deps="yes"
-], [
-	test "$enable_docbook" = "auto" && AC_MSG_WARN([docbook plugin: dependencies not satisfied - $docbook_pkgs])
-])
-
-fi
-
-if test "$enable_docbook" = "yes" || \
-   test "$docbook_deps" = "yes"; then
-
-AC_HEADER_TIME
-
-PKG_CHECK_MODULES(DOCBOOK,[ $docbook_pkgs ])
-
-test "$enable_docbook" = "auto" && PLUGINS="$PLUGINS docbook"
-
-DOCBOOK_CFLAGS="$DOCBOOK_CFLAGS "'${PLUGIN_CFLAGS}'
-DOCBOOK_LIBS="$DOCBOOK_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_docbook_builtin" = "yes"; then
-	DOCBOOK_CFLAGS="$DOCBOOK_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([DOCBOOK_CFLAGS])
-AC_SUBST([DOCBOOK_LIBS])
-
-
-OPML_CFLAGS=
-OPML_LIBS=
-
-if test "$enable_opml" != ""; then
-
-test "$enable_opml" = "auto" && PLUGINS="$PLUGINS opml"
-
-OPML_CFLAGS="$OPML_CFLAGS "'${PLUGIN_CFLAGS}'
-OPML_LIBS="$OPML_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_opml_builtin" = "yes"; then
-	OPML_CFLAGS="$OPML_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([OPML_CFLAGS])
-AC_SUBST([OPML_LIBS])
-
-
-BABELFISH_CFLAGS=
-BABELFISH_LIBS=
-
-if test "$enable_babelfish" != ""; then
-
-test "$enable_babelfish" = "auto" && PLUGINS="$PLUGINS babelfish"
-
-BABELFISH_CFLAGS="$BABELFISH_CFLAGS "'${PLUGIN_CFLAGS}'
-BABELFISH_LIBS="$BABELFISH_LIBS "'${PLUGIN_LIBS}'
-
-if test "$enable_babelfish_builtin" = "yes"; then
-	BABELFISH_CFLAGS="$BABELFISH_CFLAGS -DABI_PLUGIN_BUILTIN"
-fi
-
-fi
-
-AC_SUBST([BABELFISH_CFLAGS])
-AC_SUBST([BABELFISH_LIBS])
+AC_SUBST([EPUB_CFLAGS])
+AC_SUBST([EPUB_LIBS])
 
 
 kword_pkgs="$gsf_req"
@@ -1952,4 +1910,46 @@ fi
 
 AC_SUBST([KWORD_CFLAGS])
 AC_SUBST([KWORD_LIBS])
+
+
+rsvg_pkgs="librsvg-2.0 >= 2.0 glib-2.0"
+rsvg_deps="no"
+
+if test "$TOOLKIT" = "gtk"; then
+ 
+ if test "$enable_rsvg" = "auto"; then
+   AC_MSG_WARN([rsvg plugin: not needed with gtk])
+ fi
+ enable_rsvg=""
+fi
+
+if test "$enable_rsvg" != ""; then
+
+PKG_CHECK_EXISTS([ $rsvg_pkgs ], 
+[
+	rsvg_deps="yes"
+], [
+	test "$enable_rsvg" = "auto" && AC_MSG_WARN([rsvg plugin: dependencies not satisfied - $rsvg_pkgs])
+])
+
+fi
+
+if test "$enable_rsvg" = "yes" || \
+   test "$rsvg_deps" = "yes"; then
+
+if test "$enable_rsvg_builtin" = "yes"; then
+AC_MSG_ERROR([rsvg plugin: static linking not supported])
+fi
+
+PKG_CHECK_MODULES(RSVG,[ $rsvg_pkgs ])
+
+test "$enable_rsvg" = "auto" && PLUGINS="$PLUGINS rsvg"
+
+RSVG_CFLAGS="$RSVG_CFLAGS "'${PLUGIN_CFLAGS}'
+RSVG_LIBS="$RSVG_LIBS "'${PLUGIN_LIBS}'
+
+fi
+
+AC_SUBST([RSVG_CFLAGS])
+AC_SUBST([RSVG_LIBS])
 

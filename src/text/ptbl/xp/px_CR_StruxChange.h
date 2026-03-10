@@ -53,7 +53,7 @@ public:
 
 	~PX_ChangeRecord_StruxChange();
 
-	virtual PX_ChangeRecord * reverse(void) const override;
+	virtual PX_ChangeRecord * reverse(void) const;
 	PT_AttrPropIndex		getOldIndexAP(void) const;
 	PTStruxType             getStruxType(void) const
 		{ return m_pts;}

@@ -32,11 +32,11 @@ public:
 	AP_Prefs();
 	virtual ~AP_Prefs(void);
 
-	virtual bool				loadBuiltinPrefs(void) override;
-	virtual const gchar *	getBuiltinSchemeName(void) const override;
-	const char *		        getPrefsPathname(void) const override;
+	virtual bool				loadBuiltinPrefs(void);
+	virtual const gchar *	getBuiltinSchemeName(void) const;
+	const char *		        getPrefsPathname(void) const;
 	virtual void				overlayEnvironmentPrefs(void) = 0;
-	virtual void				fullInit(void) override;
+	virtual void				fullInit(void);
 
 	void						overlaySystemPrefs(void);
 

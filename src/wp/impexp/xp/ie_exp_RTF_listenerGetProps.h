@@ -35,25 +35,25 @@ public:
 						   IE_Exp_RTF * pie);
 	virtual ~s_RTF_ListenerGetProps();
 
-	virtual bool populate(fl_ContainerLayout* sfh,
-								 const PX_ChangeRecord * pcr) override;
+	virtual bool		populate(fl_ContainerLayout* sfh,
+								 const PX_ChangeRecord * pcr);
 
-	virtual bool populateStrux(pf_Frag_Strux* sdh,
+	virtual bool		populateStrux(pf_Frag_Strux* sdh,
 									  const PX_ChangeRecord * pcr,
-									  fl_ContainerLayout* * psfh) override;
+									  fl_ContainerLayout* * psfh);
 
-	virtual bool change(fl_ContainerLayout* sfh,
-							   const PX_ChangeRecord * pcr) override;
+	virtual bool		change(fl_ContainerLayout* sfh,
+							   const PX_ChangeRecord * pcr);
 
-	virtual bool insertStrux(fl_ContainerLayout* sfh,
+	virtual bool		insertStrux(fl_ContainerLayout* sfh,
 									const PX_ChangeRecord * pcr,
 									pf_Frag_Strux* sdh,
 									PL_ListenerId lid,
 									void (* pfnBindHandles)(pf_Frag_Strux* sdhNew,
 															PL_ListenerId lid,
-															fl_ContainerLayout* sfhNew)) override;
+															fl_ContainerLayout* sfhNew));
 
-	virtual bool signal(UT_uint32 iSignal) override;
+	virtual bool		signal(UT_uint32 iSignal);
 	bool				hasBlock() { return m_bHasBlock; }
 
 protected:

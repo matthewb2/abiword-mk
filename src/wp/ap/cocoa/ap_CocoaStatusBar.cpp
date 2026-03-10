@@ -148,10 +148,10 @@ XAP_CocoaNSStatusBar * AP_CocoaStatusBar::createWidget(void)
 		// align text
 		  switch (pf_TextInfo->getAlignmentMethod()) {
 		  case LEFT:
-		        [pStatusBarElementLabel setAlignment:NSTextAlignmentNatural];
+		        [pStatusBarElementLabel setAlignment:NSNaturalTextAlignment];
 			break;
 		  case CENTER:
-			[pStatusBarElementLabel setAlignment:NSTextAlignmentCenter];
+			[pStatusBarElementLabel setAlignment:NSCenterTextAlignment];
 			break;
 		  default:
 			UT_ASSERT_NOT_REACHED();

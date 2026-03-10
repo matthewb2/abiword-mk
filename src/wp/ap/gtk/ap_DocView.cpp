@@ -28,9 +28,8 @@
 #include "ap_DocView.h"
 //#include "at_DocView.h"
 #include "ut_debugmsg.h"
-
 #include <atk/atk.h>
-#include <gsf/gsf.h>
+#include <gsf/gsf-impl-utils.h>
 
 // our parent class
 // static GtkDrawingAreaClass * parent_class = 0;
@@ -41,7 +40,7 @@
 #define GET_CLASS(instance) G_TYPE_INSTANCE_GET_CLASS (instance, AP_DOCVIEW_TYPE, ApDocViewClass)
 
 static void
-ap_DocView_class_init(GtkWidgetClass *widget_class, gpointer)
+ap_DocView_class_init(GtkWidgetClass *widget_class)
 {
 
 #ifdef LOGFILE
@@ -53,18 +52,18 @@ ap_DocView_class_init(GtkWidgetClass *widget_class, gpointer)
 	
 	// Disable focus handlers because they emit superfluous expose
 	// events, causing flicker.
-	widget_class->focus_in_event = nullptr;
-	widget_class->focus_out_event = nullptr;
+	widget_class->focus_in_event = NULL;
+	widget_class->focus_out_event = NULL;
 #if 0
 	GType factory_type = AT_DocView_factory_get_type();
-	if (factory_type)	// will return nullptr if unable to find gail
+	if (factory_type)	// will return NULL if unable to find gail
 	{
 		atk_registry_set_factory_type(atk_get_default_registry(), ABI_TYPE_DOCVIEW, factory_type);
 	}
 #endif
 }
 GSF_CLASS(ApDocView, ap_DocView,
-          ap_DocView_class_init, nullptr,
+          ap_DocView_class_init, NULL,
           GTK_TYPE_DRAWING_AREA)
 
 /**
@@ -77,7 +76,7 @@ ap_DocView_new (void)
 {
 	ApDocView * abi;
 	UT_DEBUGMSG(("Constructing ApDocView \n"));
-	abi = static_cast<ApDocView *>(g_object_new (ap_DocView_get_type (), nullptr));
+	abi = static_cast<ApDocView *>(g_object_new (ap_DocView_get_type (), NULL));
 
 	return GTK_WIDGET (abi);
 }

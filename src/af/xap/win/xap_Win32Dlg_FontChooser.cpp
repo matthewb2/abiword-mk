@@ -52,7 +52,7 @@ XAP_Dialog * XAP_Win32Dialog_FontChooser::static_constructor(XAP_DialogFactory *
 XAP_Win32Dialog_FontChooser::XAP_Win32Dialog_FontChooser(XAP_DialogFactory * pDlgFactory,
 													 XAP_Dialog_Id id)
 	: XAP_Dialog_FontChooser(pDlgFactory,id),
-	  m_pPreviewWidget(nullptr),
+	  m_pPreviewWidget(NULL),
 	  m_bWin32Overline(false),
 	  m_iColorIndx(0),
 	  m_iColorCount(0)
@@ -89,7 +89,7 @@ void XAP_Win32Dialog_FontChooser::runModal(XAP_Frame * pFrame)
 	m_bWin32Hidden     = m_bHidden;
 	m_bWin32SuperScript = m_bSuperScript;
 	m_bWin32SubScript = m_bSubScript;
-	
+
 
 	/*
 	   WARNING: any changes to this function should be closely coordinated
@@ -97,6 +97,7 @@ void XAP_Win32Dialog_FontChooser::runModal(XAP_Frame * pFrame)
 	*/
 	LOGFONTW lf;
 	memset(&lf, 0, sizeof(lf));
+	lf.lfQuality = ANTIALIASED_QUALITY;//pascal
 
 	CHOOSEFONTW cf;
 	memset(&cf, 0, sizeof(cf));
@@ -194,14 +195,14 @@ void XAP_Win32Dialog_FontChooser::runModal(XAP_Frame * pFrame)
 			bufSize[0] = 0;
 
 		// why? let's see
-		if (bIsSizeValid && (g_ascii_strcasecmp(bufSize,m_sFontSize.c_str()) != 0))			
+		if (bIsSizeValid && (g_ascii_strcasecmp(bufSize,m_sFontSize.c_str()) != 0))
 		{
 			m_bChangedFontSize = true;
 			m_sFontSize = bufSize;
 		}
 		else
 		{
-			/* nothing changed */			
+			/* nothing changed */
 		}
 
 		bool bIsBold = ((cf.nFontType & BOLD_FONTTYPE) != 0);
@@ -247,20 +248,20 @@ void XAP_Win32Dialog_FontChooser::runModal(XAP_Frame * pFrame)
             m_bChangedOverline)
 			setFontDecoration( (lf.lfUnderline == TRUE),
                                 m_bWin32Overline,
-                                (lf.lfStrikeOut == TRUE), false, false);
+                                (lf.lfStrikeOut == TRUE), NULL, NULL);
 
 		m_bChangedHidden = (m_bWin32Hidden != m_bHidden);
 		m_bChangedSuperScript = (m_bWin32SuperScript != m_bSuperScript);
 		m_bChangedSubScript = (m_bWin32SubScript != m_bSubScript);
-		
+
 		if(m_bChangedHidden)
 			setHidden(m_bWin32Hidden);
-			
+
 		if(m_bChangedSuperScript)
 			setSuperScript(m_bWin32SuperScript);
-			
+
 		if(m_bChangedSubScript)
-			setSubScript(m_bWin32SubScript);			
+			setSubScript(m_bWin32SubScript);
 	}
 
 	UT_DEBUGMSG(("FontChooserEnd: Family[%s%s] Size[%s%s] Weight[%s%s] Style[%s%s] Color[%s%s] Underline[%d%s] StrikeOut[%d%s]\n",
@@ -274,7 +275,7 @@ void XAP_Win32Dialog_FontChooser::runModal(XAP_Frame * pFrame)
 
 	// the caller can get the answer from getAnswer().
 
-	m_pWin32Frame = nullptr;
+	m_pWin32Frame = NULL;
 }
 
 UINT CALLBACK XAP_Win32Dialog_FontChooser::s_hookProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -295,14 +296,14 @@ UINT CALLBACK XAP_Win32Dialog_FontChooser::s_hookProc(HWND hDlg, UINT msg, WPARA
 			return pThis->_onCommand(hDlg,wParam,lParam);
 		else
 			return 0;
-		
+
 	case WM_HELP:
 		pThis = (XAP_Win32Dialog_FontChooser *)GetWindowLongPtrW(hDlg,DWLP_USER);
 		if (pThis)
 			return pThis->_callHelp();
 		else
 			return 0;
-		
+
 	default:
 		return 0;
 
@@ -319,7 +320,7 @@ BOOL XAP_Win32Dialog_FontChooser::_onInitDialog(HWND hWnd, WPARAM /*wParam*/, LP
 	const XAP_StringSet*  pSS         = pApp->getStringSet();
 
     m_hDlg = hWnd;
-	
+
 	setDialogTitle(pSS->getValue(XAP_STRING_ID_DLG_UFS_FontTitle));
 
 	// localize controls
@@ -347,13 +348,13 @@ BOOL XAP_Win32Dialog_FontChooser::_onInitDialog(HWND hWnd, WPARAM /*wParam*/, LP
 
 	if( m_bWin32Hidden )
 		CheckDlgButton( hWnd, XAP_RID_DIALOG_FONT_CHK_HIDDEN, BST_CHECKED );
-		
+
 	if( m_bWin32SuperScript)
-		CheckDlgButton(hWnd, XAP_RID_DIALOG_FONT_CHK_SUPERSCRIPT, BST_CHECKED );		
-		
+		CheckDlgButton(hWnd, XAP_RID_DIALOG_FONT_CHK_SUPERSCRIPT, BST_CHECKED );
+
 	if( m_bWin32SubScript)
-		CheckDlgButton(hWnd, XAP_RID_DIALOG_FONT_CHK_SUBSCRIPT, BST_CHECKED );				
-		
+		CheckDlgButton(hWnd, XAP_RID_DIALOG_FONT_CHK_SUBSCRIPT, BST_CHECKED );
+
 	// use the owner-draw-control dialog-item (aka window) specified in the
 	// dialog resource file as a parent to the window/widget that we create
 	// here and thus have complete control of.
@@ -399,7 +400,7 @@ BOOL XAP_Win32Dialog_FontChooser::_onInitDialog(HWND hWnd, WPARAM /*wParam*/, LP
 			m_iColorIndx = m_iColorCount-1;
 		}
 	}
-	
+
 	return 1;		// 1 == we did not call SetFocus()
 }
 
@@ -418,12 +419,12 @@ BOOL XAP_Win32Dialog_FontChooser::_onCommand(HWND hWnd, WPARAM wParam, LPARAM /*
 			m_bWin32Hidden = (IsDlgButtonChecked(hWnd,XAP_RID_DIALOG_FONT_CHK_HIDDEN)==BST_CHECKED);
 			return 1;
 
-		case XAP_RID_DIALOG_FONT_CHK_SUPERSCRIPT:		
-			m_bWin32SuperScript = (IsDlgButtonChecked(hWnd,XAP_RID_DIALOG_FONT_CHK_SUPERSCRIPT)==BST_CHECKED);		
+		case XAP_RID_DIALOG_FONT_CHK_SUPERSCRIPT:
+			m_bWin32SuperScript = (IsDlgButtonChecked(hWnd,XAP_RID_DIALOG_FONT_CHK_SUPERSCRIPT)==BST_CHECKED);
 			/* It makes no sense to have subscript and superscript at the same time, Word behaves this way also*/
-			if (m_bWin32SuperScript) CheckDlgButton(hWnd, XAP_RID_DIALOG_FONT_CHK_SUBSCRIPT, BST_UNCHECKED);		
+			if (m_bWin32SuperScript) CheckDlgButton(hWnd, XAP_RID_DIALOG_FONT_CHK_SUBSCRIPT, BST_UNCHECKED);
 			return 1;
-		
+
 		case XAP_RID_DIALOG_FONT_CHK_SUBSCRIPT:
 			m_bWin32SubScript = (IsDlgButtonChecked(hWnd,XAP_RID_DIALOG_FONT_CHK_SUBSCRIPT)==BST_CHECKED);
 			/* It makes no sense to have subscript and superscript at the same time, Word behaves this way also*/

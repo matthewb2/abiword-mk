@@ -43,7 +43,7 @@ public:
 	void								setCountFromActiveFrame(void);
         void                                    ConstructWindowName(void);
 
-        void setActiveFrame(XAP_Frame *pFrame) override;
+        void                                    setActiveFrame(XAP_Frame *pFrame);
 	// must be public for Cocoa, because I can't make an Obj-C class
 	// be friend of a C++ class. Not a big deal.
 	enum {
@@ -69,8 +69,8 @@ public:
 
 protected:
 
-	virtual void localizeDialog(void) override;
-	virtual void updateDialogData(void) override;
+	virtual void localizeDialog(void);
+	virtual void updateDialogData(void);
 
 	AP_Dialog_WordCount::tAnswer		m_answer;
 	FV_DocCount							m_count;

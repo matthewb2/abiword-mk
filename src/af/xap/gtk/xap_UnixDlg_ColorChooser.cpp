@@ -40,10 +40,10 @@ std::unique_ptr<UT_RGBColor> XAP_UnixDlg_RunColorChooser(GtkWindow* parent,
 		gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER(colorbtn), &color);
 
 		// update dialog
-		rgb = UT_UnixGdkRGBAToRGBColor (color);
+		rgb = UT_UnixGdkColorToRGBColor (color);
 	}
 
 	// do not propagate further
-	gtk_widget_destroy(colordlg); // TOPLEVEL
+	gtk_widget_destroy (colordlg);
 	return std::unique_ptr<UT_RGBColor>(rgb);
 }

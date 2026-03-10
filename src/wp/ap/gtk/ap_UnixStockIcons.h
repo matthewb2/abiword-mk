@@ -19,10 +19,13 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef AP_UNIXSTOCKICONS_H
+#define AP_UNIXSTOCKICONS_H
 
+#include "ut_compiler.h"
+ABI_W_NO_CONST_QUAL
 #include <gtk/gtk.h>
-
+ABI_W_POP
 #include "xap_Types.h"
 
 #define ABIWORD_STOCK_PREFIX			"abiword"
@@ -130,4 +133,5 @@
 
 void		  abi_stock_init 				(void);
 gchar * 	  abi_stock_from_toolbar_id 	(const gchar *toolbar_id);
-const gchar* abi_stock_get_gtk_stock_id(const gchar * abi_stock_id);
+
+#endif /* AP_UNIXSTOCKICONS_H */

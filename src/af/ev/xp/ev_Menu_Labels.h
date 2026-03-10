@@ -17,14 +17,12 @@
  * 02110-1301 USA.
  */
 
-#pragma once
-
-#include <vector>
-#include <string>
-
-#include "ut_string_class.h"
+#ifndef EV_MENU_LABELS_H
+#define EV_MENU_LABELS_H
 
 #include "xap_Types.h"
+#include "ut_vector.h"
+#include "ut_string_class.h"
 
 /*****************************************************************
 ******************************************************************
@@ -77,15 +75,24 @@ public:
 								 const char * szStatusMsg);
 	bool				addLabel(EV_Menu_Label *pLabel);
 	EV_Menu_Label *		getLabel(XAP_Menu_Id id) const;
-	XAP_Menu_Id         getFirst(void) const { return m_first;}
-	const std::string& getLanguage() const;
+	XAP_Menu_Id         getFirst(void) { return m_first;}
+	const char *		getLanguage() const;
 	void				setLanguage(const char *szLanguage);
-
-	const std::vector<EV_Menu_Label*>& getAllLabels() const
-        { return m_labelTable; }
+#if 0
+	// we really do not need this, the way it was used it
+	// was causing stack overflows on my machine (took me hours to
+	// track), yet, there was no single call that would require to make
+	// a temporary copy of this table on the stack, so I have done
+	// away with this (Tomas)
+	inline const UT_GenericVector<EV_Menu_Label *>& getAllLabels() const { return m_labelTable; }
+#else
+	const UT_GenericVector<EV_Menu_Label *> *		getAllLabels() const { return &m_labelTable;}
+#endif
 
 private:
-        std::vector<EV_Menu_Label*> m_labelTable;
+	UT_GenericVector<EV_Menu_Label *>	m_labelTable;
 	XAP_Menu_Id			m_first;
-	std::string m_stLanguage;	/* for the convenience of the app only	*/
+	UT_String			m_stLanguage;	/* for the convenience of the app only  */
 };
+
+#endif /* EV_MENU_LABELS_H */

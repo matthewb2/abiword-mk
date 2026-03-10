@@ -1,30 +1,29 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
  * Copyright (C) 2003 Marc Maurer
- * Copyright (C) 2009, 2013, 2019-2021 Hubert Figuière
- *
+ * Copyright (C) 2009, 2013 Hubert Figuiere
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
 
+#include "ut_compiler.h"
 
 #include <stdlib.h>
-
+ABI_W_NO_CONST_QUAL
 #include <gdk/gdk.h>
-
+ABI_W_POP
 #include "ut_locale.h"
 
 #include "ut_string.h"
@@ -71,7 +70,7 @@ static void s_line_left(GtkWidget *widget, gpointer data )
 	AP_UnixDialog_FormatFrame * dlg = reinterpret_cast<AP_UnixDialog_FormatFrame *>(data);
 	UT_return_if_fail(widget && dlg);
 	dlg->toggleLineType(AP_Dialog_FormatFrame::toggle_left, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)));
-	dlg->event_previewInvalidate();
+	dlg->event_previewExposed();
 }
 
 static void s_line_right(GtkWidget *widget, gpointer data )
@@ -79,7 +78,7 @@ static void s_line_right(GtkWidget *widget, gpointer data )
 	AP_UnixDialog_FormatFrame * dlg = static_cast<AP_UnixDialog_FormatFrame *>(data);
 	UT_return_if_fail(widget && dlg);
 	dlg->toggleLineType(AP_Dialog_FormatFrame::toggle_right, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)));
-	dlg->event_previewInvalidate();
+	dlg->event_previewExposed();
 }
 
 static void s_line_top(GtkWidget *widget, gpointer data )
@@ -87,7 +86,7 @@ static void s_line_top(GtkWidget *widget, gpointer data )
 	AP_UnixDialog_FormatFrame * dlg = static_cast<AP_UnixDialog_FormatFrame *>(data);
 	UT_return_if_fail(widget && dlg);
 	dlg->toggleLineType(AP_Dialog_FormatFrame::toggle_top, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)));
-	dlg->event_previewInvalidate();
+	dlg->event_previewExposed();
 }
 
 static void s_line_bottom(GtkWidget *widget, gpointer data )
@@ -95,7 +94,7 @@ static void s_line_bottom(GtkWidget *widget, gpointer data )
 	AP_UnixDialog_FormatFrame * dlg = static_cast<AP_UnixDialog_FormatFrame *>(data);
 	UT_return_if_fail(widget && dlg);
 	dlg->toggleLineType(AP_Dialog_FormatFrame::toggle_bottom, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)));
-	dlg->event_previewInvalidate();
+	dlg->event_previewExposed();
 }
 
 
@@ -117,7 +116,7 @@ static void s_border_thickness(GtkWidget *widget, gpointer data )
 static gboolean s_preview_draw(GtkWidget * widget, gpointer /* data */, AP_UnixDialog_FormatFrame * dlg)
 {
 	UT_return_val_if_fail(widget && dlg, FALSE);
-	dlg->event_previewDraw();
+	dlg->event_previewExposed();
 	return FALSE;
 }
 
@@ -147,9 +146,7 @@ AP_UnixDialog_FormatFrame__onBorderColorClicked (GtkWidget 		*button,
 												 gpointer 		data)
 {
 	// only handle left clicks
-	guint ev_button = 0;
-	gdk_event_get_button((GdkEvent*)event, &ev_button);
-	if (ev_button != 1) {
+	if (event->button != 1) {
 		return FALSE;
 	}
 
@@ -162,7 +159,7 @@ AP_UnixDialog_FormatFrame__onBorderColorClicked (GtkWidget 		*button,
 
 	if (color.get()) {
 		dlg->setBorderColor (*color);
-		dlg->event_previewInvalidate ();
+		dlg->event_previewExposed ();
 	}
 
 	return TRUE;
@@ -178,9 +175,7 @@ AP_UnixDialog_FormatFrame__onBackgroundColorClicked (GtkWidget 		*button,
 													 gpointer 		data)
 {
 	// only handle left clicks
-	guint ev_button = 0;
-	gdk_event_get_button((GdkEvent*)event, &ev_button);
-	if (ev_button != 1) {
+	if (event->button != 1) {
 		return FALSE;
 	}
 
@@ -193,7 +188,7 @@ AP_UnixDialog_FormatFrame__onBackgroundColorClicked (GtkWidget 		*button,
 
 	if (color.get()) {
 		dlg->setBGColor (*color);
-		dlg->event_previewInvalidate ();
+		dlg->event_previewExposed ();
 	}
 
 	return TRUE;
@@ -214,25 +209,26 @@ XAP_Dialog * AP_UnixDialog_FormatFrame::static_constructor(XAP_DialogFactory * p
 
 AP_UnixDialog_FormatFrame::AP_UnixDialog_FormatFrame(XAP_DialogFactory * pDlgFactory,
 										             XAP_Dialog_Id id)
-	: AP_Dialog_FormatFrame(pDlgFactory, id)
-	, m_wPreviewArea(nullptr)
-	, m_pPreviewWidget(nullptr)
-	, m_wApplyButton(nullptr)
-	, m_wBorderColorButton(nullptr)
-	, m_wLineLeft(nullptr)
-	, m_wLineRight(nullptr)
-	, m_wLineTop(nullptr)
-	, m_wLineBottom(nullptr)
-	, m_wSetImageButton(nullptr)
-	, m_wSelectImageButton(nullptr)
-	, m_wNoImageButton(nullptr)
-	, m_wBorderThickness(nullptr)
-	, m_iBorderThicknessConnect(0)
-	, m_wWrapButton(nullptr)
-	, m_wPosParagraph(nullptr)
-	, m_wPosColumn(nullptr)
-	, m_wPosPage(nullptr)
-	{
+	: AP_Dialog_FormatFrame(pDlgFactory,id)
+{
+	m_windowMain = NULL;
+	m_wPreviewArea = NULL;
+	m_pPreviewWidget = NULL;
+	m_wApplyButton = NULL;
+	m_wBorderColorButton = NULL;
+	m_wLineLeft = NULL;
+	m_wLineRight = NULL;
+	m_wLineTop = NULL;
+	m_wLineBottom = NULL;
+	m_wSetImageButton = NULL;
+	m_wSelectImageButton = NULL;
+	m_wNoImageButton = NULL;
+	m_wBorderThickness = NULL;
+	m_iBorderThicknessConnect = 0;
+	m_wWrapButton = NULL;
+	m_wPosParagraph =  NULL;
+	m_wPosColumn = NULL;
+	m_wPosPage = NULL;
 //
 // These are hardwired into the GUI.
 //
@@ -266,7 +262,7 @@ void AP_UnixDialog_FormatFrame::runModeless(XAP_Frame * pFrame)
 	
 	// *** this is how we add the gc for Column Preview ***
 	// attach a new graphics context to the drawing area
-	UT_return_if_fail(m_wPreviewArea && XAP_HAS_NATIVE_WINDOW(m_wPreviewArea));
+	UT_return_if_fail(m_wPreviewArea && gtk_widget_get_window(m_wPreviewArea));
 
 	// make a new Unix GC
 	DELETEP (m_pPreviewWidget);
@@ -286,7 +282,7 @@ void AP_UnixDialog_FormatFrame::runModeless(XAP_Frame * pFrame)
 						 static_cast<UT_uint32>(allocation.width),
 						 static_cast<UT_uint32>(allocation.height));	
 	
-	m_pFormatFramePreview->queueDraw();
+	m_pFormatFramePreview->draw();
 	
 	startUpdater();
 }
@@ -309,16 +305,10 @@ void AP_UnixDialog_FormatFrame::event_Close(void)
 	destroy();
 }
 
-void AP_UnixDialog_FormatFrame::event_previewInvalidate(void)
+void AP_UnixDialog_FormatFrame::event_previewExposed(void)
 {
 	if(m_pFormatFramePreview)
-		m_pFormatFramePreview->queueDraw();
-}
-
-void AP_UnixDialog_FormatFrame::event_previewDraw(void)
-{
-	if(m_pFormatFramePreview)
-		m_pFormatFramePreview->drawImmediate();
+		m_pFormatFramePreview->draw();
 }
 
 void AP_UnixDialog_FormatFrame::setBorderThicknessInGUI(UT_UTF8String & sThick)
@@ -356,7 +346,7 @@ void AP_UnixDialog_FormatFrame::event_BorderThicknessChanged(void)
 		}
 
 		setBorderThicknessAll(sThickness);
-		event_previewInvalidate();
+		event_previewExposed();
 	}
 }
 
@@ -380,8 +370,8 @@ void AP_UnixDialog_FormatFrame::event_ApplyToChanged(void)
 void AP_UnixDialog_FormatFrame::destroy(void)
 {
 	finalize();
-	gtk_widget_destroy(m_windowMain); // TOPLEVEL
-	m_windowMain = nullptr;
+	gtk_widget_destroy(m_windowMain);
+	m_windowMain = NULL;
 }
 
 void AP_UnixDialog_FormatFrame::activate(void)
@@ -391,7 +381,7 @@ void AP_UnixDialog_FormatFrame::activate(void)
 	ConstructWindowName();
 	gtk_window_set_title (GTK_WINDOW (m_windowMain), m_WindowName);
 	setAllSensitivities();
-	XAP_gtk_window_raise(m_windowMain);
+	gdk_window_raise (gtk_widget_get_window(m_windowMain));
 }
 
 void AP_UnixDialog_FormatFrame::notifyActiveFrame(XAP_Frame *_pFrame)
@@ -442,7 +432,7 @@ GtkWidget * AP_UnixDialog_FormatFrame::_constructWindow(void)
 	const XAP_StringSet * pSS = XAP_App::getApp()->getStringSet();
 	
 	// load the dialog from the UI file
-	GtkBuilder* builder = newDialogBuilderFromResource("ap_UnixDialog_FormatFrame.ui");
+	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_FormatFrame.ui");
 	
 	// Update our member variables with the important widgets that 
 	// might need to be queried or altered later
@@ -545,15 +535,25 @@ static void s_destroy_clicked(GtkWidget * /* widget */,
 	dlg->event_Close();
 }
 
+
+static void s_delete_clicked(GtkWidget * widget,
+			     gpointer,
+			     gpointer * /*dlg*/)
+{
+	abiDestroyWidget(widget);
+}
+
 void AP_UnixDialog_FormatFrame::_connectSignals(void)
 {
-	connectBasicSignals();
-
 	// the catch-alls
 	// Dont use gtk_signal_connect_after for modeless dialogs
 	g_signal_connect(G_OBJECT(m_windowMain),
 							"destroy",
 							G_CALLBACK(s_destroy_clicked),
+							reinterpret_cast<gpointer>(this));
+	g_signal_connect(G_OBJECT(m_windowMain),
+							"delete_event",
+							G_CALLBACK(s_delete_clicked),
 							reinterpret_cast<gpointer>(this));
 
 	g_signal_connect(G_OBJECT(m_wApplyButton),

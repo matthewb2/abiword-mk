@@ -75,8 +75,8 @@ XAP_Dialog * AP_UnixDialog_ListRevisions::static_constructor(XAP_DialogFactory *
 AP_UnixDialog_ListRevisions::AP_UnixDialog_ListRevisions(XAP_DialogFactory * pDlgFactory,
 							 XAP_Dialog_Id id)
   : AP_Dialog_ListRevisions(pDlgFactory,id)
-  , m_mainWindow(nullptr)
-  , m_treeModel(nullptr)
+  , m_mainWindow(NULL)
+  , m_treeModel(NULL)
 {
 }
 
@@ -139,7 +139,7 @@ GtkWidget * AP_UnixDialog_ListRevisions::constructWindow ()
 
   vbDialog = gtk_dialog_get_content_area(GTK_DIALOG(ap_UnixDialog_ListRevisions));
   gtk_widget_show (vbDialog);
-  XAP_gtk_widget_set_margin(vbDialog, 5);
+  gtk_container_set_border_width (GTK_CONTAINER (vbDialog), 5);
 
   constructWindowContents ( vbDialog ) ;
 
@@ -161,7 +161,7 @@ void AP_UnixDialog_ListRevisions::constructWindowContents ( GtkWidget * vbDialog
   vbContent = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
   gtk_widget_show (vbContent);
   gtk_container_add (GTK_CONTAINER (vbDialog), vbContent);
-  XAP_gtk_widget_set_margin(vbContent, 5);
+  gtk_container_set_border_width (GTK_CONTAINER (vbContent), 5);
 
   std::string s("<b>");
   s += getLabel1();
@@ -170,11 +170,11 @@ void AP_UnixDialog_ListRevisions::constructWindowContents ( GtkWidget * vbDialog
                                         "label", s.c_str(),
                                         "use-markup", TRUE,
                                         "xalign", 0.0, "yalign", 0.5,
-                                        nullptr);
+                                        NULL);
   gtk_widget_show (lbExistingRevisions);
   gtk_box_pack_start (GTK_BOX (vbContent), lbExistingRevisions, FALSE, FALSE, 0);
 
-  swExistingRevisions = gtk_scrolled_window_new (nullptr, nullptr);
+  swExistingRevisions = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_show (swExistingRevisions);
   gtk_container_add (GTK_CONTAINER (vbContent), swExistingRevisions);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swExistingRevisions), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -193,13 +193,13 @@ void AP_UnixDialog_ListRevisions::constructWindowContents ( GtkWidget * vbDialog
 
   // comment column
   col = gtk_tree_view_column_new_with_attributes(getColumn3Label(),
-												 renderer, "text", COL_COMMENT, nullptr);
+												 renderer, "text", COL_COMMENT, NULL);
   gtk_tree_view_column_set_sort_column_id(col, COL_COMMENT);
   gtk_tree_view_append_column(GTK_TREE_VIEW(clExistingRevisions), col);
 
   // revision date column
   col = gtk_tree_view_column_new_with_attributes(getColumn2Label(),
-												 renderer, "text", COL_DATE_STRING, nullptr);
+												 renderer, "text", COL_DATE_STRING, NULL);
   // we sort on the numerical tt column instead of the human readable text
   gtk_tree_view_column_set_sort_column_id(col, COL_DATE_AS_TIMET);
   // later we sort on date desc.
@@ -210,7 +210,7 @@ void AP_UnixDialog_ListRevisions::constructWindowContents ( GtkWidget * vbDialog
   
   // revision # column
   col = gtk_tree_view_column_new_with_attributes(getColumn1Label(),
-												 renderer, "text", COL_REVID, nullptr);
+												 renderer, "text", COL_REVID, NULL);
   gtk_tree_view_column_set_fixed_width(col, 80);
   gtk_tree_view_column_set_sort_column_id(col, COL_REVID);
   gtk_tree_view_append_column(GTK_TREE_VIEW(clExistingRevisions), col);
@@ -236,7 +236,7 @@ void AP_UnixDialog_ListRevisions::constructWindowContents ( GtkWidget * vbDialog
     gtk_list_store_append(m_treeModel, &iter);
 
     gchar * txt = getNthItemText(i, true);
-    gchar * itemtime = g_locale_to_utf8(getNthItemTime(i), -1, nullptr, nullptr, nullptr);
+    gchar * itemtime = g_locale_to_utf8(getNthItemTime(i), -1, NULL, NULL, NULL);
     gtk_list_store_set(m_treeModel, &iter,
                        COL_REVID,         getNthItemId(i),
                        COL_DATE_STRING,   itemtime?itemtime:"",

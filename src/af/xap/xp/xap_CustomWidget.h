@@ -1,6 +1,5 @@
 /* AbiSource Application Framework
  * Copyright (C) 2010 Patrik Fimml
- * Copyright (C) 2021 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,23 +17,35 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef XAP_CUSTOMWIDGET_H
+#define XAP_CUSTOMWIDGET_H
 
-#include <queue>
+#include "ut_misc.h"
+#include "gr_Graphics.h"
 
-#include "ut_option.h"
-#include "xap_Drawable.h"
-
-/* utility class for widgets drawing in layout units */
 class ABI_EXPORT XAP_CustomWidget
-    : public XAP_Drawable
 {
 public:
-    virtual void queueDrawLU(const UT_Rect* clip);
-    virtual void drawImmediate(const UT_Rect* clip) override;
-    virtual void queueDraw(const UT_Rect *clip = nullptr) override;
+	XAP_CustomWidget() {}
+	virtual ~XAP_CustomWidget() {}
 
-    virtual void drawImmediateLU(const UT_Rect* clip) = 0;
-private:
-    std::queue<UT_Option<UT_Rect>> m_drawQueue;
+	virtual void queueDraw(const UT_Rect *clip=NULL);
+
+	/* derived classes should do their actual drawing here */
+	virtual void draw(const UT_Rect *clip=NULL) = 0;
 };
+
+/* utility class for widgets drawing in layout units */
+class ABI_EXPORT XAP_CustomWidgetLU: virtual public XAP_CustomWidget
+{
+public:
+	virtual GR_Graphics *getGraphics() const = 0;
+	virtual void queueDrawLU(const UT_Rect *clip);
+
+	virtual void draw(const UT_Rect *clip);
+
+protected:
+	virtual void drawLU(const UT_Rect *clip) = 0;
+};
+
+#endif

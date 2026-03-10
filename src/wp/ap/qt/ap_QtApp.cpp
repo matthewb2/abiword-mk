@@ -143,16 +143,20 @@ bool AP_QtApp::initialize(bool has_display)
 		UT_ASSERT(pBuiltinStringSet);
 
 		// try loading strings by preference
-		std::string stringSet = NULL;
-		if (getPrefsValue(AP_PREF_KEY_StringSet, stringSet) && !stringSet.empty()
-			&& (stringSet != AP_PREF_DEFAULT_StringSet)) {
-			m_pStringSet = loadStringsFromDisk(stringSet.c_str(), pBuiltinStringSet);
+		const char * szStringSet = NULL;
+		if (   (getPrefsValue(AP_PREF_KEY_StringSet,
+							  static_cast<const gchar**>(&szStringSet)))
+			   && (szStringSet)
+			   && (*szStringSet)
+			   && (strcmp(szStringSet,AP_PREF_DEFAULT_StringSet) != 0))
+		{
+			m_pStringSet = loadStringsFromDisk(szStringSet, pBuiltinStringSet);
 		}
 
 		// try loading fallback strings for the language, e.g. es-ES for es-AR
 		if (m_pStringSet == NULL)
 		{
-			const char *szFallbackStringSet = UT_getFallBackStringSetLocale(stringSet.c_str());
+			const char *szFallbackStringSet = UT_getFallBackStringSetLocale(szStringSet);
 			if (szFallbackStringSet)
 				m_pStringSet = loadStringsFromDisk(szFallbackStringSet, pBuiltinStringSet);
 		}
@@ -206,19 +210,21 @@ bool AP_QtApp::initialize(bool has_display)
     /// Build a labelset so the plugins can add themselves to something ///
     ///////////////////////////////////////////////////////////////////////
 
-	std::string menuLabelSetName = NULL;
-	if (getPrefsValue(AP_PREF_KEY_StringSet, menuLabelSetName) && !menuLabelSetName.empty()) {
+	const char * szMenuLabelSetName = NULL;
+	if (getPrefsValue( AP_PREF_KEY_StringSet, static_cast<const gchar**>(&szMenuLabelSetName))
+		&& (szMenuLabelSetName) && (*szMenuLabelSetName))
+	{
 		;
-	} else {
-		menuLabelSetName = AP_PREF_DEFAULT_StringSet;
 	}
+	else
+		szMenuLabelSetName = AP_PREF_DEFAULT_StringSet;
 
-	getMenuFactory()->buildMenuLabelSet(menuLabelSetName);
+	getMenuFactory()->buildMenuLabelSet(szMenuLabelSetName);
 
 	abi_register_builtin_plugins();
 
 	bool bLoadPlugins = true;
-	bool bFound = getPrefsValueBool(XAP_PREF_KEY_AutoLoadPlugins, bLoadPlugins);
+	bool bFound = getPrefsValueBool(XAP_PREF_KEY_AutoLoadPlugins,&bLoadPlugins);
 	if(bLoadPlugins || !bFound) {
 //		loadAllPlugins();
 	}

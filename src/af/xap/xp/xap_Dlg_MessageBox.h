@@ -1,6 +1,5 @@
 /* AbiSource Application Framework
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2021 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,50 +17,37 @@
  * 02110-1301 USA.
  */
 
-#pragma once
-
-#include <string>
+#ifndef XAP_DIALOG_MESSAGEBOX_H
+#define XAP_DIALOG_MESSAGEBOX_H
 
 #include "xap_Dialog.h"
 #include "xap_Strings.h"
 
-class ABI_EXPORT XAP_Dialog_MessageBox
-    : public XAP_Dialog_NonPersistent
+class ABI_EXPORT XAP_Dialog_MessageBox : public XAP_Dialog_NonPersistent
 {
 public:
-    XAP_Dialog_MessageBox(XAP_DialogFactory* pDlgFactory, XAP_Dialog_Id id);
-    virtual ~XAP_Dialog_MessageBox(void);
+	XAP_Dialog_MessageBox(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
+	virtual ~XAP_Dialog_MessageBox(void) ;
 
-    virtual void runModal(XAP_Frame* pFrame) override = 0;
+	virtual void					runModal(XAP_Frame * pFrame) = 0;
 
-    typedef enum {
-        b_O,
-        b_OC,
-        b_YN,
-        b_YNC
-    } tButtons;
+	typedef enum { b_O, b_OC, b_YN, b_YNC }			tButtons;
+	typedef enum { a_OK, a_CANCEL, a_YES, a_NO }	tAnswer;
 
-    typedef enum {
-        a_OK,
-        a_CANCEL,
-        a_YES,
-        a_NO
-    } tAnswer;
-
-    void setMessage(XAP_String_Id id, ...);
-    void setMessage(const char* sz, ...)
-        ABI_PRINTF_FORMAT(2, 3);
-    void setSecondaryMessage(XAP_String_Id id, ...);
-    void setSecondaryMessage(const char* sz, ...)
-        ABI_PRINTF_FORMAT(2, 3);
-    void setButtons(XAP_Dialog_MessageBox::tButtons buttons);
-    void setDefaultAnswer(XAP_Dialog_MessageBox::tAnswer answer);
-    XAP_Dialog_MessageBox::tAnswer getAnswer(void) const;
+	void							setMessage(XAP_String_Id id, ...);
+	void							setMessage(const char * sz, ...);
+	void							setSecondaryMessage(XAP_String_Id id, ...);
+	void							setSecondaryMessage(const char * sz, ...);
+	void							setButtons(XAP_Dialog_MessageBox::tButtons buttons);
+	void							setDefaultAnswer(XAP_Dialog_MessageBox::tAnswer answer);
+	XAP_Dialog_MessageBox::tAnswer	getAnswer(void) const;
 
 protected:
-    std::string m_message;
-    std::string m_secondaryMessage;
-    XAP_Dialog_MessageBox::tButtons m_buttons;
-    XAP_Dialog_MessageBox::tAnswer m_defaultAnswer;
-    XAP_Dialog_MessageBox::tAnswer m_answer;
+	char *							m_szMessage;
+	char *							m_szSecondaryMessage;
+	XAP_Dialog_MessageBox::tButtons	m_buttons;
+	XAP_Dialog_MessageBox::tAnswer	m_defaultAnswer;
+	XAP_Dialog_MessageBox::tAnswer	m_answer;
 };
+
+#endif /* XAP_DIALOG_MESSAGEBOX_H */

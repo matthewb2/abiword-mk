@@ -19,7 +19,6 @@
  * 02110-1301 USA.
  */
 
-#include <gtk/gtk.h>
 #include "ut_bytebuf.h"
 
 #include "gr_UnixCairoGraphics.h"
@@ -48,7 +47,7 @@ GR_Image* GR_UnixCairoGraphicsBase::createNewImage (const char* pszName,
 													UT_sint32 iHeight,
 													GR_Image::GRType iType)
 {
-	GR_Image* pImg = nullptr;
+   	GR_Image* pImg = NULL;
 
 	if (iType == GR_Image::GRT_Raster) {
 		pImg = new GR_UnixImage(pszName);
@@ -73,22 +72,18 @@ GR_UnixCairoGraphicsBase::GR_UnixCairoGraphicsBase(cairo_t *cr, UT_uint32 iDevic
 {
 }
 
-GR_UnixCairoGraphics::GR_UnixCairoGraphics(GtkWidget * win)
+GR_UnixCairoGraphics::GR_UnixCairoGraphics(GdkWindow * win, bool /*double_buffered*/)
 	: GR_UnixCairoGraphicsBase(),
-	  m_pWin(win ? gtk_widget_get_window(win) : nullptr),
-	  m_context(nullptr),
+	  m_pWin(win),
 	  m_CairoCreated(false),
 	  m_Painting(false),
 	  m_Signal(0),
  	  m_DestroySignal(0),
-	  m_Widget(win),
-	  m_styleBg(nullptr),
-	  m_styleHighlight(nullptr)
+	  m_Widget(NULL),
+	  m_styleBg(NULL),
+	  m_styleHighlight(NULL)
 {
-	m_cr = nullptr;
-	if (m_Widget) {
-		_initWidget();
-	}
+	m_cr = NULL;
 	if (_getWindow())
 	{
 		// Set GraphicsExposes so that XCopyArea() causes an expose on
@@ -117,13 +112,13 @@ GR_UnixCairoGraphics::~GR_UnixCairoGraphics()
 
 GR_Graphics *   GR_UnixCairoGraphics::graphicsAllocator(GR_AllocInfo& info)
 {
-	UT_return_val_if_fail(info.getType() == GRID_UNIX, nullptr);
+	UT_return_val_if_fail(info.getType() == GRID_UNIX, NULL);
 	xxx_UT_DEBUGMSG(("GR_CairoGraphics::graphicsAllocator\n"));
 
-//	UT_return_val_if_fail(!info.isPrinterGraphics(), nullptr);
+//	UT_return_val_if_fail(!info.isPrinterGraphics(), NULL);
 	GR_UnixCairoAllocInfo &AI = (GR_UnixCairoAllocInfo&)info;
 
-	return new GR_UnixCairoGraphics(AI.m_win);
+	return new GR_UnixCairoGraphics(AI.m_win, AI.m_double_buffered);
 }
 
 inline UT_RGBColor _convertGdkRGBA(const GdkRGBA &c)
@@ -144,16 +139,17 @@ void GR_UnixCairoGraphics::widget_size_allocate(GtkWidget* /*widget*/, GtkAlloca
 void GR_UnixCairoGraphics::widget_destroy(GtkWidget* widget, GR_UnixCairoGraphics* me)
 {
 	UT_return_if_fail(me && me->m_Widget == widget);
-	me->m_Widget = nullptr;
+	me->m_Widget = NULL;
 	me->m_Signal = 0;
 	me->m_DestroySignal = 0;
 }
 
-void GR_UnixCairoGraphics::_initWidget()
+void GR_UnixCairoGraphics::initWidget(GtkWidget* widget)
 {
-	UT_return_if_fail(m_Widget);
-	m_Signal = g_signal_connect_after(G_OBJECT(m_Widget), "size_allocate", G_CALLBACK(widget_size_allocate), this);
-	m_DestroySignal = g_signal_connect(G_OBJECT(m_Widget), "destroy", G_CALLBACK(widget_destroy), this);
+	UT_return_if_fail(widget && m_Widget == NULL);
+	m_Widget = widget;
+	m_Signal = g_signal_connect_after(G_OBJECT(widget), "size_allocate", G_CALLBACK(widget_size_allocate), this);
+	m_DestroySignal = g_signal_connect(G_OBJECT(widget), "destroy", G_CALLBACK(widget_destroy), this);
 }
 
 #define COLOR_MIX 0.67   //COLOR_MIX should be between 0 and 1
@@ -180,7 +176,7 @@ void GR_UnixCairoGraphics::init3dColors(GtkWidget* /*w*/)
 	if (m_styleHighlight) {
 		g_object_unref(m_styleHighlight);
 	}
-	m_styleHighlight = XAP_GtkStyle_get_style(nullptr, "GtkTreeView.view"); // "textview.view"
+	m_styleHighlight = XAP_GtkStyle_get_style(NULL, "GtkTreeView.view"); // "textview.view"
 	gtk_style_context_get_color (m_styleHighlight, GTK_STATE_FLAG_NORMAL, &rgba1);
 	m_3dColors[CLR3D_Highlight] = _convertGdkRGBA(rgba1);
 
@@ -204,7 +200,7 @@ void GR_UnixCairoGraphics::init3dColors(GtkWidget* /*w*/)
 	m_3dColors[CLR3D_BevelDown]  = _convertGdkRGBA(rgba_);
 
 
-	GtkStyleContext *text_style = XAP_GtkStyle_get_style(nullptr, "GtkLabel.view"); // "label.view"
+	GtkStyleContext *text_style = XAP_GtkStyle_get_style(NULL, "GtkLabel.view"); // "label.view"
 	gtk_style_context_get_color (text_style, GTK_STATE_FLAG_NORMAL, &rgba2);
 	m_3dColors[CLR3D_Foreground]	= _convertGdkRGBA(rgba2);
 	g_object_unref(text_style);
@@ -225,7 +221,7 @@ GR_Font * GR_UnixCairoGraphics::getGUIFont(void)
 		gtk_style_context_set_path(tempCtxt, path);
 		gtk_widget_path_free(path);
 		PangoFontDescription* fontDesc;
-		gtk_style_context_get(tempCtxt, GTK_STATE_FLAG_NORMAL, "font", &fontDesc, nullptr);
+		gtk_style_context_get(tempCtxt, GTK_STATE_FLAG_NORMAL, "font", &fontDesc, NULL);
 		const char *guiFontName = pango_font_description_get_family(fontDesc);
 
 		if (!guiFontName)
@@ -253,9 +249,15 @@ GR_Font * GR_UnixCairoGraphics::getGUIFont(void)
 	return m_pPFontGUI;
 }
 
-const char* GR_UnixCairoGraphics::_getCursor(GR_Graphics::Cursor c)
+
+void GR_UnixCairoGraphics::setCursor(GR_Graphics::Cursor c)
 {
-	const char* cursor_name;
+	if (m_cursor == c)
+		return;
+
+	m_cursor = c;
+
+	GdkCursorType cursor_number;
 
 	switch (c)
 	{
@@ -263,11 +265,11 @@ const char* GR_UnixCairoGraphics::_getCursor(GR_Graphics::Cursor c)
 		UT_ASSERT(UT_NOT_IMPLEMENTED);
 		/*FALLTHRU*/
 	case GR_CURSOR_DEFAULT:
-		cursor_name = "default";
+		cursor_number = GDK_LEFT_PTR;
 		break;
 
 	case GR_CURSOR_IBEAM:
-		cursor_name = "text";
+		cursor_number = GDK_XTERM;
 		break;
 
 	//I have changed the shape of the arrow so get a consistent
@@ -275,110 +277,100 @@ const char* GR_UnixCairoGraphics::_getCursor(GR_Graphics::Cursor c)
 	//for the purpose anyway
 
 	case GR_CURSOR_RIGHTARROW:
-		cursor_name = "default"; //XXX GDK_ARROW;
+		cursor_number = GDK_SB_RIGHT_ARROW; //GDK_ARROW;
 		break;
 
 	case GR_CURSOR_LEFTARROW:
-		cursor_name = "default"; //XXX GDK_LEFT_PTR;
+		cursor_number = GDK_SB_LEFT_ARROW; //GDK_LEFT_PTR;
 		break;
 
 	case GR_CURSOR_IMAGE:
-		cursor_name = "move";
+		cursor_number = GDK_FLEUR;
 		break;
 
 	case GR_CURSOR_IMAGESIZE_NW:
-		cursor_name = "nw-resize";
+		cursor_number = GDK_TOP_LEFT_CORNER;
 		break;
 
 	case GR_CURSOR_IMAGESIZE_N:
-		cursor_name = "n-resize";
+		cursor_number = GDK_TOP_SIDE;
 		break;
 
 	case GR_CURSOR_IMAGESIZE_NE:
-		cursor_name = "ne-resize";
+		cursor_number = GDK_TOP_RIGHT_CORNER;
 		break;
 
 	case GR_CURSOR_IMAGESIZE_E:
-		cursor_name = "e-resize";
+		cursor_number = GDK_RIGHT_SIDE;
 		break;
 
 	case GR_CURSOR_IMAGESIZE_SE:
-		cursor_name = "se-resize";
+		cursor_number = GDK_BOTTOM_RIGHT_CORNER;
 		break;
 
 	case GR_CURSOR_IMAGESIZE_S:
-		cursor_name = "s-resize";
+		cursor_number = GDK_BOTTOM_SIDE;
 		break;
 
 	case GR_CURSOR_IMAGESIZE_SW:
-		cursor_name = "sw-resize";
+		cursor_number = GDK_BOTTOM_LEFT_CORNER;
 		break;
 
 	case GR_CURSOR_IMAGESIZE_W:
-		cursor_name = "w-resize";
+		cursor_number = GDK_LEFT_SIDE;
 		break;
 
 	case GR_CURSOR_LEFTRIGHT:
-		cursor_name = "col-resize";
+		cursor_number = GDK_SB_H_DOUBLE_ARROW;
 		break;
 
 	case GR_CURSOR_UPDOWN:
-		cursor_name = "row-resize";
+		cursor_number = GDK_SB_V_DOUBLE_ARROW;
 		break;
 
 	case GR_CURSOR_EXCHANGE:
-		cursor_name = "default"; // XXX no equivalent
+		cursor_number = GDK_EXCHANGE;
 		break;
 
 	case GR_CURSOR_GRAB:
-		cursor_name = "grab";
+		cursor_number = GDK_HAND1;
 		break;
 
 	case GR_CURSOR_LINK:
-		cursor_name = "alias";
+		cursor_number = GDK_HAND2;
 		break;
 
 	case GR_CURSOR_WAIT:
-		cursor_name = "wait";
+		cursor_number = GDK_WATCH;
 		break;
 
 	case GR_CURSOR_HLINE_DRAG:
-		cursor_name = "col-resize";
+		cursor_number = GDK_SB_V_DOUBLE_ARROW;
 		break;
 
 	case GR_CURSOR_VLINE_DRAG:
-		cursor_name = "row-resize";
+		cursor_number = GDK_SB_H_DOUBLE_ARROW;
 		break;
 
 	case GR_CURSOR_CROSSHAIR:
-		cursor_name = "crosshair";
+		cursor_number = GDK_CROSSHAIR;
 		break;
 
 	case GR_CURSOR_DOWNARROW:
-		cursor_name = "s-resize"; // not sure
+		cursor_number = GDK_SB_DOWN_ARROW;
 		break;
 
 	case GR_CURSOR_DRAGTEXT:
-		cursor_name = "grabbing";
+		cursor_number = GDK_TARGET;
 		break;
 
 	case GR_CURSOR_COPYTEXT:
-		cursor_name = "copy";
+		cursor_number = GDK_DRAPED_BOX;
 		break;
 	}
-
-	return cursor_name;
-}
-
-void GR_UnixCairoGraphics::setCursor(GR_Graphics::Cursor c)
-{
-	if (m_cursor == c)
-		return;
-	const char* cursor_name = _getCursor(c);
-	m_cursor = c;
-	xxx_UT_DEBUGMSG(("cursor set to %d	gdk %s \n", c, cursor_name));
-	GdkCursor * cursor = gdk_cursor_new_from_name(
-		gdk_window_get_display(m_pWin), cursor_name);
+	xxx_UT_DEBUGMSG(("cursor set to %d	gdk %d \n",c,cursor_number));
+	GdkCursor * cursor = gdk_cursor_new_for_display(
+		gdk_window_get_display(m_pWin), cursor_number);
 	gdk_window_set_cursor(m_pWin, cursor);
 	g_object_unref(cursor);
 }
@@ -454,12 +446,12 @@ GR_Image * GR_UnixCairoGraphics::genImageFromRectangle(const UT_Rect &rec)
 	UT_sint32 idy = _tduY(rec.top);
 	UT_sint32 idw = _tduR(rec.width);
 	UT_sint32 idh = _tduR(rec.height);
-	UT_return_val_if_fail (idw > 0 && idh > 0 && idx >= 0, nullptr);
+	UT_return_val_if_fail (idw > 0 && idh > 0 && idx >= 0, NULL);
 	cairo_surface_flush ( cairo_get_target(m_cr));
 	GdkPixbuf * pix = gdk_pixbuf_get_from_window(getWindow(),
 	                                             idx, idy,
 	                                             idw, idh);
-	UT_return_val_if_fail(pix, nullptr);
+	UT_return_val_if_fail(pix, NULL);
 
 	GR_UnixImage * pImg = new GR_UnixImage("ScreenShot");
 	pImg->setData(pix);
@@ -472,13 +464,10 @@ void GR_UnixCairoGraphics::_beginPaint()
 	UT_ASSERT(m_Painting == false);
 	GR_CairoGraphics::_beginPaint();
 
-	if (m_cr == nullptr)
+	if (m_cr == NULL)
 	{
 		UT_ASSERT(m_pWin);
-		auto region = cairo_region_create();
-		m_context = gdk_window_begin_draw_frame(m_pWin, region);
-		cairo_region_destroy(region);
-		m_cr = gdk_drawing_context_get_cairo_context(m_context);
+		m_cr = gdk_cairo_create (m_pWin);
 		m_CairoCreated = true;
 	}
 
@@ -491,32 +480,15 @@ void GR_UnixCairoGraphics::_endPaint()
 {
 	if (m_CairoCreated)
 	{
-		gdk_window_end_draw_frame(m_pWin, m_context);
+		cairo_surface_flush(cairo_get_target(m_cr));
+		cairo_destroy (m_cr);
 	}
-	m_context = nullptr;
-	m_cr = nullptr;
+	m_cr = NULL;
 
 	m_Painting = false;
 	m_CairoCreated = false;
 
 	GR_CairoGraphics::_endPaint();
-}
-
-void GR_UnixCairoGraphics::queueDraw(const UT_Rect* clip)
-{
-	UT_ASSERT(m_Widget);
-
-	if (!clip) {
-		gtk_widget_queue_draw(m_Widget);
-	} else {
-		gtk_widget_queue_draw_area(
-				m_Widget,
-				clip->left,
-				clip->top,
-				clip->width,
-				clip->height
-			);
-	}
 }
 
 void GR_UnixCairoGraphics::flush(void)
@@ -540,7 +512,7 @@ bool GR_UnixCairoGraphics::queryProperties(GR_Graphics::Properties gp) const
 	{
 		case DGP_SCREEN:
 		case DGP_OPAQUEOVERLAY:
-			return m_pWin != nullptr;
+			return m_pWin != NULL;
 		case DGP_PAPER:
 			return false;
 		default:
@@ -572,7 +544,7 @@ void GR_UnixCairoGraphics::fillRect(GR_Color3D c, UT_sint32 x, UT_sint32 y,
 	case GR_Graphics::CLR3D_Background:
 	case GR_Graphics::CLR3D_Highlight:
 	{
-		if (m_cr == nullptr) {
+		if (m_cr == NULL) {
 			return;
 		}
 		_setProps();

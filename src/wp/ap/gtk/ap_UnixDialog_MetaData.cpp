@@ -27,7 +27,6 @@
 // This header defines some functions for Unix dialogs,
 // like centering them, measuring them, etc.
 #include "xap_UnixDialogHelper.h"
-#include "xap_GtkUtils.h"
 
 #include "xap_App.h"
 #include "xap_UnixApp.h"
@@ -83,7 +82,7 @@ void AP_UnixDialog_MetaData::eventCancel ()
 	setAnswer ( AP_Dialog_MetaData::a_CANCEL ) ;
 }
 
-#define GRAB_ENTRY_TEXT(name) txt = XAP_gtk_entry_get_text(GTK_ENTRY(m_entry##name)) ; \
+#define GRAB_ENTRY_TEXT(name) txt = gtk_entry_get_text(GTK_ENTRY(m_entry##name)) ; \
 if( txt ) \
 set##name ( txt )
 
@@ -92,7 +91,7 @@ void AP_UnixDialog_MetaData::eventOK ()
 	setAnswer ( AP_Dialog_MetaData::a_OK ) ;
 	
 	// TODO: gather data
-	const char * txt = nullptr ;
+	const char * txt = NULL ;
 	
 	GRAB_ENTRY_TEXT(Title);
 	GRAB_ENTRY_TEXT(Subject);
@@ -130,7 +129,7 @@ GtkWidget * AP_UnixDialog_MetaData::_constructWindow ()
 	const XAP_StringSet * pSS = m_pApp->getStringSet();
 	
 	// load the dialog from the UI file
-	GtkBuilder* builder = newDialogBuilderFromResource("ap_UnixDialog_MetaData.ui");
+	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_MetaData.ui");
 
 	// Update our member variables with the important widgets that 
 	// might need to be queried or altered later
@@ -181,7 +180,7 @@ GtkWidget * AP_UnixDialog_MetaData::_constructWindow ()
 	#define SET_ENTRY_TXT(name) \
 	prop = get##name () ; \
 	if ( !prop.empty () ) { \
-		XAP_gtk_entry_set_text (GTK_ENTRY(m_entry##name), prop.c_str() ) ; \
+		gtk_entry_set_text (GTK_ENTRY(m_entry##name), prop.c_str() ) ; \
 	}
 	
 	SET_ENTRY_TXT(Title)

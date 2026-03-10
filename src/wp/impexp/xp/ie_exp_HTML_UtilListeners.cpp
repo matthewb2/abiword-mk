@@ -34,8 +34,8 @@
 IE_Exp_HTML_HeaderFooterListener::IE_Exp_HTML_HeaderFooterListener(
     PD_Document * pDocument, IE_Exp_HTML_DocumentWriter* pDocumentWriter,
     IE_Exp_HTML_Listener *pListener) :
-m_pHdrDocRange(nullptr),
-m_pFtrDocRange(nullptr),
+m_pHdrDocRange(NULL),
+m_pFtrDocRange(NULL),
 m_pDocument(pDocument),
 m_pDocumentWriter(pDocumentWriter),
 m_pListener(pListener),
@@ -77,26 +77,25 @@ bool IE_Exp_HTML_HeaderFooterListener::populateStrux(pf_Frag_Strux* sdh,
 {
     /* Housekeeping and prep */
     UT_return_val_if_fail(pcr->getType() == PX_ChangeRecord::PXT_InsertStrux, false);
-    *psfh = nullptr; // we don't need it.
+    *psfh = 0; // we don't need it.
     const PX_ChangeRecord_Strux * pcrx = static_cast<const PX_ChangeRecord_Strux *> (pcr);
     PT_AttrPropIndex api = pcr->getIndexAP();
     switch (pcrx->getStruxType())
     {
     case PTX_SectionHdrFtr:
     {
-        const PP_AttrProp * pAP = nullptr;
+        const PP_AttrProp * pAP = 0;
         bool bHaveProp = m_pDocument->getAttrProp(api, &pAP);
 
-        if (!bHaveProp || (pAP == nullptr))
-            return true;
+        if (!bHaveProp || (pAP == 0)) return true;
 
-        const gchar * szType = nullptr;
+        const gchar * szType = 0;
         pAP->getAttribute("type", szType);
         /* // */
 
         PT_DocPosition m_iHdrFtrStartPos = m_pDocument->getStruxPosition(sdh) + 1;
         PT_DocPosition m_iHdrFtrStopPos = 0;
-        pf_Frag_Strux* nextSDH = nullptr;
+        pf_Frag_Strux* nextSDH = NULL;
         bool bHaveNextSection = m_pDocument->getNextStruxOfType(sdh, PTX_Section, &nextSDH);
         if (bHaveNextSection)
         {
@@ -537,7 +536,7 @@ bool IE_Exp_HTML_HeaderFooterListener::signal(UT_uint32 /* iSignal */)
 //    }
 //
 //    UT_UTF8String var;
-//    const gchar * value = nullptr;
+//    const gchar * value = NULL;
 //
 //    if (eq)
 //    {

@@ -1,7 +1,8 @@
 /* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
+
 /* AbiSource Program Utilities
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2001-2003, 2009, 2011-2021 Hubert Figuière
+ * Copyright (C) 2001-2003, 2009, 2011 Hubert Figuiere
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,7 +23,6 @@
 
 #include <string.h>
 #include <stdlib.h>
-
 #include "ut_assert.h"
 #include "ut_debugmsg.h"
 #include "ut_string.h"
@@ -42,7 +42,7 @@
 #include "xap_EncodingManager.h"
 #include "ap_CocoaFrame.h"
 #include "xap_CocoaFrameImpl.h"
-#include "gr_CocoaGraphics.h"
+#include "gr_CocoaCairoGraphics.h"
 #include "pd_Style.h"
 
 #import <Cocoa/Cocoa.h>
@@ -84,7 +84,7 @@
 {
 	NSColor * color = [[NSColorPanel sharedColorPanel] color];
 	UT_RGBColor rgbclr;
-	GR_CocoaGraphics::_utNSColorToRGBColor(color, rgbclr);
+	GR_CocoaCairoGraphics::_utNSColorToRGBColor(color, rgbclr);
 	
 	UT_HashColor hash;
 
@@ -118,17 +118,17 @@
 	
 	if ([sender isKindOfClass:[NSPopUpButton class]])
 	{
-		XAP_Toolbar_Id tlbrID = (XAP_Toolbar_Id)[sender tag];
+		XAP_Toolbar_Id tlbrID = [sender tag];
 
 		UT_UCS4String ucsText([[sender titleOfSelectedItem] UTF8String]);
-		_xap->toolbarEvent(tlbrID, ucsText.ucs4_str(), (UT_uint32)ucsText.length());
+		_xap->toolbarEvent (tlbrID, ucsText.ucs4_str(), ucsText.length());
 
 		if (XAP_Frame * pFrame = _xap->getFrame())
 			pFrame->raise();
 	}
 	else if ([sender isKindOfClass:[NSButton class]])
 	{
-		XAP_Toolbar_Id tlbrID = (XAP_Toolbar_Id)[sender tag];
+		XAP_Toolbar_Id tlbrID = [sender tag];
 
 		switch (tlbrID) {
 		case AP_TOOLBAR_ID_COLOR_FORE:
@@ -138,8 +138,8 @@
 
 				// ?? [NSColorPanel setPickerMask:(NSColorPanelRGBModeMask|NSColorPanelWheelModeMask|NSColorPanelGrayModeMask)];
 
-				[colorPanel setAction:nil];
-				[colorPanel setTarget:nil];
+				[colorPanel setAction:0];
+				[colorPanel setTarget:0];
 
 				if (tlbrID == AP_TOOLBAR_ID_COLOR_FORE)
 				{
@@ -160,7 +160,7 @@
 
 		default:
 			{
-				const UT_UCSChar * pData = nullptr;
+				const UT_UCSChar * pData = NULL;
 				UT_uint32 dataLength = 0;
 		
 				_xap->toolbarEvent(tlbrID, pData, dataLength);
@@ -170,7 +170,7 @@
 	}
 	else if ([sender isKindOfClass:[NSComboBox class]])
 	{
-		XAP_Toolbar_Id tlbrID = (XAP_Toolbar_Id)[sender tag];
+		XAP_Toolbar_Id tlbrID = [sender tag];
 
 	    if (tlbrID == AP_TOOLBAR_ID_FMT_SIZE)
 		{
@@ -189,7 +189,7 @@
 			if (XAP_Frame * pFrame = _xap->getFrame())
 			{
 				pFrame->raise();
-				_xap->toolbarEvent (tlbrID, ucsText.ucs4_str(), (UT_uint32)ucsText.length());
+				_xap->toolbarEvent (tlbrID, ucsText.ucs4_str(), ucsText.length());
 			}
 		}
 		else
@@ -206,7 +206,7 @@
 				if (XAP_Frame * pFrame = _xap->getFrame())
 				{
 					pFrame->raise();
-					_xap->toolbarEvent (tlbrID, ucsText.ucs4_str(), (UT_uint32)ucsText.length());
+					_xap->toolbarEvent (tlbrID, ucsText.ucs4_str(), ucsText.length());
 				}
 			}
 			else
@@ -226,7 +226,7 @@
 				if (XAP_Frame * pFrame = _xap->getFrame())
 				{
 					pFrame->raise();
-					_xap->toolbarEvent (tlbrID, ucsText.ucs4_str(), (UT_uint32)ucsText.length());
+					_xap->toolbarEvent (tlbrID, ucsText.ucs4_str(), ucsText.length());
 				}
 			}
 		}
@@ -252,7 +252,7 @@ EV_CocoaToolbar::EV_CocoaToolbar(AP_CocoaFrame * pCocoaFrame,
 				 szToolbarLabelSetName),
 	  m_pCocoaFrame(pCocoaFrame)
 {
-	m_pViewListener = nullptr;
+	m_pViewListener = 0;
 	m_wToolbar = nil;
 	m_lid = 0;							// view listener id
 	m_target = [[EV_CocoaToolbarTarget alloc] init];
@@ -270,10 +270,10 @@ EV_CocoaToolbar::~EV_CocoaToolbar(void)
 
 NSButton * EV_CocoaToolbar::_makeToolbarButton (int type, EV_Toolbar_Label * pLabel, 
 												XAP_Toolbar_Id tlbrid, NSView *parent,
-												CGFloat& btnX)
+												float & btnX)
 {
-	const CGFloat BTN_WIDTH = getButtonWidth ();
-	const CGFloat BTN_HEIGHT = getButtonHeight ();
+	const float BTN_WIDTH = getButtonWidth ();
+	const float BTN_HEIGHT = getButtonHeight ();
 
 	NSButton * btn = nil;
 	
@@ -290,7 +290,7 @@ NSButton * EV_CocoaToolbar::_makeToolbarButton (int type, EV_Toolbar_Label * pLa
 			btn = [[NSButton alloc] initWithFrame:btnFrame];
 
 		//  [btn setButtonType:NSToggleButton];
-			[btn setButtonType:NSButtonTypeMomentaryPushIn];
+			[btn setButtonType:NSMomentaryPushInButton];
 		}
 		break;
 
@@ -301,7 +301,7 @@ NSButton * EV_CocoaToolbar::_makeToolbarButton (int type, EV_Toolbar_Label * pLa
 
 			btn = [[XAP_CocoaToolbarButton alloc] initWithFrame:btnFrame];
 
-			[btn setButtonType:NSButtonTypePushOnPushOff];
+			[btn setButtonType:NSPushOnPushOffButton];
 
 			NSButtonCell * cell = (NSButtonCell *) [btn cell];
 
@@ -313,15 +313,14 @@ NSButton * EV_CocoaToolbar::_makeToolbarButton (int type, EV_Toolbar_Label * pLa
 		UT_ASSERT (UT_SHOULD_NOT_HAPPEN);
 	}
 	if (btn) {
-		[btn setBezelStyle:NSBezelStyleRegularSquare];
+		[btn setBezelStyle:NSRegularSquareBezelStyle];
 		[btn setBordered:NO];
 		[btn setTag:(int)tlbrid];
 		[btn setTarget:m_target];
 		[btn setAction:@selector(toolbarSelected:)];
 
 		UT_ASSERT(g_ascii_strcasecmp(pLabel->getIconName(),"NoIcon")!=0);
-		NSImage* wPixmap =
-			static_cast<XAP_CocoaApp*>(XAP_App::getApp())->getToolbarIcons()->getPixmapForIcon(pLabel->getIconName());		// autoreleased
+		NSImage * wPixmap = m_pCocoaToolbarIcons->getPixmapForIcon(pLabel->getIconName());		// autoreleased
 		UT_ASSERT(wPixmap);
 		[btn setImage:wPixmap];
 
@@ -354,7 +353,7 @@ bool EV_CocoaToolbar::toolbarEvent(XAP_Toolbar_Id tlbrid,
 	// make sure we ignore presses on "down" group buttons
 	if (pAction->getItemType() == EV_TBIT_GroupButton)
 	{
-		const char * szState = nullptr;
+		const char * szState = 0;
 		EV_Toolbar_ItemState tis = pAction->getToolbarItemState(pView,&szState);
 
 		if (EV_TIS_ShouldBeToggled(tis))
@@ -436,11 +435,11 @@ void EV_CocoaToolbar::rebuildToolbar(UT_sint32 /*oldpos*/)
 bool EV_CocoaToolbar::synthesize(void)
 {
 	// TODO: rationalize those as static members of the class.
-//	const CGFloat BTN_WIDTH = getButtonWidth ();
-	const CGFloat BTN_HEIGHT = getButtonHeight ();
+//	const float BTN_WIDTH = getButtonWidth ();
+	const float BTN_HEIGHT = getButtonHeight ();
 
 	// create a Cocoa toolbar from the info provided.
-	CGFloat btnX = 0;
+	float btnX = 0;
 	const EV_Toolbar_ActionSet * pToolbarActionSet = XAP_App::getApp()->getToolbarActionSet();
 	UT_ASSERT(pToolbarActionSet);
 
@@ -457,9 +456,8 @@ bool EV_CocoaToolbar::synthesize(void)
 	UT_ASSERT (pToolbarWinCtrl);
 	NSView * toolbarParent = [[pToolbarWinCtrl window] contentView];
 	UT_ASSERT (toolbarParent);
-
 	NSRect viewBounds = [toolbarParent bounds];
-	CGFloat viewHeight = viewBounds.size.height;	// the toolbar window view height
+	float viewHeight = viewBounds.size.height;	// the toolbar window view height
 	viewBounds.size.height = getToolbarHeight();
 	xxx_UT_DEBUGMSG (("toolbar has %u subviews\n", [[toolbarParent subviews] count]));
 	// revert the coordinate as they are upside down in NSView
@@ -480,17 +478,17 @@ bool EV_CocoaToolbar::synthesize(void)
 	// get toolbar button appearance from the preferences
 	////////////////////////////////////////////////////////////////
 	// TODO
-	std::string value;
-	XAP_App::getApp()->getPrefsValue(XAP_PREF_KEY_ToolbarAppearance, value);
-	UT_ASSERT(!value.empty());
-
-	if (g_ascii_strcasecmp(value.c_str(), "icon") == 0) {
+	const gchar * szValue = NULL;
+	XAP_App::getApp()->getPrefsValue(XAP_PREF_KEY_ToolbarAppearance, &szValue);
+	UT_ASSERT((szValue) && (*szValue));
+	
+	if (g_ascii_strcasecmp(szValue, "icon") == 0) {
 		[toolbar setDisplayMode:NSToolbarDisplayModeIconOnly];
 	}
-	else if (g_ascii_strcasecmp(value.c_str(), "text") == 0) {
+	else if (g_ascii_strcasecmp(szValue, "text") == 0) {
 		[toolbar setDisplayMode:NSToolbarDisplayModeLabelOnly];
 	}
-	else if (g_ascii_strcasecmp(value.c_str(), "both") == 0) {
+	else if (g_ascii_strcasecmp(szValue, "both") == 0) {
 		[toolbar setDisplayMode:NSToolbarDisplayModeIconAndLabel];
 	}
 #endif
@@ -547,7 +545,7 @@ bool EV_CocoaToolbar::synthesize(void)
 
 				bool bIsCombo = true;
 
-				CGFloat fWidth = 100;
+				float fWidth = 100;
 
 				if (pControl)
 				{
@@ -580,8 +578,8 @@ bool EV_CocoaToolbar::synthesize(void)
 				btnFrame.size.height = (bIsCombo ? 26.0f : 25.0f);
 				btnFrame.origin.y = rintf((BTN_HEIGHT - 26.0f) / 2.0f /* - (bIsCombo ? 0.0f : 1.0f) */);
 
-				NSComboBox * comboBox = nil;
-				NSPopUpButton * popupButton = nil;
+				NSComboBox * comboBox = 0;
+				NSPopUpButton * popupButton = 0;
 
 				if (bIsCombo)
 				{
@@ -740,7 +738,7 @@ void EV_CocoaToolbar::_releaseListener(void)
 	if (!m_pViewListener)
 		return;
 	DELETEP(m_pViewListener);
-	m_pViewListener = nullptr;
+	m_pViewListener = 0;
 	m_lid = 0;
 }
 	
@@ -786,7 +784,7 @@ bool EV_CocoaToolbar::refreshToolbar(AV_View * pView, AV_ChangeMask mask)
 		{
 		case EV_TLF_Normal:
 			{
-				const char * szState = nullptr;
+				const char * szState = 0;
 				EV_Toolbar_ItemState tis = pAction->getToolbarItemState(pView,&szState);
 
 				switch (pAction->getItemType())
@@ -818,7 +816,7 @@ bool EV_CocoaToolbar::refreshToolbar(AV_View * pView, AV_ChangeMask mask)
 					NSButton * item = [m_wToolbar viewWithTag:tlbrid];
 					UT_ASSERT(item);
 					UT_ASSERT([item isKindOfClass:[NSButton class]]);						
-					[item setState:(bToggled?NSControlStateValueOn:NSControlStateValueOff)];
+					[item setState:(bToggled?NSOnState:NSOffState)];
 						
 					// Disable/enable toolbar item
 					[item setEnabled:(bGrayed?NO:YES)];
@@ -861,14 +859,14 @@ bool EV_CocoaToolbar::refreshToolbar(AV_View * pView, AV_ChangeMask mask)
 
 						if ((tlbrid == AP_TOOLBAR_ID_FMT_STYLE) && m_pCocoaFrame)
 						{
-							NSInteger count = [popupButton numberOfItems];
+							int count = [popupButton numberOfItems];
 
 							NSMutableArray * styles = [NSMutableArray arrayWithCapacity:(count ? count : 32)];
 
 							if (PD_Document * pDoc = static_cast<PD_Document *>(m_pCocoaFrame->getCurrentDoc()))
 							{
 
-								UT_GenericVector<PD_Style*>* pStyles = nullptr;
+								UT_GenericVector<PD_Style*>* pStyles = NULL;
 								pDoc->enumStyles(pStyles);
 								UT_uint32 nStyles = pStyles->getItemCount();
 								for (UT_uint32 k = 0; k < nStyles; k++) {
@@ -896,7 +894,7 @@ bool EV_CocoaToolbar::refreshToolbar(AV_View * pView, AV_ChangeMask mask)
 						if ((tlbrid == AP_TOOLBAR_ID_FMT_FONT) && state) {
 							if ([popupButton indexOfItemWithTitle:state] < 0)
 							{
-								NSInteger count = [popupButton numberOfItems];
+								int count = [popupButton numberOfItems];
 
 								NSMutableArray * fonts = [NSMutableArray arrayWithCapacity:(count + 1)];
 
@@ -938,7 +936,7 @@ bool EV_CocoaToolbar::refreshToolbar(AV_View * pView, AV_ChangeMask mask)
 							value = [[NSString alloc] initWithUTF8String:szState];
 						}
 						else {
-							UT_DEBUGMSG(("value is nullptr\n"));
+							UT_DEBUGMSG(("value is NULL\n"));
 						}
 					}
 					if (value) {

@@ -93,7 +93,7 @@ class ABI_EXPORT AP_RDFSemanticItemGTKInjected : public ParentClass
                                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                                     convertMnemonics(s).c_str(),
                                                     GTK_RESPONSE_NONE,
-                                                    nullptr);
+                                                    NULL);
         GtkWidget* w = GTK_WIDGET(c->createEditor());
         g_object_set_data_full( G_OBJECT(w),
                                 G_OBJECT_SEMITEM,
@@ -126,7 +126,7 @@ class ABI_EXPORT AP_RDFSemanticItemGTKInjected : public ParentClass
                                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                                     convertMnemonics(s).c_str(),
                                                     GTK_RESPONSE_NONE,
-                                                    nullptr);
+                                                    NULL);
         GtkNotebook* notebook = GTK_NOTEBOOK(gtk_notebook_new());
         gtk_container_add( GTK_CONTAINER(gtk_dialog_get_content_area( GTK_DIALOG (d))),
                            GTK_WIDGET(notebook) );
@@ -163,13 +163,13 @@ class ABI_EXPORT AP_RDFSemanticItemGTKInjected : public ParentClass
     void importFromDataComplete( std::istream& /*iss*/,
                                 PD_DocumentRDFHandle rdf,
                                 PD_DocumentRDFMutationHandle m,
-                                PD_DocumentRange * pDocRange = 0 ) override
+                                PD_DocumentRange * pDocRange = 0 )
     {
         // Create and populate and editor with the current data,
         // then update the Rdf from that editor.
         GtkWidget* objectEditor = (GtkWidget*)this->createEditor();
         this->updateFromEditorData( m );
-        gtk_container_remove(GTK_CONTAINER(gtk_widget_get_parent(objectEditor)), objectEditor);
+        gtk_widget_destroy( GTK_WIDGET(objectEditor) );
 
         if (pDocRange)
         {
@@ -183,7 +183,7 @@ class ABI_EXPORT AP_RDFSemanticItemGTKInjected : public ParentClass
     }
 
     std::string getImportFromFileName( const std::string& filename_const,
-                                       std::list< std::pair< std::string, std::string> > types ) const override
+                                       std::list< std::pair< std::string, std::string> > types ) const
     {
         std::string ret = filename_const;
 
@@ -211,7 +211,7 @@ class ABI_EXPORT AP_RDFSemanticItemGTKInjected : public ParentClass
     std::string
         getExportToFileName( const std::string& filename_const,
                              std::string defaultExtension,
-                             std::list<std::pair<std::string, std::string>> types) const override
+                             std::list< std::pair< std::string, std::string> > types ) const
     {
         std::string filename = filename_const;
 

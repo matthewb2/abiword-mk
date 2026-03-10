@@ -115,9 +115,9 @@ void  AP_Win32Dialog_Stylist::destroy(void)
 void  AP_Win32Dialog_Stylist::setStyleInGUI(void)
 {
 	UT_sint32 row,col;
-	std::string sCurStyle = getCurStyle();
+	UT_UTF8String sCurStyle = *getCurStyle();
 
-	if((getStyleTree() == nullptr) || (sCurStyle.size() == 0))
+	if((getStyleTree() == NULL) || (sCurStyle.size() == 0))
 		updateDialog();
 
 	if(isStyleTreeChanged())
@@ -130,7 +130,7 @@ void  AP_Win32Dialog_Stylist::setStyleInGUI(void)
 	UT_DEBUGMSG(("Full Path string is %s \n",sPathFull.c_str()));
 
 	HWND hTree = GetDlgItem(m_hDlg, AP_RID_DIALOG_STYLIST_TREE_STYLIST);
-	HTREEITEM hitem = nullptr;
+	HTREEITEM hitem = NULL;
 
 	hitem = TreeView_GetRoot(hTree);
 	UT_sint32 i;
@@ -234,7 +234,7 @@ void AP_Win32Dialog_Stylist::_populateWindowData(void)
 void AP_Win32Dialog_Stylist::_fillTree(void)
 {
 	Stylist_tree * pStyleTree = getStyleTree();
-	if(pStyleTree == nullptr)
+	if(pStyleTree == NULL)
 	{
 		updateDialog();
 		pStyleTree = getStyleTree();
@@ -296,14 +296,15 @@ void AP_Win32Dialog_Stylist::_fillTree(void)
 		{
 			for(col = 0; col < pStyleTree->getNumCols(row); col++)
 			{
-				if(!pStyleTree->getStyleAtRowCol(sTmp,row,col))
+				UT_UTF8String utf8Tmp;
+				if(!pStyleTree->getStyleAtRowCol(utf8Tmp,row,col))
 				{
 					UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
 					break;
 				}
-				xxx_UT_DEBUGMSG(("Adding style %s at row %d col %d \n",sTmp.c_str(),row,col+1));
+				xxx_UT_DEBUGMSG(("Adding style %s at row %d col %d \n",utf8Tmp.utf8_str(),row,col+1));
 
-				pt_PieceTable::s_getLocalisedStyleName (sTmp.c_str(), str_loc);
+				pt_PieceTable::s_getLocalisedStyleName (utf8Tmp.utf8_str(), str_loc);
 				str.fromUTF8(str_loc.c_str());
 
 				// Insert the item into the treeview
@@ -363,7 +364,7 @@ BOOL AP_Win32Dialog_Stylist::_styleClicked(void)
 
 	// Retrieve the row/column information from the treeview
 	// This maps back to the pStyleList's row&column identifiers
-	if (TreeView_GetParent(hTree, tvi.hItem) == nullptr)
+	if (TreeView_GetParent(hTree, tvi.hItem) == NULL)
 	{
 		if (tvi.cChildren >= 1)
 			return 0; // we've clicked on a style category, not a style
@@ -381,7 +382,7 @@ BOOL AP_Win32Dialog_Stylist::_styleClicked(void)
 		row = tvi.lParam;
 	}
 
-	std::string sStyle;
+	UT_UTF8String sStyle;
 
 	getStyleTree()->getStyleAtRowCol(sStyle,row,col);
 	

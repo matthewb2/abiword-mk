@@ -33,7 +33,7 @@
 #include "xap_CocoaApp.h"
 #include "xap_CocoaFrame.h"
 
-#include "gr_CocoaGraphics.h"
+#include "gr_CocoaCairoGraphics.h"
 #include "ap_Strings.h"
 #include "ap_Dialog_Id.h"
 #include "fl_DocLayout.h"
@@ -103,7 +103,6 @@
     IBOutlet NSTextField *_styleTypeLabel;
 	AP_CocoaDialog_Styles* _xap;
 }
-@property (readonly) XAP_CocoaNSView* preview;
 - (IBAction)basedOnAction:(id)sender;
 - (IBAction)cancelAction:(id)sender;
 - (IBAction)followStyleAction:(id)sender;
@@ -128,9 +127,9 @@ XAP_Dialog * AP_CocoaDialog_Styles::static_constructor(XAP_DialogFactory * pFact
 AP_CocoaDialog_Styles::AP_CocoaDialog_Styles(XAP_DialogFactory * pDlgFactory,
 										 XAP_Dialog_Id dlgid)
   : AP_Dialog_Styles(pDlgFactory, dlgid), 
-	m_pParaPreviewWidget(nullptr),
-	m_pCharPreviewWidget(nullptr),
-	m_pAbiPreviewWidget(nullptr),
+	m_pParaPreviewWidget(NULL),
+	m_pCharPreviewWidget(NULL),
+	m_pAbiPreviewWidget(NULL),
 	m_whichRow(-1), 
 	m_whichType(AP_CocoaDialog_Styles::USED_STYLES)
 {
@@ -174,29 +173,28 @@ void AP_CocoaDialog_Styles::runModal(XAP_Frame * pFrame)
 	DELETEP (m_pParaPreviewWidget);
 	XAP_CocoaNSView * preview = m_dlg->_paraPreview;
 	{
-		GR_CocoaAllocInfo ai(preview);
-		m_pParaPreviewWidget = (GR_CocoaGraphics*)XAP_App::getApp()->newGraphics(ai);
+		GR_CocoaCairoAllocInfo ai(preview);
+		m_pParaPreviewWidget = (GR_CocoaCairoGraphics*)XAP_App::getApp()->newGraphics(ai);
 	}
 	
         // let the widget materialize
-	NSSize size = preview.frame.size;
+	NSSize size = [preview frame].size;
 	_createParaPreviewFromGC(m_pParaPreviewWidget,
 							 (UT_uint32)rintf(size.width), (UT_uint32)rintf(size.height));
-	preview.drawable = m_pParaPreview;
 
 	// make a new Cocoa GC
 	DELETEP (m_pCharPreviewWidget);
 	preview = m_dlg->_charPreview;
 	{
-		GR_CocoaAllocInfo ai(preview);
-		m_pCharPreviewWidget = (GR_CocoaGraphics*)XAP_App::getApp()->newGraphics(ai);
+		GR_CocoaCairoAllocInfo ai(preview);
+		m_pCharPreviewWidget = (GR_CocoaCairoGraphics*)XAP_App::getApp()->newGraphics(ai);
 	}
 
 	// let the widget materialize
-	size = preview.frame.size;
+	size = [preview frame].size;
 	_createCharPreviewFromGC(m_pCharPreviewWidget,
 							 (UT_uint32)rintf(size.width), (UT_uint32)rintf(size.height));
-	preview.drawable = m_pCharPreview;
+
 //
 // Draw the previews!!
 //
@@ -239,7 +237,7 @@ void AP_CocoaDialog_Styles::event_Close(void)
 void AP_CocoaDialog_Styles::event_paraPreviewExposed(void)
 {
 	if(m_pParaPreview)
-		m_pParaPreview->queueDraw();
+		m_pParaPreview->draw();
 }
 
 
@@ -307,7 +305,7 @@ void AP_CocoaDialog_Styles::_populateCList(void)
 	[dataSource removeAllStrings];
 	m_whichRow = -1;	// make sure it is no longer selected
 
-	UT_GenericVector<PD_Style*>* pStyles = nullptr;
+	UT_GenericVector<PD_Style*>* pStyles = NULL;
 	getDoc()->enumStyles(pStyles);
 	for (UT_uint32 i = 0; i < nStyles; i++)
 	{
@@ -346,7 +344,7 @@ void AP_CocoaDialog_Styles::setDescription(const char * desc) const
 const char * AP_CocoaDialog_Styles::getCurrentStyle (void) const
 {
 	if (m_whichRow < 0) {
-		return nullptr;
+		return NULL;
 	}
 	NSString * szStyle = [[m_dlg->m_stylesDataSource array] objectAtIndex:m_whichRow];
 
@@ -499,27 +497,26 @@ void  AP_CocoaDialog_Styles::modifyRunModal(void)
 {
 	m_modifyDlg = [[AP_CocoaDialog_StylesModifyController alloc] initFromNib];
 	[m_modifyDlg setXAPOwner:this];
-	NSWindow* window = m_modifyDlg.window;
+	NSWindow * window = [m_modifyDlg window];
 	UT_ASSERT(window);
 
 	if (_populateModify()) {
 		// make a new Cocoa GC
 		DELETEP (m_pAbiPreviewWidget);
-		XAP_CocoaNSView* preview = m_modifyDlg.preview;
-		GR_CocoaAllocInfo ai(preview);
-		m_pAbiPreviewWidget = (GR_CocoaGraphics*)XAP_App::getApp()->newGraphics(ai);
+		XAP_CocoaNSView * preview = m_modifyDlg->_preview;
+		GR_CocoaCairoAllocInfo ai(preview);
+		m_pAbiPreviewWidget = (GR_CocoaCairoGraphics*)XAP_App::getApp()->newGraphics(ai);
 
 		
 			// let the widget materialize
 	
-		NSSize size =  preview.frame.size;
+		NSSize size =  [preview frame].size;
 		_createAbiPreviewFromGC(m_pAbiPreviewWidget,
-								(UT_uint32)rintf(size.width), (UT_uint32)rintf(size.height));
-		preview.drawable = m_pAbiPreview;
+								(UT_uint32)rintf(size.width), (UT_uint32)rintf(size.height)); 
 		_populateAbiPreview(isNew());
 		event_ModifyPreviewExposed();
 	
-		[NSApp beginSheet:window modalForWindow:m_dlg.window modalDelegate:m_modifyDlg
+		[NSApp beginSheet:window modalForWindow:[m_dlg window] modalDelegate:m_modifyDlg
 				didEndSelector:@selector(sheetDidEnd:returnCode:contextInfo:) contextInfo:nil];
 	}
 }
@@ -554,12 +551,12 @@ void AP_CocoaDialog_Styles::event_modifySheetDidEnd(int /*code*/)
 
 void AP_CocoaDialog_Styles::event_ModifyPreviewExposed(void)
 {
-	invalidatePreview();
+	drawLocal();
 }
 
 void AP_CocoaDialog_Styles::event_ModifyClicked(void)
 {
-	PD_Style * pStyle = nullptr;
+	PD_Style * pStyle = NULL;
 	const char * szCurrentStyle = getCurrentStyle ();
 	
 	if(szCurrentStyle)
@@ -612,7 +609,7 @@ bool  AP_CocoaDialog_Styles::_populateModify(void)
 //
 // Get Style name and put in in the text entry
 //
-	const char * szCurrentStyle = nullptr;
+	const char * szCurrentStyle = NULL;
 	if(!isNew())
 	{
 		szCurrentStyle= getCurrentStyle();
@@ -633,13 +630,13 @@ bool  AP_CocoaDialog_Styles::_populateModify(void)
 // Next interogate the current style and find the based on and followed by
 // Styles
 //
-	const char * szBasedOn = nullptr;
-	const char * szFollowedBy = nullptr;
-	PD_Style * pBasedOnStyle = nullptr;
-	PD_Style * pFollowedByStyle = nullptr;
+	const char * szBasedOn = NULL;
+	const char * szFollowedBy = NULL;
+	PD_Style * pBasedOnStyle = NULL;
+	PD_Style * pFollowedByStyle = NULL;
 	if(!isNew())
 	{
-		PD_Style * pStyle = nullptr;
+		PD_Style * pStyle = NULL;
 		if(szCurrentStyle)
 			getDoc()->getStyle(szCurrentStyle,&pStyle);
 		if(!pStyle)
@@ -664,11 +661,11 @@ bool  AP_CocoaDialog_Styles::_populateModify(void)
 	[m_modifyDlg->_followStyleCombo removeAllItems];
 	[m_modifyDlg->_styleTypeCombo removeAllItems];
 
-	UT_GenericVector<PD_Style*>* pStyles = nullptr;
+	UT_GenericVector<PD_Style*>* pStyles = NULL;
 	getDoc()->enumStyles(pStyles);
 	for (UT_uint32 i = 0; i < nStyles; i++)
 	{
-		const char * name = nullptr;
+		const char * name = NULL;
 		const PD_Style * pcStyle = pStyles->getNthItem(i);
 
 		if(pcStyle) {
@@ -683,7 +680,7 @@ bool  AP_CocoaDialog_Styles::_populateModify(void)
 		if(szCurrentStyle && strcmp(name,szCurrentStyle) != 0) {
 			[m_modifyDlg->_basedOnCombo addItemWithObjectValue:[NSString stringWithUTF8String:name]];
 		}
-		else if(szCurrentStyle == nullptr) {
+		else if(szCurrentStyle == NULL) {
 			[m_modifyDlg->_basedOnCombo addItemWithObjectValue:[NSString stringWithUTF8String:name]];
 		}
 		[m_modifyDlg->_followStyleCombo addItemWithObjectValue:[NSString stringWithUTF8String:name]];
@@ -707,11 +704,11 @@ bool  AP_CocoaDialog_Styles::_populateModify(void)
 //
 	if(!isNew())
 	{
-		if(pBasedOnStyle != nullptr)
+		if(pBasedOnStyle != NULL)
 			[m_modifyDlg->_basedOnCombo setStringValue:[NSString stringWithUTF8String:szBasedOn]];
 		else
 			[m_modifyDlg->_basedOnCombo setStringValue:LocalizedString(pSS, AP_STRING_ID_DLG_Styles_DefNone)];
-		if(pFollowedByStyle != nullptr)
+		if(pFollowedByStyle != NULL)
 			[m_modifyDlg->_followStyleCombo setStringValue:[NSString stringWithUTF8String:szFollowedBy]];
 		else
 			[m_modifyDlg->_followStyleCombo setStringValue:LocalizedString(pSS, AP_STRING_ID_DLG_Styles_DefCurrent)];
@@ -828,6 +825,7 @@ void   AP_CocoaDialog_Styles::event_ModifyTabs()
 
 @implementation AP_CocoaDialog_StylesController
 
+
 - (id)initFromNib
 {
 	return [super initWithWindowNibName:@"ap_CocoaDialog_Styles"];
@@ -835,7 +833,7 @@ void   AP_CocoaDialog_Styles::event_ModifyTabs()
 
 -(void)discardXAP
 {
-	_xap = nullptr;
+	_xap = NULL;
 }
 
 -(void)dealloc
@@ -893,7 +891,7 @@ void   AP_CocoaDialog_Styles::event_ModifyTabs()
 {
 	UT_UNUSED(sender);
 	NSString *str;
-	NSInteger row = [_availStylesList selectedRow];
+	int row = [_availStylesList selectedRow];
 	if (row >= 0) {
 		str = [[m_stylesDataSource array] objectAtIndex:row];
 		_xap->event_DeleteClicked(str);
@@ -941,8 +939,6 @@ void   AP_CocoaDialog_Styles::event_ModifyTabs()
 
 @implementation AP_CocoaDialog_StylesModifyController
 
-@synthesize preview = _preview;
-
 - (id)initFromNib
 {
 	return [super initWithWindowNibName:@"ap_CocoaDialog_StylesModify"];
@@ -951,7 +947,7 @@ void   AP_CocoaDialog_Styles::event_ModifyTabs()
 -(void)discardXAP
 {
 	if (_xap) {
-		_xap = nullptr;
+		_xap = NULL;
 	}
 }
 

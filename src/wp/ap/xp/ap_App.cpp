@@ -1,7 +1,6 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t -*- */
 /* AbiWord
  * Copyright (C) 2002 Dom Lachowicz and others
- * Copyright (C) 2004, 2009, 2019 Hubert Figuière
+ * Copyright (C) 2004, 2009 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -45,41 +44,13 @@ AP_App::AP_App (HINSTANCE hInstance, const char * szAppName)
   : XAP_App_BaseClass ( hInstance, szAppName )
 #else
 AP_App::AP_App (const char * szAppName)
-  : XAP_App_BaseClass(szAppName, "com.abisource.AbiWord")
+  : XAP_App_BaseClass ( szAppName )
 #endif
 {
 }
 
 AP_App::~AP_App ()
 {
-}
-
-XAP_Frame* AP_App::openFile(const char* uri, const char* file)
-{
-	XAP_Frame*  pFrame = newFrame();
-
-	UT_Error error = pFrame->loadDocument(uri, IEFT_Unknown, true);
-
-	if (UT_IS_IE_SUCCESS(error)) {
-		if (error == UT_IE_TRY_RECOVER) {
-			pFrame->showMessageBox(AP_STRING_ID_MSG_OpenRecovered,
-								   XAP_Dialog_MessageBox::b_O,
-								   XAP_Dialog_MessageBox::a_OK);
-		}
-	} else {
-		// TODO we crash if we just delete this without putting something
-		// TODO in it, so let's go ahead and open an untitled document
-		// TODO for now.  this would cause us to get 2 untitled documents
-		// TODO if the user gave us 2 bogus pathnames....
-
-		// Because of the incremental loader, we should not crash anymore;
-		// I've got other things to do now though.
-		pFrame->loadDocument((const char *)nullptr, IEFT_Unknown);
-		pFrame->raise();
-
-		errorMsgBadFile (pFrame, file ? file : uri, error);
-	}
-	return pFrame;
 }
 
 /*!
@@ -91,24 +62,50 @@ XAP_Frame* AP_App::openFile(const char* uri, const char* file)
 bool AP_App::openCmdLineFiles(const AP_Args * args)
 {
 	int kWindowsOpened = 0;
-	const char *file = nullptr;
+	const char *file = NULL;
 
-	if (AP_Args::m_sFiles == nullptr) {
+	if (AP_Args::m_sFiles == NULL) {
 		// no files to open, this is ok
 		XAP_Frame * pFrame = newFrame();
-		pFrame->loadDocument((const char *)nullptr, IEFT_Unknown);
+		pFrame->loadDocument((const char *)NULL, IEFT_Unknown);
 		return true;
 	}
 
 	int i = 0;
-	while ((file = AP_Args::m_sFiles[i++]) != nullptr) {
-		char * uri = nullptr;
+	while ((file = AP_Args::m_sFiles[i++]) != NULL) {
+		char * uri = NULL;
 
 		uri = UT_go_shell_arg_to_uri (file);
-		XAP_Frame* pFrame = openFile(uri);
-		g_free(uri);
 
-		kWindowsOpened++;
+		XAP_Frame * pFrame = newFrame();
+
+		UT_Error error = pFrame->loadDocument (uri, IEFT_Unknown, true);
+		g_free (uri);
+
+		if (UT_IS_IE_SUCCESS(error))
+		{
+			kWindowsOpened++;
+			if (error == UT_IE_TRY_RECOVER) {
+				pFrame->showMessageBox(AP_STRING_ID_MSG_OpenRecovered,
+                           XAP_Dialog_MessageBox::b_O,
+                           XAP_Dialog_MessageBox::a_OK);
+			}
+		}
+		else
+		{
+			// TODO we crash if we just delete this without putting something
+			// TODO in it, so let's go ahead and open an untitled document
+			// TODO for now.  this would cause us to get 2 untitled documents
+			// TODO if the user gave us 2 bogus pathnames....
+
+			// Because of the incremental loader, we should not crash anymore;
+			// I've got other things to do now though.
+			kWindowsOpened++;
+			pFrame->loadDocument((const char *)NULL, IEFT_Unknown);
+			pFrame->raise();
+
+			errorMsgBadFile (pFrame, file, error);
+		}
 
 		if (args->m_sMerge) {
 			PD_Document * pDoc = static_cast<PD_Document*>(pFrame->getCurrentDoc());
@@ -121,7 +118,7 @@ bool AP_App::openCmdLineFiles(const AP_Args * args)
 		// no documents specified or openable, open an untitled one
 		
 		XAP_Frame * pFrame = newFrame();
-		pFrame->loadDocument((const char *)nullptr, IEFT_Unknown);
+		pFrame->loadDocument((const char *)NULL, IEFT_Unknown);
 		if (args->m_sMerge) {
 			PD_Document * pDoc = static_cast<PD_Document*>(pFrame->getCurrentDoc());
 			pDoc->setMailMergeLink(args->m_sMerge);
@@ -138,9 +135,9 @@ bool AP_App::openCmdLinePlugins(const AP_Args * Args, bool &bSuccess)
 //
 // Start a plugin rather than the main abiword application.
 //
-	    const char * szName = nullptr;
-		XAP_Module * pModule = nullptr;
-		const char * szRequest = nullptr;
+	    const char * szName = NULL;
+		XAP_Module * pModule = NULL;
+		const char * szRequest = NULL;
 		bool bFound = false;	
 		if(Args->m_sPluginArgs[0])
 		{
@@ -195,6 +192,11 @@ bool	AP_App::initialize(void)
 	return XAP_App_BaseClass::initialize(AP_PREF_KEY_KeyBindings,AP_PREF_DEFAULT_KeyBindings);
 }
 
+void AP_App::errorMsgBadArg (AP_Args *, int)
+{
+	UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
+}
+
 void AP_App::errorMsgBadFile(XAP_Frame *, const char *, UT_Error)
 {
 	UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
@@ -215,7 +217,7 @@ void AP_App::saveRecoveryFiles()
 			continue;
 		}
 		try {
-			if (nullptr == curFrame->getFilename()) {
+			if (NULL == curFrame->getFilename()) {
 				curFrame->backup(".abw.saved",abiType);
 			}
 			else {

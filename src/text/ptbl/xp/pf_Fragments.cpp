@@ -53,31 +53,25 @@ void pf_Fragments::Node::print()
 }
 #endif
 pf_Fragments::Node::Node(void)
-  : color(red),
-    item(nullptr),
-    left(nullptr),
-    right(nullptr),
-    parent(nullptr)
-{
-}
+		    : color(red), 
+	              item(NULL), 
+                      left(NULL), 
+                      right(NULL), 
+                      parent(NULL) {}
 
 pf_Fragments::Node::Node(Color c)
-  : color(c),
-    item(nullptr),
-    left(nullptr),
-    right(nullptr),
-    parent(nullptr)
-{
-}
+		    : color(c), 
+	              item(NULL), 
+                      left(NULL), 
+                      right(NULL), 
+                      parent(NULL) {}
 
-pf_Fragments::Node::Node(Color c, pf_Frag* pf, Node* l, Node* r, Node* p)
-  : color(c),
-    item(pf),
-    left(l),
-    right(r),
-    parent(p)
-{
-}
+pf_Fragments::Node::Node(Color c, pf_Frag * pf, Node * l, Node * r, Node * p)
+		    : color(c), 
+	              item(pf), 
+                      left(l), 
+                      right(r), 
+                      parent(p) {}
 
 pf_Fragments::Node::~Node(void)
 {
@@ -133,7 +127,7 @@ void pf_Fragments::appendFrag(pf_Frag * pf)
 		// requested. If we have zero length frags, these are
 		// not accounted for. So we itterate to find the truley last
 		// fragment
-		while( lastIt.value()->getNext() != nullptr)
+		while( lastIt.value()->getNext() != NULL)
 		  lastIt++;
 		insertRight(pf, lastIt);
 	}
@@ -147,10 +141,10 @@ void pf_Fragments::appendFrag(pf_Frag * pf)
 pf_Frag * pf_Fragments::getFirst() const
 {
   //
-  // If tree is empty return nullptr;
+  // If tree is empty return NULL;
   //
         if(m_pLeaf == m_pRoot)
-	  return nullptr;
+	  return NULL;
 	return find( 0 ).value();
 }
 
@@ -161,10 +155,10 @@ pf_Frag * pf_Fragments::getFirst() const
 pf_Frag * pf_Fragments::getLast() const
 {
   //
-  // If tree is empty return nullptr;
+  // If tree is empty return NULL;
   //
         if(m_pLeaf == m_pRoot)
-	  return nullptr;
+	  return NULL;
 	return find( sizeDocument() - 1 ).value();
 }
 
@@ -235,7 +229,7 @@ pf_Frag*
 pf_Fragments::Iterator::value()
 {
         if(!m_pNode)
-	    return nullptr;
+	    return NULL;
 	return m_pNode->item;
 }
 
@@ -400,7 +394,7 @@ pf_Fragments::insert(pf_Frag* new_piece)
 pf_Fragments::Iterator
 pf_Fragments::insertRoot(pf_Frag* new_piece)
 {
-	Iterator it_null(this, nullptr);
+	Iterator it_null(this, 0);
 	return insertRight(new_piece, it_null);
 }
 
@@ -418,7 +412,7 @@ pf_Fragments::insertRight(pf_Frag* new_piece, Iterator it)
 
 	UT_ASSERT(m_nSize == 0 || it.is_valid());
 	
-	Node* pNewNode = new Node(Node::red, new_piece, m_pLeaf, m_pLeaf, nullptr);
+	Node* pNewNode = new Node(Node::red, new_piece, m_pLeaf, m_pLeaf, 0);
 	xxx_UT_DEBUGMSG(("!!!!!! New node created %p item %p \n",pNewNode,pNewNode->item));
 	new_piece->setLeftTreeLength(0);
 	
@@ -468,7 +462,7 @@ pf_Fragments::insertLeft(pf_Frag* new_piece, Iterator it)
 
 	UT_ASSERT(m_nSize == 0 || it.is_valid());
 	
-	Node* pNewNode = new Node(Node::red, new_piece, m_pLeaf, m_pLeaf, nullptr);
+	Node* pNewNode = new Node(Node::red, new_piece, m_pLeaf, m_pLeaf, 0);
 
 	new_piece->setLeftTreeLength(0);
 	
@@ -513,7 +507,7 @@ pf_Fragments::erase(Iterator it)
 {
 	if (!it.is_valid())
 	{
-	        UT_DEBUGMSG(("Inavlid frag %p in erase \n", (void*)it.getNode()->item));
+	        UT_DEBUGMSG(("Inavlid frag %p in erase \n",it.getNode()->item));
 		return;
 	}
 	Node* pNode = it.getNode();
@@ -731,7 +725,7 @@ pf_Fragments::find(PT_DocPosition orig_pos) const
 	{
 		pf_Frag* p = x->item;
 		xxx_UT_DEBUGMSG(("pos %d leftLength %d length %d",pos,p->getLeftTreeLength(),p->getLength()));
-		if(p == nullptr)
+		if(p == NULL)
 		{
 		    UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
 		    break;
@@ -752,7 +746,7 @@ pf_Fragments::find(PT_DocPosition orig_pos) const
 	{
 	  verifyDoc();
 	}
-	return Iterator(this, nullptr);
+	return Iterator(this, 0);
 }
 
 /*
@@ -778,15 +772,15 @@ void pf_Fragments::verifyDoc(void) const
       UT_DEBUGMSG(("Correcting Error. New LeftTreeLength set to %d \n",iCalcLeft));
       pf->setLeftTreeLength(iCalcLeft);
     }
-    UT_DEBUGMSG(("frag %d pointer %p pos %d leftLength %d length %d PT Pos %d \n", count, (void*)pf, pos, pf->getLeftTreeLength(), pf->getLength(), pf->getPos()));
+    UT_DEBUGMSG(("frag %d pointer %p pos %d leftLength %d length %d PT Pos %d \n",count,pf,pos,pf->getLeftTreeLength(),pf->getLength(),pf->getPos()));
     UT_ASSERT(pos == pf->getPos());
     count++;
     pos += pf->getLength();
     pf = pf->getNext();
   }
   UT_ASSERT(pf && (pf->getType() ==  pf_Frag::PFT_EndOfDoc));
-  UT_ASSERT(pf && (pf->getNext() == nullptr));
-  UT_DEBUGMSG(("Last Frag is %p Type is %d pos is %d \n", (void*)getLast(), getLast()->getType(), getLast()->getPos()));
+  UT_ASSERT(pf && (pf->getNext() == NULL));
+  UT_DEBUGMSG(("Last Frag is %p Type is %d pos is %d \n",getLast(),getLast()->getType(),getLast()->getPos()));
 }
 
 /**
@@ -808,7 +802,7 @@ void pf_Fragments::verifyDoc(void) const
 PT_DocPosition pf_Fragments::_calculateLeftSize( pf_Frag * pf) const
 {
   Node* x = pf->_getNode();
-  UT_ASSERT(x != nullptr);
+  UT_ASSERT(x != NULL);
 
   if (x == m_pLeaf)
     return 0;
@@ -845,10 +839,10 @@ pf_Fragments::changeSize(int delta)
 	m_nDocumentSize += delta;
 }
 
-pf_Fragments::Node*
-pf_Fragments::_prev(Node* pn) const
+const pf_Fragments::Node*
+pf_Fragments::_prev(const Node* pn) const
 {
-	UT_ASSERT(pn != nullptr);
+	UT_ASSERT(pn != NULL);
 
 	if (pn && pn != m_pLeaf)
 	{
@@ -869,7 +863,7 @@ pf_Fragments::_prev(Node* pn) const
 					pn = pn->parent;
 			}
 
-			return nullptr;
+			return 0;
 		}
 	}
 
@@ -877,11 +871,17 @@ pf_Fragments::_prev(Node* pn) const
 }
 
 pf_Fragments::Node*
-pf_Fragments::_next(Node* pn) const
+pf_Fragments::_prev(Node* pn)
 {
-	UT_ASSERT(pn != nullptr);
-	if (pn == nullptr)
-	  return nullptr;
+	return const_cast<Node*> (_prev(const_cast<const Node*> (pn)));
+}
+
+const pf_Fragments::Node*
+pf_Fragments::_next(const Node* pn) const
+{
+	UT_ASSERT(pn != NULL);
+	if(pn == 0)
+	  return 0;
 	if (pn && pn != m_pLeaf)
 	{
 		if (pn && pn->right != m_pLeaf)
@@ -907,11 +907,11 @@ pf_Fragments::_next(Node* pn) const
 				}
 				else
 				{
-				       return nullptr;
+				       return 0;
 				}
 			}
 
-			return nullptr;
+			return 0;
 		}
 	}
 
@@ -919,12 +919,18 @@ pf_Fragments::_next(Node* pn) const
 }
 
 pf_Fragments::Node*
+pf_Fragments::_next(Node* pn)
+{
+	return const_cast<Node*> (_next(const_cast<const Node*> (pn)));
+}
+
+const pf_Fragments::Node*
 pf_Fragments::_first() const
 {
 	Node* pn = m_pRoot;
 	
 	if (pn == m_pLeaf)
-		return nullptr;
+		return 0;
 
 	while(pn->left != m_pLeaf)
 		pn = pn->left;
@@ -933,12 +939,40 @@ pf_Fragments::_first() const
 }
 
 pf_Fragments::Node*
+pf_Fragments::_first()
+{
+	Node* pn = m_pRoot;
+	
+	if (pn == m_pLeaf)
+		return 0;
+
+	while(pn->left != m_pLeaf)
+		pn = pn->left;
+
+	return pn;
+}
+
+const pf_Fragments::Node*
 pf_Fragments::_last() const
 {
 	Node* pn = m_pRoot;
 	
 	if (pn == m_pLeaf)
-		return nullptr;
+		return 0;
+
+	while(pn->right != m_pLeaf)
+		pn = pn->right;
+
+	return pn;
+}
+
+pf_Fragments::Node*
+pf_Fragments::_last()
+{
+	Node* pn = m_pRoot;
+	
+	if (pn == m_pLeaf)
+		return 0;
 
 	while(pn->right != m_pLeaf)
 		pn = pn->right;
@@ -1055,7 +1089,7 @@ pf_Fragments::_rightRotate(Node* x)
 PT_DocPosition
 pf_Fragments::_calculateSize(Node* x) const
 {
-	UT_ASSERT(x != nullptr);
+	UT_ASSERT(x != NULL);
 
 	if (x == m_pLeaf)
 		return 0;
@@ -1124,7 +1158,7 @@ pf_Fragments::_countBlackNodes(const Iterator it) const
 
 		pn = pn->parent;
 	}
-	while (pn != nullptr);
+	while (pn != 0);
 
 	return retval;
 }
@@ -1137,8 +1171,8 @@ pf_Fragments::checkInvariants() const
 	// These iterators should be ConstIterators
 	// ConstIterator end(end());
 	// ConstIterator it(begin());
-	Iterator end_(this);
-	Iterator it(this, _first());
+	Iterator end_(const_cast<pf_Fragments*> (this));
+	Iterator it(const_cast<pf_Fragments*> (this), const_cast<Node*> (_first()));
 
 	if (it != end_)
 		nb_blacks = _countBlackNodes(it++);
@@ -1146,7 +1180,7 @@ pf_Fragments::checkInvariants() const
 	if (nb_blacks < 0)
 		return false;
 
-	if (!checkSizeInvariant(m_pRoot, nullptr))
+	if (!checkSizeInvariant(m_pRoot, NULL))
 		return false;
 	
 	for (; it != end_; ++it)

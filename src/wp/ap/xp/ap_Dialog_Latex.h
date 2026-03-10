@@ -51,7 +51,7 @@ public:
 	  { m_sMathML = sMathML;}
 	void            insertIntoDoc(void);
 	void            ConstructWindowName(void);
-	void setActiveFrame(XAP_Frame *pFrame) override;
+	void            setActiveFrame(XAP_Frame *pFrame);
 	void            setDisplayMode (AbiDisplayMode mode)
 	  { m_compact = mode == ABI_DISPLAY_INLINE; }
 protected:

@@ -113,7 +113,7 @@ public:
 
     bool isPattern() const
     {
-        return m_patImpl != nullptr;
+        return m_patImpl != NULL;
     }
     const UT_ColorPatImpl *pattern() const
     {

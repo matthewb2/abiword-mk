@@ -5,12 +5,12 @@
 #include "xav_View.h"
 #include "ev_EditMethod.h"
 
-XAP_Log *XAP_Log::m_pInstance = nullptr;
+XAP_Log *XAP_Log::m_pInstance = 0;
 
 class ABI_EXPORT XAP_LogDestructor
 {
 public:
-	XAP_LogDestructor() : t_(nullptr) {}
+	XAP_LogDestructor() : t_(0) {}
 	~XAP_LogDestructor() { delete t_; }
 	void control(XAP_Log *t) { t_ = t; }
 private:
@@ -19,7 +19,7 @@ private:
 
 static XAP_LogDestructor g_pLogDestructor;
 
-XAP_Log::XAP_Log(const std::string &logfile)
+XAP_Log::XAP_Log(const UT_String &logfile)
 {
 	m_pOutput = fopen(logfile.c_str(), "w");
 	fprintf(m_pOutput, "<?xml version=\"1.0\"?>\n");
@@ -28,26 +28,26 @@ XAP_Log::XAP_Log(const std::string &logfile)
 
 XAP_Log::~XAP_Log()
 {
-	if (m_pOutput != nullptr)
+	if (m_pOutput != 0)
 	{
 		fprintf(m_pOutput, "</logger>\n");
 		fclose(m_pOutput);
 	}
 }
 
-void XAP_Log::log(const std::string &method_name, AV_View * /*pAV_View*/, EV_EditMethodCallData *pCallData)
+void XAP_Log::log(const UT_String &method_name, AV_View * /*pAV_View*/, EV_EditMethodCallData *pCallData)
 {
-	UT_ASSERT(m_pOutput != nullptr);
+	UT_ASSERT(m_pOutput != 0);
 	fprintf(m_pOutput, "\t<event name=\"%s\"", method_name.c_str());
 
-	if (pCallData != nullptr)
+	if (pCallData != 0)
 	{
 		fprintf(m_pOutput, ">\n\t\t<calldata x=\"%d\" y=\"%d\"",
 				pCallData->m_xPos,
 				pCallData->m_yPos);
 		
 		// the pCallData->m_bAllocatedData flag is not set when it should
-		if (pCallData->m_pData != nullptr)
+		if (pCallData->m_pData != 0)
 		{
 			fprintf(m_pOutput, ">");
 			UT_UCSChar *orig_data;
@@ -55,7 +55,7 @@ void XAP_Log::log(const std::string &method_name, AV_View * /*pAV_View*/, EV_Edi
 			UT_uint32 data_length = pCallData->m_dataLength;
 			gchar outbuf[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 			g_unichar_to_utf8(*data++, outbuf);
-			std::string stData(outbuf);
+			UT_String stData(outbuf);
 
 			while (static_cast<size_t>(data - pCallData->m_pData) < data_length) {
 				memset(outbuf, 0, sizeof(outbuf));
@@ -83,7 +83,7 @@ void XAP_Log::log(const std::string &method_name, AV_View * /*pAV_View*/, EV_Edi
 
 XAP_Log *XAP_Log::get_instance()
 {
-	if (m_pInstance == nullptr)
+	if (m_pInstance == 0)
 	{
 		m_pInstance = new XAP_Log("fixme_log.txt");
 		g_pLogDestructor.control(m_pInstance);

@@ -1,7 +1,8 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
+
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyritht (C) 2003-2021 Hubert Figuière
+ * Copyritht (C) 2003 Hubert Figuiere
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -57,7 +58,13 @@ void AP_CocoaDialog_PageSetup::runModal(XAP_Frame * pFrame)
 {
 	m_pFrame = pFrame;
 
-	m_ctrl = [[AP_CocoaDialog_PageSetup_Controller alloc] initWithXAP:this];
+	m_ctrl = [[AP_CocoaDialog_PageSetup_Controller alloc] init];
+
+	[m_ctrl setXAPOwner:this];
+
+	if (![NSBundle loadNibNamed:@"ap_CocoaDialog_PageSetup" owner:m_ctrl]) {
+		NSLog(@"Couldn't load nib ap_CocoaDialog_PageSetup");
+	}
 
 	NSPrintInfo * printInfo = [NSPrintInfo sharedPrintInfo];
 
@@ -66,8 +73,8 @@ void AP_CocoaDialog_PageSetup::runModal(XAP_Frame * pFrame)
 	fp_PageSize fp = getPageSize();
 
 	NSSize paperSize;
-	paperSize.width = (CGFloat)fp.Width(DIM_PT);
-	paperSize.height = (CGFloat)fp.Height(DIM_PT);
+	paperSize.width  = (float) fp.Width(DIM_PT);
+	paperSize.height = (float) fp.Height(DIM_PT);
 
 	[printInfo setPaperSize:paperSize];
 
@@ -77,10 +84,10 @@ void AP_CocoaDialog_PageSetup::runModal(XAP_Frame * pFrame)
 
 	NSPageLayout * pageLayout = [NSPageLayout pageLayout];
 
-	[pageLayout addAccessoryController:m_ctrl];
+	[pageLayout setAccessoryView:[m_ctrl view]];
 
 	while (true) {
-		if ([pageLayout runModalWithPrintInfo:printInfo] != NSModalResponseOK) {
+		if ([pageLayout runModalWithPrintInfo:printInfo] != NSOKButton) {
 			setAnswer(a_CANCEL);
 			break;
 		}
@@ -101,12 +108,12 @@ bool AP_CocoaDialog_PageSetup::_validate(AP_CocoaDialog_PageSetup_Controller * /
 	/* Printable page rectangle (inches)
 	 */
 #if 0
-	CGFloat boundsOriginX = UT_convertDimensions(bounds.origin.x, DIM_PT, DIM_IN);
-	CGFloat boundsOriginY = UT_convertDimensions(bounds.origin.y, DIM_PT, DIM_IN);
+	float boundsOriginX = (float) UT_convertDimensions((double) bounds.origin.x, DIM_PT, DIM_IN);
+	float boundsOriginY = (float) UT_convertDimensions((double) bounds.origin.y, DIM_PT, DIM_IN);
 #endif
 
-	CGFloat boundedWidth  = UT_convertDimensions(bounds.size.width,  DIM_PT, DIM_IN);
-	CGFloat boundedHeight = UT_convertDimensions(bounds.size.height, DIM_PT, DIM_IN);
+	float boundedWidth  = (float) UT_convertDimensions((double) bounds.size.width,  DIM_PT, DIM_IN);
+	float boundedHeight = (float) UT_convertDimensions((double) bounds.size.height, DIM_PT, DIM_IN);
 
 	if ((boundedWidth < 1.0) || (boundedHeight < 1.0))
 	{
@@ -120,15 +127,15 @@ bool AP_CocoaDialog_PageSetup::_validate(AP_CocoaDialog_PageSetup_Controller * /
 #if 0
 	/* Paper size (inches)
 	 */
-	CGFloat width  = UT_convertDimensions(paperSize.width, DIM_PT, DIM_IN);
-	CGFloat height = UT_convertDimensions(paperSize.height, DIM_PT, DIM_IN);
+	float width  = (float) UT_convertDimensions((double) paperSize.width,  DIM_PT, DIM_IN);
+	float height = (float) UT_convertDimensions((double) paperSize.height, DIM_PT, DIM_IN);
 
 	/* Minimum margin sizes (inches)
 	 */
-	CGFloat top = height - boundsOriginY - boundedHeight;
-	CGFloat bottom = boundsOriginY;
-	CGFloat left = boundsOriginX;
-	CGFloat right = width  - boundsOriginX - boundedWidth;
+	float    top = height - boundsOriginY - boundedHeight;
+	float bottom = boundsOriginY;
+	float   left = boundsOriginX;
+	float  right = width  - boundsOriginX - boundedWidth;
 #endif
 	/* Get dialog controller to update base class with margin settings
 	 */
@@ -140,7 +147,7 @@ bool AP_CocoaDialog_PageSetup::_validate(AP_CocoaDialog_PageSetup_Controller * /
 
 	setPageOrientation(bPortrait ? PORTRAIT : LANDSCAPE);
 
-	fp_PageSize fp(paperSize.width, paperSize.height, DIM_PT);
+	fp_PageSize fp((double) paperSize.width, (double) paperSize.height, DIM_PT);
 
 	setPageSize(fp);
 
@@ -161,14 +168,6 @@ bool AP_CocoaDialog_PageSetup::_validate(AP_CocoaDialog_PageSetup_Controller * /
 }
 
 @implementation AP_CocoaDialog_PageSetup_Controller
-
-- (id)initWithXAP:(AP_CocoaDialog_PageSetup*)owner
-{
-    if (self = [super initWithNibName:@"ap_CocoaDialog_PageSetup" bundle:NSBundle.mainBundle]) {
-        _xap = owner;
-    }
-    return self;
-}
 
 - (void)awakeFromNib
 {
@@ -195,14 +194,24 @@ bool AP_CocoaDialog_PageSetup::_validate(AP_CocoaDialog_PageSetup_Controller * /
 
 		[_unitPopup selectItemAtIndex:[_unitPopup indexOfItemWithTag:_last_margin_unit]];
 
-		[   _topMargin setDoubleValue:(_xap->getMarginTop())];
-		[_bottomMargin setDoubleValue:(_xap->getMarginBottom())];
-		[  _leftMargin setDoubleValue:(_xap->getMarginLeft())];
-		[ _rightMargin setDoubleValue:(_xap->getMarginRight())];
+		[   _topMargin setFloatValue:(_xap->getMarginTop())];
+		[_bottomMargin setFloatValue:(_xap->getMarginBottom())];
+		[  _leftMargin setFloatValue:(_xap->getMarginLeft())];
+		[ _rightMargin setFloatValue:(_xap->getMarginRight())];
 
-		[_headerMargin setDoubleValue:(_xap->getMarginHeader())];
-		[_footerMargin setDoubleValue:(_xap->getMarginFooter())];
+		[_headerMargin setFloatValue:(_xap->getMarginHeader())];
+		[_footerMargin setFloatValue:(_xap->getMarginFooter())];
 	}
+}
+
+- (void)setXAPOwner:(AP_CocoaDialog_PageSetup *)owner
+{
+	_xap = owner;
+}
+
+- (NSView *)view
+{
+	return _view;
 }
 
 - (void)fetchData
@@ -211,13 +220,13 @@ bool AP_CocoaDialog_PageSetup::_validate(AP_CocoaDialog_PageSetup_Controller * /
 
 	_xap->setMarginUnits(_last_margin_unit);
 
-	_xap->setMarginTop   ([   _topMargin doubleValue]);
-	_xap->setMarginBottom([_bottomMargin doubleValue]);
-	_xap->setMarginLeft  ([  _leftMargin doubleValue]);
-	_xap->setMarginRight ([ _rightMargin doubleValue]);
+	_xap->setMarginTop   ([   _topMargin floatValue]);
+	_xap->setMarginBottom([_bottomMargin floatValue]);
+	_xap->setMarginLeft  ([  _leftMargin floatValue]);
+	_xap->setMarginRight ([ _rightMargin floatValue]);
 
-	_xap->setMarginHeader([_headerMargin doubleValue]);
-	_xap->setMarginFooter([_footerMargin doubleValue]);
+	_xap->setMarginHeader([_headerMargin floatValue]);
+	_xap->setMarginFooter([_footerMargin floatValue]);
 }
 
 - (IBAction)adjustAction:(id)sender
@@ -240,31 +249,31 @@ bool AP_CocoaDialog_PageSetup::_validate(AP_CocoaDialog_PageSetup_Controller * /
 	UT_UNUSED(sender);
 	UT_Dimension mu = (UT_Dimension) [[_unitPopup selectedItem] tag];
 
-	CGFloat top    = [_topMargin doubleValue];
-	CGFloat bottom = [_bottomMargin doubleValue];
-	CGFloat left   = [_leftMargin doubleValue];
-	CGFloat right  = [_rightMargin doubleValue];
+	float top    = [   _topMargin floatValue];
+	float bottom = [_bottomMargin floatValue];
+	float left   = [  _leftMargin floatValue];
+	float right  = [ _rightMargin floatValue];
 
-	CGFloat header = [_headerMargin doubleValue];
-	CGFloat footer = [_footerMargin doubleValue];
+	float header = [_headerMargin floatValue];
+	float footer = [_footerMargin floatValue];
 	
-	top    = UT_convertDimensions(top,    _last_margin_unit, mu);
-	bottom = UT_convertDimensions(bottom, _last_margin_unit, mu);
-	left   = UT_convertDimensions(left,   _last_margin_unit, mu);
-	right  = UT_convertDimensions(right,  _last_margin_unit, mu);
+	top    = (float) UT_convertDimensions((double) top,    _last_margin_unit, mu);
+	bottom = (float) UT_convertDimensions((double) bottom, _last_margin_unit, mu);
+	left   = (float) UT_convertDimensions((double) left,   _last_margin_unit, mu);
+	right  = (float) UT_convertDimensions((double) right,  _last_margin_unit, mu);
 
-	header = UT_convertDimensions(header, _last_margin_unit, mu);
-	footer = UT_convertDimensions(footer, _last_margin_unit, mu);
+	header = (float) UT_convertDimensions((double) header, _last_margin_unit, mu);
+	footer = (float) UT_convertDimensions((double) footer, _last_margin_unit, mu);
 
 	_last_margin_unit = mu;
 
-	[   _topMargin setDoubleValue:top   ];
-	[_bottomMargin setDoubleValue:bottom];
-	[  _leftMargin setDoubleValue:left  ];
-	[ _rightMargin setDoubleValue:right ];
+	[   _topMargin setFloatValue:top   ];
+	[_bottomMargin setFloatValue:bottom];
+	[  _leftMargin setFloatValue:left  ];
+	[ _rightMargin setFloatValue:right ];
 
-	[_headerMargin setDoubleValue:header];
-	[_footerMargin setDoubleValue:footer];
+	[_headerMargin setFloatValue:header];
+	[_footerMargin setFloatValue:footer];
 }
 
 @end

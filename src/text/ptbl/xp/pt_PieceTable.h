@@ -19,7 +19,8 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef PT_PIECETABLE_H
+#define PT_PIECETABLE_H
 
 #include <stdio.h>
 #include <list>
@@ -102,7 +103,7 @@ protected:
 											UT_uint32 length,
 											const PP_PropertyVector & attributes,
 											const PP_PropertyVector & properties,
-											fd_Field * pField = nullptr,
+											fd_Field * pField = NULL,
 											bool bAddChangeRec = true);
 
 	bool					_realDeleteSpan(PT_DocPosition dpos1,
@@ -115,7 +116,7 @@ protected:
 	// this is for fields and so should not be needed with revisions
 	bool					_realInsertSpan_norec(PT_DocPosition dpos,
 											 const UT_UCSChar * p,
-											 UT_uint32 length, fd_Field * pField = nullptr);
+											 UT_uint32 length, fd_Field * pField = NULL);
 	bool                	_realDeleteFieldFrag(pf_Frag * pf);
 #endif
 
@@ -167,7 +168,7 @@ public:
 
 	bool					insertSpan(PT_DocPosition dpos,
 									   const UT_UCSChar * p,
-									   UT_uint32 length, fd_Field * pField = nullptr,
+									   UT_uint32 length, fd_Field * pField = NULL,
 									   bool bAddChangeRec = true);
 
     pf_Frag* getEndOfBlock( PT_DocPosition currentpos, PT_DocPosition endpos );
@@ -216,13 +217,13 @@ public:
 
 	bool					insertStrux(PT_DocPosition dpos,
 										PTStruxType pts,
-										pf_Frag_Strux ** ppfs_ret = nullptr);
+										pf_Frag_Strux ** ppfs_ret = 0);
 
 	bool					insertStrux(PT_DocPosition dpos,
 										PTStruxType pts,
 										const PP_PropertyVector & attributes,
 										const PP_PropertyVector & properties,
-										pf_Frag_Strux ** ppfs_ret = nullptr
+										pf_Frag_Strux ** ppfs_ret = 0
 										);
 
 	bool					changeStruxFmt(PTChangeFmt ptc,
@@ -271,7 +272,7 @@ public:
 	// the document.
 
 	PD_Document *			getDocument(void);
-	bool					appendStrux(PTStruxType pts, const PP_PropertyVector & attributes, pf_Frag_Strux ** ppfs_ret = nullptr);
+	bool					appendStrux(PTStruxType pts, const PP_PropertyVector & attributes, pf_Frag_Strux ** ppfs_ret = 0);
 	bool					appendStruxFmt(pf_Frag_Strux * pfs, const PP_PropertyVector & attributes);
 	bool                    appendLastStruxFmt(PTStruxType pts, const PP_PropertyVector & attrs, const PP_PropertyVector & props,
 											   bool bSkipEmbededSections);
@@ -286,7 +287,7 @@ public:
 
 	bool					insertStruxBeforeFrag(pf_Frag * pF, PTStruxType pts,
 												  const PP_PropertyVector & attributes,
-                                                  pf_Frag_Strux ** ppfs_ret = nullptr);
+                                                  pf_Frag_Strux ** ppfs_ret = 0);
 	bool					insertSpanBeforeFrag(pf_Frag * pF, const UT_UCSChar * p, UT_uint32 length);
 	bool					insertObjectBeforeFrag(pf_Frag * pF, PTObjectType pto,
 												   const PP_PropertyVector & attributes);
@@ -299,7 +300,7 @@ public:
 	bool					tellListener(PL_Listener * pListener);
 	bool					tellListenerSubset( PL_Listener * pListener,
 											    PD_DocumentRange * pDocRange,
-                                                PL_ListenerCoupleCloser* closer = nullptr);
+                                                PL_ListenerCoupleCloser* closer = 0 );
 
 	bool					addListener(PL_Listener * pListener,
 										PL_ListenerId listenerId);
@@ -360,7 +361,7 @@ public:
 	const std::map<std::string, PD_Style *> & getAllStyles()const {return m_hashStyles;}
 	bool                    isEndFootnote(pf_Frag * pf) const;
 	bool                    isFootnote(pf_Frag * pf) const;
-	bool                    isInsideFootnote(PT_DocPosition dpos, pf_Frag ** pfBegin = nullptr) const;
+	bool                    isInsideFootnote(PT_DocPosition dpos, pf_Frag ** pfBegin = NULL) const;
 	bool                    hasEmbedStruxOfTypeInRange(PT_DocPosition posStart, PT_DocPosition posEnd, 
 													   PTStruxType iType) const;
 
@@ -429,7 +430,7 @@ protected:
 										PT_BlockOffset fragOffset,
 										UT_uint32 length,
 										PT_AttrPropIndex indexAP,
-                                        fd_Field * pField = nullptr);
+                                        fd_Field * pField = NULL);
 	bool                    _StruxIsNotTable(pf_Frag_Strux * pfs);
 	bool					_deleteSpan(pf_Frag_Text * pft, UT_uint32 fragOffset,
 										PT_BufIndex bi, UT_uint32 length,
@@ -442,7 +443,7 @@ protected:
 														PTStruxType pts,
 														pf_Frag_Strux ** ppfs) const;
     pf_Frag_Strux*          _getBlockFromPosition(PT_DocPosition pos) const;
-    bool					_doTheDo(PX_ChangeRecord* pcr, bool bUndo);
+    bool					_doTheDo(const PX_ChangeRecord * pcr, bool bUndo);
 	bool					_struxHasContent(pf_Frag_Strux * pfs) const;
 	bool					_struxIsEmpty(pf_Frag_Strux * pfs) const;
 	bool					_unlinkStrux(pf_Frag_Strux * pfs,
@@ -616,7 +617,7 @@ protected:
 	bool					_lastUndoIsThisFmtMark(PT_DocPosition dpos);
 
 	bool					_changePointWithNotify(PT_DocPosition dpos);
-	bool                    _checkSkipFootnote(PT_DocPosition dpos1, PT_DocPosition dpos2, pf_Frag * pf_End = nullptr) const;
+	bool                    _checkSkipFootnote(PT_DocPosition dpos1, PT_DocPosition dpos2, pf_Frag * pf_End = NULL) const;
 	// helper methods for the appned and insert*BeforeFrag methods
 	bool					_makeStrux(PTStruxType pts, const PP_PropertyVector & attributes,
 									   pf_Frag_Strux * &pfs);
@@ -662,3 +663,5 @@ protected:
 
 	std::list <embeddedStrux> m_embeddedStrux;
 };
+
+#endif /* PT_PIECETABLE_H */

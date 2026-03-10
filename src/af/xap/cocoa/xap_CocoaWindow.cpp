@@ -48,10 +48,10 @@ static float s_ToolbarHeight = 0.0;
 
 
 XAP_CocoaWindow::XAP_CocoaWindow (WindowStyle ws, const NSRect & frameRect) :
-	m_styleMask(NSWindowStyleMaskBorderless),
+	m_styleMask(NSBorderlessWindowMask),
 	m_backingType(NSBackingStoreBuffered),
-	m_controller(nil),
-	m_window(nil),
+	m_controller(0),
+	m_window(0),
 	m_isToolbar(false)
 {
 	NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
@@ -65,10 +65,10 @@ XAP_CocoaWindow::XAP_CocoaWindow (WindowStyle ws, const NSRect & frameRect) :
 }
 
 XAP_CocoaWindow::XAP_CocoaWindow () :
-	m_styleMask(NSWindowStyleMaskTitled|NSWindowStyleMaskClosable|NSWindowStyleMaskMiniaturizable|NSWindowStyleMaskResizable),
+	m_styleMask(NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask),
 	m_backingType(NSBackingStoreBuffered),
-	m_controller(nil),
-	m_window(nil),
+	m_controller(0),
+	m_window(0),
 	m_isToolbar(false)
 {
 	NSRect frame = [[NSScreen mainScreen] visibleFrame];
@@ -88,10 +88,10 @@ XAP_CocoaWindow::XAP_CocoaWindow () :
 }
 
 XAP_CocoaWindow::XAP_CocoaWindow (float height) :
-	m_styleMask(NSWindowStyleMaskBorderless),
+	m_styleMask(NSBorderlessWindowMask),
 	m_backingType(NSBackingStoreBuffered),
-	m_controller(nil),
-	m_window(nil),
+	m_controller(0),
+	m_window(0),
 	m_isToolbar(true)
 {
 	m_frame = [[NSScreen mainScreen] visibleFrame];
@@ -109,12 +109,12 @@ void XAP_CocoaWindow::_init (WindowStyle ws)
 	switch (ws)
 	{
 	case ws_Raw:
-		m_styleMask = NSWindowStyleMaskBorderless;
+		m_styleMask = NSBorderlessWindowMask;
 		break;
 
 	case ws_Normal:
 	default: // ??
-		m_styleMask = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskResizable;
+		m_styleMask = NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSResizableWindowMask;
 		break;
 	}
 	m_window = [[NSWindow alloc] initWithContentRect:m_frame styleMask:m_styleMask backing:m_backingType defer:YES];
@@ -140,7 +140,7 @@ XAP_CocoaWindow::~XAP_CocoaWindow ()
 void XAP_CocoaWindow::_show ()
 {
 	UT_ASSERT(m_controller);
-	if (m_controller == nil)
+	if (m_controller == 0) 
 		return;
 
 	[m_controller showWindow:m_controller]; // what object should we really be passing?
@@ -165,7 +165,7 @@ void XAP_CocoaWindow::_resize (float height) // special case for toolbar
 		return;
 
 	UT_ASSERT(m_window);
-	if (m_window == nil)
+	if (m_window == 0) 
 		return;
 
 	m_frame = [[NSScreen mainScreen] visibleFrame];

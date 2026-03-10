@@ -1,4 +1,3 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t -*- */
 /* AbiSource Program Utilities
  * Copyright (C) 1998 AbiSource, Inc.
  * 
@@ -130,7 +129,7 @@ EV_Menu::addMenuItem(const UT_String &path, const UT_String& description)
 	UT_DEBUGMSG(("Gonna add a menu item.\n"));
 	// and now we create the menu item
 	index = m_pMenuLayout->addLayoutItem(last_pos, EV_MLF_Normal);
-//	pMenuActionSet->addAction(new EV_Menu_Action(index, false, false, false, "scriptPlay", nullptr, nullptr));
+//	pMenuActionSet->addAction(new EV_Menu_Action(index, false, false, false, "scriptPlay", NULL, NULL));
 	m_pMenuLabelSet->addLabel(new EV_Menu_Label(index, names.back().c_str(),
 												names.back().c_str()));
 
@@ -150,7 +149,7 @@ EV_Menu::addMenuItem(const UT_String &path, const UT_String& description)
 bool EV_Menu::invokeMenuMethod(AV_View * pView,
 							   EV_EditMethod * pEM,
 							   UT_UCSChar * pData,
-							   UT_uint32 dataLength) const
+							   UT_uint32 dataLength)
 {
 	UT_ASSERT(pView);
 	UT_return_val_if_fail(pEM, false);
@@ -174,7 +173,7 @@ bool EV_Menu::invokeMenuMethod(AV_View * pView,
 
 bool EV_Menu::invokeMenuMethod(AV_View * pView,
 							   EV_EditMethod * pEM,
-							   const UT_String& stScriptName) const
+							   const UT_String& stScriptName)
 {
 	UT_return_val_if_fail(pEM,false);
 	EV_EditMethodType t = pEM->getType();
@@ -196,15 +195,15 @@ bool EV_Menu::invokeMenuMethod(AV_View * pView,
 /* replace _ev_GetLabelName () */
 /* this version taken from ev_UnixMenu.cpp */
 const char ** EV_Menu::getLabelName(XAP_App * pApp, 
-									const EV_Menu_Action * pAction, const EV_Menu_Label * pLabel) const
+									const EV_Menu_Action * pAction, const EV_Menu_Label * pLabel)
 {
-	static const char * data[2] = {nullptr, nullptr};
+	static const char * data[2] = {NULL, NULL};
 
-	UT_return_val_if_fail( pAction && pLabel, nullptr );
+	UT_return_val_if_fail( pAction && pLabel, NULL );
 	
 	// hit the static pointers back to null each time around
-	data[0] = nullptr;
-	data[1] = nullptr;
+	data[0] = NULL;
+	data[1] = NULL;
 	
 	const char * szLabelName;
 	
@@ -224,7 +223,7 @@ const char ** EV_Menu::getLabelName(XAP_App * pApp,
 		if (szMethodName)
 		{
 			const EV_EditMethodContainer * pEMC = pApp->getEditMethodContainer();
-			UT_return_val_if_fail(pEMC, nullptr);
+			UT_return_val_if_fail(pEMC, NULL);
 
 			EV_EditMethod * pEM = pEMC->findEditMethodByName(szMethodName);
 			if(!pEM)
@@ -234,10 +233,10 @@ const char ** EV_Menu::getLabelName(XAP_App * pApp,
 			
 			// make sure it's bound to something
 
-			UT_return_val_if_fail(pEM, nullptr);
+			UT_return_val_if_fail(pEM, NULL);
 
 			const EV_EditEventMapper * pEEM = getApp()->getEditEventMapper();
-			UT_return_val_if_fail(pEEM, nullptr);
+			UT_return_val_if_fail(pEEM, NULL);
 
 			const char * string = pEEM->getShortcutFor(pEM);
 			if (string && *string)
@@ -267,21 +266,22 @@ const char ** EV_Menu::getLabelName(XAP_App * pApp,
 	strcat(buf,"...");
 
 	data[0] = buf;
-
+	
 	return data;
 }
 
 XAP_Menu_Id EV_searchMenuLabel(const EV_Menu_LabelSet *labels, const UT_String &label)
 {
-	const std::vector<EV_Menu_Label*>& labels_table = labels->getAllLabels();
-	const EV_Menu_Label *l = nullptr;
+	const UT_GenericVector<EV_Menu_Label *> * labels_table = labels->getAllLabels();
+	const EV_Menu_Label *l = 0;
 
-	UT_uint32 size_labels = labels_table.size();
+	UT_return_val_if_fail(labels_table, 0);
+	UT_uint32 size_labels = labels_table->size();
 	XAP_Menu_Id id = 0;
 
 	for (UT_uint32 i = 0; i < size_labels; ++i)
 	{
-		l = labels_table.at(i);
+		l = labels_table->getNthItem(i);
 		if (l && label ==l->getMenuLabel())
 		{
 			id = l->getMenuId();

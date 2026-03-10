@@ -57,7 +57,7 @@
 AP_StatusBarField::AP_StatusBarField(AP_StatusBar * pSB)
 {
     m_pSB = pSB;
-    m_pStatusBarFieldListener = nullptr;
+    m_pStatusBarFieldListener = NULL;
     m_fillMethod = MAX_POSSIBLE;
 }
 
@@ -82,7 +82,7 @@ public:
     ap_sbf_PageInfo(AP_StatusBar * pSB);
 	~ap_sbf_PageInfo();
 
-    virtual void notify(AV_View * pView, const AV_ChangeMask mask) override;
+    virtual void		notify(AV_View * pView, const AV_ChangeMask mask);
 
 private:
     UT_uint32			m_pageNr;
@@ -151,7 +151,7 @@ class ABI_EXPORT ap_sbf_StatusMessage : public AP_StatusBarField_TextInfo
 public:
     ap_sbf_StatusMessage(AP_StatusBar * pSB);
 
-    virtual void notify(AV_View * pView, const AV_ChangeMask mask) override;
+    virtual void		notify(AV_View * pView, const AV_ChangeMask mask);
     void update(const std::string &sMessage); // for receiving messages from the status bar itself
 };
 
@@ -187,7 +187,7 @@ class ABI_EXPORT ap_sbf_InputMode : public AP_StatusBarField_TextInfo
 public:
     ap_sbf_InputMode(AP_StatusBar * pSB);
 
-    virtual void notify(AV_View * pView, const AV_ChangeMask mask) override;
+    virtual void		notify(AV_View * pView, const AV_ChangeMask mask);
 };
 
 ap_sbf_InputMode::ap_sbf_InputMode(AP_StatusBar * pSB)
@@ -223,7 +223,7 @@ class ABI_EXPORT ap_sbf_InsertMode : public AP_StatusBarField_TextInfo
 public:
     ap_sbf_InsertMode(AP_StatusBar * pSB);
 
-    virtual void notify(AV_View * pView, const AV_ChangeMask mask) override;
+    virtual void        notify(AV_View * pView, const AV_ChangeMask mask);
 
 private:
     std::string m_sInsertMode[2];
@@ -275,7 +275,7 @@ class ABI_EXPORT ap_sbf_Language : public AP_StatusBarField_TextInfo
 public:
     ap_sbf_Language(AP_StatusBar * pSB);
 
-    virtual void notify(AV_View * pView, const AV_ChangeMask mask) override;
+    virtual void notify(AV_View * pView, const AV_ChangeMask mask);
 };
 
 ap_sbf_Language::ap_sbf_Language(AP_StatusBar * pSB)
@@ -316,7 +316,7 @@ AP_StatusBarField_ProgressBar::AP_StatusBarField_ProgressBar(AP_StatusBar * pSB)
 {
     m_ProgressStartPoint = 0;
     m_ProgressFlags = 0;
-    m_ProgressTimer = nullptr;
+    m_ProgressTimer = NULL;
     m_fillMethod = PROGRESS_BAR;
 }
 
@@ -390,10 +390,10 @@ bool AP_StatusBarField_ProgressBar::isDefinate(void)
 
 AP_StatusBar::AP_StatusBar(XAP_Frame * pFrame)
     :       m_pFrame(pFrame),
-	    m_pView(nullptr),
+	    m_pView(NULL),
 	    m_bInitFields(false),
-	    m_pStatusMessageField(nullptr),
-	    m_pStatusProgressField(nullptr),
+	    m_pStatusMessageField(NULL),
+	    m_pStatusProgressField(NULL),
 	    m_sStatusMessage("")
 {
 
@@ -475,7 +475,7 @@ bool AP_StatusBar::notify(AV_View * pView, const AV_ChangeMask mask)
 	{
 		return true;
 	}
-    setStatusMessage(nullptr);
+    setStatusMessage(NULL);
 
     // Let each field on the status bar update itself accordingly.
     UT_ASSERT_HARMLESS(pView==m_pView);

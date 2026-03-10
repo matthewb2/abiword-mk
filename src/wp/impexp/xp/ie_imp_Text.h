@@ -65,7 +65,7 @@ public:
 	~ImportStreamFile();
 	bool getChar();
 protected:
-	virtual bool _getByte(unsigned char &b) override;
+	bool _getByte(unsigned char &b);
 private:
 	GsfInput *m_pFile;
 };
@@ -79,7 +79,7 @@ public:
 	~ImportStreamClipboard();
 	//	bool getChar();
 protected:
-	virtual bool _getByte(unsigned char &b) override;
+	bool _getByte(unsigned char &b);
 private:
 	const unsigned char *m_p;
 	const unsigned char *m_pEnd;
@@ -96,17 +96,17 @@ public:
 	IE_Imp_Text_Sniffer();
 	virtual ~IE_Imp_Text_Sniffer();
 
-	virtual const IE_SuffixConfidence * getSuffixConfidence() override;
-	virtual const IE_MimeConfidence * getMimeConfidence() override;
+	virtual const IE_SuffixConfidence * getSuffixConfidence ();
+	virtual const IE_MimeConfidence * getMimeConfidence ();
 	virtual UT_Confidence_t recognizeContents (const char * szBuf,
-									UT_uint32 iNumbytes) override;
+									UT_uint32 iNumbytes);
 	const char * recognizeContentsType (const char * szBuf,
 									UT_uint32 iNumbytes);
 	virtual bool getDlgLabels (const char ** szDesc,
 							   const char ** szSuffixList,
-							   IEFileType * ft) override;
+							   IEFileType * ft);
 	virtual UT_Error constructImporter (PD_Document * pDocument,
-										IE_Imp ** ppie) override;
+										IE_Imp ** ppie);
 
 protected:
 	enum UCS2_Endian { UE_BigEnd = -1, UE_NotUCS = 0, UE_LittleEnd };
@@ -129,16 +129,16 @@ public:
 	IE_Imp_EncodedText_Sniffer();
 	virtual ~IE_Imp_EncodedText_Sniffer();
 
-	virtual const IE_SuffixConfidence * getSuffixConfidence() override;
-	virtual const IE_MimeConfidence * getMimeConfidence() override { return nullptr; }
+	virtual const IE_SuffixConfidence * getSuffixConfidence ();
+	virtual const IE_MimeConfidence * getMimeConfidence () { return NULL; }
 
 	virtual UT_Confidence_t recognizeContents (const char * szBuf,
-					    UT_uint32 iNumbytes)  override;
+					    UT_uint32 iNumbytes);
 	virtual bool getDlgLabels (const char ** szDesc,
 							   const char ** szSuffixList,
-							   IEFileType * ft) override;
+							   IEFileType * ft);
 	virtual UT_Error constructImporter (PD_Document * pDocument,
-										IE_Imp ** ppie) override;
+										IE_Imp ** ppie);
 
 protected:
 };
@@ -151,10 +151,10 @@ public:
 	virtual ~IE_Imp_Text();
 
 	virtual bool		pasteFromBuffer(PD_DocumentRange * pDocRange,
-										const unsigned char * pData, UT_uint32 lenData, const char * szEncoding = nullptr) override;
+										const unsigned char * pData, UT_uint32 lenData, const char * szEncoding = 0);
 
 protected:
-	virtual UT_Error _loadFile(GsfInput * fp) override;
+	virtual UT_Error	_loadFile(GsfInput * fp);
 	UT_Error			_recognizeEncoding(GsfInput * fp);
 	UT_Error			_recognizeEncoding(const char *szBuf, UT_uint32 iNumbytes);
 	virtual UT_Error	_constructStream(ImportStream *& pStream, GsfInput * fp);

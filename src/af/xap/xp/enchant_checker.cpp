@@ -1,19 +1,19 @@
 /* AbiSuite
  * Copyright (C) 2003 Dom Lachowicz
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
  */
 
@@ -39,34 +39,20 @@
 static UT_UCS4Char *
 utf8_to_utf32(const char *word8)
 {
-	UT_UCS4Char * ucs4 = nullptr;
+	UT_UCS4Char * ucs4 = 0;
 	UT_UCS4_cloneString (&ucs4, UT_UCS4String (word8).ucs4_str());
 	return ucs4;
 }
 
 static size_t s_enchant_broker_count = 0;
-static EnchantBroker * s_enchant_broker = nullptr;
+static EnchantBroker * s_enchant_broker = 0;
 
 EnchantChecker::EnchantChecker()
-	: m_dict(nullptr)
+	: m_dict(0)
 {
 	if (s_enchant_broker_count == 0)
 	{
 		s_enchant_broker = enchant_broker_init ();
-#ifdef _MSC_VER
-		// hack: the old dictionary installers download to the "dictionary" path...
-		gchar* ispell_path1 = g_build_filename (XAP_App::getApp()->getAbiSuiteLibDir(), "dictionary", nullptr);
-		// ... while in the new situation we support multiple types of dictionaries
-		gchar* ispell_path2 = g_build_filename (XAP_App::getApp()->getAbiSuiteLibDir(), "dictionary", "ispell", nullptr);
-		std::string ispell_path = std::string(ispell_path1) + ";" + std::string(ispell_path2);
-		enchant_broker_set_param(s_enchant_broker,  "enchant.ispell.dictionary.path", ispell_path.c_str());
-		g_free(ispell_path1);
-		g_free(ispell_path2);
-
-		gchar* myspell_path = g_build_filename (XAP_App::getApp()->getAbiSuiteLibDir(), "dictionary", "myspell", nullptr);
-		enchant_broker_set_param(s_enchant_broker,  "enchant.myspell.dictionary.path", myspell_path);
-		g_free(myspell_path);
-#endif
 	}
 	s_enchant_broker_count++;
 }
@@ -81,7 +67,7 @@ EnchantChecker::~EnchantChecker()
 	s_enchant_broker_count--;
 	if (s_enchant_broker_count == 0) {
 		enchant_broker_free (s_enchant_broker);
-		s_enchant_broker = nullptr;
+		s_enchant_broker = 0;
 	}
 }
 
@@ -94,7 +80,7 @@ EnchantChecker::_checkWord (const UT_UCSChar * ucszWord, size_t len)
 
 	UT_UTF8String utf8 (ucszWord, len);
 
-	switch (enchant_dict_check (m_dict, utf8.utf8_str(), utf8.byteLength())) 
+	switch (enchant_dict_check (m_dict, utf8.utf8_str(), utf8.byteLength()))
 	{
 	case -1:
 		return SpellChecker::LOOKUP_ERROR;
@@ -105,13 +91,13 @@ EnchantChecker::_checkWord (const UT_UCSChar * ucszWord, size_t len)
 	}
 }
 
-std::unique_ptr<std::vector<UT_UCSChar*>>
+UT_GenericVector<UT_UCSChar*> *
 EnchantChecker::_suggestWord (const UT_UCSChar *ucszWord, size_t len)
 {
-	UT_return_val_if_fail(m_dict, nullptr);
-	UT_return_val_if_fail(ucszWord && len, nullptr);
+	UT_return_val_if_fail (m_dict, 0);
+	UT_return_val_if_fail (ucszWord && len, 0);
 
-	std::unique_ptr<std::vector<UT_UCSChar*>> pvSugg(new std::vector<UT_UCSChar*>());
+	UT_GenericVector<UT_UCSChar*> * pvSugg = new UT_GenericVector<UT_UCSChar*>();
 
 	UT_UTF8String utf8 (ucszWord, len);
 
@@ -124,10 +110,10 @@ EnchantChecker::_suggestWord (const UT_UCSChar *ucszWord, size_t len)
 		for (size_t i = 0; i < n_suggestions; i++) {
 			UT_UCSChar *ucszSugg = utf8_to_utf32(suggestions[i]);
 			if (ucszSugg)
-				pvSugg->push_back(ucszSugg);
+				pvSugg->addItem (ucszSugg);
 		}
 
-		enchant_dict_free_string_list(m_dict, suggestions);
+		enchant_dict_free_string_list(m_dict, suggestions); //pascal enchant_dict_free_suggestions
 	}
 
 	return pvSugg;
@@ -139,6 +125,7 @@ bool EnchantChecker::addToCustomDict (const UT_UCSChar *word, size_t len)
 
 	if (word && len) {
 		UT_UTF8String utf8 (word, len);
+		//pascal enchant_dict_add_to_personal (m_dict, utf8.utf8_str(), utf8.byteLength());
 		enchant_dict_add(m_dict, utf8.utf8_str(), utf8.byteLength());
 		return true;
 	}
@@ -150,7 +137,8 @@ bool EnchantChecker::isIgnored (const UT_UCSChar *toCorrect, size_t toCorrectLen
 	UT_return_val_if_fail (m_dict, false);
 
 	UT_UTF8String ignore (toCorrect, toCorrectLen);
-	return enchant_dict_is_added(m_dict, ignore.utf8_str(), ignore.byteLength()) != 0;
+	//pascal return enchant_dict_is_in_session (m_dict, ignore.utf8_str(), ignore.byteLength()) != 0;
+	return enchant_dict_is_added (m_dict, ignore.utf8_str(), ignore.byteLength()) != 0;
 }
 
 void EnchantChecker::ignoreWord (const UT_UCSChar *toCorrect, size_t toCorrectLen)
@@ -162,7 +150,7 @@ void EnchantChecker::ignoreWord (const UT_UCSChar *toCorrect, size_t toCorrectLe
 
 	enchant_dict_add_to_session (m_dict, ignore.utf8_str(), ignore.byteLength());
 }
-   
+
 void EnchantChecker::correctWord (const UT_UCSChar *toCorrect, size_t toCorrectLen,
 								  const UT_UCSChar *correct, size_t correctLen)
 {
@@ -194,5 +182,5 @@ EnchantChecker::_requestDictionary (const char * szLang)
 	m_dict = enchant_broker_request_dict(s_enchant_broker, lang);
 	FREEP(lang);
 
-	return (m_dict != nullptr);
+	return (m_dict != NULL);
 }

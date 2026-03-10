@@ -52,24 +52,22 @@ public:
 	void						setAreaGc(GR_Graphics *);
 	void						setRow(UT_uint32 row);
 
-	const char*					getSelectedFont() const;
-	UT_uint32					getSymbolRows () const;
+	const char*					getSelectedFont();
+	UT_uint32					getSymbolRows ();
 
     // where all the Symbol-specific drawing happens
 
-	virtual void drawImmediate(const UT_Rect* clip = nullptr) override;
+	void						draw(const UT_Rect *clip=NULL);
 	void						drawarea(UT_UCSChar c, UT_UCSChar p);
 
 	UT_UCSChar					calcSymbol(UT_uint32 x, UT_uint32 y);
 	UT_UCSChar                  calcSymbolFromCoords(UT_uint32 x, UT_uint32 y);
 	void						setCurrent(UT_UCSChar c);
-	UT_UCSChar					getCurrent() const
-	{ return m_CurrentSymbol; }
+	UT_UCSChar					getCurrent() { return m_CurrentSymbol; }
 
-	void onLeftButtonDown(UT_sint32 x, UT_sint32 y) override;
+	void						onLeftButtonDown(UT_sint32 x, UT_sint32 y);
 	void						calculatePosition(UT_UCSChar c, UT_uint32 &x, UT_uint32 &y);
-	virtual GR_Graphics* getGraphics(void) const override
-	{ return m_areagc; }
+	GR_Graphics * 				getGraphics(void){return m_areagc;};
 
 protected:
 	GR_Graphics *               m_areagc;
@@ -88,7 +86,7 @@ protected:
 private:
 
 	UT_NumberVector				m_vCharSet;
-	std::string				m_stFont;
+	UT_String				m_stFont;
 };
 
 #endif /* XAP_Draw_Symbol_H */

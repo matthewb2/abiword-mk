@@ -93,9 +93,9 @@ static char * strippath(char *fname)
  * note that szDestPath lacks slash at end
  * szFName is the file to extract
  * szWantedFile is the file to extract
- * szDestPath is the path to extract to (without trailing slash) - if nullptr, extracted data wont be saved to disk
- * retBuf is a pointer to a bufferpointer - will be g_try_malloc'ed and filled with data if retBuf != nullptr
- * retFileSize will be filled with the size of the file, if it's != nullptr
+ * szDestPath is the path to extract to (without trailing slash) - if NULL, extracted data wont be saved to disk
+ * retBuf is a pointer to a bufferpointer - will be g_try_malloc'ed and filled with data if retBuf != NULL
+ * retFileSize will be filled with the size of the file, if it's != NULL
  *
  * extraction routines derived from logic in zlib's contrib untgz.c program
  */
@@ -108,13 +108,13 @@ UT_untgz(const char *szFName, const char *szWantedFile, const char *szDestPath, 
 	int    remaining = 0;
 	int    len;
 	char   fname[TGZ_BLOCKSIZE];
-	FILE   *outfile = nullptr;
+	FILE   *outfile = NULL;
 	int    fileSize = 0;
 	
 	if (retBuf)
 		FREEP(*retBuf);
 
-	if ((tarball = gzopen(szFName, "rb")) == nullptr)
+	if ((tarball = gzopen(szFName, "rb")) == NULL)
 	{
 		UT_DEBUGMSG(("untgz: Error while opening downloaded dictionary archive"));
 		return 1;
@@ -164,25 +164,25 @@ UT_untgz(const char *szFName, const char *szWantedFile, const char *szDestPath, 
 					if (retBuf)
 					{
 						if (!(*retBuf = static_cast<char *>(g_try_malloc(fileSize))))
-							*retBuf = nullptr;
+							*retBuf = NULL;
 					}
 					
 					if (retFileSize)
 						*retFileSize = fileSize;
 					
 					if (szDestPath) {
-						std::string outfilename(szDestPath);
+						UT_String outfilename(szDestPath);
 						outfilename += "/";
 						outfilename += fname;
-						if ((outfile = fopen(outfilename.c_str(), "wb")) == nullptr) {
+						if ((outfile = fopen(outfilename.c_str(), "wb")) == NULL) {
 							UT_DEBUGMSG(("untgz: Unable to save %s", outfilename.c_str()));
 							}
 					}
 					else
-						outfile = nullptr;
+						outfile = NULL;
 				}
 				else
-					outfile = nullptr;
+					outfile = NULL;
 
 				/*
 				 * could have no contents
@@ -199,7 +199,7 @@ UT_untgz(const char *szFName, const char *szWantedFile, const char *szDestPath, 
 				memcpy(retBuf[fileSize - remaining], buffer.buffer, bytes);
 			}
 			
-			if (outfile != nullptr)
+			if (outfile != NULL)
 			{
 				if (fwrite(&buffer,sizeof(char),bytes,outfile) != bytes)
 				{
@@ -213,17 +213,17 @@ UT_untgz(const char *szFName, const char *szWantedFile, const char *szDestPath, 
 			if (remaining == 0)
 			{
 				getheader = 1;
-				if (outfile != nullptr)
+				if (outfile != NULL)
 				{
 					// TODO: should actually set proper time from archive, oh well
 					fclose(outfile);
-					outfile = nullptr;
+					outfile = NULL;
 				}
 			}
 		} // if (getheader == 1) else end
 	}
 
-	if (tarball != nullptr) gzclose(tarball);
+	if (tarball != NULL) gzclose(tarball);
 	return 0;
 }
 /* End from untgz.c */

@@ -1,6 +1,6 @@
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2001-2003, 2005-2021 Hubert Figuiere
+ * Copyright (C) 2001-2003, 2005 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,8 +17,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
  */
-
-#pragma once
 
 #import <Cocoa/Cocoa.h>
 
@@ -105,7 +103,7 @@ private:
 	XAP_NSScroller*					m_hScrollbar;
 	XAP_NSScroller*					m_vScrollbar;
 	XAP_CocoaTextView*				m_docAreaGRView;
-	static bool					_graphicsUpdateCB(NSRect * aRect, GR_CocoaGraphics *pG, void* param);
+	static bool					_graphicsUpdateCB(NSRect * aRect, GR_CocoaCairoGraphics *pG, void* param);
 private:
 	UT_sint32					m_HMinScroll;
 	UT_sint32					m_HMaxScroll;

@@ -1,4 +1,4 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
 
 /* AbiWord
  * Copyright (C) 2000 AbiSource, Inc.
@@ -25,10 +25,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include <string>
-
 #include "ut_string.h"
-#include "ut_std_string.h"
 #include "ut_assert.h"
 #include "ut_debugmsg.h"
 
@@ -138,7 +135,7 @@ void AP_CocoaDialog_FormatTOC::_populateWindowData(void)
 
 - (void)discardXAP
 {
-	_xap = nullptr;
+	_xap = NULL; 
 }
 
 - (void)windowDidLoad
@@ -226,20 +223,22 @@ void AP_CocoaDialog_FormatTOC::_populateWindowData(void)
 - (void)sync
 {
 	if (_xap) {
+		UT_UTF8String sVal;
+
 		/* Heading
 		 */
-		std::string sVal = _xap->getTOCPropVal("toc-has-heading");
+		sVal = _xap->getTOCPropVal("toc-has-heading");
 		BOOL bHasHeading = (sVal == "1") ? YES : NO;
-		[    _hasHeadingBtn setState:(bHasHeading ? NSControlStateValueOn : NSControlStateValueOff)];
+		[    _hasHeadingBtn setState:(bHasHeading ? NSOnState : NSOffState)];
 
 		[_headingTextData setEnabled:bHasHeading];
 		[_headingStyleBtn setEnabled:bHasHeading];
 
 		sVal = _xap->getTOCPropVal("toc-heading");
-		[  _headingTextData setStringValue:[NSString stringWithUTF8String:sVal.c_str()]];
+		[  _headingTextData setStringValue:[NSString stringWithUTF8String:(sVal.utf8_str())]];
 
 		sVal = _xap->getTOCPropVal("toc-heading-style");
-		[ _headingStyleData setStringValue:[NSString stringWithUTF8String:sVal.c_str()]];
+		[ _headingStyleData setStringValue:[NSString stringWithUTF8String:(sVal.utf8_str())]];
 	}
 	[self   syncMainLevelSettings];
 	[self syncDetailLevelSettings];
@@ -248,20 +247,22 @@ void AP_CocoaDialog_FormatTOC::_populateWindowData(void)
 - (void)syncMainLevelSettings
 {
 	if (_xap) {
+		UT_UTF8String sVal;
+
 		/* Main Properties
 		 */
-		std::string sVal = _xap->getTOCPropVal("toc-has-label", _xap->getMainLevel());
+		sVal = _xap->getTOCPropVal("toc-has-label", _xap->getMainLevel());
 		BOOL bHasLabel = (sVal == "1") ? YES : NO;
-		[      _hasLabelBtn setState:(bHasLabel ? NSControlStateValueOn : NSControlStateValueOff)];
+		[      _hasLabelBtn setState:(bHasLabel ? NSOnState : NSOffState)];
 
 		[    _fillStyleData setEnabled:bHasLabel];
 		[ _displayStyleData setEnabled:bHasLabel];
 
 		sVal = _xap->getTOCPropVal("toc-source-style", _xap->getMainLevel());
-		[    _fillStyleData setStringValue:[NSString stringWithUTF8String:sVal.c_str()]];
+		[    _fillStyleData setStringValue:[NSString stringWithUTF8String:(sVal.utf8_str())]];
 
 		sVal = _xap->getTOCPropVal("toc-dest-style", _xap->getMainLevel());
-		[ _displayStyleData setStringValue:[NSString stringWithUTF8String:sVal.c_str()]];
+		[ _displayStyleData setStringValue:[NSString stringWithUTF8String:(sVal.utf8_str())]];
 	}
 }
 
@@ -280,23 +281,25 @@ void AP_CocoaDialog_FormatTOC::_populateWindowData(void)
 				return;
 			}
 
+		UT_UTF8String sVal;
+
 		/* Label Definitions
 		 */
-		std::string sVal = _xap->getTOCPropVal("toc-label-start", _xap->getDetailsLevel());
-		[      _startAtData setStringValue:[NSString stringWithUTF8String:sVal.c_str()]];
+		sVal = _xap->getTOCPropVal("toc-label-start", _xap->getDetailsLevel());
+		[      _startAtData setStringValue:[NSString stringWithUTF8String:(sVal.utf8_str())]];
 
 		sVal = _xap->getTOCPropVal("toc-label-before", _xap->getDetailsLevel());
-		[   _textBeforeData setStringValue:[NSString stringWithUTF8String:sVal.c_str()]];
+		[   _textBeforeData setStringValue:[NSString stringWithUTF8String:(sVal.utf8_str())]];
 
 		sVal = _xap->getTOCPropVal("toc-label-type", _xap->getDetailsLevel());
-		[_numberingTypeData selectItemAtIndex:((int) (pView->getLayout()->FootnoteTypeFromString(sVal.c_str())))];
+		[_numberingTypeData selectItemAtIndex:((int) (pView->getLayout()->FootnoteTypeFromString(sVal.utf8_str())))];
 
 		sVal = _xap->getTOCPropVal("toc-label-after", _xap->getDetailsLevel());
-		[    _textAfterData setStringValue:[NSString stringWithUTF8String:sVal.c_str()]];
+		[    _textAfterData setStringValue:[NSString stringWithUTF8String:(sVal.utf8_str())]];
 
 		sVal = _xap->getTOCPropVal("toc-label-inherits", _xap->getDetailsLevel());
 		BOOL bInherits = (sVal == "1") ? YES : NO;
-		[ _inheritLabelBtn setState:(bInherits ? NSControlStateValueOn : NSControlStateValueOff)];
+		[ _inheritLabelBtn setState:(bInherits ? NSOnState : NSOffState)];
 
 		/* Tabs & Page Nos
 		 */
@@ -304,22 +307,22 @@ void AP_CocoaDialog_FormatTOC::_populateWindowData(void)
 
 		int iTabLeader = 1;
 
-		if (g_ascii_strcasecmp(sVal.c_str(), "none") == 0)
+		if      (g_ascii_strcasecmp(sVal.utf8_str(), "none"     ) == 0)
 			iTabLeader = 0;
-		else if (g_ascii_strcasecmp(sVal.c_str(), "dot") == 0)
+		else if (g_ascii_strcasecmp(sVal.utf8_str(), "dot"      ) == 0)
 			iTabLeader = 1;
-		else if (g_ascii_strcasecmp(sVal.c_str(), "hyphen") == 0)
+		else if (g_ascii_strcasecmp(sVal.utf8_str(), "hyphen"   ) == 0)
 			iTabLeader = 2;
-		else if (g_ascii_strcasecmp(sVal.c_str(), "underline") == 0)
+		else if (g_ascii_strcasecmp(sVal.utf8_str(), "underline") == 0)
 			iTabLeader = 3;
 
 		[   _tabLeadersData selectItemAtIndex:iTabLeader];
 
 		sVal = _xap->getTOCPropVal("toc-page-type", _xap->getDetailsLevel());
-		[_pageNumberingData selectItemAtIndex:((int) (pView->getLayout()->FootnoteTypeFromString(sVal.c_str())))];
+		[_pageNumberingData selectItemAtIndex:((int) (pView->getLayout()->FootnoteTypeFromString(sVal.utf8_str())))];
 
 		sVal = _xap->getTOCPropVal("toc-indent", _xap->getDetailsLevel());
-		[      _indentData setStringValue:[NSString stringWithUTF8String:sVal.c_str()]];
+		[      _indentData setStringValue:[NSString stringWithUTF8String:(sVal.utf8_str())]];
 	}
 }
 
@@ -327,13 +330,13 @@ void AP_CocoaDialog_FormatTOC::_populateWindowData(void)
 {
 	UT_UNUSED(sender);
 	if (_xap) {
-		std::string sTOCProp = "toc-heading-style";
+		UT_UTF8String sTOCProp = "toc-heading-style";
 
-		std::string sVal = _xap->getNewStyle(sTOCProp);
+		UT_UTF8String sVal = _xap->getNewStyle(sTOCProp);
 
 		[[self window] makeKeyAndOrderFront:self];
 
-		[ _headingStyleData setStringValue:[NSString stringWithUTF8String:sVal.c_str()]];
+		[ _headingStyleData setStringValue:[NSString stringWithUTF8String:(sVal.utf8_str())]];
 	}
 }
 
@@ -341,15 +344,15 @@ void AP_CocoaDialog_FormatTOC::_populateWindowData(void)
 {
 	UT_UNUSED(sender);
 	if (_xap) {
-		std::string sLevelNo = UT_std_string_sprintf("%d", _xap->getMainLevel());
-		std::string sTOCProp = "toc-source-style";
+		UT_UTF8String sLevelNo = UT_UTF8String_sprintf("%d", _xap->getMainLevel());
+		UT_UTF8String sTOCProp = "toc-source-style";
 		sTOCProp += sLevelNo;
 
-		std::string sVal = _xap->getNewStyle(sTOCProp);
+		UT_UTF8String sVal = _xap->getNewStyle(sTOCProp);
 
 		[[self window] makeKeyAndOrderFront:self];
 
-		[    _fillStyleData setStringValue:[NSString stringWithUTF8String:sVal.c_str()]];
+		[    _fillStyleData setStringValue:[NSString stringWithUTF8String:(sVal.utf8_str())]];
 	}
 }
 
@@ -357,15 +360,15 @@ void AP_CocoaDialog_FormatTOC::_populateWindowData(void)
 {
 	UT_UNUSED(sender);
 	if (_xap) {
-		std::string sLevelNo = UT_std_string_sprintf("%d", _xap->getMainLevel());
-		std::string sTOCProp = "toc-dest-style";
+		UT_UTF8String sLevelNo = UT_UTF8String_sprintf("%d", _xap->getMainLevel());
+		UT_UTF8String sTOCProp = "toc-dest-style";
 		sTOCProp += sLevelNo;
 
-		std::string sVal = _xap->getNewStyle(sTOCProp);
+		UT_UTF8String sVal = _xap->getNewStyle(sTOCProp);
 
 		[[self window] makeKeyAndOrderFront:self];
 
-		[ _displayStyleData setStringValue:[NSString stringWithUTF8String:sVal.c_str()]];
+		[ _displayStyleData setStringValue:[NSString stringWithUTF8String:(sVal.utf8_str())]];
 	}
 }
 
@@ -375,8 +378,8 @@ void AP_CocoaDialog_FormatTOC::_populateWindowData(void)
 	_xap->incrementStartAt(_xap->getDetailsLevel(), ([_startAtStepper intValue] > 1));
 	[_startAtStepper setIntValue:1];
 
-	std::string sVal = _xap->getTOCPropVal("toc-label-start", _xap->getDetailsLevel());
-	[_startAtData setStringValue:[NSString stringWithUTF8String:sVal.c_str()]];
+	UT_UTF8String sVal = _xap->getTOCPropVal("toc-label-start", _xap->getDetailsLevel());
+	[_startAtData setStringValue:[NSString stringWithUTF8String:(sVal.utf8_str())]];
 }
 
 - (IBAction)startAtAction:(id)sender
@@ -391,8 +394,8 @@ void AP_CocoaDialog_FormatTOC::_populateWindowData(void)
 	_xap->incrementIndent(_xap->getDetailsLevel(), ([_indentStepper intValue] > 1));
 	[_indentStepper setIntValue:1];
 
-	std::string sVal = _xap->getTOCPropVal("toc-indent", _xap->getDetailsLevel());
-	[_indentData setStringValue:[NSString stringWithUTF8String:sVal.c_str()]];
+	UT_UTF8String sVal = _xap->getTOCPropVal("toc-indent", _xap->getDetailsLevel());
+	[_indentData setStringValue:[NSString stringWithUTF8String:(sVal.utf8_str())]];
 }
 
 - (IBAction)indentAction:(id)sender
@@ -422,13 +425,13 @@ void AP_CocoaDialog_FormatTOC::_populateWindowData(void)
 - (void)saveMainLevelSettings
 {
 	if (_xap) {
-		std::string sLevelNo = UT_std_string_sprintf("%d", _xap->getMainLevel());
-		std::string sTOCProp;
-		std::string sVal;
+		UT_UTF8String sLevelNo = UT_UTF8String_sprintf("%d", _xap->getMainLevel());
+		UT_UTF8String sTOCProp;
+		UT_UTF8String sVal;
 
 		sTOCProp  = "toc-has-label";
 		sTOCProp += sLevelNo;
-		if ([_hasLabelBtn state] == NSControlStateValueOn)
+		if ([_hasLabelBtn state] == NSOnState)
 			sVal = "1";
 		else
 			sVal = "0";
@@ -451,9 +454,9 @@ void AP_CocoaDialog_FormatTOC::_populateWindowData(void)
 	if (_xap) {
 		const FootnoteTypeDesc * vecPropList = AP_Dialog_FormatFootnotes::getFootnoteTypeLabelList();
 
-		std::string sLevelNo = UT_std_string_sprintf("%d", _xap->getDetailsLevel());
-		std::string sTOCProp;
-		std::string sVal;
+		UT_UTF8String sLevelNo = UT_UTF8String_sprintf("%d", _xap->getDetailsLevel());
+		UT_UTF8String sTOCProp;
+		UT_UTF8String sVal;
 
 		/* Label Definitions
 		 */
@@ -477,7 +480,7 @@ void AP_CocoaDialog_FormatTOC::_populateWindowData(void)
 
 		sTOCProp  = "toc-label-inherits";
 		sTOCProp += sLevelNo;
-		if ([ _inheritLabelBtn state] == NSControlStateValueOn)
+		if ([ _inheritLabelBtn state] == NSOnState)
 			sVal = "1";
 		else
 			sVal = "0";
@@ -521,11 +524,11 @@ void AP_CocoaDialog_FormatTOC::_populateWindowData(void)
 	[self saveMainLevelSettings];
 	[self saveDetailLevelSettings];
 
-	std::string sTOCProp;
-	std::string sVal;
+	UT_UTF8String sTOCProp;
+	UT_UTF8String sVal;
 
 	sTOCProp = "toc-has-heading";
-	if ([_hasHeadingBtn state] == NSControlStateValueOn)
+	if ([_hasHeadingBtn state] == NSOnState)
 		sVal = "1";
 	else
 		sVal = "0";

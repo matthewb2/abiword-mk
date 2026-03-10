@@ -40,17 +40,17 @@
 #include "fv_ViewDoubleBuffering.h"
 
 FV_FrameEdit::FV_FrameEdit (FV_View * pView)
-	: FV_Base (pView), 
+	: FV_Base (pView),
 	  m_iFrameEditMode(FV_FrameEdit_NOT_ACTIVE),
-	  m_pFrameLayout(nullptr),
-	  m_pFrameContainer(nullptr),
+	  m_pFrameLayout(NULL),
+	  m_pFrameContainer(NULL),
 	  m_iLastX(0),
 	  m_iLastY(0),
 	  m_iInitialDragX(0),
 	  m_iInitialDragY(0),
 	  m_bInitialClick(false),
-	  m_pFrameImage(nullptr),
-	  m_pAutoScrollTimer(nullptr),
+	  m_pFrameImage(NULL),
+	  m_pAutoScrollTimer(NULL),
 	  m_iInitialFrameX(0),
 	  m_iInitialFrameY(0),
 	  m_sRelWidth(""),
@@ -73,7 +73,7 @@ FV_FrameEdit::~FV_FrameEdit()
 void FV_FrameEdit::setPointInside(void)
 {
   fl_FrameLayout * pFL = getFrameLayout();
-  if(pFL == nullptr)
+  if(pFL == NULL)
   {
     return;
   }
@@ -89,11 +89,12 @@ bool FV_FrameEdit::isActive(void) const
 
 void FV_FrameEdit::setMode(FV_FrameEditMode iEditMode)
 {
+
     UT_DEBUGMSG(("Frame Edit mode set to %d \n",iEditMode));
 	if(iEditMode == FV_FrameEdit_NOT_ACTIVE)
 	{
-		m_pFrameLayout = nullptr;
-		m_pFrameContainer = nullptr;
+		m_pFrameLayout = NULL;
+		m_pFrameContainer = NULL;
 		DELETEP(m_pFrameImage);
 		m_recCurFrame.width = 0;
 		m_recCurFrame.height = 0;
@@ -111,7 +112,7 @@ void FV_FrameEdit::setMode(FV_FrameEditMode iEditMode)
 
 
 static bool bScrollRunning = false;
-static UT_Worker * s_pScroll = nullptr;
+static UT_Worker * s_pScroll = NULL;
 static UT_sint32 iExtra = 0;
 
 void FV_FrameEdit::_actuallyScroll(UT_Worker * pWorker)
@@ -128,7 +129,7 @@ void FV_FrameEdit::_actuallyScroll(UT_Worker * pWorker)
 		iExtra = 0;
 		s_pScroll->stop();
 		delete s_pScroll;
-		s_pScroll = nullptr;
+		s_pScroll = NULL;
 		bScrollRunning = false;
 		return;
 	}
@@ -179,7 +180,7 @@ void FV_FrameEdit::_actuallyScroll(UT_Worker * pWorker)
 	{
 		pFE->getGraphics()->setClipRect(&pFE->m_recCurFrame);
 		pView->updateScreen(false);
-		pFE->getGraphics()->setClipRect(nullptr);
+		pFE->getGraphics()->setClipRect(NULL);
 		UT_sint32 minScroll = pFE->getGraphics()->tlu(20);
 		if(bScrollUp)
 		{
@@ -217,7 +218,7 @@ void FV_FrameEdit::_actuallyScroll(UT_Worker * pWorker)
 	iExtra = 0;
 	s_pScroll->stop();
 	delete s_pScroll;
-	s_pScroll = nullptr;
+	s_pScroll = NULL;
 	bScrollRunning = false;
 }
 
@@ -278,19 +279,19 @@ void FV_FrameEdit::_mouseDrag(UT_sint32 x, UT_sint32 y)
 {
 	FV_ViewDoubleBuffering dblBuffObj(m_pView, false, false);
 	dblBuffObj.beginDoubleBuffering();
-	
+
 	UT_sint32 dx = 0;
 	UT_sint32 dy = 0;
 	UT_Rect expX(0,m_recCurFrame.top,0,m_recCurFrame.height);
 	UT_Rect expY(m_recCurFrame.left,0,m_recCurFrame.width,0);
-	
+
 	FV_Base::_doMouseDrag( x, y, dx, dy, expX, expY );
-	if (getDragWhat()==FV_DragWhole) 
+	if (getDragWhat()==FV_DragWhole)
 	{
 		UT_sint32 diffx = 0;
 		UT_sint32 diffy = 0;
 		UT_sint32 iext = getGraphics()->tlu(3);
-		
+
 		bool bScrollDown = false;
 		bool bScrollUp = false;
 		bool bScrollLeft = false;
@@ -335,7 +336,7 @@ void FV_FrameEdit::_mouseDrag(UT_sint32 x, UT_sint32 y)
 		}
 		if(bScrollDown || bScrollUp || bScrollLeft || bScrollRight)
 		{
-			if(m_pAutoScrollTimer != nullptr)
+			if(m_pAutoScrollTimer != NULL)
 			{
 				return;
 			}
@@ -400,7 +401,7 @@ void FV_FrameEdit::_mouseDrag(UT_sint32 x, UT_sint32 y)
 	{
 		xxx_UT_DEBUGMSG(("width after drag %d \n",m_recCurFrame.width));
 	}
-	else 
+	else
 	{
 		if (FV_FrameEdit_RESIZE_EXISTING == m_iFrameEditMode)
 		{
@@ -412,7 +413,7 @@ void FV_FrameEdit::_mouseDrag(UT_sint32 x, UT_sint32 y)
 			m_pFrameContainer->_setWidth(iW);
 			m_pFrameContainer->_setHeight(iH);
 			m_pFrameLayout->miniFormat();
-			m_pFrameLayout->getDocSectionLayout()->setNeedsSectionBreak(false,nullptr);
+			m_pFrameLayout->getDocSectionLayout()->setNeedsSectionBreak(false,NULL);
 		}
 
 		if (FV_FrameEdit_RESIZE_EXISTING == m_iFrameEditMode || FV_FrameEdit_DRAG_EXISTING == m_iFrameEditMode)
@@ -433,8 +434,8 @@ void FV_FrameEdit::_mouseDrag(UT_sint32 x, UT_sint32 y)
 				getGraphics()->setClipRect(&expY);
 				m_pView->updateScreen(false);
 			}
-			getGraphics()->setClipRect(nullptr);
-			
+			getGraphics()->setClipRect(NULL);
+
 			drawFrame(true);
 		}
 	}
@@ -447,7 +448,7 @@ void FV_FrameEdit::_mouseDrag(UT_sint32 x, UT_sint32 y)
  * (x,y) point.
  * It sets the FV_FrameEditMode and the FV_FrameEditDragWhat mode depending
  * on which control is selected at the (x,y) position.
- * 
+ *
  *        top left     top edge     top right
  *             X----------X----------X
  *             |                     |
@@ -458,21 +459,21 @@ void FV_FrameEdit::_mouseDrag(UT_sint32 x, UT_sint32 y)
  *             X----------X----------X
  *        Bot left    Bot edge    Bot right
  *
- * An (x,y) point that does not fall in a specified control sets drag 
+ * An (x,y) point that does not fall in a specified control sets drag
  * whole frame mode.
  *
- * The method also sets the fl_FrameLayout and FP_FrameContainer pointers. 
+ * The method also sets the fl_FrameLayout and FP_FrameContainer pointers.
  */
 void FV_FrameEdit::setDragType(UT_sint32 x, UT_sint32 y, bool bDrawFrame)
 {
 	xxx_UT_DEBUGMSG(("setDragType called frameEdit mode %d \n",m_iFrameEditMode));
 	PT_DocPosition posAtXY = m_pView->getDocPositionFromXY(x,y,false);
-	fp_FrameContainer * pFCon = nullptr;
-	fl_FrameLayout * pFL = nullptr;
-	fl_BlockLayout * pBL = nullptr;
+	fp_FrameContainer * pFCon = NULL;
+	fl_FrameLayout * pFL = NULL;
+  	fl_BlockLayout * pBL = NULL;
 	if(getDoc()->isFrameAtPos(posAtXY))
 	{
-		fl_ContainerLayout* psfh = nullptr;
+		fl_ContainerLayout* psfh = NULL;
 		getDoc()->getStruxOfTypeFromPosition(m_pView->getLayout()->getLID(),posAtXY+1,
 										   PTX_SectionFrame, &psfh);
 		pFL = static_cast<fl_FrameLayout *>(psfh);
@@ -485,7 +486,7 @@ void FV_FrameEdit::setDragType(UT_sint32 x, UT_sint32 y, bool bDrawFrame)
 		pBL = m_pView->_findBlockAtPosition(posAtXY);
 		UT_return_if_fail(pBL);
 	}
-	if(!isActive() && (pFCon == nullptr))
+	if(!isActive() && (pFCon == NULL))
 	{
 		m_iFrameEditMode = 	FV_FrameEdit_EXISTING_SELECTED;
 		if(getGraphics())
@@ -514,7 +515,7 @@ void FV_FrameEdit::setDragType(UT_sint32 x, UT_sint32 y, bool bDrawFrame)
 		m_iLastX = x;
 		m_iLastY = y;
 		setDragWhat( FV_DragWhole );
-		return;	
+		return;
 	}
 	if(!isActive())
 	{
@@ -647,11 +648,11 @@ void FV_FrameEdit::setDragType(UT_sint32 x, UT_sint32 y, bool bDrawFrame)
 	{
 		drawFrame(true);
 	}
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	pFL->getAP(pAP);
-	const char * pszPercentWidth = nullptr;
-	const char * pszMinHeight = nullptr;
-	const char * pszExpandHeight = nullptr;
+	const char * pszPercentWidth = NULL;
+	const char * pszMinHeight = NULL;
+	const char * pszExpandHeight = NULL;
 	if(pAP && pAP->getProperty("frame-rel-width",pszPercentWidth))
 	{
 		if(pszPercentWidth)
@@ -669,7 +670,7 @@ void FV_FrameEdit::setDragType(UT_sint32 x, UT_sint32 y, bool bDrawFrame)
 	if(pAP && pAP->getProperty("frame-expand-height",pszExpandHeight))
 	{
 	        m_sExpandHeight = pszExpandHeight;
-	}	
+	}
 	m_recCurFrame.left = iLeft;
 	m_recCurFrame.top = iTop;
 	m_recCurFrame.width = (iRight - iLeft);
@@ -678,7 +679,7 @@ void FV_FrameEdit::setDragType(UT_sint32 x, UT_sint32 y, bool bDrawFrame)
 	m_iLastY = y;
 	m_iInitialDragX = iLeft;
 	m_iInitialDragY = iTop;
-	
+
 	xxx_UT_DEBUGMSG(("Initial width %d \n",m_recCurFrame.width));
 	xxx_UT_DEBUGMSG((" Dragging What %d \n",getDragWhat()));
 	m_pView->setCursorToContext();
@@ -700,7 +701,7 @@ void FV_FrameEdit::mouseLeftPress(UT_sint32 x, UT_sint32 y)
 	if(!isActive())
 	{
 		setDragType(x,y,true);
-		UT_DEBUGMSG(("Was not active now %d FrameLayout %p \n", getFrameEditMode(), (void*)getFrameLayout()));
+		UT_DEBUGMSG(("Was not active now %d FrameLayout %p \n",getFrameEditMode(),getFrameLayout()));
 		return;
 	}
 //
@@ -725,9 +726,9 @@ void FV_FrameEdit::mouseLeftPress(UT_sint32 x, UT_sint32 y)
 			      m_pView->updateScreen(false);
 			    }
 			  }
-			} 
-			m_pFrameLayout = nullptr;
-			m_pFrameContainer = nullptr;
+			}
+			m_pFrameLayout = NULL;
+			m_pFrameContainer = NULL;
 			DELETEP(m_pFrameImage);
 			XAP_Frame * pFrame = static_cast<XAP_Frame*>(m_pView->getParentData());
 			if(pFrame)
@@ -814,7 +815,7 @@ void FV_FrameEdit::mouseLeftPress(UT_sint32 x, UT_sint32 y)
 
 bool FV_FrameEdit::isImageWrapper(void) const
 {
-        if(m_pFrameLayout == nullptr)
+        if(m_pFrameLayout == NULL)
 	{
 	        return false;
 	}
@@ -839,9 +840,9 @@ bool FV_FrameEdit::getFrameStrings(UT_sint32 x, UT_sint32 y,
 //
                 PT_DocPosition posAtXY = 0;
 		posAtXY = m_pView->getDocPositionFromXY(x,y,true);
-		fl_BlockLayout * pBL = nullptr;
-		fp_Run * pRun = nullptr;
-		fp_Line * pLine = nullptr;
+		fl_BlockLayout * pBL = NULL;
+		fp_Run * pRun = NULL;
+		fp_Line * pLine = NULL;
 		UT_sint32 x1,x2,y1,y2;
 		UT_uint32 height;
 		bool bEOL=false;
@@ -849,7 +850,7 @@ bool FV_FrameEdit::getFrameStrings(UT_sint32 x, UT_sint32 y,
 		m_pView->_findPositionCoords(posAtXY,bEOL,x1,y1,x2,y2,height,bDir,&pBL,&pRun);
 		xxx_UT_DEBUGMSG((" Requested y %d frameEdit y1= %d y2= %d \n",y,y1,y2));
 		fp_Run * pRunOrig = pRun;
-		if((pBL == nullptr) || (pRun == nullptr))
+		if((pBL == NULL) || (pRun == NULL))
 		{
 			return false;
 		}
@@ -863,20 +864,20 @@ bool FV_FrameEdit::getFrameStrings(UT_sint32 x, UT_sint32 y,
 		(pBL->myContainingLayout()->getContainerType() == FL_CONTAINER_SHADOW) ||
 		(pBL->myContainingLayout()->getContainerType() == FL_CONTAINER_HDRFTR)))
 		{
-		    UT_DEBUGMSG(("Skipping Block %p \n", (void*)pBL));
+		    UT_DEBUGMSG(("Skipping Block %p \n",pBL));
 		    pPrevBL = pBL;
 		    pBL = pBL->getPrevBlockInDocument();
 		}
-		if(pBL == nullptr)
+		if(pBL == NULL)
 		{
 		     pBL = pPrevBL;
 		}
 		pLine = pRun->getLine();
-		if(pLine == nullptr)
+		if(pLine == NULL)
 		{
 			return false;
 		}
-		UT_ASSERT(pBL->myContainingLayout() && (pBL->myContainingLayout()->getContainerType() != FL_CONTAINER_HDRFTR) 
+		UT_ASSERT(pBL->myContainingLayout() && (pBL->myContainingLayout()->getContainerType() != FL_CONTAINER_HDRFTR)
 			  && (pBL->myContainingLayout()->getContainerType() != FL_CONTAINER_SHADOW));
 		*pCloseBL = pBL;
 		posAtXY = pBL->getPosition();
@@ -944,15 +945,15 @@ bool FV_FrameEdit::getFrameStrings(UT_sint32 x, UT_sint32 y,
 
 		double xPos = static_cast<double>(finalColx)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 		double yPos = static_cast<double>(finalColy)/static_cast<double>(UT_LAYOUT_RESOLUTION);
-		FrameStrings.sColXpos = UT_formatDimensionedValue(xPos,"in", nullptr);
-		FrameStrings.sColYpos = UT_formatDimensionedValue(yPos,"in", nullptr);
+		FrameStrings.sColXpos = UT_formatDimensionedValue(xPos,"in", NULL);
+		FrameStrings.sColYpos = UT_formatDimensionedValue(yPos,"in", NULL);
 		//
 		// OK calculate relative to page now
 		//
 		xPos += static_cast<double>(pCol->getX())/static_cast<double>(UT_LAYOUT_RESOLUTION);
 		yPos += static_cast<double>(pCol->getY())/static_cast<double>(UT_LAYOUT_RESOLUTION);
-		FrameStrings.sPageXpos = UT_formatDimensionedValue(xPos,"in", nullptr);
-		FrameStrings.sPageYpos = UT_formatDimensionedValue(yPos,"in", nullptr);
+		FrameStrings.sPageXpos = UT_formatDimensionedValue(xPos,"in", NULL);
+		FrameStrings.sPageYpos = UT_formatDimensionedValue(yPos,"in", NULL);
 
 //
 // Find the screen coords of pLine, then work out the offset to the (x,y)
@@ -978,7 +979,7 @@ bool FV_FrameEdit::getFrameStrings(UT_sint32 x, UT_sint32 y,
 
 // OK correct for page offsets
 		pPage = pVCon->getPage();
-		if(pPage == nullptr)
+		if(pPage == NULL)
 		{
 			return false;
 		}
@@ -989,16 +990,16 @@ bool FV_FrameEdit::getFrameStrings(UT_sint32 x, UT_sint32 y,
 		UT_DEBUGMSG(("fv_FrameEdit: (x,y) %d %d xLineOff %d yLineOff %d \n",x,y,xLineOff,yLineOff));
 //
 // The sXpos and sYpos values are the numbers that need to be added from the
-// top left corner of thefirst line of the block to reach the top left 
+// top left corner of thefirst line of the block to reach the top left
 // corner of the frame. We now have these in layout units. Convert to inches
 // now
 //
 		xPos = static_cast<double>(xLineOff)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 		yPos = static_cast<double>(yLineOff)/static_cast<double>(UT_LAYOUT_RESOLUTION);
-		FrameStrings.sXpos = UT_formatDimensionedValue(xPos,"in", nullptr);
-		FrameStrings.sYpos = UT_formatDimensionedValue(yPos,"in", nullptr);
-		FrameStrings.sWidth = UT_formatDimensionedValue(dWidth,"in", nullptr);
-		FrameStrings.sHeight = UT_formatDimensionedValue(dHeight,"in", nullptr);
+		FrameStrings.sXpos = UT_formatDimensionedValue(xPos,"in", NULL);
+		FrameStrings.sYpos = UT_formatDimensionedValue(yPos,"in", NULL);
+		FrameStrings.sWidth = UT_formatDimensionedValue(dWidth,"in", NULL);
+		FrameStrings.sHeight = UT_formatDimensionedValue(dHeight,"in", NULL);
 		*ppPage = pPage;
 		UT_sint32 iPage = getView()->getLayout()->findPage(pPage);
 		UT_String_sprintf(FrameStrings.sPrefPage,"%d",iPage);
@@ -1041,7 +1042,7 @@ void FV_FrameEdit::mouseRelease(UT_sint32 x, UT_sint32 y)
 		UT_DEBUGMSG(("Existing Frame selected now released button isActive() %d \n",isActive()));
 		return;
 	}
-	if(m_pAutoScrollTimer != nullptr)
+	if(m_pAutoScrollTimer != NULL)
 	{
 		m_pAutoScrollTimer->stop();
 		DELETEP(m_pAutoScrollTimer);
@@ -1060,10 +1061,10 @@ void FV_FrameEdit::mouseRelease(UT_sint32 x, UT_sint32 y)
 		_beginGlob();
 
 		fv_FrameStrings FrameStrings;
-		fl_BlockLayout * pCloseBL = nullptr;
-		fp_Page * pPage = nullptr;
+		fl_BlockLayout * pCloseBL = NULL;
+		fp_Page * pPage = NULL;
 		getFrameStrings(m_recCurFrame.left,m_recCurFrame.top,FrameStrings,&pCloseBL,&pPage);
-		pf_Frag_Strux * pfFrame = nullptr;
+		pf_Frag_Strux * pfFrame = NULL;
 		// WARNING: Will need to change this to accomodate variable styles without constantly resetting to solid.
 		//				 Recommend to do whatever is done for thickness, which must also have a default set but not
 		//				 reverted to on every change.
@@ -1098,7 +1099,7 @@ void FV_FrameEdit::mouseRelease(UT_sint32 x, UT_sint32 y)
 // position posXY.
 // It returns the Frag_Strux of the new frame.
 //
-		const PP_AttrProp* pBlockAP = nullptr;
+		const PP_AttrProp* pBlockAP = NULL;
 		pCloseBL->getAP(pBlockAP);
 		posAtXY = pCloseBL->getPosition();
 		getDoc()->insertStrux(posAtXY, PTX_SectionFrame, PP_NOPROPS, props, &pfFrame);
@@ -1162,7 +1163,7 @@ void FV_FrameEdit::mouseRelease(UT_sint32 x, UT_sint32 y)
 	else if((m_iFrameEditMode == FV_FrameEdit_RESIZE_EXISTING) ||
 			(m_iFrameEditMode == FV_FrameEdit_DRAG_EXISTING))
 	{
-		const PP_AttrProp* pSectionAP = nullptr;
+		const PP_AttrProp* pSectionAP = NULL;
 		m_pFrameLayout->getAP(pSectionAP);
 
 //
@@ -1178,8 +1179,8 @@ void FV_FrameEdit::mouseRelease(UT_sint32 x, UT_sint32 y)
 			m_iInitialFrameX = 0;
 			m_iInitialFrameY = 0;
 			drawFrame(false);
-			m_pFrameLayout = nullptr;
-			m_pFrameContainer = nullptr;
+			m_pFrameLayout = NULL;
+			m_pFrameContainer = NULL;
 			DELETEP(m_pFrameImage);
 			XAP_Frame * pFrame = static_cast<XAP_Frame*>(m_pView->getParentData());
 			if(pFrame)
@@ -1211,8 +1212,8 @@ void FV_FrameEdit::mouseRelease(UT_sint32 x, UT_sint32 y)
 //  Frame Image
 
 		fv_FrameStrings FrameStrings;
-		fl_BlockLayout * pCloseBL = nullptr;
-		fp_Page * pPage = nullptr;
+		fl_BlockLayout * pCloseBL = NULL;
+		fp_Page * pPage = NULL;
 		fl_FrameLayout *pFL = m_pFrameLayout;
 		getFrameStrings(m_recCurFrame.left,m_recCurFrame.top,FrameStrings,
 				&pCloseBL,&pPage);
@@ -1267,7 +1268,7 @@ void FV_FrameEdit::mouseRelease(UT_sint32 x, UT_sint32 y)
 		m_pView->notifyListeners(AV_CHG_HDRFTR);
 		m_pView->_fixInsertionPointCoords();
 //
-// If this was a drag following the initial click, wrap it in a 
+// If this was a drag following the initial click, wrap it in a
 // endUserAtomicGlob so it undo's in a single click.
 //
 		while(m_iGlobCount > 0)
@@ -1276,7 +1277,7 @@ void FV_FrameEdit::mouseRelease(UT_sint32 x, UT_sint32 y)
 		m_bInitialClick = false;
 //
 // Finish up by putting the editmode back to existing selected.
-//	
+//
 		m_pView->updateScreen(false);
 		m_pFrameLayout = pFL;
 		setMode(FV_FrameEdit_EXISTING_SELECTED);
@@ -1302,17 +1303,17 @@ const char * FV_FrameEdit::getPNGImage(UT_ConstByteBufPtr & pByteBuf)
 {
 
 //  Frame Image
-      const PP_AttrProp* pSectionAP = nullptr;
+      const PP_AttrProp* pSectionAP = NULL;
       m_pFrameLayout->getAP(pSectionAP);
-      
-      const char * pszDataID = nullptr;
+
+      const char * pszDataID = NULL;
       pSectionAP->getAttribute(PT_STRUX_IMAGE_DATAID, (const gchar *&)pszDataID);
       if(!pszDataID)
       {
 		pByteBuf.reset();
-		return nullptr;
+		return NULL;
       }
-      m_pView->getDocument()->getDataItemDataByName(pszDataID, pByteBuf, nullptr, nullptr);
+      m_pView->getDocument()->getDataItemDataByName(pszDataID, pByteBuf, NULL, NULL);
       return pszDataID;
 }
 
@@ -1321,10 +1322,10 @@ const char * FV_FrameEdit::getPNGImage(UT_ConstByteBufPtr & pByteBuf)
  */
 void FV_FrameEdit::deleteFrame(fl_FrameLayout * pFL)
 {
-	if(m_pFrameLayout == nullptr)
+	if(m_pFrameLayout == NULL)
 	{
 	        m_pFrameLayout = pFL;
-		if(m_pFrameLayout == nullptr)
+		if(m_pFrameLayout == NULL)
 		{
 		  UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
 		  return;
@@ -1334,7 +1335,7 @@ void FV_FrameEdit::deleteFrame(fl_FrameLayout * pFL)
 	FV_ViewDoubleBuffering dblBuffObj(m_pView, true, true);
 	dblBuffObj.beginDoubleBuffering();
 
-	PP_AttrProp * p_AttrProp_Before = nullptr;
+	PP_AttrProp * p_AttrProp_Before = NULL;
 
 	// Signal PieceTable Change
 	m_pView->_saveAndNotifyPieceTableChange();
@@ -1347,10 +1348,10 @@ void FV_FrameEdit::deleteFrame(fl_FrameLayout * pFL)
 // Delete the frame
 
 	pf_Frag_Strux* sdhStart =  m_pFrameLayout->getStruxDocHandle();
-	pf_Frag_Strux* sdhEnd = nullptr;
+	pf_Frag_Strux* sdhEnd = NULL;
 	PT_DocPosition posStart = getDoc()->getStruxPosition(sdhStart);
 	getDoc()->getNextStruxOfType(sdhStart, PTX_EndFrame, &sdhEnd);
-	PT_DocPosition posEnd = getDoc()->getStruxPosition(sdhEnd)+1;	
+	PT_DocPosition posEnd = getDoc()->getStruxPosition(sdhEnd)+1;
 	UT_uint32 iRealDeleteCount;
 
 	getDoc()->deleteSpan(posStart, posEnd, p_AttrProp_Before, iRealDeleteCount,true);
@@ -1381,8 +1382,8 @@ void FV_FrameEdit::deleteFrame(fl_FrameLayout * pFL)
 
 // Clear all internal variables
 
-	m_pFrameLayout = nullptr;
-	m_pFrameContainer = nullptr;
+	m_pFrameLayout = NULL;
+	m_pFrameContainer = NULL;
 	DELETEP(m_pFrameImage);
 	m_recCurFrame.width = 0;
 	m_recCurFrame.height = 0;
@@ -1405,7 +1406,7 @@ FV_DragWhat FV_FrameEdit::mouseMotion(UT_sint32 /*x*/, UT_sint32 /*y*/)
 
 void FV_FrameEdit::drawFrame(bool bWithHandles)
 {
-	if(m_pFrameContainer == nullptr)
+	if(m_pFrameContainer == NULL)
 	{
 		UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
 		return;
@@ -1418,7 +1419,7 @@ void FV_FrameEdit::drawFrame(bool bWithHandles)
 	m_pView->getPageScreenOffsets(pPage,xPage,yPage);
 	da.xoff = xPage + m_pFrameContainer->getX();
 	da.yoff = yPage + m_pFrameContainer->getY();
-	if((m_pFrameImage == nullptr) || (getDragWhat() != FV_DragWhole) )
+	if((m_pFrameImage == NULL) || (getDragWhat() != FV_DragWhole) )
 	{
 //		m_pFrameContainer->clearScreen();
 		m_pFrameContainer->draw(&da);
@@ -1446,7 +1447,7 @@ void FV_FrameEdit::drawFrame(bool bWithHandles)
 	else
 	{
 		GR_Painter painter(getGraphics());
-		m_pView->drawImmediate(&m_recCurFrame);
+		m_pView->draw(&m_recCurFrame);
 		painter.drawImage(m_pFrameImage,m_recCurFrame.left,m_recCurFrame.top);
 	}
 }

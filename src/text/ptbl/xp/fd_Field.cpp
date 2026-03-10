@@ -33,10 +33,10 @@
 fd_Field::fd_Field(pf_Frag_Object& fO, pt_PieceTable * pt, 
                    FieldType fieldType, const gchar *pParam)
     : m_fragObject(fO),m_pPieceTable(pt),
-      m_updateCount(0), m_iFieldType(fieldType), m_pParameter(nullptr)
+      m_updateCount(0), m_iFieldType(fieldType), m_pParameter(0)
 {
-	m_pBlock = nullptr;
-	m_szValue = nullptr;
+	m_pBlock = NULL;
+	m_szValue = NULL;
 	if(pParam)
 	{
 		m_pParameter = g_strdup(pParam);
@@ -134,7 +134,7 @@ bool fd_Field::update(void)
 		      m_updateCount);
 
               //UT_UCSChar * curpos;
-	      char lineno[26];
+	      char lineno[20];
 	      UT_UCS4_strcpy_char(testUCSFieldText,
 				 testChars);
 	      UT_uint32 len = UT_UCS4_strlen(testUCSFieldText);
@@ -180,7 +180,7 @@ bool fd_Field::update(void)
 
 bool fd_Field::_deleteSpan(void)
 {
-       pf_Frag * pfOld = nullptr;
+       pf_Frag * pfOld = NULL;
        pf_Frag * pf = m_fragObject.getNext();
        while (pf&&pf->getType()==pf_Frag::PFT_Text&&
 	      pf->getField()==this)
@@ -198,14 +198,15 @@ void  fd_Field::_throwChangeRec(  PT_DocPosition docPos)
   // Notify listeners in the views to update the blocks containing pieceTable
   // Fields
   //
-       pf_Frag_Strux* sdh = nullptr;
+       pf_Frag_Strux* sdh = NULL;
        bool bret = m_pPieceTable->getStruxOfTypeFromPosition(docPos,PTX_Block, &sdh);
        if(bret == true)
-       {
+       {    
              pf_Frag_Strux * pfs = sdh;
 	     PT_AttrPropIndex pAppIndex = pfs->getIndexAP();
-	     PX_ChangeRecord * pcr = new PX_ChangeRecord(PX_ChangeRecord::PXT_UpdateField, docPos, pAppIndex, pfs->getXID());
+	     const PX_ChangeRecord * pcr = new PX_ChangeRecord(PX_ChangeRecord::PXT_UpdateField,docPos,pAppIndex,
+														   pfs->getXID());
 	     m_pPieceTable->getDocument()->notifyListeners(pfs, pcr);
 	     delete pcr;
        }
-}
+}		

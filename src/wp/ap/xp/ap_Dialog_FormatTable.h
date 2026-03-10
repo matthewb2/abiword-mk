@@ -58,7 +58,8 @@ public:
 	virtual ~AP_FormatTable_preview(void);
 
 	// data twiddlers
-	void drawImmediate(const UT_Rect* clip = nullptr) override;
+	void			draw(const UT_Rect *clip=NULL);
+	GR_Graphics *   getGraphics(void) const { return m_gc;}
 private:
 	AP_Dialog_FormatTable *  m_pFormatTable;
 protected:
@@ -71,7 +72,7 @@ public:
 	AP_Dialog_FormatTable(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_Dialog_FormatTable(void);
 
-	virtual void runModeless(XAP_Frame * pFrame) override = 0;
+	virtual void					runModeless(XAP_Frame * pFrame) = 0;
 
 	enum tAnswer {
 		a_OK,
@@ -90,7 +91,7 @@ public:
 	static void                         autoUpdateMC(UT_Worker * pTimer);
 
 	virtual void                        setSensitivity(bool bSens) = 0;
-    virtual void setActiveFrame(XAP_Frame *pFrame) override;
+    virtual void                        setActiveFrame(XAP_Frame *pFrame);
 	void                                ConstructWindowName(void);
 	void                                event_update(void);
 	void                                finalize(void);

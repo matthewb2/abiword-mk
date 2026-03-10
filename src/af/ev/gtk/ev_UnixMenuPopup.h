@@ -1,7 +1,5 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t -*- */
 /* AbiSource Program Utilities
  * Copyright (C) 1998-2000 AbiSource, Inc.
- * Copyright (C) 2019 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -40,12 +38,14 @@ public:
 	virtual ~EV_UnixMenuPopup(void);
 
 	virtual bool		synthesizeMenuPopup(void);
-	virtual bool		refreshMenu(AV_View * pView) override;
+	virtual bool		refreshMenu(AV_View * pView);
 	virtual GtkWidget *	getMenuHandle(void) const;
 
 
 protected:
 	GtkWidget *			m_wMenuPopup;
+private:
+	UT_Vector m_vecCallbacks;
 };
 
 #endif /* EV_UNIXMENUPOPUP_H */

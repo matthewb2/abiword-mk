@@ -19,38 +19,51 @@
  * 02110-1301 USA.
  */
 
-#pragma once
 
-#include <vector>
 
+#ifndef UT_STACK_H
+#define UT_STACK_H
+
+/* pre-emptive dismissal; ut_types.h is needed by just about everything,
+ * so even if it's commented out in-file that's still a lot of work for
+ * the preprocessor to do...
+ */
+#ifndef UT_TYPES_H
 #include "ut_types.h"
+#endif
+#include "ut_vector.h"
 
 class ABI_EXPORT UT_Stack
 {
 public:
-	void			push(void * pVoid);
+	bool			push(void * pVoid);
 	bool			pop(void ** ppVoid);
 	bool			viewTop(void ** ppVoid) const;
 	UT_sint32		getDepth(void) const;
 	void            clear() {m_vecStack.clear();}
 
 private:
-	std::vector<const void*>		m_vecStack;
+	UT_Vector		m_vecStack;
 };
 
-/** A stack to store numbers
+/* some people have been storing numbers casted to pointers in a UT_Stack;
+ * this causes problems sometimes on 64-bit architectures.
+ *
+ * so, here is a number stack
  */
 class ABI_EXPORT UT_NumberStack
 {
 public:
-	UT_NumberStack (UT_uint32 sizehint = 32);
+	UT_NumberStack (UT_uint32 sizehint = 32, UT_uint32 baseincr = 32); // see UT_NumberVector
 
-	void			push (UT_sint32 number);
-	bool			pop (UT_sint32 * number = nullptr);
+	bool			push (UT_sint32 number);
+	bool			pop (UT_sint32 * number = 0);
 	bool			viewTop (UT_sint32 & number) const;
 	UT_sint32		getDepth (void) const;
 	void            clear() {m_vecStack.clear();}
 
 private:
-	std::vector<UT_sint32>	m_vecStack;
+	UT_NumberVector	m_vecStack;
 };
+
+#endif /* UT_STACK_H */

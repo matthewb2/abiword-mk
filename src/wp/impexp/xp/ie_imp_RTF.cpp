@@ -93,7 +93,7 @@ inline UT_sint32 _sanitizeListLevel(UT_sint32 level)
  */
 #define CPNAME_OR_FALLBACK(destination,name,fallbackname) \
 {  \
-	static const char* cpname = nullptr; \
+	static const char* cpname = NULL; \
 	if (!cpname)    \
 	{       \
 		UT_iconv_t cd = UT_iconv_open(name,name);     \
@@ -109,6 +109,12 @@ inline UT_sint32 _sanitizeListLevel(UT_sint32 level)
 	} \
 	destination = cpname;  \
 }
+
+
+// This should probably be defined in pt_Types.h
+// this used to be 8, which way to small ...
+static const UT_uint32 PT_MAX_ATTRIBUTES = 20;
+
 
 static char g_dbgLastKeyword [256];
 static UT_sint32 g_dbgLastParam; 
@@ -265,7 +271,7 @@ void RTF_msword97_level::buildAbiListProperties( const char ** szListID,
 //
 	UT_uint32 iParentID = 0;
 	// http://bugzilla.abisource.com/show_bug.cgi?id=12880
-	// Check that m_pMSWord97_list is not nullptr or kaboom. Assume this restart the list.
+	// Check that m_pMSWord97_list is not NULL or kaboom. Assume this restart the list.
 	if(m_localLevel> 0 && !m_bStartNewList && m_pMSWord97_list)
 	{
 		iParentID = m_pMSWord97_list->m_RTF_level[m_localLevel-1]->m_AbiLevelID;
@@ -438,7 +444,7 @@ bool RTF_msword97_level::ParseLevelText(const std::string & szLevelText,const st
 	{
 		ilength = icurrent;
 	}
-	// Find the occurrence of a previous level place holder
+	// Find the occurance of a previous level place holder
 	for (icurrent = ilength-1; icurrent>=0; icurrent--)
 	{
 		if(-iLevelText[icurrent] >= 0 && (-iLevelText[icurrent] < static_cast<UT_sint32>(iLevel)))
@@ -515,7 +521,7 @@ ABI_RTF_Annotation::ABI_RTF_Annotation(void):
 	m_sAuthor(""),
 	m_sDate(""),
 	m_sTitle(""),
-	m_pInsertFrag(nullptr),
+	m_pInsertFrag(NULL),
 	m_Annpos(0),
 	m_iRTFLevel(0)
 {
@@ -553,7 +559,7 @@ RTF_msword97_listOverride::RTF_msword97_listOverride(IE_Imp_RTF * pie_rtf )
 	: m_RTF_listID((UT_uint32) - 1)
 	, m_OverrideCount(0)
 	, m_pie_rtf(pie_rtf)
-	, m_pList(nullptr)
+	, m_pList(NULL)
 
 {
 }
@@ -959,12 +965,12 @@ RTFFontTableItem::RTFFontTableItem(FontFamilyEnum fontFamily, int charSet,
 	m_family = fontFamily;
 	m_charSet = charSet;
 	m_codepage = codepage;
-	m_szEncoding = nullptr;
+	m_szEncoding = 0;
 	m_pitch = pitch;
 	if (panose)
 		memcpy(m_panose, panose, 10*sizeof(unsigned char));
 	// TODO KAY: If we run out of memory then m_pFontName and m_pAlternativeFontName,
-	// get left as nullptr. Could we throw an exception from here?
+	// get left as NULL. Could we throw an exception from here?
 	m_pFontName = g_strdup(pFontName);
 	m_pAlternativeFontName = g_strdup(pAlternativeFontName);
 
@@ -1059,7 +1065,7 @@ RTFFontTableItem::RTFFontTableItem(FontFamilyEnum fontFamily, int charSet,
 				m_szEncoding = "CP1252";	// MS-ANSI
 				break;
 			case 2:		// SYMBOL_CHARSET
-				m_szEncoding = nullptr;	// MS-ANSI
+				m_szEncoding = NULL;	// MS-ANSI
 				UT_DEBUGMSG(("RTF Font charset 'Symbol' worked around \n"));
 				break;
 			case 77:    // Source Vlad Harchev from OpenOffice
@@ -1173,7 +1179,7 @@ RTFProps_CharProps::RTFProps_CharProps(void)
 	m_bgcolourNumber = 0;
 	m_styleNumber = -1;
 	m_listTag = 0;
-	m_szLang = nullptr;
+	m_szLang = 0;
 	m_dir = UT_BIDI_UNSET;
 	m_dirOverride = UT_BIDI_UNSET;
 	m_Hidden = false;
@@ -1439,7 +1445,7 @@ RTFStateStore * RTFStateStore::clone(void)
 IE_Imp_RTF::IE_Imp_RTF(PD_Document * pDocument)
 :	IE_Imp(pDocument),
 	m_gbBlock(1024),
-	m_szFileDirName(nullptr),
+	m_szFileDirName(NULL),
 	m_groupCount(0),
 	m_newParaFlagged(false),
 	m_newSectionFlagged(false),
@@ -1453,10 +1459,10 @@ IE_Imp_RTF::IE_Imp_RTF(PD_Document * pDocument)
 	m_currentHdrLastID(0),
 	m_currentFtrLastID(0),
 	m_numLists(0),
-	m_pImportFile(nullptr),
-	m_pPasteBuffer(nullptr),
+	m_pImportFile(NULL),
+	m_pPasteBuffer(NULL),
 	m_lenPasteBuffer(0),
-	m_pCurrentCharInPasteBuffer(nullptr),
+	m_pCurrentCharInPasteBuffer(NULL),
 	deflangid(0),
 	m_mbtowc (XAP_EncodingManager::get_instance()->getNative8BitEncodingName()),
 	m_parsingHdrFtr(false),
@@ -1464,7 +1470,7 @@ IE_Imp_RTF::IE_Imp_RTF(PD_Document * pDocument)
 	m_icurOverrideLevel(0),
 	m_bAppendAnyway(false),
 	m_TableControl(pDocument),
-	m_lastCellSDH(nullptr),
+	m_lastCellSDH(NULL),
 	m_bNestTableProps(false),
 	m_bParaWrittenForSection(false),
 	m_bCellBlank(true),
@@ -1495,12 +1501,12 @@ IE_Imp_RTF::IE_Imp_RTF(PD_Document * pDocument)
 	m_iAutoBidiOverride(UT_BIDI_UNSET),
 	m_iBidiLastType(UT_BIDI_UNSET),
 	m_iBidiNextType(UT_BIDI_UNSET),
-	m_szDefaultEncoding(nullptr),
+	m_szDefaultEncoding(NULL),
 	m_iDefaultFontNumber(-1),
 	m_dPosBeforeFootnote(0),
 	m_bMovedPos(true),
-	m_pAnnotation(nullptr),
-	m_pDelayedFrag(nullptr),
+	m_pAnnotation(NULL),
+	m_pDelayedFrag(NULL),
 	m_posSavedDocPosition(0),
 	m_bInAnnotation(false),
 	m_bFrameTextBox(false),
@@ -1508,7 +1514,7 @@ IE_Imp_RTF::IE_Imp_RTF(PD_Document * pDocument)
 	m_bCellActive(false),
 	m_ctMoveID("")
 {
-	UT_DEBUGMSG(("New ie_imp_RTF %p \n", (void*)this));
+	UT_DEBUGMSG(("New ie_imp_RTF %p \n",this));
 	m_sImageName.clear();
 	if (!IE_Imp_RTF::keywordSorted) {
 		_initialKeywordSort();
@@ -1520,7 +1526,7 @@ IE_Imp_RTF::IE_Imp_RTF(PD_Document * pDocument)
 	}
 	m_mbtowc.setInCharset(XAP_EncodingManager::get_instance()->getNativeEncodingName());
 	m_hyperlinkBase.clear();
-	m_pasteTableStack.push(nullptr);
+	m_pasteTableStack.push(NULL);
 
 	m_XMLIDCreatorHandle = getDoc()->makeXMLIDCreator();
 }
@@ -1529,19 +1535,19 @@ IE_Imp_RTF::IE_Imp_RTF(PD_Document * pDocument)
 IE_Imp_RTF::~IE_Imp_RTF()
 {
 	// Empty the state stack
-	UT_DEBUGMSG(("In RTF destructor %p \n", (void*)this));
+	UT_DEBUGMSG(("In RTF destructor %p \n",this));
 	while (m_stateStack.getDepth() > 0)
 	{
-		RTFStateStore* pItem = nullptr;
+		RTFStateStore* pItem = NULL;
 		m_stateStack.pop((void**)(&pItem));
-		UT_DEBUGMSG(("Deleting item %p in RTF destructor \n", (void*)pItem));
+		UT_DEBUGMSG(("Deleting item %p in RTF destructor \n",pItem));
 		delete pItem;
 	}
-	UT_DEBUGMSG(("Closing pastetable In RTF destructor %p \n", (void*)this));
+	UT_DEBUGMSG(("Closing pastetable In RTF destructor %p \n",this));
 	closePastedTableIfNeeded();
-	UT_DEBUGMSG(("Deleting fonts In RTF destructor %p \n", (void*)this));
+	UT_DEBUGMSG(("Deleting fonts In RTF destructor %p \n",this));
 
-	// and the font table (can't use the macro as we allow nullptrs in the vector
+	// and the font table (can't use the macro as we allow NULLs in the vector
 	UT_sint32 size = m_fontTable.size();
 	UT_sint32 i =0;
 	for (i = size-1; i>=0; i--)
@@ -1551,9 +1557,9 @@ IE_Imp_RTF::~IE_Imp_RTF()
 	}
 
 	// and the styleName table.
-	UT_DEBUGMSG(("Deleting styles In RTF destructor %p \n", (void*)this));
+	UT_DEBUGMSG(("Deleting styles In RTF destructor %p \n",this));
 
-	UT_DEBUGMSG(("Purging In RTF destructor %p \n", (void*)this));
+	UT_DEBUGMSG(("Purging In RTF destructor %p \n",this));
 	UT_std_vector_purgeall(m_vecAbiListTable);
 	UT_std_vector_purgeall(m_hdrFtrTable);
 	UT_std_vector_purgeall(m_vecWord97Lists);
@@ -1572,11 +1578,11 @@ UT_Error IE_Imp_RTF::_loadFile(GsfInput * fp)
 	m_newSectionFlagged = true;
 
 	m_szFileDirName = g_strdup (gsf_input_name (fp));
-	if(m_szFileDirName == nullptr)
+	if(m_szFileDirName == NULL)
 		m_szFileDirName = g_strdup("/tmp");
 	// UT_basename returns a point INSIDE the passed string.
 	// the trick is to truncate the string by setting the char pointed
-	// by tmp to nullptr. This IS useful code. (2 LOC)
+	// by tmp to NULL. This IS useful code. (2 LOC)
 	char * tmp = const_cast<char *>(UT_basename (m_szFileDirName));
 	*tmp = 0;
 
@@ -1590,7 +1596,7 @@ UT_Error IE_Imp_RTF::_loadFile(GsfInput * fp)
 	}
 
 	// check if the doc is empty or not
-	if (getDoc()->getLastFrag() == nullptr)
+	if (getDoc()->getLastFrag() == NULL)
 	{
 		error = UT_IE_BOGUSDOCUMENT;
 	}
@@ -1636,7 +1642,7 @@ bool IE_Imp_RTF::hexVal(char c, int& value)
 
 ie_imp_cell * IE_Imp_RTF::getCell(void)
 {
-	UT_return_val_if_fail(getTable(),nullptr);
+	UT_return_val_if_fail(getTable(),NULL);
 	return getTable()->getCurCell();
 }
 
@@ -1714,7 +1720,7 @@ void IE_Imp_RTF::OpenTable(bool bDontFlush)
 	PT_DocPosition posEnd=0;
 	getDoc()->getBounds(true,posEnd); // clean frags!
 	pf_Frag_Strux* sdh = getDoc()->getLastStruxOfType(PTX_SectionTable);
-	UT_DEBUGMSG(("SEVIOR: Table strux sdh is %p \n", (void*)sdh));
+	UT_DEBUGMSG(("SEVIOR: Table strux sdh is %p \n",sdh));
 	getTable()->setTableSDH(sdh);
 	getTable()->OpenCell();
 	if(!bDontFlush)
@@ -1728,7 +1734,7 @@ void IE_Imp_RTF::OpenTable(bool bDontFlush)
 	getCell()->setCellSDH(sdh);
 	m_currentRTFState.m_cellProps = RTFProps_CellProps();
 	m_currentRTFState.m_tableProps = RTFProps_TableProps();
-	m_lastCellSDH = nullptr; // This is in the table structure and can be deleted from there.
+	m_lastCellSDH = NULL; // This is in the table structure and can be deleted from there.
 	m_bCellBlank = true;
 //	m_iNoCellsSinceLastRow = 0;
 }
@@ -1759,9 +1765,9 @@ void IE_Imp_RTF::closePastedTableIfNeeded(void)
 {
 	while(m_pasteTableStack.getDepth() > 0)
 	{
-		ABI_Paste_Table * pPaste = nullptr;
+		ABI_Paste_Table * pPaste = NULL;
 		m_pasteTableStack.pop((void**)(&pPaste));
-		if(pPaste != nullptr)
+		if(pPaste != NULL)
 		{
 			if(pPaste->m_bHasPastedCellStrux && !pPaste->m_bHasPastedBlockStrux)
 			{
@@ -1821,9 +1827,9 @@ void IE_Imp_RTF::closePastedTableIfNeeded(void)
 // below
 //
 				UT_sint32 numRows = pPaste->m_iNumRows;
-				pf_Frag_Strux* sdhCell = nullptr;
-				pf_Frag_Strux* sdhTable = nullptr;
-				pf_Frag_Strux* sdhEndTable = nullptr;
+				pf_Frag_Strux* sdhCell = NULL;
+				pf_Frag_Strux* sdhTable = NULL;
+				pf_Frag_Strux* sdhEndTable = NULL;
 				bool b = getDoc()->getStruxOfTypeFromPosition(m_dposPaste,PTX_SectionTable,&sdhTable);
 				PT_DocPosition posTable = getDoc()->getStruxPosition(sdhTable);
 				UT_ASSERT(b);
@@ -1834,7 +1840,7 @@ void IE_Imp_RTF::closePastedTableIfNeeded(void)
 				b = getDoc()->getNextStruxOfType(sdhCell,PTX_SectionCell,&sdhCell);
 				std::string sTop;
 				std::string sBot;
-				const char * szVal = nullptr;
+				const char * szVal = NULL;
 				PT_DocPosition posCell = 0;
 				if(b)
 				{
@@ -1893,14 +1899,14 @@ void IE_Imp_RTF::CloseTable(bool bForce /* = false */)
 //
 // Close table removes extraneous struxes like unmatched PTX_SectionCell's
 //
-	if(!bForce && (bUseInsertNotAppend() || (getTable() == nullptr)))
+	if(!bForce && (bUseInsertNotAppend() || (getTable() == NULL)))
 	{
 		return;
 	}
 	if(getTable() && getTable()->wasTableUsed())
 	{
 		UT_DEBUGMSG(("SEVIOR: Table used appened end Table, block \n"));
-		if(m_lastCellSDH != nullptr )
+		if(m_lastCellSDH != NULL )
 		{
 			getDoc()->insertStruxNoUpdateBefore(m_lastCellSDH, PTX_EndTable, PP_NOPROPS);
 //
@@ -1912,20 +1918,20 @@ void IE_Imp_RTF::CloseTable(bool bForce /* = false */)
 			m_bEndTableOpen = true;
 		}
 		m_TableControl.CloseTable();
-		if(m_lastCellSDH == nullptr)
+		if(m_lastCellSDH == NULL)
 		{
 			getDoc()->appendStrux(PTX_EndTable, PP_NOPROPS);
 			m_bEndTableOpen = true;
 		}
-		m_lastCellSDH = nullptr;
+		m_lastCellSDH = NULL;
 	}
 	else if(getTable())
 	{
-		if(m_lastCellSDH != nullptr )
+		if(m_lastCellSDH != NULL )
 		{
 			pf_Frag_Strux* cellSDH = m_lastCellSDH;
 			getDoc()->deleteStruxNoUpdate(cellSDH);
-			m_lastCellSDH = nullptr;
+			m_lastCellSDH = NULL;
 		}
 		m_TableControl.CloseTable();
 		m_bEndTableOpen = true;
@@ -1933,11 +1939,11 @@ void IE_Imp_RTF::CloseTable(bool bForce /* = false */)
 	}
 	else
 	{
-		if(m_lastCellSDH != nullptr )
+		if(m_lastCellSDH != NULL )
 		{
 			pf_Frag_Strux* cellSDH = m_lastCellSDH;
 			getDoc()->deleteStruxNoUpdate(cellSDH);
-			m_lastCellSDH = nullptr;
+			m_lastCellSDH = NULL;
 		}
 	}
 }
@@ -1949,7 +1955,7 @@ void IE_Imp_RTF::HandleCell(void)
 // so, close the table and make copy of the last cells.
 //
 	UT_DEBUGMSG(("Handle Cell \n"));
-	if(m_bRowJustPassed && m_bDoCloseTable && (getTable()!= nullptr))
+	if(m_bRowJustPassed && m_bDoCloseTable && (getTable()!= NULL))
 	{
 		UT_GenericVector<ie_imp_cell *> vecOldCells;
 		UT_GenericVector<ie_imp_cell *> vecCopyCells;
@@ -1959,7 +1965,7 @@ void IE_Imp_RTF::HandleCell(void)
 		for(i=0; i< vecOldCells.getItemCount();i++)
 		{
 			ie_imp_cell * pCell = vecOldCells.getNthItem(i);
-			ie_imp_cell * pNewCell = new ie_imp_cell(nullptr,nullptr,nullptr,0);
+			ie_imp_cell * pNewCell = new ie_imp_cell(NULL,NULL,NULL,0);
 			pNewCell->copyCell(pCell);
 			vecCopyCells.addItem(pNewCell);
 		}
@@ -2004,7 +2010,7 @@ void IE_Imp_RTF::HandleCell(void)
 //	
 		FlushStoredChars();
 	}
-	if(getTable() == nullptr)
+	if(getTable() == NULL)
 	{
 		OpenTable();
 	}
@@ -2070,11 +2076,11 @@ void IE_Imp_RTF::FlushCellProps(void)
 	}
 	if(m_currentRTFState.m_cellProps.m_bVerticalMerged)
 	{
-		UT_DEBUGMSG(("Set merged above to cell %p \n", (void*)getCell()));
+		UT_DEBUGMSG(("Set merged above to cell %p \n",getCell()));
 	}
 	if(m_currentRTFState.m_cellProps.m_bHorizontalMerged)
 	{
-		UT_DEBUGMSG(("Set merged left to cell %p \n", (void*)getCell()));
+		UT_DEBUGMSG(("Set merged left to cell %p \n",getCell()));
 	}
 	getCell()->setMergeAbove( m_currentRTFState.m_cellProps.m_bVerticalMerged );
 	getCell()->setFirstVerticalMerge( m_currentRTFState.m_cellProps.m_bVerticalMergedFirst );
@@ -2139,7 +2145,7 @@ void IE_Imp_RTF::HandleCellX(UT_sint32 cellx)
 		return;
 	}
 
-	if(getTable() == nullptr)
+	if(getTable() == NULL)
 	{
 		OpenTable();
 	}
@@ -2176,7 +2182,7 @@ void IE_Imp_RTF::HandleCellX(UT_sint32 cellx)
 	}
 	UT_ASSERT_HARMLESS(cellx>1);
 	getTable()->setCellX(cellx);
-	UT_DEBUGMSG(("set cellx for class %p to %d \n", (void*)getCell(), cellx));
+	UT_DEBUGMSG(("set cellx for class %p to %d \n",getCell(),cellx));
 	getTable()->incCellXOnRow();
 	FlushCellProps();
 	ResetCellAttributes();
@@ -2221,7 +2227,7 @@ void IE_Imp_RTF::HandleRow(void)
 void IE_Imp_RTF::HandleNoteReference(void)
 {
 	// see if we have a reference marker pending ...
-	const gchar * attribs[3] ={"footnote-id",nullptr,nullptr};
+	const gchar * attribs[3] ={"footnote-id",NULL,NULL};
 
 	if(!m_bNoteIsFNote)
 	{
@@ -2285,7 +2291,7 @@ void IE_Imp_RTF::HandleNoteReference(void)
 		m_bFtnReferencePending = false;
 
 		// now we pop the saved state off and restore the current state
-		RTFStateStore* pState = nullptr;
+		RTFStateStore* pState = NULL;
 		m_stateStack.pop(reinterpret_cast<void**>(&pState));
 		m_stateStack.pop(reinterpret_cast<void**>(&pState));
 		m_currentRTFState = *pState;
@@ -2369,12 +2375,12 @@ void IE_Imp_RTF::HandleAnnotation(void)
 	}
 	m_bInAnnotation = true;
 	std::string sAnnNum = UT_std_string_sprintf("%d",m_pAnnotation->m_iAnnNumber);
-	const char * ann_attrs[5] = {nullptr,nullptr,nullptr,nullptr,nullptr};
+	const char * ann_attrs[5] = {NULL,NULL,NULL,NULL,NULL};
 	ann_attrs[0] = "annotation-id";
 	ann_attrs[1] = sAnnNum.c_str();
-	ann_attrs[2] = nullptr;
-	ann_attrs[3] = nullptr;
-	const char * pszAnn[7] = {nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr};
+	ann_attrs[2] = 0;
+	ann_attrs[3] = 0;
+	const char * pszAnn[7] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 	UT_sint32 i = 0;
 	if(m_pAnnotation->m_sAuthor.size() > 0)
 	{
@@ -2403,7 +2409,7 @@ void IE_Imp_RTF::HandleAnnotation(void)
 		m_pDelayedFrag = m_pAnnotation->m_pInsertFrag->getNext();
 		if(!m_pDelayedFrag)
 			m_pDelayedFrag = doc->getLastFrag();
-		UT_DEBUGMSG(("Delayed Frag set to %p \n", (void*)m_pDelayedFrag));
+		UT_DEBUGMSG(("Delayed Frag set to %p \n",m_pDelayedFrag));
 		ann_attrs[2] = PT_PROPS_ATTRIBUTE_NAME;
 		UT_sint32 k = 0;
 		std::string sProperties;
@@ -2632,7 +2638,7 @@ UT_Error IE_Imp_RTF::_isBidiDocument()
 	UT_return_val_if_fail(m_pImportFile, UT_ERROR);
 
 	char buff[8192 + 1];
-	char * token = nullptr;
+	char * token = NULL;
 	
 	size_t iBytes = UT_MIN(8192, gsf_input_remaining(m_pImportFile));
 	gsf_input_read(m_pImportFile, iBytes, (guint8*)buff);
@@ -2712,7 +2718,7 @@ UT_Error IE_Imp_RTF::_parseFile(GsfInput* fp)
 	{
 		double width = 12240./1440.; // default width in twips
 		double height = 15840./1440; // default height in twips
-		if(fp != nullptr)
+		if(fp != NULL)
 		{
 			getDoc()->m_docPageSize.Set(width,height,DIM_IN);
 		}
@@ -2739,7 +2745,7 @@ bool IE_Imp_RTF::HandleParKeyword()
 
 		ApplyParagraphAttributes();
 		
-		//getDoc()->appendStrux(PTX_Block,nullptr); // FIXME 28/3/2005!
+		//getDoc()->appendStrux(PTX_Block,NULL); // FIXME 28/3/2005!
 		m_newParaFlagged = false;
 		m_bSectionHasPara = true;
 	}
@@ -2837,13 +2843,13 @@ bool IE_Imp_RTF::AddChar(UT_UCSChar ch)
  */
 bool IE_Imp_RTF::isPastedTableOpen(void)
 {
-	ABI_Paste_Table * pPaste = nullptr;
+	ABI_Paste_Table * pPaste = NULL;
 	if(m_pasteTableStack.getDepth() == 0)
 	{
 		return false;
 	}
 	m_pasteTableStack.viewTop(reinterpret_cast<void **>(&pPaste));
-	if(pPaste == nullptr)
+	if(pPaste == NULL)
 	{
 		return false;
 	}
@@ -2902,7 +2908,7 @@ bool IE_Imp_RTF::FlushStoredChars(bool forceInsertPara)
 
 	if (ok  &&  (m_gbBlock.getLength() > 0))
 	{
-		if(ok && m_bCellBlank && (getTable() != nullptr))
+		if(ok && m_bCellBlank && (getTable() != NULL))
 		{
 			ok = ApplyParagraphAttributes();
 			if(m_newParaFlagged || m_bCellBlank)
@@ -2986,7 +2992,7 @@ bool IE_Imp_RTF::FlushStoredChars(bool forceInsertPara)
 			}
 			EndAnnotation();
 			DELETEP(m_pAnnotation);
-			m_pDelayedFrag = nullptr;
+			m_pDelayedFrag = NULL;
 			xxx_UT_DEBUGMSG(("After complete annotation Saved doc Postion %d \n",m_posSavedDocPosition));
 			m_dposPaste = m_posSavedDocPosition;
 			m_posSavedDocPosition = 0;
@@ -3009,7 +3015,7 @@ RTFFontTableItem* IE_Imp_RTF::GetNthTableFont(UT_sint32 fontNum)
 	}
 	else
 	{
-		return nullptr;
+		return NULL;
 	}
 }
 
@@ -3118,7 +3124,7 @@ bool IE_Imp_RTF::ParseRTFKeyword()
 /*!
   Read a keyword from the file.
   \retval pKeyword the keyword buffer whose len is in keywordBuffLen
-  Can not be nullptr on input.
+  Can not be NULL on input.
   \retval pParam the keyword parameter as specified by the RTF spec. 0
   is there is no param.
   \retval pParamUsed true if the keyword does really have a param. false
@@ -3237,7 +3243,7 @@ bool IE_Imp_RTF::ReadKeyword(unsigned char* pKeyword, UT_sint32* pParam, bool* p
 /*!
   Reads a character from the file. Doesn't ignore CR and LF
   \retval pCh the char read
-  \return false if an error occurred.
+  \return false if an error occured.
   \see IE_Imp_RTF::ReadCharFromFile
 */
 bool IE_Imp_RTF::ReadCharFromFileWithCRLF(unsigned char* pCh)
@@ -3246,7 +3252,7 @@ bool IE_Imp_RTF::ReadCharFromFileWithCRLF(unsigned char* pCh)
 
 	if (m_pImportFile)					// if we are reading a file
 	{
-		if (gsf_input_read(m_pImportFile, 1, pCh) != nullptr)
+		if (gsf_input_read(m_pImportFile, 1, pCh) != NULL)
 		{
 			ok = true;
 		}
@@ -3284,7 +3290,7 @@ bool IE_Imp_RTF::ReadContentFromFile(UT_UTF8String & str)
 /*!
   Reads a character from the file ignoring CR and LF
   \retval pCh the char read
-  \return false if an error occurred.
+  \return false if an error occured.
   \see IE_Imp_RTF::ReadCharFromFileWithCRLF
 */
 bool IE_Imp_RTF::ReadCharFromFile(unsigned char* pCh)
@@ -3504,7 +3510,7 @@ bool IE_Imp_RTF::HandleField()
 	if (tokenType == RTF_TOKEN_OPEN_BRACE)
 	{
 		UT_ByteBuf fldBuf;
-		gchar * xmlField = nullptr;
+		gchar * xmlField = NULL;
 		bool gotStarKW = false;
 		// bUseResult will to be set to false if we encounter a field
 		// instruction we know about. Otherwise, we use the result by default
@@ -3561,7 +3567,7 @@ bool IE_Imp_RTF::HandleField()
 		while ((tokenType != RTF_TOKEN_CLOSE_BRACE) || (nested >= 0));
 		bool isXML = false;
 		xmlField = _parseFldinstBlock (fldBuf, xmlField, isXML);
-		bUseResult = (xmlField == nullptr) && (!isXML);
+		bUseResult = (xmlField == NULL) && (!isXML);
 		if (!bUseResult)
 		{
 			UT_DebugOnly<bool> ok;
@@ -3733,7 +3739,7 @@ gchar *IE_Imp_RTF::_parseFldinstBlock (UT_ByteBuf & _buf, gchar *xmlField, bool 
 	if (_buf.getLength() == 0)
 	{
 		FREEP (xmlField);
-		return nullptr;
+		return NULL;
 	}
 
 	len = _buf.getLength ();
@@ -3744,14 +3750,14 @@ gchar *IE_Imp_RTF::_parseFldinstBlock (UT_ByteBuf & _buf, gchar *xmlField, bool 
 	newBuf [len] = 0;
 	Instr = newBuf;
 	instr = const_cast<char *>(Instr.c_str());
-	instr = strtok (instr, " \\{}"); // This writes a nullptr into Instr somewhere
+	instr = strtok (instr, " \\{}"); // This writes a NULL into Instr somewhere
 	                                 // I assume this is OK since the char storage
 	                                 // Within the class is contiguous.
-	if (instr == nullptr)
+	if (instr == NULL)
 	{
 		g_free (newBuf);
 		g_free (xmlField);
-		return nullptr;
+		return NULL;
 	}
 
 	switch (*instr)
@@ -3761,7 +3767,7 @@ gchar *IE_Imp_RTF::_parseFldinstBlock (UT_ByteBuf & _buf, gchar *xmlField, bool 
 		{
 			xmlField = g_strdup ("meta_creator");
 			UT_ASSERT_HARMLESS (xmlField);
-			isXML = (xmlField != nullptr);
+			isXML = (xmlField != NULL);
 		}
 		break;
 	case 'C':
@@ -3769,13 +3775,13 @@ gchar *IE_Imp_RTF::_parseFldinstBlock (UT_ByteBuf & _buf, gchar *xmlField, bool 
 		{
 			xmlField = g_strdup ("meta_date");
 			UT_ASSERT_HARMLESS (xmlField);
-			isXML = (xmlField != nullptr);
+			isXML = (xmlField != NULL);
 		}
 		else if (strcmp (instr, "COMMENTS") == 0)
 		{
 			xmlField = g_strdup ("meta_description");
 			UT_ASSERT_HARMLESS (xmlField);
-			isXML = (xmlField != nullptr);
+			isXML = (xmlField != NULL);
 		}
 		break;
 	case 'D':
@@ -3783,7 +3789,7 @@ gchar *IE_Imp_RTF::_parseFldinstBlock (UT_ByteBuf & _buf, gchar *xmlField, bool 
 		{
 			xmlField = g_strdup ("date");
 			UT_ASSERT_HARMLESS (xmlField);
-			isXML = (xmlField != nullptr);
+			isXML = (xmlField != NULL);
 		}
 		break;
 	case 'F':
@@ -3792,7 +3798,7 @@ gchar *IE_Imp_RTF::_parseFldinstBlock (UT_ByteBuf & _buf, gchar *xmlField, bool 
 			// TODO handle parameters
 			xmlField = g_strdup ("file_name");
 			UT_ASSERT_HARMLESS (xmlField);
-			isXML = (xmlField != nullptr);
+			isXML = (xmlField != NULL);
 		}
 		break;
 	case 'H':
@@ -3800,17 +3806,17 @@ gchar *IE_Imp_RTF::_parseFldinstBlock (UT_ByteBuf & _buf, gchar *xmlField, bool 
 		{
 			xxx_UT_DEBUGMSG (("RTF: HYPERLINK fieldinst not handled yet\n"));
 			// set these so that HandleField outputs the result
-			xmlField = nullptr;
+			xmlField = NULL;
 			isXML = false;
 			
-			instr = strtok(nullptr, " \\{}");
-			if (instr == nullptr)  // ignore empty hyperlinks
+			instr = strtok(0, " \\{}");
+			if (instr == NULL)  // ignore empty hyperlinks
 				break;
 
 			std::string href;
 			if ( !strcmp(instr, "l") )
 			{
-				instr = strtok (nullptr, " \\{}");
+				instr = strtok (NULL, " \\{}");
 				href = "#";
 			}
 			else
@@ -3909,7 +3915,7 @@ gchar *IE_Imp_RTF::_parseFldinstBlock (UT_ByteBuf & _buf, gchar *xmlField, bool 
 		{
 			xmlField = g_strdup ("meta_keywords");
 			UT_ASSERT_HARMLESS (xmlField);
-			isXML = (xmlField != nullptr);
+			isXML = (xmlField != NULL);
 		}
 		break;
 	case 'P':
@@ -3917,7 +3923,7 @@ gchar *IE_Imp_RTF::_parseFldinstBlock (UT_ByteBuf & _buf, gchar *xmlField, bool 
 		{
 			xmlField = g_strdup ("page_number");
 			UT_ASSERT_HARMLESS (xmlField);
-			isXML = (xmlField != nullptr);
+			isXML = (xmlField != NULL);
 		}
 		else if (strcmp (instr, "PRIVATE") == 0)
 		{
@@ -3929,20 +3935,20 @@ gchar *IE_Imp_RTF::_parseFldinstBlock (UT_ByteBuf & _buf, gchar *xmlField, bool 
 		{
 			xmlField = g_strdup ("char_count");
 			UT_ASSERT_HARMLESS (xmlField);
-			isXML = (xmlField != nullptr);
+			isXML = (xmlField != NULL);
 		}
 		// this one have been found with ApplixWare exported RTF.
 		else if (strcmp (instr, "NUMPAGES") == 0)
 		{
 			xmlField = g_strdup ("page_count");
 			UT_ASSERT_HARMLESS (xmlField);
-			isXML = (xmlField != nullptr);
+			isXML = (xmlField != NULL);
 		}
 		else if (strcmp (instr, "NUMWORDS") == 0)
 		{
 			xmlField = g_strdup ("word_count");
 			UT_ASSERT_HARMLESS (xmlField);
-			isXML = (xmlField != nullptr);
+			isXML = (xmlField != NULL);
 		}
 		break;
 	case 'S':
@@ -3950,13 +3956,13 @@ gchar *IE_Imp_RTF::_parseFldinstBlock (UT_ByteBuf & _buf, gchar *xmlField, bool 
 		{
 			xmlField = g_strdup ("date_dfl");
 			UT_ASSERT_HARMLESS (xmlField);
-			isXML = (xmlField != nullptr);
+			isXML = (xmlField != NULL);
 		}
 		else if (strcmp (instr, "SUBJECT") == 0)
 		{
 			xmlField = g_strdup ("meta_subject");
 			UT_ASSERT_HARMLESS (xmlField);
-			isXML = (xmlField != nullptr);
+			isXML = (xmlField != NULL);
 		}
 		break;
 	case 'T':
@@ -3985,75 +3991,75 @@ gchar *IE_Imp_RTF::_parseFldinstBlock (UT_ByteBuf & _buf, gchar *xmlField, bool 
 		{
 			// Some Parameters from MS Word 2000 output
 
-			if(strstr(newBuf,"dddd, MMMM dd, yyyy") != nullptr)
+			if(strstr(newBuf,"dddd, MMMM dd, yyyy") != NULL)
 			{
 				xmlField = g_strdup("date");
 				UT_ASSERT_HARMLESS (xmlField);
-				isXML = (xmlField != nullptr);
+				isXML = (xmlField != NULL);
 			}
-			else if( strstr(newBuf,"m/d/yy") != nullptr)
+			else if( strstr(newBuf,"m/d/yy") != NULL)
 			{
 				xmlField = g_strdup("date_ddmmyy");
 				UT_ASSERT_HARMLESS (xmlField);
-				isXML = (xmlField != nullptr);
+				isXML = (xmlField != NULL);
 			}
-			else if( strstr(newBuf,"MMMM d, yyyy") != nullptr)
+			else if( strstr(newBuf,"MMMM d, yyyy") != NULL)
 			{
 				xmlField = g_strdup("date_mdy");
 				UT_ASSERT_HARMLESS (xmlField);
-				isXML = (xmlField != nullptr);
+				isXML = (xmlField != NULL);
 			}
-			else if( strstr(newBuf,"MMM d, yy") != nullptr)
+			else if( strstr(newBuf,"MMM d, yy") != NULL)
 			{
 				xmlField = g_strdup("date_mthdy");
 				UT_ASSERT_HARMLESS (xmlField);
-				isXML = (xmlField != nullptr);
+				isXML = (xmlField != NULL);
 			}
-			else if( strstr(newBuf,"MMM d, yy") != nullptr)
+			else if( strstr(newBuf,"MMM d, yy") != NULL)
 			{
 				xmlField = g_strdup("date_mthdy");
 				UT_ASSERT_HARMLESS (xmlField);
-				isXML = (xmlField != nullptr);
+				isXML = (xmlField != NULL);
 			}
-			else if( strstr(newBuf,"MM-d-yy") != nullptr)
+			else if( strstr(newBuf,"MM-d-yy") != NULL)
 			{
 				xmlField = g_strdup("date_ntdfl");
 				UT_ASSERT_HARMLESS (xmlField);
-				isXML = (xmlField != nullptr);
+				isXML = (xmlField != NULL);
 			}
-			else if( strstr(newBuf,"HH:mm:ss") != nullptr)
+			else if( strstr(newBuf,"HH:mm:ss") != NULL)
 			{
 				xmlField = g_strdup("time_miltime");
 				UT_ASSERT_HARMLESS (xmlField);
-				isXML = (xmlField != nullptr);
+				isXML = (xmlField != NULL);
 			}
-			else if( strstr(newBuf,"h:mm:ss am/pm") != nullptr)
+			else if( strstr(newBuf,"h:mm:ss am/pm") != NULL)
 			{
 				xmlField = g_strdup("time_ampm");
 				UT_ASSERT_HARMLESS (xmlField);
-				isXML = (xmlField != nullptr);
+				isXML = (xmlField != NULL);
 			}
 //
 // Make this the second last one since it's not unique
 //
-			else if( strstr(newBuf,"dddd") != nullptr)
+			else if( strstr(newBuf,"dddd") != NULL)
 			{
 				xmlField = g_strdup("date_wkday");
 				UT_ASSERT_HARMLESS (xmlField);
-				isXML = (xmlField != nullptr);
+				isXML = (xmlField != NULL);
 			}
 			else
 			{
 				xmlField = g_strdup ("time");
 				UT_ASSERT_HARMLESS (xmlField);
-				isXML = (xmlField != nullptr);
+				isXML = (xmlField != NULL);
 			}
 		}
 		if (strcmp (instr, "TITLE") == 0)
 		{
 			xmlField = g_strdup ("meta_title");
 			UT_ASSERT_HARMLESS (xmlField);
-			isXML = (xmlField != nullptr);
+			isXML = (xmlField != NULL);
 		}
 		else if (strcmp (instr, "TOC") == 0)
 		{
@@ -4063,17 +4069,17 @@ gchar *IE_Imp_RTF::_parseFldinstBlock (UT_ByteBuf & _buf, gchar *xmlField, bool 
 #if 0
 			if(!m_bParaWrittenForSection)
 			{
-				getDoc()->appendStrux(PTX_Block, nullptr);
+				getDoc()->appendStrux(PTX_Block, NULL);
 				m_bParaWrittenForSection = true;
 			}
 
-			getDoc()->appendStrux(PTX_SectionTOC, nullptr);
-			getDoc()->appendStrux(PTX_EndTOC, nullptr);
+			getDoc()->appendStrux(PTX_SectionTOC, NULL);
+			getDoc()->appendStrux(PTX_EndTOC, NULL);
 
 			// DAL: hack
 			xmlField = g_strdup ("");
 			UT_ASSERT_HARMLESS (xmlField);
-			isXML = (xmlField != nullptr);
+			isXML = (xmlField != NULL);
 #endif
 		}
 		
@@ -4084,7 +4090,7 @@ gchar *IE_Imp_RTF::_parseFldinstBlock (UT_ByteBuf & _buf, gchar *xmlField, bool 
 			// TODO handle parameters
 			xmlField = g_strdup ("date");
 			UT_ASSERT_HARMLESS (xmlField);
-			isXML = (xmlField != nullptr);
+			isXML = (xmlField != NULL);
 		}
 		break;
 	case '\\':
@@ -4093,18 +4099,18 @@ gchar *IE_Imp_RTF::_parseFldinstBlock (UT_ByteBuf & _buf, gchar *xmlField, bool 
 		{
 			xmlField = g_strdup ("file_name");
 			UT_ASSERT_HARMLESS (xmlField);
-			isXML = (xmlField != nullptr);
+			isXML = (xmlField != NULL);
 		}
 		else if (strcmp (instr, "\\import") == 0)
 		{
 			// need to read the filename.
 			UT_DEBUGMSG (("importing StarOffice image\n"));
 
-			if (m_szFileDirName	!= nullptr)
+			if (m_szFileDirName	!= NULL)
 			{
-				char * fileName = nullptr;
-				char * tok  = strtok (nullptr, " ");
-				fileName = g_build_filename (m_szFileDirName, tok, nullptr);
+				char * fileName = NULL;
+				char * tok  = strtok (NULL, " ");
+				fileName = g_build_filename (m_szFileDirName, tok, NULL);
 				UT_DEBUGMSG (("fileName is %s\n", fileName));
 
 				bool ok = FlushStoredChars ();
@@ -4137,7 +4143,7 @@ gchar *IE_Imp_RTF::_parseFldinstBlock (UT_ByteBuf & _buf, gchar *xmlField, bool 
 		{
 			xmlField = g_strdup ("page_number");
 			UT_ASSERT_HARMLESS (xmlField);
-			isXML = (xmlField != nullptr);
+			isXML = (xmlField != NULL);
 		}
 		break;
 	default:
@@ -4241,7 +4247,7 @@ bool IE_Imp_RTF::TranslateKeywordID(RTF_KEYWORD_ID keywordID,
 	{
 	case RTF_KW_ansicpg:
 	{
-		const char *szEncoding = nullptr;
+		const char *szEncoding = NULL;
 		if(param == -1)
 		{
 			// IE issues this value on copy (ctrl+c), and I could not find out from anywhere what it is
@@ -4726,13 +4732,13 @@ bool IE_Imp_RTF::TranslateKeywordID(RTF_KEYWORD_ID keywordID,
 		return _appendField ("time");
 	case RTF_KW_chdpl:
 	{
-		const gchar * attribs[3] ={"param",nullptr,nullptr};
+		const gchar * attribs[3] ={"param",NULL,NULL};
 		attribs[1] = "%A, %B %d, %Y";
 		return _appendField ("datetime_custom", attribs);
 	}
 	case RTF_KW_chdpa:
 	{
-//		const gchar * attribs[3] ={"param",nullptr,nullptr};
+//		const gchar * attribs[3] ={"param",NULL,NULL};
 //		attribs[1] = "%a, %b %d, %Y";
 		return _appendField ("datetime_custom");
 	}
@@ -4909,13 +4915,13 @@ bool IE_Imp_RTF::TranslateKeywordID(RTF_KEYWORD_ID keywordID,
 		if(bUseInsertNotAppend())
 		{
 			XAP_Frame * pFrame = XAP_App::getApp()->getLastFocussedFrame();
-			if(pFrame == nullptr)
+			if(pFrame == NULL)
 			{
 				m_currentRTFState.m_destinationState = RTFStateStore::rdsSkip;
 				return true;
 			}
 			FV_View * pView = static_cast<FV_View*>(pFrame->getCurrentView());
-			if(pView == nullptr)
+			if(pView == NULL)
 			{
 				m_currentRTFState.m_destinationState = RTFStateStore::rdsSkip;
 				return true;
@@ -5477,7 +5483,7 @@ bool IE_Imp_RTF::TranslateKeywordID(RTF_KEYWORD_ID keywordID,
 		if(getTable())
 		{
 			double dLeftPos = static_cast<double>(param)/1440.0;
-			std::string sLeftPos = UT_formatDimensionString(DIM_IN,dLeftPos,nullptr);
+			std::string sLeftPos = UT_formatDimensionString(DIM_IN,dLeftPos,NULL);
 			getTable()->setProp("table-column-leftpos",sLeftPos);
 		}
 		return true;
@@ -5492,7 +5498,7 @@ bool IE_Imp_RTF::TranslateKeywordID(RTF_KEYWORD_ID keywordID,
 			m_bRowJustPassed = false;
 			m_bDoCloseTable = false;
 			UT_DEBUGMSG(("Doing trowd \n"));
-			if(getTable() == nullptr)
+			if(getTable() == NULL)
 			{
 				OpenTable();
 				m_currentRTFState.m_paraProps.m_tableLevel = m_TableControl.getNestDepth();
@@ -5789,7 +5795,7 @@ bool IE_Imp_RTF::HandleStarKeyword()
 					if(m_iIsInHeaderFooter == 0)
 					{
 						XAP_Frame * pFrame = XAP_App::getApp()->getLastFocussedFrame();
-						if(pFrame == nullptr)
+						if(pFrame == NULL)
 						{
 							m_iIsInHeaderFooter =1;
 							m_currentRTFState.m_destinationState = RTFStateStore::rdsSkip;
@@ -5798,7 +5804,7 @@ bool IE_Imp_RTF::HandleStarKeyword()
 						// TODO fix this as it appears to be a real hack. We shouldn't have access to 
 						// this from importers.
 						FV_View * pView = static_cast<FV_View*>(pFrame->getCurrentView());
-						if(pView == nullptr)
+						if(pView == NULL)
 						{
 							m_iIsInHeaderFooter =1;
 							m_currentRTFState.m_destinationState = RTFStateStore::rdsSkip;
@@ -5911,13 +5917,13 @@ bool IE_Imp_RTF::HandleStarKeyword()
 					if(bUseInsertNotAppend())
 					{
 						XAP_Frame * pFrame = XAP_App::getApp()->getLastFocussedFrame();
-						if(pFrame == nullptr)
+						if(pFrame == NULL)
 						{
 							m_currentRTFState.m_destinationState = RTFStateStore::rdsSkip;
 							return true;
 						}
 						FV_View * pView = static_cast<FV_View*>(pFrame->getCurrentView());
-						if(pView == nullptr)
+						if(pView == NULL)
 						{
 							m_currentRTFState.m_destinationState = RTFStateStore::rdsSkip;
 							return true;
@@ -5980,7 +5986,7 @@ bool IE_Imp_RTF::HandleStarKeyword()
 					
 				case RTF_KW_atnid:
 				{
-					if(nullptr == m_pAnnotation)
+					if(NULL == m_pAnnotation)
 					{
 						StartAnnotation();
 						UT_DEBUGMSG(("found atnid without annotation\n"));
@@ -5999,7 +6005,7 @@ bool IE_Imp_RTF::HandleStarKeyword()
 					//
 					// Annotation Author
 					UT_DEBUGMSG(("Handling atnauthor keyword \n"));
-					if(nullptr == m_pAnnotation)
+					if(NULL == m_pAnnotation)
 					{
 						StartAnnotation();
 						UT_DEBUGMSG(("found atnauthor without annotation\n"));
@@ -6017,8 +6023,8 @@ bool IE_Imp_RTF::HandleStarKeyword()
 				{
 					//
 					// date of the annotation
-					UT_DEBUGMSG(("Found annotation date %p \n", (void*)m_pAnnotation));
-					if(nullptr == m_pAnnotation)
+					UT_DEBUGMSG(("Found annotation date %p \n",m_pAnnotation));
+					if(NULL == m_pAnnotation)
 					{
 						UT_DEBUGMSG(("found atndate without annotation"));
 						return true;
@@ -6033,8 +6039,8 @@ bool IE_Imp_RTF::HandleStarKeyword()
 				{
 					//
 					// Annotation content
-					UT_DEBUGMSG(("Found annotation content m_pAnnotation %p \n", (void*)m_pAnnotation));
-					if(m_pAnnotation == nullptr)
+					UT_DEBUGMSG(("Found annotation content m_pAnnotation %p \n",m_pAnnotation));
+					if(m_pAnnotation == NULL)
 					{
 						UT_DEBUGMSG(("found annotation without annotation"));
 						return true;
@@ -6083,9 +6089,9 @@ void IE_Imp_RTF::StartAnnotation()
 {
 	//
 	// Start of Annotated region
-	if(m_pAnnotation == nullptr)
+	if(m_pAnnotation == NULL)
 		m_pAnnotation = new ABI_RTF_Annotation();
-	UT_DEBUGMSG(("created m_pAnnotation %p \n", (void*)m_pAnnotation));
+	UT_DEBUGMSG(("created m_pAnnotation %p \n",m_pAnnotation));
 	m_pAnnotation->m_iAnnNumber = ABI_RTF_Annotation::newNumber();
 
 	PP_PropertyVector attr = {
@@ -6116,7 +6122,7 @@ void IE_Imp_RTF::EndAnnotation()
 	//
 	// End of Annotated region
 	UT_DEBUGMSG(("found annotation end \n"));
-	if(nullptr == m_pAnnotation)
+	if(NULL == m_pAnnotation)
 	{
 		UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
 		return;
@@ -6289,7 +6295,7 @@ bool IE_Imp_RTF::buildCharacterProps(std::string & propBuffer)
 	propBuffer += UT_std_string_sprintf("; font-size:%spt", std_size_string(static_cast<float>(m_currentRTFState.m_charProps.m_fontSize)));
 	// typeface
 	RTFFontTableItem* pFont = GetNthTableFont(m_currentRTFState.m_charProps.m_fontNumber);
-	if (pFont != nullptr)
+	if (pFont != NULL)
 	{
 		propBuffer += "; font-family:";
 
@@ -6298,7 +6304,7 @@ bool IE_Imp_RTF::buildCharacterProps(std::string & propBuffer)
 		// note the empty slot after the panose entry
 		// later it gets referenced: {\b\f83\fs24\cf1\cgrid0 Malte Cornils
 		// this turns those into "Times New Roman" for now, as a hack to keep from crashing
-		if ( pFont->m_pFontName != nullptr )
+		if ( pFont->m_pFontName != NULL )
 			propBuffer += pFont->m_pFontName;
 		else
 			propBuffer += "Times New Roman";
@@ -6327,7 +6333,7 @@ bool IE_Imp_RTF::buildCharacterProps(std::string & propBuffer)
 		propBuffer += UT_std_string_sprintf("; list-tag:%d",m_currentRTFState.m_charProps.m_listTag);
 	}
 
-	if (m_currentRTFState.m_charProps.m_szLang != nullptr)
+	if(m_currentRTFState.m_charProps.m_szLang != 0)
 	{
 		propBuffer += "; lang:";
 		propBuffer += m_currentRTFState.m_charProps.m_szLang;
@@ -6351,7 +6357,7 @@ bool IE_Imp_RTF::buildCharacterProps(std::string & propBuffer)
  */
 bool IE_Imp_RTF::bUseInsertNotAppend(void)
 {
-	return ((m_pImportFile == nullptr) && !m_parsingHdrFtr );
+	return ((m_pImportFile == NULL) && !m_parsingHdrFtr );
 }
 
 // in non-bidi doc we just append the current format and text; in bidi
@@ -6449,7 +6455,7 @@ bool IE_Imp_RTF::_appendSpan()
 							if(!getDoc()->insertFmtMarkBeforeFrag(m_pDelayedFrag, propsArray)) {
 								return false;
 							}
-							UT_DEBUGMSG(("Appending span before %p \n", (void*)m_pDelayedFrag));
+							UT_DEBUGMSG(("Appending span before %p \n",m_pDelayedFrag));
 							if(!getDoc()->insertSpanBeforeFrag(m_pDelayedFrag,p, i- iLast)) {
 								return false;
 							}
@@ -6898,7 +6904,7 @@ UT_uint32 IE_Imp_RTF::mapID(UT_uint32 id)
 // Handle case of no id in any lists. If this is the case no need to remap
 //
 	fl_AutoNumConstPtr pAuto1 = getDoc()->getListByID(id);
-	if(pAuto1 == nullptr)
+	if(pAuto1 == NULL)
 	{
 	        return id;
 	}
@@ -6954,7 +6960,7 @@ UT_uint32 IE_Imp_RTF::mapID(UT_uint32 id)
 						}
 					}
 				}
-				if(pMapAuto == nullptr )
+				if(pMapAuto == NULL )
 				{
 					mappedID = getDoc()->getUID(UT_UniqueId::List);
 				}
@@ -7068,7 +7074,7 @@ bool IE_Imp_RTF::ApplyParagraphAttributes(bool bDontInsert)
 //
 // Determine if we've dropped out of a table
 //
-	if(getTable() != nullptr)
+	if(getTable() != NULL)
 	{
 		if(!m_currentRTFState.m_paraProps.m_bInTable)
 		{
@@ -7081,7 +7087,7 @@ bool IE_Imp_RTF::ApplyParagraphAttributes(bool bDontInsert)
 	bool bWord97List = m_currentRTFState.m_paraProps.m_isList && isWord97Lists();
 	bool bAbiList = m_currentRTFState.m_paraProps.m_isList && ( 0 != m_currentRTFState.m_paraProps.m_rawID);
 	bWord97List = bWord97List && !bAbiList;
-	RTF_msword97_listOverride * pOver = nullptr;
+	RTF_msword97_listOverride * pOver = NULL;
 	UT_uint32 iLevel = 0;
 	UT_uint32 iOverride = 0;
 //
@@ -7095,7 +7101,7 @@ bool IE_Imp_RTF::ApplyParagraphAttributes(bool bDontInsert)
 	}
 
 	// tabs
-	if ((pOver != nullptr && pOver->isTab(iLevel)))
+	if ((pOver != NULL && pOver->isTab(iLevel)))
 	{
 //
 // The Word 97 RTF list definition has some extra tab stops. Add them here.
@@ -7271,16 +7277,16 @@ bool IE_Imp_RTF::ApplyParagraphAttributes(bool bDontInsert)
 //
 // Now get the properties we've painstakingly put together.
 //
-		const char * szListID = nullptr;
-		const char * szParentID = nullptr;
-		const char * szLevel = nullptr;
-		const char * szStartat = nullptr;
-		const char * szFieldFont = nullptr;
-		const char * szListDelim = nullptr;
-		const char * szListDecimal = nullptr;
-		const char * szAlign = nullptr;
-		const char * szIndent = nullptr;
-		const char * szListStyle = nullptr;
+		const char * szListID = NULL;
+		const char * szParentID = NULL;
+		const char * szLevel = NULL;
+		const char * szStartat = NULL;
+		const char * szFieldFont = NULL;
+		const char * szListDelim = NULL;
+		const char * szListDecimal = NULL;
+		const char * szAlign = NULL;
+		const char * szIndent = NULL;
+		const char * szListStyle = NULL;
 		pOver->buildAbiListProperties( &szListID, &szParentID, &szLevel, &szStartat, &szFieldFont,
 									   &szListDelim, &szListDecimal, &szAlign, &szIndent,
 									   &szListStyle, iLevel);
@@ -7397,7 +7403,7 @@ bool IE_Imp_RTF::ApplyParagraphAttributes(bool bDontInsert)
 		if(pOver->isFontNumberChanged(iLevel))
 		{
 			RTFFontTableItem* pFont = GetNthTableFont(pOver->getFontNumber(iLevel));
-			if (pFont != nullptr)
+			if (pFont != NULL)
 			{
 				propBuffer += " font-family:";
 				propBuffer += pFont->m_pFontName;
@@ -7696,9 +7702,9 @@ bool IE_Imp_RTF::ApplyParagraphAttributes(bool bDontInsert)
 		}
 		else if(bUseInsertNotAppend())
 		{
-			ABI_Paste_Table * pPaste = nullptr;
+			ABI_Paste_Table * pPaste = NULL;		
 			m_pasteTableStack.viewTop((void**)(&pPaste));
-			if(pPaste != nullptr)
+			if(pPaste != NULL)
 			{
 				if(!pPaste->m_bHasPastedCellStrux && pPaste->m_bHasPastedTableStrux)
 				{
@@ -7721,7 +7727,7 @@ bool IE_Imp_RTF::ApplyParagraphAttributes(bool bDontInsert)
 			//
 			// Now check if this strux has associated list element. If so stop the list!
 			//
-			pf_Frag_Strux* sdh = nullptr;
+			pf_Frag_Strux* sdh = NULL;
 			getDoc()->getStruxOfTypeFromPosition(m_dposPaste,PTX_Block,&sdh);
 			bool bisListItem = false;
 			//
@@ -7744,7 +7750,7 @@ bool IE_Imp_RTF::ApplyParagraphAttributes(bool bDontInsert)
 				//
 				if(bisListItem)
 				{
-					UT_DEBUGMSG(("SEVIOR: Stopping list at %p \n", (void*)sdh));
+					UT_DEBUGMSG(("SEVIOR: Stopping list at %p \n",sdh));
 					getDoc()->StopList(sdh);
 				}
 				iLoop--;
@@ -7999,12 +8005,12 @@ bool IE_Imp_RTF::ApplySectionAttributes()
 			if(m_posSavedDocPosition > 0)
 				m_posSavedDocPosition--;
 			XAP_Frame * pFrame = XAP_App::getApp()->getLastFocussedFrame();
-			if(pFrame == nullptr)
+			if(pFrame == NULL)
 			{
 				return false;
 			}
 			FV_View * pView = static_cast<FV_View*>(pFrame->getCurrentView());
-			if(pView == nullptr)
+			if(pView == NULL)
 			{
 				return false;
 			}
@@ -8045,7 +8051,7 @@ bool IE_Imp_RTF::ApplySectionAttributes()
  *         Current read point.
  * It will return {\key1 fred;} {\key2 fred2} {\key3 {\key4 fred}}  and
  * swallow the closing brace.
- * returns nullptr on error.
+ * returns NULL on error.
  */
 char * IE_Imp_RTF::getCharsInsideBrace(void)
 {
@@ -8060,7 +8066,7 @@ char * IE_Imp_RTF::getCharsInsideBrace(void)
 	while(nesting > 0 && count < MAX_KEYWORD_LEN - 1)
 	{
 		if (!ReadCharFromFile(&ch))
-			return nullptr;
+			return NULL;
 		if( nesting == 1 && (ch == '}'  || ch == ';'))
 		{
 			nesting--;
@@ -8084,7 +8090,7 @@ char * IE_Imp_RTF::getCharsInsideBrace(void)
 // Swallow closing brace if ";}" finishes
 //
 		if (!ReadCharFromFile(&ch))
-			return nullptr;
+			return NULL;
 //
 // if character is not a '}' put it back in the input stream.
 //
@@ -8360,11 +8366,11 @@ bool IE_Imp_RTF::HandleListLevel(RTF_msword97_list * pList, UT_uint32 levelCount
 	else
 	{
 		pLevel->m_listDelim = "%L";
-		if (strstr(szLevelText.c_str(),"u-3913") != nullptr)
+		if(strstr(szLevelText.c_str(),"u-3913") != 0)
 		{
 			pLevel->m_RTFListType = 23; // Bulleted List
 		}
-		if (strstr(szLevelText.c_str(),"u-3880") != nullptr)
+		if(strstr(szLevelText.c_str(),"u-3880") != 0)
 		{
 			pLevel->m_RTFListType = 23 + IMPLIES_LIST; // IMPLIES List
 		}
@@ -8432,7 +8438,7 @@ bool IE_Imp_RTF::ParseCharParaProps( unsigned char * pKeyword,
 	{
 		UT_uint32 fontNumber = (UT_uint32) (fParam ? param : 0);
 		RTFFontTableItem* pFont = GetNthTableFont(fontNumber);
-		if (pFont != nullptr && pFont->m_szEncoding)
+		if (pFont != NULL && pFont->m_szEncoding)
 			m_mbtowc.setInCharset(pFont->m_szEncoding);
 
 		pbChars->bm_fontNumber = true;
@@ -8683,7 +8689,7 @@ bool IE_Imp_RTF::ReadListOverrideTable(void)
 /*!
   Get list override of given id
   \param id Id of list override
-  \return List override or nullptr if not found
+  \return List override or NULL if not found
 
   The old code in ApplyParagraphAttributes would use the given
   id as an index to the vector of list overrides. But these
@@ -8710,7 +8716,7 @@ IE_Imp_RTF::_getTableListOverride(UT_uint32 id)
 
 	// Client requested a list override that was not defined.
 	UT_ASSERT_NOT_REACHED();
-	return nullptr;
+	return NULL;
 }
 
 bool IE_Imp_RTF::HandleTableListOverride(void)
@@ -8801,7 +8807,7 @@ IE_Imp_RTF::s_unEscapeXMLString()
 
 	// We want &7d;&7d; -> &7d;
 	// And         &7d; -> }
-	// as we know there are no occurrences of }} in the string
+	// as we know there are no occurances of }} in the string
 	// we use that as a temporary state to hold the case of two 7d in a row.
 	s = replace_all( s, "&7d;&7d;", "}}" );
 	s = replace_all( s, "&7d;", "}" );
@@ -8935,8 +8941,8 @@ bool IE_Imp_RTF::ReadFontTable()
 	UT_Stack stateStack;
 	// RTF state pointers.
 	struct SFontTableState *currentState = new SFontTableState;
-	UT_DEBUGMSG(("Made new currentState -1 %p \n", (void*)currentState));
-	struct SFontTableState *oldState = nullptr;
+	UT_DEBUGMSG(("Made new currentState -1 %p \n",currentState));
+	struct SFontTableState *oldState = NULL;
 	UT_sint32 i;                         // Generic loop index.
 
 	// Initialise the current state.
@@ -8967,7 +8973,7 @@ bool IE_Imp_RTF::ReadFontTable()
 			stateStack.push(reinterpret_cast<void*>(currentState));
 			// ...allocate a new one...
 			currentState = new SFontTableState;
-			UT_DEBUGMSG(("Made new currentState -2 %p \n", (void*)currentState));
+			UT_DEBUGMSG(("Made new currentState -2 %p \n",currentState));
 			if (!currentState) {
 				UT_DEBUGMSG(("RTF: Out of memory.\n"));
 				goto IEImpRTF_ReadFontTable_ErrorExit;
@@ -8980,7 +8986,7 @@ bool IE_Imp_RTF::ReadFontTable()
 			break;
 		case RTF_TOKEN_CLOSE_BRACE:
 			// Throw away the current state.
-			UT_DEBUGMSG(("Deleting currentState -4 %p \n", (void*)currentState));
+			UT_DEBUGMSG(("Deleting currentState -4 %p \n",currentState));
 			DELETEP(currentState);
 			// Pop an old state off the stack .
 			if (!stateStack.pop(reinterpret_cast<void**>(&currentState))) 
@@ -8990,7 +8996,7 @@ bool IE_Imp_RTF::ReadFontTable()
 				bFoundFinalClosingBracket = true;
 				// Put the closing brace back onto the input stream.
 				SkipBackChar('}');
-				currentState = nullptr;
+				currentState = NULL;
 			}
 			break;
 		case RTF_TOKEN_DATA:
@@ -9180,7 +9186,7 @@ bool IE_Imp_RTF::ReadFontTable()
 			break;
 		} // Token type switch
 	}; // while (we've finished reading the font entry).
-	UT_DEBUGMSG(("Deleting currentState -2 %p \n", (void*)currentState));
+	UT_DEBUGMSG(("Deleting currentState -2 %p \n",currentState));
 	DELETEP(currentState);
 	return true;
 
@@ -9191,11 +9197,11 @@ bool IE_Imp_RTF::ReadFontTable()
 IEImpRTF_ReadFontTable_ErrorExit:
 	UT_DEBUGMSG(("RTF: ReadFontTable: Freeing memory due to error.\n"));
 	// Delete the current state and everything on the state stack.
-	UT_DEBUGMSG(("Deleting currentState -2 %p \n", (void*)currentState));
+	UT_DEBUGMSG(("Deleting currentState -2 %p \n",currentState));
 	DELETEP(currentState);
 	while (stateStack.pop(reinterpret_cast<void**>(&currentState))) 
 	{
-		UT_DEBUGMSG(("Deleting currentState -3  %p \n", (void*)currentState));
+		UT_DEBUGMSG(("Deleting currentState -3  %p \n",currentState));
 		DELETEP(currentState);
 	}
 	return false;
@@ -9222,16 +9228,16 @@ bool IE_Imp_RTF::RegisterFont(RTFFontTableItem::FontFamilyEnum fontFamily,
 
 	// Create the font entry and put it into the font table
 	// NB: If the font table didn't specify a font name then we want to pass
-	//     nullptrs to RTFFontTableItem() rather than zero length strings.
+	//     NULLs to RTFFontTableItem() rather than zero length strings.
 	RTFFontTableItem* pNewFont = new RTFFontTableItem(
 							fontFamily, charSet, codepage, pitch, 
 							sFontNamesAndPanose[SFontTableState::Panose].length() ?
-							  sFontNamesAndPanose[SFontTableState::Panose].utf8_str() : nullptr,
+							  sFontNamesAndPanose[SFontTableState::Panose].utf8_str() : NULL,
 							sFontNamesAndPanose[SFontTableState::MainFontName].length() ?
-							  sFontNamesAndPanose[SFontTableState::MainFontName].utf8_str() : nullptr,
+							  sFontNamesAndPanose[SFontTableState::MainFontName].utf8_str() : NULL,
 							sFontNamesAndPanose[SFontTableState::AltFontName].length() ? 
-							  sFontNamesAndPanose[SFontTableState::AltFontName].utf8_str() : nullptr);
-	if (pNewFont == nullptr)
+							  sFontNamesAndPanose[SFontTableState::AltFontName].utf8_str() : NULL);
+	if (pNewFont == NULL)
 	{
 		return false;
 	}
@@ -9239,9 +9245,9 @@ bool IE_Imp_RTF::RegisterFont(RTFFontTableItem::FontFamilyEnum fontFamily,
 	// ensure that the font table is large enough for this index
 	while (m_fontTable.size() <= fontIndex)
 	{
-		m_fontTable.push_back(nullptr);
+		m_fontTable.push_back(NULL);
 	}
-	RTFFontTableItem* pOld = nullptr;
+	RTFFontTableItem* pOld = NULL;
 	// some RTF files define the fonts several time. This is INVALID according to the
 	// specifications. So we ignore it.
 
@@ -9251,11 +9257,11 @@ bool IE_Imp_RTF::RegisterFont(RTFFontTableItem::FontFamilyEnum fontFamily,
 	#else
 		#pragma message("WARNING: maybe not the right behaviour" __FILE__)
 	#endif
-	if (m_fontTable[fontIndex] == nullptr)
+	if (m_fontTable[fontIndex] == NULL)
 	{
 		pOld = m_fontTable[fontIndex];
 		m_fontTable[fontIndex] = pNewFont;
-		UT_return_val_if_fail(pOld == nullptr, false);
+		UT_return_val_if_fail(pOld == NULL, false);
 	}
 	else
 	{
@@ -9828,13 +9834,13 @@ bool IE_Imp_RTF::HandleAbiMathml(void)
 	else
 	{
 		XAP_Frame * pFrame = XAP_App::getApp()->getLastFocussedFrame();
-		if(pFrame == nullptr)
+		if(pFrame == NULL)
 		{
 			 m_currentRTFState.m_destinationState = RTFStateStore::rdsSkip;
 			 return true;
 		}
 		FV_View * pView = static_cast<FV_View*>(pFrame->getCurrentView());
-		if(pView == nullptr)
+		if(pView == NULL)
 		{
 			m_currentRTFState.m_destinationState = RTFStateStore::rdsSkip;
 			return true;
@@ -9947,7 +9953,7 @@ bool IE_Imp_RTF::CreateDataItemfromStream(void)
 	SkipBackChar(ch);
 	
 	UT_ConstByteBufPtr bb;
-	bFound = getDoc()->getDataItemDataByName(sName.utf8_str(), bb, nullptr, nullptr);
+	bFound = getDoc()->getDataItemDataByName(sName.utf8_str(), bb, NULL, NULL);
 	if(bFound)
 	{
 		return true;
@@ -9956,7 +9962,7 @@ bool IE_Imp_RTF::CreateDataItemfromStream(void)
 	// Now create the data item from the RTF data stream
 	//
 	
-	retval = getDoc()->createDataItem(sName.utf8_str(), false, BinData, mime, nullptr);
+	retval = getDoc()->createDataItem(sName.utf8_str(), false, BinData, mime, NULL);
 	return retval;
 
 }
@@ -10023,13 +10029,13 @@ bool IE_Imp_RTF::HandleAbiEmbed(void)
 	else
 	{
 		XAP_Frame * pFrame = XAP_App::getApp()->getLastFocussedFrame();
-		if(pFrame == nullptr)
+		if(pFrame == NULL)
 		{
 			 m_currentRTFState.m_destinationState = RTFStateStore::rdsSkip;
 			 return true;
 		}
 		FV_View * pView = static_cast<FV_View*>(pFrame->getCurrentView());
-		if(pView == nullptr)
+		if(pView == NULL)
 		{
 			m_currentRTFState.m_destinationState = RTFStateStore::rdsSkip;
 			return true;
@@ -10075,17 +10081,17 @@ bool IE_Imp_RTF::HandleAbiTable(void)
 	
 	UT_DEBUGMSG(("RTF_Import: Paste: Tables props are: %s \n",sProps.c_str()));
 	bool bIsPasteIntoSame = false;
-	pf_Frag_Strux* sdhTable = nullptr;
-	pf_Frag_Strux* sdhEndTable = nullptr;
+	pf_Frag_Strux* sdhTable = NULL;
+	pf_Frag_Strux* sdhEndTable = NULL;
 	bool bFound = getDoc()->getStruxOfTypeFromPosition(m_dposPaste,PTX_SectionTable,&sdhTable);
 	PT_DocPosition posTable = 0;
 	XAP_Frame * pFrame = XAP_App::getApp()->getLastFocussedFrame();
-	if(pFrame == nullptr)
+	if(pFrame == NULL)
 	{
 		return false;
 	}
 	FV_View * pView = static_cast<FV_View*>(pFrame->getCurrentView());
-	if(pView == nullptr)
+	if(pView == NULL)
 	{
 		return false;
 	}
@@ -10093,7 +10099,7 @@ bool IE_Imp_RTF::HandleAbiTable(void)
 	{
 		posTable = getDoc()->getStruxPosition(sdhTable);
 		sdhEndTable = getDoc()->getEndTableStruxFromTableSDH(sdhTable);
-		if(sdhEndTable != nullptr)
+		if(sdhEndTable != NULL)
 		{
 			PT_DocPosition posEndTable = getDoc()->getStruxPosition(sdhEndTable);
 			if(posEndTable > m_dposPaste)
@@ -10101,7 +10107,7 @@ bool IE_Imp_RTF::HandleAbiTable(void)
 				std::string sPasteTableSDH;
 				std::string sProp = "table-sdh";
 				sPasteTableSDH = UT_std_string_getPropVal(sProps,sProp);
-				std::string sThisTableSDH = UT_std_string_sprintf("%p", (void*)sdhTable);
+				std::string sThisTableSDH = UT_std_string_sprintf("%p",sdhTable);
 				UT_DEBUGMSG(("sThisTableSDH %s sPasteTableSDH %s \n",sThisTableSDH.c_str(),sPasteTableSDH.c_str()));
 				bool isRow = (pView->getSelectionMode() == FV_SelectionMode_TableRow);
 				if(!isRow && pView->getSelectionMode() == FV_SelectionMode_NONE)
@@ -10113,10 +10119,10 @@ bool IE_Imp_RTF::HandleAbiTable(void)
 					UT_DEBUGMSG(("Paste Whole Row into same Table!!!!! \n"));
 					bIsPasteIntoSame = true;
 					pPaste->m_bPasteAfterRow = true;
-					pf_Frag_Strux* sdhCell = nullptr;
+					pf_Frag_Strux* sdhCell = NULL;
 					bool b = getDoc()->getStruxOfTypeFromPosition(m_dposPaste,PTX_SectionCell,&sdhCell);
 					UT_return_val_if_fail(b,false);
-					const char * szTop = nullptr;
+					const char * szTop = NULL;
 					getDoc()->getPropertyFromSDH(sdhCell,
 												 true,
 												 PD_MAX_REVISION,
@@ -10212,9 +10218,9 @@ bool IE_Imp_RTF::HandleAbiTable(void)
 
 bool IE_Imp_RTF:: HandleAbiEndTable(void)
 {
-	ABI_Paste_Table * pPaste = nullptr;
+	ABI_Paste_Table * pPaste = NULL;
 	m_pasteTableStack.viewTop((void**)(&pPaste));
-	if(pPaste == nullptr)
+	if(pPaste == NULL)
 	{
 		return false;
 	}
@@ -10222,9 +10228,9 @@ bool IE_Imp_RTF:: HandleAbiEndTable(void)
 	{
 		UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
 		UT_sint32 numRows = pPaste->m_iCurTopCell -pPaste->m_iRowNumberAtPaste;
-		pf_Frag_Strux* sdhCell = nullptr;
-		pf_Frag_Strux* sdhTable = nullptr;
-		pf_Frag_Strux* sdhEndTable = nullptr;
+		pf_Frag_Strux* sdhCell = NULL;
+		pf_Frag_Strux* sdhTable = NULL;
+		pf_Frag_Strux* sdhEndTable = NULL;
 		bool b = getDoc()->getStruxOfTypeFromPosition(m_dposPaste,PTX_SectionTable,&sdhTable);
 		UT_return_val_if_fail(b,false);
 		sdhEndTable = getDoc()->getEndTableStruxFromTableSDH(sdhTable);
@@ -10233,7 +10239,7 @@ bool IE_Imp_RTF:: HandleAbiEndTable(void)
 		b = getDoc()->getStruxOfTypeFromPosition(m_dposPaste,PTX_SectionCell,&sdhCell);
 		b = getDoc()->getNextStruxOfType(sdhCell,PTX_SectionCell,&sdhCell);
 
-		const char * szVal = nullptr;
+		const char * szVal = NULL;
 		PT_DocPosition posCell = getDoc()->getStruxPosition(sdhCell);
 		while(b && (posCell < posEndTable))
 		{
@@ -10283,9 +10289,9 @@ bool IE_Imp_RTF::markPasteBlock(void)
 	{
 		return false;
 	}
-	ABI_Paste_Table * pPaste = nullptr;
+	ABI_Paste_Table * pPaste = NULL;
 	m_pasteTableStack.viewTop((void**)(&pPaste));
-	if(pPaste == nullptr)
+	if(pPaste == NULL)
 	{
 		return false;
 	}
@@ -10299,13 +10305,13 @@ bool IE_Imp_RTF::markPasteBlock(void)
 
 bool IE_Imp_RTF::isBlockNeededForPasteTable(void)
 {
-	ABI_Paste_Table * pPaste = nullptr;
+	ABI_Paste_Table * pPaste = NULL;
 	if(m_pasteTableStack.getDepth() == 0)
 	{
 		return false;
 	}
 	m_pasteTableStack.viewTop((void**)(&pPaste));
-	if(pPaste == nullptr)
+	if(pPaste == NULL)
 	{
 		return false;
 	}
@@ -10318,9 +10324,9 @@ bool IE_Imp_RTF::isBlockNeededForPasteTable(void)
 
 bool IE_Imp_RTF::HandleAbiEndCell(void)
 {
-	ABI_Paste_Table * pPaste = nullptr;
+	ABI_Paste_Table * pPaste = NULL;
 	m_pasteTableStack.viewTop((void**)(&pPaste));
-	if(pPaste == nullptr)
+	if(pPaste == NULL)
 	{
 		return false;
 	}
@@ -10357,9 +10363,9 @@ bool IE_Imp_RTF::HandleAbiCell(void)
 			return false;
 	}
 
-	ABI_Paste_Table * pPaste = nullptr;
+	ABI_Paste_Table * pPaste = NULL;
 	m_pasteTableStack.viewTop((void**)(&pPaste));
-	if(pPaste == nullptr)
+	if(pPaste == NULL)
 	{
 		return false;
 	}
@@ -10423,7 +10429,7 @@ bool IE_Imp_RTF::insertStrux(PTStruxType pts , const PP_PropertyVector & attrs, 
 	bool bDoExtraBlock = false;
 	bool res = false;
 	XAP_Frame * pFrame = XAP_App::getApp()->getLastFocussedFrame();
-	if(pFrame == nullptr)
+	if(pFrame == NULL)
 	{
 		m_currentRTFState.m_destinationState = RTFStateStore::rdsSkip;
 		return true;
@@ -10431,7 +10437,7 @@ bool IE_Imp_RTF::insertStrux(PTStruxType pts , const PP_PropertyVector & attrs, 
 	FV_View * pView = static_cast<FV_View*>(pFrame->getCurrentView());
 	PT_DocPosition posEOD = 0;
 	pView->getEditableBounds(true,posEOD);
-	if(pView == nullptr)
+	if(pView == NULL)
 	{
 		m_currentRTFState.m_destinationState = RTFStateStore::rdsSkip;
 		return true;
@@ -10439,7 +10445,7 @@ bool IE_Imp_RTF::insertStrux(PTStruxType pts , const PP_PropertyVector & attrs, 
 	if(!m_bStruxInserted)
 	{
 		fp_Run *pHyperRun = pView->getHyperLinkRun(m_dposPaste);
-		if((pHyperRun != nullptr) ||(m_iHyperlinkOpen > 0) )
+		if((pHyperRun != NULL) ||(m_iHyperlinkOpen > 0) )
 		{
 			fp_HyperlinkRun * pRHyper = static_cast<fp_HyperlinkRun *>(pHyperRun);
 			if(pRHyper->getHyperlinkType() == HYPERLINK_NORMAL)
@@ -10499,7 +10505,7 @@ bool IE_Imp_RTF::insertStrux(PTStruxType pts , const PP_PropertyVector & attrs, 
 	}
 	if(pts == PTX_SectionFrame)
 	{
-		pf_Frag_Strux * pfs = nullptr;
+		pf_Frag_Strux * pfs = NULL;
 		if(pView->isInFrame(m_dposPaste))
 		{
 			PT_DocPosition pos = m_dposPaste;
@@ -10541,11 +10547,11 @@ bool IE_Imp_RTF::insertStrux(PTStruxType pts , const PP_PropertyVector & attrs, 
 			return false;
 		}
 		fl_BlockLayout * pBL = pView->getBlockAtPosition(m_dposPaste);
-		if(pBL == nullptr)
+		if(pBL == NULL)
 		{
 			return false;
 		}
-		if(pBL->myContainingLayout() == nullptr)
+		if(pBL->myContainingLayout() == NULL)
 		{
 			return false;
 		}
@@ -10561,11 +10567,11 @@ bool IE_Imp_RTF::insertStrux(PTStruxType pts , const PP_PropertyVector & attrs, 
 		{
 			return false;
 		}
-		if((pBL->getPrev() == nullptr))
+		if((pBL->getPrev() == NULL))
 		{
 			return false;
 		}
-		if((pBL->getNext() == nullptr))
+		if((pBL->getNext() == NULL))
 		{
 			return false;
 		}
@@ -10792,13 +10798,15 @@ bool IE_Imp_RTF::HandleRevisedTextTimestamp(UT_uint32 iDttm)
 	// them in this sequence, and so do we
 	UT_return_val_if_fail( m_currentRTFState.m_charProps.m_iCurrentRevisionId > 0,true); // was false (this enables RTF spec to load)
 	
-	std::vector<AD_Revision> & Rtbl = getDoc()->getRevisions();
-	UT_return_val_if_fail(Rtbl.empty(), true); // was false (This enables RTF spec to load)
+	const UT_GenericVector<AD_Revision*> & Rtbl = getDoc()->getRevisions();
+	UT_return_val_if_fail(Rtbl.getItemCount(),true); // was false (This enables RTF spec to load)
 
 	// valid revision id's start at 1, but vector is 0-based
-	AD_Revision& rev = Rtbl[m_currentRTFState.m_charProps.m_iCurrentRevisionId - 1];
+	AD_Revision * pRev = Rtbl.getNthItem(m_currentRTFState.m_charProps.m_iCurrentRevisionId - 1);
 
-	if (!rev.getStartTime())
+	UT_return_val_if_fail( pRev, false );
+
+	if(!pRev->getStartTime())
 	{
 		// set the start time to what ever is represented by dttm
 		struct tm TM;
@@ -10811,7 +10819,7 @@ bool IE_Imp_RTF::HandleRevisedTextTimestamp(UT_uint32 iDttm)
 		TM.tm_isdst = 0;
 
 		time_t tT = mktime(&TM);
-		rev.setStartTime(tT);
+		pRev->setStartTime(tT);
 	}
 	
 	return true;
@@ -11114,7 +11122,7 @@ bool IE_Imp_RTF::HandleBookmark (RTFBookmarkType type)
 	HandlePCData(bookmarkName);
 
 	PP_PropertyVector props = {
-		"type", "",
+		"type", ""
 		"name", bookmarkName.utf8_str()
 	};
 	switch (type) {
@@ -11283,7 +11291,7 @@ void IE_Imp_RTF::_appendHdrFtr ()
 	UT_uint32 numHdrFtr;
 	const RTFHdrFtr * header;
 	std::string tempBuffer;
-	const gchar* szType = nullptr;
+	const gchar* szType = NULL;
 
 	UT_return_if_fail(m_pImportFile);
 
@@ -11353,14 +11361,14 @@ void IE_Imp_RTF::_appendHdrFtr ()
 		// actually it appears that we have to append a block for some cases.
 		UT_DEBUGMSG(("Append block 4 with props \n"));
 #if 0 //#TF
-		propsArray[0] = nullptr;
+		propsArray[0] = NULL;
 		getDoc()->appendStrux(PTX_Block, propsArray);
 #endif
 		// tell that we are parsing headers and footers
 		m_parsingHdrFtr = true;
 		m_newParaFlagged = true;
 		m_bSectionHasPara = false;
-		_parseFile (nullptr);
+		_parseFile (NULL);
 		m_parsingHdrFtr = false;
 	}
 }
@@ -11377,7 +11385,7 @@ bool IE_Imp_RTF::_appendField (const gchar *xmlField, const gchar ** pszAttribs)
 	std::string propBuffer;
 	buildCharacterProps(propBuffer);
 
-	const gchar * pStyle = nullptr;
+	const gchar * pStyle = NULL;
 	std::string styleName;
 	if(m_currentRTFState.m_charProps.m_styleNumber >= 0
 	   && static_cast<UT_uint32>(m_currentRTFState.m_charProps.m_styleNumber) < m_styleTable.size())
@@ -11390,7 +11398,7 @@ bool IE_Imp_RTF::_appendField (const gchar *xmlField, const gchar ** pszAttribs)
 	{
 		bNoteRef = true;
 	}
-	if(pszAttribs == nullptr)
+	if(pszAttribs == NULL)
 	{
 		propsArray.resize(pStyle ? 6 : 4);
 		propsArray [0] = "type";
@@ -11454,13 +11462,13 @@ bool IE_Imp_RTF::_appendField (const gchar *xmlField, const gchar ** pszAttribs)
 	else
 	{
 		XAP_Frame * pFrame = XAP_App::getApp()->getLastFocussedFrame();
-		if(pFrame == nullptr)
+		if(pFrame == NULL)
 		 {
 			 m_currentRTFState.m_destinationState = RTFStateStore::rdsSkip;
 			 return true;
 		 }
 		FV_View * pView = static_cast<FV_View*>(pFrame->getCurrentView());
-		if(pView == nullptr)
+		if(pView == NULL)
 		{
 			m_currentRTFState.m_destinationState = RTFStateStore::rdsSkip;
 			return true;
@@ -11472,7 +11480,7 @@ bool IE_Imp_RTF::_appendField (const gchar *xmlField, const gchar ** pszAttribs)
 		if(bNoteRef && pView->isInFrame(m_dposPaste))
 		{
 			fl_FrameLayout * pFL = pView->getFrameLayout(m_dposPaste);
-			if(pFL == nullptr)
+			if(pFL == NULL)
 			{
 				m_currentRTFState.m_destinationState = RTFStateStore::rdsSkip;
 				return true;
@@ -11614,12 +11622,12 @@ bool IE_Imp_RTF::pasteFromBuffer(PD_DocumentRange * pDocRange,
 	// to do a paste, we set the fp to null and let the
 	// read-a-char routines know about our paste buffer.
 
-	UT_return_val_if_fail(m_pImportFile==nullptr,false);
+	UT_return_val_if_fail(m_pImportFile==NULL,false);
 
 	// note, we skip the _writeHeader() call since we don't
 	// want to assume that selection starts with a section
 	// break.
-	_parseFile(nullptr);
+	_parseFile(NULL);
 
 	if(m_newParaFlagged)
 	{
@@ -11644,9 +11652,9 @@ bool IE_Imp_RTF::pasteFromBuffer(PD_DocumentRange * pDocRange,
 				m_posSavedDocPosition++;
 		}
 	}
-	m_pPasteBuffer = nullptr;
+	m_pPasteBuffer = NULL;
 	m_lenPasteBuffer = 0;
-	m_pCurrentCharInPasteBuffer = nullptr;
+	m_pCurrentCharInPasteBuffer = NULL;
 	return true;
 }
 
@@ -11875,7 +11883,7 @@ bool IE_Imp_RTF::HandleStyleDefinition(void)
 				}
 				else
 				{
-					pVecAttr->addItem(nullptr);
+					pVecAttr->addItem(NULL);
 				}
 			}
 			vecStyles.addItem(pVecAttr);
@@ -11905,7 +11913,7 @@ bool IE_Imp_RTF::HandleStyleDefinition(void)
 		UT_GenericVector<const gchar*> * pCurStyleVec = vecStyles.getNthItem(i);
 		UT_sint32 nAtts = pCurStyleVec->getItemCount();
 		UT_sint32 j = 0;
-		const char * szName = nullptr;
+		const char * szName = NULL;
 
 		while(j < nAtts)
 		{
@@ -11913,7 +11921,7 @@ bool IE_Imp_RTF::HandleStyleDefinition(void)
 			const char * szValue = pCurStyleVec->getNthItem(j++);
 
 			if (!szAtt) {
-				UT_WARNINGMSG(("Attribute name is nullptr. Skipping.\n"));
+				UT_WARNINGMSG(("Attribute name is NULL. Skipping.\n"));
 				// skip the value.
 				j++;
 				continue;
@@ -11926,7 +11934,7 @@ bool IE_Imp_RTF::HandleStyleDefinition(void)
 			}
 			else if( strcmp(szAtt, PT_BASEDON_ATTRIBUTE_NAME)== 0)
 			{
-				if(nullptr == szValue)
+				if(NULL == szValue)
 				{
 					UT_sint32 istyle = BasedOn[i];
 					if (istyle >= 0 && static_cast<UT_uint32>(istyle) < m_styleTable.size()) {
@@ -11944,7 +11952,7 @@ bool IE_Imp_RTF::HandleStyleDefinition(void)
 			}
 			else if( strcmp(szAtt, PT_FOLLOWEDBY_ATTRIBUTE_NAME)== 0)
 			{
-				if(nullptr == szValue)
+				if(NULL == szValue)
 				{
 					UT_sint32 istyle = FollowedBy[i];
 					if (istyle >= 0 && static_cast<UT_uint32>(istyle) < m_styleTable.size()) {
@@ -11972,7 +11980,7 @@ bool IE_Imp_RTF::HandleStyleDefinition(void)
 		if(szName && *szName)
 		{
 			xxx_UT_DEBUGMSG(("Looking at style %s \n",szName));
-			PD_Style * pStyle = nullptr;
+			PD_Style * pStyle = NULL;
 			if(getDoc()->getStyle(szName, &pStyle))
 			{
 				if (!isPasting())
@@ -11998,12 +12006,12 @@ bool IE_Imp_RTF::HandleStyleDefinition(void)
 		for(j=0; j< nAtts; j++)
 		{
 			const gchar * sz = pCurStyleVec->getNthItem(j);
-			if(sz != nullptr)
+			if(sz != NULL)
 			{
 				// MUST NOT USED delete[] on strings allocated by g_try_malloc/UT_calloc !!!
 				// delete [] sz;
 				g_free(const_cast<gchar*>(sz));
-				sz = nullptr;
+				sz = NULL;
 			}
 		}
 		delete pCurStyleVec;
@@ -12236,7 +12244,7 @@ bool IE_Imp_RTF::buildAllProps(std::string & s,
 	if(pbChars->bm_fontNumber)
 	{
 		RTFFontTableItem* pFont = GetNthTableFont(pChars->m_fontNumber);
-		if (pFont != nullptr)
+		if (pFont != NULL)
 		{
 			s += " font-family:";
 			s += pFont->m_pFontName;
@@ -12306,7 +12314,7 @@ bool IE_Imp_RTF::HandleInfoMetaData()
 	bool paramUsed = false;	
 	int nested = 0;
 	//bool result;
-	const char * metaDataKey = nullptr;
+	const char * metaDataKey = NULL;
 	std::string metaDataProp;
 	enum {
 		ACT_NONE,
@@ -12562,10 +12570,10 @@ void IE_Imp_RTF::setEncoding() {
 
 	// Activate the current encoding.
 	pFont = GetNthTableFont(m_currentRTFState.m_charProps.m_fontNumber);
-	if (pFont != nullptr && pFont->m_szEncoding) {
+	if (pFont != NULL && pFont->m_szEncoding) {
 		m_mbtowc.setInCharset(pFont->m_szEncoding);
 	}
-	else if (m_szDefaultEncoding != nullptr) {
+	else if (m_szDefaultEncoding != NULL) {
 		m_mbtowc.setInCharset(m_szDefaultEncoding);
 	}
 }

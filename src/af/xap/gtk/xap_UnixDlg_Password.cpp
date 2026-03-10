@@ -24,7 +24,6 @@
 #include "ut_debugmsg.h"
 
 #include "xap_UnixDialogHelper.h"
-#include "xap_GtkUtils.h"
 
 #include "xap_App.h"
 #include "xap_UnixApp.h"
@@ -37,7 +36,7 @@
 
 void XAP_UnixDialog_Password::event_OK ()
 {
-	const char * txt = XAP_gtk_entry_get_text (GTK_ENTRY(mTextEntry));
+	const char * txt = gtk_entry_get_text (GTK_ENTRY(mTextEntry));
 	if (txt && strlen(txt)) {
 		setPassword (txt);
 		setAnswer(XAP_Dialog_Password::a_OK);
@@ -85,7 +84,7 @@ void XAP_UnixDialog_Password::runModal(XAP_Frame * pFrame)
 		event_Cancel(); break;
 	}
 
-	XAP_gtk_keyboard_ungrab(cf);
+	XAP_gdk_keyboard_ungrab(GDK_CURRENT_TIME);
 
 	abiDestroyWidget(cf);
 }
@@ -95,7 +94,7 @@ GtkWidget * XAP_UnixDialog_Password::_constructWindow ()
 	const XAP_StringSet * pSS = m_pApp->getStringSet();
 	
 	// load the dialog from the UI file
-	GtkBuilder* builder = newDialogBuilderFromResource("xap_UnixDlg_Password.ui");
+	GtkBuilder* builder = newDialogBuilder("xap_UnixDlg_Password.ui");
 
 	// Update our member variables with the important widgets that 
 	// might need to be queried or altered later

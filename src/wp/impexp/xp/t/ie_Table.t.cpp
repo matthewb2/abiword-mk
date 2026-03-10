@@ -18,20 +18,20 @@ class TF_TableListener
 {
 public:
   TF_TableListener(PD_Document* pDoc, ie_Table & tableHelper)
-    : m_tableHelper(tableHelper)
+    :m_tableHelper(tableHelper)
     {
-      m_tableHelper.setDoc(pDoc);
+      tableHelper.setDoc(pDoc);
     }
 
   virtual bool populate(fl_ContainerLayout* /*sfh*/,
-                        const PX_ChangeRecord * /*pcr*/) override
+                        const PX_ChangeRecord * /*pcr*/)
     {
       return true;
     }
 
   virtual bool populateStrux(pf_Frag_Strux* sdh,
                              const PX_ChangeRecord* pcr,
-                             fl_ContainerLayout** /*psfh*/) override
+                             fl_ContainerLayout** /*psfh*/)
     {
       if(pcr->getType() != PX_ChangeRecord::PXT_InsertStrux) {
         return false;
@@ -68,7 +68,7 @@ public:
     }
 
   virtual bool change(fl_ContainerLayout* /*sfh*/,
-                      const PX_ChangeRecord * /*pcr*/) override
+                      const PX_ChangeRecord * /*pcr*/)
     {
       return true;
     }
@@ -79,12 +79,12 @@ public:
                            PL_ListenerId /*lid*/,
                            void (* /*pfnBindHandles*/) (pf_Frag_Strux* sdhNew,
                                                    PL_ListenerId lid,
-                                                   fl_ContainerLayout* sfhNew)) override
+                                                   fl_ContainerLayout* sfhNew))
     {
       return true;
     }
 
-  virtual bool signal(UT_uint32 /*iSignal*/) override
+  virtual bool signal(UT_uint32 /*iSignal*/)
     {
       return true;
     }
@@ -136,7 +136,8 @@ TFTEST_MAIN("ie Table")
         TFPASSEQ(tables[1].numRows, 2);
       }
 
-      TFPASS(table.getLastTable().empty());
+      TFPASSEQ(table.getNumRows(), 0);
+      TFPASSEQ(table.getNumCols(), 0);
     }
 
     doc->unref();

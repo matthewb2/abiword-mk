@@ -61,8 +61,8 @@ ie_PartTable::ie_PartTable(PD_Document * pDoc) :
 	m_pDoc(pDoc),
 	m_apiTable(0), 
 	m_apiCell(0), 
-	m_TableAttProp(nullptr),
-	m_CellAttProp(nullptr),
+	m_TableAttProp(NULL),
+	m_CellAttProp(NULL),
 	m_iNumRows(0),
 	m_iNumCols(0),
 	m_iLeft(-1),
@@ -73,7 +73,7 @@ ie_PartTable::ie_PartTable(PD_Document * pDoc) :
 	m_iPrevRight(-1),
 	m_iPrevTop(-1),
 	m_iPrevBot(-1),
-	m_TableSDH(nullptr),
+	m_TableSDH(NULL),
 	m_bIsCellJustOpenned(false),
 	m_iCurRow(-1)
 {
@@ -92,7 +92,7 @@ void ie_PartTable::_clearAllCell(void)
 {
 	xxx_UT_DEBUGMSG(("Clearing cell now \n"));
 	m_apiCell = 0;
-	m_CellAttProp = nullptr;
+	m_CellAttProp = NULL;
 	m_iLeft = -1;
 	m_iRight = -1;
 	m_iTop = -1;
@@ -111,10 +111,10 @@ void ie_PartTable::_clearAll(void)
 {
 	_clearAllCell();
 	m_apiTable = 0;
-	m_TableAttProp = nullptr;
+	m_TableAttProp = NULL;
 	m_iNumRows = 0;
 	m_iNumCols = 0;
-	m_TableSDH = nullptr;
+	m_TableSDH = NULL;
 }
 
 void ie_PartTable::setCellJustOpenned(bool b)
@@ -236,7 +236,7 @@ void ie_PartTable::setCellApi(PT_AttrPropIndex iApi)
 	m_apiCell = iApi;
 	UT_return_if_fail(m_pDoc);
 	m_pDoc->getAttrProp(iApi, &m_CellAttProp);
-	const char * szVal = nullptr;
+	const char * szVal = NULL;
 	szVal = getCellProp("left-attach");
 	if(szVal && *szVal)
 	{
@@ -273,10 +273,10 @@ void ie_PartTable::setCellApi(PT_AttrPropIndex iApi)
  */
 const char * ie_PartTable::getTableProp(const char * pProp) const
 {
-	const gchar * szVal = nullptr;
-	if(m_TableAttProp == nullptr)
+	const gchar * szVal = NULL;
+	if(m_TableAttProp == NULL)
 	{
-		return nullptr;
+		return NULL;
 	}
 	m_TableAttProp->getProperty(pProp,szVal);
 	return szVal;
@@ -289,10 +289,10 @@ const char * ie_PartTable::getTableProp(const char * pProp) const
  */
 const char * ie_PartTable::getCellProp(const char * pProp) const
 {
-	const gchar * szVal = nullptr;
-	if(m_CellAttProp == nullptr)
+	const gchar * szVal = NULL;
+	if(m_CellAttProp == NULL)
 	{
-		return nullptr;
+		return NULL;
 	}
 	m_CellAttProp->getProperty(pProp,szVal);
 	return szVal;
@@ -312,17 +312,17 @@ void ie_PartTable::_setRowsCols(void)
 ie_Table::ie_Table(PD_Document * pDoc) :
 	m_pDoc(pDoc),
 	m_bNewRow(false),
-	m_sdhLastCell(nullptr)
+	m_sdhLastCell(NULL)
 {
-	m_sLastTable.push(nullptr);
+	m_sLastTable.push(NULL);
 }
 
 ie_Table::ie_Table(void) :
-	m_pDoc(nullptr),
+	m_pDoc(NULL),
 	m_bNewRow(false),
-	m_sdhLastCell(nullptr)
+	m_sdhLastCell(NULL)
 {
-	m_sLastTable.push(nullptr);
+	m_sLastTable.push(NULL);
 }
 
 /*!
@@ -352,7 +352,7 @@ void ie_Table::_clearLastTables()
 void ie_Table::setDoc(PD_Document * pDoc)
 {
 	m_pDoc = pDoc;
-	m_sdhLastCell = nullptr;
+	m_sdhLastCell = NULL;
 	_clearLastTables();
 }
 
@@ -362,7 +362,7 @@ void ie_Table::setDoc(PD_Document * pDoc)
 void ie_Table::openTable(pf_Frag_Strux* tableSDH, PT_AttrPropIndex iApi)
 {
 	ie_PartTable * pPT = new ie_PartTable(m_pDoc);
-	m_sdhLastCell = nullptr;
+	m_sdhLastCell = NULL;
 	m_sLastTable.push(pPT);
 	pPT->setTableApi(tableSDH,iApi);
 }
@@ -374,7 +374,7 @@ void ie_Table::openCell(PT_AttrPropIndex iApi)
 {
 	UT_return_if_fail(!m_sLastTable.empty());
 	ie_PartTable * pPT = m_sLastTable.top();
-	UT_return_if_fail(pPT != nullptr);
+	UT_return_if_fail(pPT != NULL);
 
 	UT_sint32 iOldTop = pPT->getTop();
 	pPT->setCellApi(iApi);
@@ -413,13 +413,13 @@ void ie_Table::setCellJustOpenned(bool b)
  */
 pf_Frag_Strux* ie_Table::getTableSDH(void) const
 {
-	UT_return_val_if_fail(!m_sLastTable.empty(), nullptr);
+	UT_return_val_if_fail(!m_sLastTable.empty(), NULL);
 	ie_PartTable * pPT = m_sLastTable.top();
 	if(pPT)
 	{
 		return pPT->getTableSDH();
 	}
-	return nullptr;
+	return NULL;
 }
 
 /*!
@@ -442,7 +442,7 @@ void ie_Table::closeTable(void)
 	ie_PartTable * pPT = m_sLastTable.top();
 	m_sLastTable.pop();
 	delete pPT;
-	m_sdhLastCell = nullptr;
+	m_sdhLastCell = NULL;
 }
 
 /*!
@@ -466,7 +466,7 @@ UT_sint32 ie_Table::getCurRow(void) const
 {
 	UT_return_val_if_fail(!m_sLastTable.empty(), 0);
 	ie_PartTable * pPT = m_sLastTable.top();
-	UT_return_val_if_fail(pPT != nullptr, 0);
+	UT_return_val_if_fail(pPT != NULL, 0);
 
 	return pPT->getCurRow();
 }
@@ -554,7 +554,7 @@ UT_sint32 ie_Table::getNumCols(void) const
 
 
 /*!
- * RTF expects an unnested table to have a nest depth of 0. Since we push nullptr
+ * RTF expects an unnested table to have a nest depth of 0. Since we push NULL
  * at the start we have to subtract this from the depth calculation.
  */
 UT_sint32 ie_Table::getNestDepth(void) const
@@ -592,9 +592,9 @@ PT_AttrPropIndex ie_Table::getTableAPI(void) const
  */
 const char * ie_Table::getTableProp(const char * pProp) const
 {
-	UT_return_val_if_fail(!m_sLastTable.empty(), nullptr);
+	UT_return_val_if_fail(!m_sLastTable.empty(), 0);
 	ie_PartTable * pPT = m_sLastTable.top();
-	UT_return_val_if_fail(pPT,nullptr);
+	UT_return_val_if_fail(pPT,NULL);
 	return pPT->getTableProp(pProp);
 }
 
@@ -604,9 +604,9 @@ const char * ie_Table::getTableProp(const char * pProp) const
  */
 const char * ie_Table::getCellProp(const char * pProp) const
 {
-	UT_return_val_if_fail(!m_sLastTable.empty(), nullptr);
+	UT_return_val_if_fail(!m_sLastTable.empty(), 0);
 	ie_PartTable * pPT = m_sLastTable.top();
-	UT_return_val_if_fail(pPT,nullptr);
+	UT_return_val_if_fail(pPT,NULL);
 	return pPT->getCellProp(pProp);
 }
 /*!
@@ -619,18 +619,18 @@ void ie_Table::setCellRowCol(UT_sint32 row, UT_sint32 col)
 	ie_PartTable * pPT = m_sLastTable.top();
 	UT_return_if_fail(pPT);
 	pf_Frag_Strux* sdhStart = m_sdhLastCell;
-	if(sdhStart == nullptr)
+	if(sdhStart == NULL)
 	{
 		sdhStart = pPT->getTableSDH();
 	}
 	pf_Frag_Strux* cellSDH = m_pDoc->getCellSDHFromRowCol(sdhStart,true,PD_MAX_REVISION,row,col);
-	if(cellSDH == nullptr)
+	if(cellSDH == NULL)
 	{
 		sdhStart = pPT->getTableSDH();
 		cellSDH = m_pDoc->getCellSDHFromRowCol(sdhStart,true,PD_MAX_REVISION,row,col);
 	}
 	m_sdhLastCell = cellSDH;
-	if(cellSDH != nullptr)
+	if(cellSDH != NULL)
 	{
 		PT_AttrPropIndex api = m_pDoc->getAPIFromSDH(cellSDH);
 		pPT->setCellApi(api);
@@ -651,7 +651,7 @@ ie_imp_cell::ie_imp_cell(ie_imp_table * pImpTable, PD_Document * pDoc,
 	m_iRight(-1),
 	m_iTop(-1),
 	m_iBot(-1),
-	m_cellSDH(nullptr),
+	m_cellSDH(NULL),
 	m_pImpTable(pImpTable),
 	m_pCellLeft(pLeftImpCell),
 	m_iRow(iRow),
@@ -788,7 +788,7 @@ void ie_imp_cell::setCellSDH(pf_Frag_Strux* cellSDH)
  */
 bool ie_imp_cell::writeCellPropsInDoc(void) const
 {
-	if(m_cellSDH == nullptr)
+	if(m_cellSDH == NULL)
 	{
 		return false;
 	}
@@ -802,7 +802,7 @@ bool ie_imp_cell::writeCellPropsInDoc(void) const
  */
 ie_imp_cell * ie_imp_cell::getCellAbove(void) const
 {
-	return nullptr;
+	return NULL;
 }
 
 /*!
@@ -810,7 +810,7 @@ ie_imp_cell * ie_imp_cell::getCellAbove(void) const
  */
 ie_imp_cell * ie_imp_cell::getCellBelow(void) const
 {
-	return nullptr;
+	return NULL;
 }
 
 /*!
@@ -818,7 +818,7 @@ ie_imp_cell * ie_imp_cell::getCellBelow(void) const
  */
 ie_imp_cell * ie_imp_cell::getCellRight(void) const
 {
-	return nullptr;
+	return NULL;
 }
 
 /*!
@@ -892,8 +892,8 @@ std::string ie_imp_cell::getPropVal(const char * szProp) const
  */
 ie_imp_table::ie_imp_table(PD_Document * pDoc):
 	m_pDoc(pDoc),
-	m_tableSDH(nullptr),
-	m_pCurImpCell(nullptr),
+	m_tableSDH(NULL),
+	m_pCurImpCell(NULL),
 	m_iRowCounter(0),
 	m_bAutoFit(false),
 	m_bNewRow(true),
@@ -946,7 +946,7 @@ UT_sint32 ie_imp_table::OpenCell(void)
 bool ie_imp_table::getVecOfCellsOnRow(UT_sint32 row, UT_GenericVector<ie_imp_cell*> * pVec) const
 {
 	UT_sint32 i = 0;
-	ie_imp_cell * pCell = nullptr;
+	ie_imp_cell * pCell = NULL;
 	bool bFound = false;
 	UT_sint32 iFound = 0;
 	for(i=0; !bFound && (i < m_vecCells.getItemCount()); i++)
@@ -1020,7 +1020,7 @@ UT_sint32 ie_imp_table::NewRow(void)
 	if(m_iRowCounter > 0)
 	{
 		ie_imp_cell * pCell = getNthCellOnRow(0);
-		ie_imp_cell * pPrevCell = nullptr;
+		ie_imp_cell * pPrevCell = NULL;
 		UT_GenericVector<ie_imp_cell*> vecPrev;
 		UT_GenericVector<ie_imp_cell*> vecCur;
 		vecPrev.clear();
@@ -1100,7 +1100,7 @@ UT_sint32 ie_imp_table::NewRow(void)
 		}
 #endif
 	}
-	m_pCurImpCell = nullptr;
+	m_pCurImpCell = NULL;
 	m_iRowCounter++;
 	m_iPosOnRow = 0;
 	m_iCellXOnRow = 0;
@@ -1116,7 +1116,7 @@ UT_sint32 ie_imp_table::NewRow(void)
 void ie_imp_table::setCellRowNthCell(UT_sint32 row, UT_sint32 col)
 {
 	UT_sint32 i =0;
-	ie_imp_cell * pCell = nullptr;
+	ie_imp_cell * pCell = NULL;
 	UT_sint32 ColCount = 0;
 	bool bFound = false;
 	for(i=0; !bFound && (i < m_vecCells.getItemCount()); i++)
@@ -1135,7 +1135,7 @@ void ie_imp_table::setCellRowNthCell(UT_sint32 row, UT_sint32 col)
 	if(!bFound)
 	{
 		UT_ASSERT_HARMLESS(0);
-		m_pCurImpCell = nullptr;
+		m_pCurImpCell = NULL;
 	}
 	else
 	{
@@ -1224,7 +1224,7 @@ void ie_imp_table::writeTablePropsInDoc(void)
 			UT_sint32 iDiffCellx = iCellx - iPrev;
 			double dCellx = static_cast<double>(iDiffCellx)/1440.0 -dColSpace;
 			iPrev = iCellx;
-			std::string sWidth = UT_formatDimensionString(DIM_IN,dCellx,nullptr);
+			std::string sWidth = UT_formatDimensionString(DIM_IN,dCellx,NULL);
 			sColWidth += sWidth;
 			sColWidth += "/";
 		}
@@ -1240,9 +1240,9 @@ void ie_imp_table::writeTablePropsInDoc(void)
 void ie_imp_table::writeAllCellPropsInDoc(void)
 {
 	UT_sint32 i =0;
-	ie_imp_cell * pCell = nullptr;
+	ie_imp_cell * pCell = NULL;
 #if DEBUG
-	ie_imp_cell * pOldCell = nullptr;
+	ie_imp_cell * pOldCell = NULL;
 #endif
 	for(i=0; i< m_vecCells.getItemCount();i++)
 	{
@@ -1255,18 +1255,18 @@ void ie_imp_table::writeAllCellPropsInDoc(void)
 				//				removeOnThisCellRow(pCell);
 				continue;
 			}
-			UT_DEBUGMSG(("writeallcellprops: pCell %d row %d left %d right %d top %d bot %d sdh %p \n", i, pCell->getRow(), pCell->getLeft(), pCell->getRight(), pCell->getTop(), pCell->getBot(), (void*)pCell->getCellSDH())); 
+			UT_DEBUGMSG(("writeallcellprops: pCell %d row %d left %d right %d top %d bot %d sdh %p \n",i,pCell->getRow(),pCell->getLeft(),pCell->getRight(),pCell->getTop(),pCell->getBot(),pCell->getCellSDH())); 
 		}
-		if(pCell->isMergedAbove() && (pCell->getCellSDH() != nullptr))
+		if(pCell->isMergedAbove() && (pCell->getCellSDH() != NULL))
 		{
 			UT_DEBUGMSG(("BUG!BUG! found a sdh is merged above cell! removing it \n"));
 			pf_Frag_Strux* cellSDH = pCell->getCellSDH();
-			UT_return_if_fail(cellSDH != nullptr);
-			pf_Frag_Strux* nextSDH = nullptr;
+			UT_return_if_fail(cellSDH != NULL);
+			pf_Frag_Strux* nextSDH = NULL;
 			m_pDoc->getNextStrux(cellSDH,&nextSDH);
 			bool bStop = (cellSDH == nextSDH);
 			m_pDoc->deleteStruxNoUpdate(cellSDH);
-			while(!bStop && (nextSDH != nullptr) && (m_pDoc->getStruxType(nextSDH) != PTX_SectionCell))
+			while(!bStop && (nextSDH != NULL) && (m_pDoc->getStruxType(nextSDH) != PTX_SectionCell))
 			{
 				if(	cellSDH == nextSDH)
 				{
@@ -1281,15 +1281,15 @@ void ie_imp_table::writeAllCellPropsInDoc(void)
 				}
 			}
 		}
-		if(pCell->isMergedLeft() && (pCell->getCellSDH() != nullptr))
+		if(pCell->isMergedLeft() && (pCell->getCellSDH() != NULL))
 		{
 			UT_DEBUGMSG(("BUG!BUG! found a sdh is merged left cell! removing it \n"));
 			pf_Frag_Strux* cellSDH = pCell->getCellSDH();
-			UT_return_if_fail(cellSDH != nullptr);
-			pf_Frag_Strux* nextSDH = nullptr;
+			UT_return_if_fail(cellSDH != NULL);
+			pf_Frag_Strux* nextSDH = NULL;
 			m_pDoc->getNextStrux(cellSDH,&nextSDH);
 			m_pDoc->deleteStruxNoUpdate(cellSDH);
-			while((nextSDH != nullptr) && (m_pDoc->getStruxType(nextSDH) != PTX_SectionCell))
+			while((nextSDH != NULL) && (m_pDoc->getStruxType(nextSDH) != PTX_SectionCell))
 			{
 				cellSDH = nextSDH;
 				m_pDoc->getNextStrux(cellSDH,&nextSDH);
@@ -1404,7 +1404,7 @@ void ie_imp_table::_buildCellXVector(void)
 {
 	m_vecCellX.clear();
 	UT_sint32 i =0;
-	ie_imp_cell * pCell = nullptr;
+	ie_imp_cell * pCell = NULL;
 	for(i=0; i< m_vecCells.getItemCount(); i++)
 	{
 		pCell = m_vecCells.getNthItem(i);
@@ -1451,7 +1451,7 @@ UT_sint32 ie_imp_table::getColNumber(ie_imp_cell * pImpCell) const
 ie_imp_cell *  ie_imp_table::getCellAtRowColX(UT_sint32 iRow,UT_sint32 cellX) const
 {
 	UT_sint32 i = 0;
-	ie_imp_cell * pCell = nullptr;
+	ie_imp_cell * pCell = NULL;
 	bool bfound = false;
 	for(i=0; i< m_vecCells.getItemCount(); i++)
 	{
@@ -1469,7 +1469,7 @@ ie_imp_cell *  ie_imp_table::getCellAtRowColX(UT_sint32 iRow,UT_sint32 cellX) co
 	}
 	else
 	{
-		return nullptr;
+		return NULL;
 	}
 }
 
@@ -1488,7 +1488,7 @@ void ie_imp_table::buildTableStructure(void)
 // Now construct the table structure.
 //
 	UT_sint32 i = 0;
-	ie_imp_cell * pCell = nullptr;
+	ie_imp_cell * pCell = NULL;
 	//UT_sint32 cellx = 0;
 	UT_sint32 curRow = 0;
 	UT_sint32 iLeft =0;
@@ -1586,7 +1586,7 @@ UT_sint32  ie_imp_table::getNumRows(void) const
 {
 	UT_sint32 numrows = 0;
 	UT_sint32 i =0;
-	ie_imp_cell * pCell = nullptr;
+	ie_imp_cell * pCell = NULL;
 	for(i= m_vecCells.getItemCount() -1; i >=0 ; i--)
 	{
 		pCell = m_vecCells.getNthItem(i);
@@ -1613,7 +1613,7 @@ void ie_imp_table::deleteRow(UT_sint32 row)
 	m_iCellXOnRow = 0;
 	m_bNewRow = true;
 	UT_sint32 i = 0;
-	ie_imp_cell * pCell = nullptr;
+	ie_imp_cell * pCell = NULL;
 	UT_DEBUGMSG(("Deleting row %d \n",row));
 	m_iPosOnRow = 0;
 	for(i= m_vecCells.getItemCount() -1; i>=0; i--)
@@ -1623,11 +1623,11 @@ void ie_imp_table::deleteRow(UT_sint32 row)
 		if(pCell->getRow() == row)
 		{
 			UT_DEBUGMSG(("Delete Cell pos %d on row %d \n",pCell->getLeft(),row));
-			if(pCell->getCellSDH() != nullptr)
+			if(pCell->getCellSDH() != NULL)
 			{
 				pf_Frag_Strux* cellSDH = pCell->getCellSDH();
 				pf_Frag_Strux* endCellSDH = m_pDoc->getEndCellStruxFromCellSDH(cellSDH);
-				if(endCellSDH == nullptr)
+				if(endCellSDH == NULL)
 				{
 					m_pDoc->deleteStruxNoUpdate(pCell->getCellSDH());
 				}
@@ -1659,23 +1659,23 @@ void ie_imp_table::deleteRow(UT_sint32 row)
 	//
 	pf_Frag_Strux* sdhCell = m_pDoc->getLastStruxOfType(PTX_SectionCell);
 	pf_Frag_Strux* sdhEndCell = m_pDoc->getLastStruxOfType(PTX_EndCell);
-	if((sdhCell != nullptr) && (sdhEndCell != nullptr))
+	if((sdhCell != NULL) && (sdhEndCell != NULL))
 	{
 		pf_Frag_Strux* sdhMyEnd= m_pDoc->getEndCellStruxFromCellSDH(sdhCell);
-		if((sdhMyEnd != nullptr) && (sdhEndCell != sdhMyEnd))
+		if((sdhMyEnd != NULL) && (sdhEndCell != sdhMyEnd))
 		{
-			UT_DEBUGMSG(("Delete extraneous endCell strux 1 sdhEndCell %p sdhMyEnd %p \n", (void*)sdhEndCell, (void*)sdhMyEnd));
+			UT_DEBUGMSG(("Delete extraneous endCell strux 1 sdhEndCell %p sdhMyEnd %p \n",sdhEndCell,sdhMyEnd));
 			m_pDoc->deleteStruxNoUpdate(sdhEndCell);
 			m_pDoc->appendStrux(PTX_Block, PP_NOPROPS);
 		}
 	}
-	else if( sdhCell == nullptr)
+	else if( sdhCell == NULL)
 	{
-// 		if(sdhEndCell != nullptr)
+// 		if(sdhEndCell != NULL)
 // 		{
 // 			UT_DEBUGMSG(("Delete extraneous endCell strux 2 \n"));
 // 			m_pDoc->deleteStruxNoUpdate(sdhEndCell);
-// 			m_pDoc->appendStrux(PTX_Block,nullptr);
+// 			m_pDoc->appendStrux(PTX_Block,NULL);
 //		}
 	}
 }
@@ -1707,11 +1707,11 @@ void ie_imp_table::removeCurrentRow(void)
 void ie_imp_table::removeExtraneousCells(void)
 {
 	UT_sint32 i =0;
-	ie_imp_cell * pCell = nullptr;
+	ie_imp_cell * pCell = NULL;
 	for(i= m_vecCells.getItemCount() -1; i >=0 ; i--)
 	{
 		pCell = m_vecCells.getNthItem(i);
-		if(pCell->getCellX() == -1 && (pCell->getCellSDH() != nullptr))
+		if(pCell->getCellX() == -1 && (pCell->getCellSDH() != NULL))
 		{
 			m_pDoc->deleteStruxNoUpdate(pCell->getCellSDH());
 			delete pCell;
@@ -1728,19 +1728,19 @@ void ie_imp_table::removeExtraneousCells(void)
 void ie_imp_table::_removeAllStruxes(void)
 {
 	UT_sint32 i =0;
-	ie_imp_cell * pCell = nullptr;
+	ie_imp_cell * pCell = NULL;
 	for(i= m_vecCells.getItemCount() -1; i >=0 ; i--)
 	{
 		pCell = m_vecCells.getNthItem(i);
 		if(pCell->getCellSDH())
 		{
-			UT_DEBUGMSG(("SEVIOR: Removing cell strux %p from PT \n", (void*)pCell->getCellSDH())); 
+			UT_DEBUGMSG(("SEVIOR: Removing cell strux %p from PT \n",pCell->getCellSDH())); 
 			m_pDoc->deleteStruxNoUpdate(pCell->getCellSDH());
 		}
 	}
 	if(m_tableSDH)
 	{
-		UT_DEBUGMSG(("SEVIOR: Removing table strux %p from PT \n", (void*)m_tableSDH));
+		UT_DEBUGMSG(("SEVIOR: Removing table strux %p from PT \n",m_tableSDH)); 
 		m_pDoc->deleteStruxNoUpdate(m_tableSDH);
 	}
 }
@@ -1754,7 +1754,7 @@ bool ie_imp_table::removeRow(UT_sint32 row)
 	UT_sint32 i=0;
 	UT_sint32 iFound =0;
 	bool bFound = false;
-	ie_imp_cell * pCell = nullptr;
+	ie_imp_cell * pCell = NULL;
 	for(i=0; !bFound &&  (i< m_vecCells.getItemCount()); i++)
 	{
 		pCell = m_vecCells.getNthItem(i);
@@ -1766,7 +1766,7 @@ bool ie_imp_table::removeRow(UT_sint32 row)
 		return false;
 	}
 	i = iFound;
-	while(pCell != nullptr && i < m_vecCells.getItemCount())
+	while(pCell != NULL && i < m_vecCells.getItemCount())
 	{
 		xxx_UT_DEBUGMSG(("SEVIOR: Removing cell %p from row %d \n",pCell,row));
 		m_vecCells.deleteNthItem(i);
@@ -1775,7 +1775,7 @@ bool ie_imp_table::removeRow(UT_sint32 row)
 			pCell = m_vecCells.getNthItem(i);
 			if(pCell->getRow() != row)
 			{
-				pCell = nullptr;
+				pCell = NULL;
 			}
 		}
 	}
@@ -1795,7 +1795,7 @@ void ie_imp_table::appendRow(UT_GenericVector<ie_imp_cell*>* pVecRowOfCells)
 		iNew = m_iRowCounter;
 	}
 	UT_sint32 i =0;
-	ie_imp_cell * pCell = nullptr;
+	ie_imp_cell * pCell = NULL;
 	for(i=0; i <pVecRowOfCells->getItemCount(); i++)
 	{
 		pCell = pVecRowOfCells->getNthItem(i);
@@ -1811,8 +1811,8 @@ void ie_imp_table::appendRow(UT_GenericVector<ie_imp_cell*>* pVecRowOfCells)
 */
 ie_imp_cell * ie_imp_table::getNthCellOnRow(UT_sint32 iCell) const
 {
-	ie_imp_cell * pFoundCell = nullptr;
-	ie_imp_cell * pCell = nullptr;
+	ie_imp_cell * pFoundCell = NULL;
+	ie_imp_cell * pCell = NULL;
 	UT_sint32 iCellOnRow =0;
 	UT_sint32 i=0;
 	bool bFound = false;
@@ -1843,7 +1843,7 @@ ie_imp_cell * ie_imp_table::getNthCellOnRow(UT_sint32 iCell) const
 ie_imp_table_control::ie_imp_table_control(PD_Document * pDoc):
 	m_pDoc(pDoc)
 {
-	m_sLastTable.push(nullptr);
+	m_sLastTable.push(NULL);
 }
 
 
@@ -1860,7 +1860,7 @@ ie_imp_table_control::~ie_imp_table_control(void)
 			pT->writeTablePropsInDoc();
 			pT->writeAllCellPropsInDoc();
 		}			
-		UT_DEBUGMSG(("SEVIOR: Deleting table %p \n", (void*)pT));
+		UT_DEBUGMSG(("SEVIOR: Deleting table %p \n",pT));
 		delete pT;
 	}
 }
@@ -1945,8 +1945,8 @@ bool ie_imp_table_control::NewRow(void)
 // Close the old table.
 //
 	UT_sint32 i =0;
-	pf_Frag_Strux* sdhCell = nullptr;
-	ie_imp_cell * pCell = nullptr;
+	pf_Frag_Strux* sdhCell = NULL;
+	ie_imp_cell * pCell = NULL;
 	bool bFound = false;
 	bool bAuto = false;
 	for(i=0; i < vecRow.getItemCount() && !bFound;i++)
@@ -1992,14 +1992,14 @@ bool ie_imp_table_control::NewRow(void)
 
 CellHelper::CellHelper () :
 	m_style(""),
-	m_pfsCell(nullptr),
+	m_pfsCell(0),
 	m_bottom(0),
 	m_left(0),
 	m_right(0),
 	m_top(0),
 	m_rowspan(0),
 	m_colspan(0),
-	m_next(nullptr),
+	m_next(0),
 	m_tzone(tz_body),
 	m_sCellProps("")
 {
@@ -2019,9 +2019,9 @@ IE_Imp_TableHelper::IE_Imp_TableHelper (PD_Document * pDocument, pf_Frag_Strux *
 	m_style_tzone(""),
 	m_style(""),
 	m_pfsInsertionPoint(pfsInsertionPoint),
-	m_pfsTableStart(nullptr),
+	m_pfsTableStart(0),
 	m_pfsTableEnd(pfsInsertionPoint),
-	m_pfsCellPoint(nullptr),
+	m_pfsCellPoint(NULL),
 	m_rows(0),
 	m_rows_head(0),
 	m_rows_head_max(0),
@@ -2033,7 +2033,7 @@ IE_Imp_TableHelper::IE_Imp_TableHelper (PD_Document * pDocument, pf_Frag_Strux *
 	m_cols_max(0),
 	m_col_next(0),
 	m_row_next(0),
-	m_current(nullptr),
+	m_current(0),
 	m_tzone(tz_body),
 	m_bBlockInsertedForCell(false),
 	m_bCaptionOn(false)
@@ -2041,7 +2041,7 @@ IE_Imp_TableHelper::IE_Imp_TableHelper (PD_Document * pDocument, pf_Frag_Strux *
 	m_thead.clear();
 	m_tfoot.clear();
 	m_tbody.clear();
-	UT_DEBUGMSG(("TableHelper created document = %p \n", (void*)m_pDocument)); 
+	UT_DEBUGMSG(("TableHelper created document = %p \n",m_pDocument)); 
 }
 
 IE_Imp_TableHelper::~IE_Imp_TableHelper ()
@@ -2062,7 +2062,7 @@ IE_Imp_TableHelper::~IE_Imp_TableHelper ()
 
 bool IE_Imp_TableHelper::tableStart (void)
 {
-	if(m_pfsInsertionPoint == nullptr)
+	if(m_pfsInsertionPoint == NULL)
 	{
 		if(m_style.size() == 0)
 		{
@@ -2098,7 +2098,7 @@ bool IE_Imp_TableHelper::tableStart (void)
 			getDoc()->insertStruxBeforeFrag(pf,PTX_SectionTable,atts);
 		}
 		getDoc()->insertStruxBeforeFrag(pf, PTX_EndTable, PP_NOPROPS);
-		pf_Frag_Strux* sdhEnd = nullptr;
+		pf_Frag_Strux* sdhEnd = NULL;
 		getDoc()->getPrevStruxOfType(static_cast<pf_Frag_Strux *>(pf),PTX_EndTable,&sdhEnd);
 		m_pfsTableEnd = sdhEnd;
 		m_pfsInsertionPoint = m_pfsTableEnd;
@@ -2114,9 +2114,9 @@ bool IE_Imp_TableHelper::tableEnd ()
 		return false;
 
 	// TODO: unset frag - & other clean-up?
-	m_pfsTableEnd = nullptr;
-	m_pfsInsertionPoint = nullptr;
-	m_pfsCellPoint = nullptr;
+	m_pfsTableEnd = NULL;
+	m_pfsInsertionPoint = NULL;
+	m_pfsCellPoint = NULL;
 	return true;
 }
 
@@ -2224,7 +2224,7 @@ bool IE_Imp_TableHelper::trEnd ()
 				}
 		}
 	m_col_next = 0;
-	CellHelper * pCell = nullptr;
+	CellHelper * pCell = NULL;
 	switch (m_tzone)
 		{
 		case tz_head:
@@ -2240,7 +2240,7 @@ bool IE_Imp_TableHelper::trEnd ()
 		    pCell = getCellAtRowCol(m_tbody,m_row_next, m_col_next);
 			break;
 		}
-	if(pCell != nullptr)
+	if(pCell != NULL)
 		{
 			m_col_next = pCell->m_right;
 		}
@@ -2271,7 +2271,7 @@ void IE_Imp_TableHelper::padAllRowsWithCells(UT_GenericVector<CellHelper *> & ve
  */
 void IE_Imp_TableHelper::padRowWithCells(UT_GenericVector<CellHelper *>& vecCells,UT_sint32 row, UT_sint32 extra)
 {
-	CellHelper * pCell = nullptr;
+	CellHelper * pCell = NULL;
 	UT_sint32 i =0;
 	bool bFoundRow = false;
 	for(i= vecCells.getItemCount()-1; i>=0;i--)
@@ -2293,8 +2293,8 @@ void IE_Imp_TableHelper::padRowWithCells(UT_GenericVector<CellHelper *>& vecCell
 	m_current = pCell;
 	TableZone oldTz = m_tzone;
 	m_tzone = pCell->m_tzone;
-	pf_Frag_Strux * pfsIns = nullptr;
-	if(pNext == nullptr)
+	pf_Frag_Strux * pfsIns = NULL;
+	if(pNext == NULL)
 		{
 			pfsIns = m_pfsCellPoint;
 		}
@@ -2307,19 +2307,19 @@ void IE_Imp_TableHelper::padRowWithCells(UT_GenericVector<CellHelper *>& vecCell
 			//
 			// Add the cell.
 			//
-			tdStart(1,1,nullptr,pfsIns);
+			tdStart(1,1,NULL,pfsIns);
 		}
 	m_current = pOldCurrent;
 	m_tzone = oldTz;
 }
 
 /*!
- * Get a cellHelper at the specified row and column. Return nullptr if none found.
+ * Get a cellHelper at the specified row and column. Return NULL if none found.
  * Optimized to find or not find cells near the end of the specifed vector.
  */
 CellHelper * IE_Imp_TableHelper::getCellAtRowCol(UT_GenericVector<CellHelper *> & vecCells, UT_sint32 row, UT_sint32 col) const
 {
-	CellHelper * pCell = nullptr;
+	CellHelper * pCell = NULL;
 	UT_sint32 i =0;
 	for(i=vecCells.getItemCount()-1; i>=0;i--)
 		{
@@ -2334,10 +2334,10 @@ CellHelper * IE_Imp_TableHelper::getCellAtRowCol(UT_GenericVector<CellHelper *> 
 				}
 			else if( (row > pCell->m_top) && (row > pCell->m_bottom) && (pCell->m_left <= col) && (pCell->m_right > col))
 				{
-					return nullptr;
+					return NULL;
 				}
 		}
-	return nullptr;
+	return NULL;
 }
 
 /*!
@@ -2375,30 +2375,30 @@ bool IE_Imp_TableHelper::tdEnd(void) const
 	m_current->m_bottom = m_row_next+rowspan;
 	m_current->m_sCellProps = "";
 	m_current->m_tzone = m_tzone;
-	UT_GenericVector<CellHelper *>* pVecCells = nullptr;
-	pCell = nullptr;
+	UT_GenericVector<CellHelper *>* pVecCells = NULL;
+	pCell = NULL;
 	if(true)
 		{
 			if(m_tzone == tz_head)
 				{
-					if(pfsThis == nullptr)
+					if(pfsThis == NULL)
 						pCell = getCellAtRowCol(m_thead,m_row_next,m_col_next+colspan);
 					pVecCells = & m_thead;
 				}
 			else if(m_tzone == tz_foot)
 				{
-					if(pfsThis == nullptr)
+					if(pfsThis == NULL)
 						pCell = getCellAtRowCol(m_tfoot,m_row_next,m_col_next+colspan);
 					pVecCells = & m_tfoot;
 				}
 			else if(m_tzone == tz_body)
 				{
-					if(pfsThis == nullptr)
+					if(pfsThis == NULL)
 						pCell = getCellAtRowCol(m_tbody,m_row_next,m_col_next+colspan);
 					pVecCells = & m_tbody;
 				}
 		}
-	if(pCell == nullptr)
+	if(pCell == NULL)
 		{
 			m_col_next += colspan;
 		}
@@ -2417,8 +2417,8 @@ bool IE_Imp_TableHelper::tdEnd(void) const
 		"props", m_current->m_sCellProps
 	};
 	UT_DEBUGMSG(("Props for td are : %s \n",atts[1].c_str()));
-	pf_Frag * pf = nullptr;
-	if(pfsThis == nullptr)
+	pf_Frag * pf = NULL;
+	if(pfsThis == NULL)
 		{
 		   pf = static_cast<pf_Frag *>(m_pfsCellPoint);
 		}
@@ -2426,15 +2426,15 @@ bool IE_Imp_TableHelper::tdEnd(void) const
 		{
 		   pf = static_cast<pf_Frag *>(pfsThis);
 		}
-	getDoc()->insertStruxBeforeFrag(pf, PTX_SectionCell, atts, nullptr);
-	pf_Frag_Strux* sdhCell = nullptr;
+	getDoc()->insertStruxBeforeFrag(pf, PTX_SectionCell, atts, NULL);
+	pf_Frag_Strux* sdhCell = NULL;
 	getDoc()->getPrevStruxOfType(static_cast<pf_Frag_Strux *>(pf),PTX_SectionCell,&sdhCell);
 	m_current->m_pfsCell = sdhCell;
-	if(pfsThis == nullptr)
+	if(pfsThis == NULL)
 		{
 			getDoc()->insertStruxBeforeFrag(pf, PTX_EndCell, PP_NOPROPS);
 			m_bBlockInsertedForCell = false;
-			pf_Frag_Strux* sdhIns = nullptr;
+			pf_Frag_Strux* sdhIns = NULL;
 			getDoc()->getPrevStruxOfType(static_cast<pf_Frag_Strux *>(pf),PTX_EndCell,&sdhIns);
 			m_pfsInsertionPoint = sdhIns;
 		}
@@ -2444,7 +2444,7 @@ bool IE_Imp_TableHelper::tdEnd(void) const
 			getDoc()->insertStruxBeforeFrag(pf, PTX_EndCell, PP_NOPROPS);
 			m_bBlockInsertedForCell = true;
 		}
-	if(pPrev == nullptr)
+	if(pPrev == NULL)
 		{
 			pVecCells->addItem(m_current);
 			return true;
@@ -2474,7 +2474,7 @@ bool IE_Imp_TableHelper::tdPending() const
 
 bool IE_Imp_TableHelper::Block (PTStruxType /*pts*/, const PP_PropertyVector & attributes)
 {
-	pf_Frag * pf = nullptr;
+	pf_Frag * pf = NULL;
 	if(m_bCaptionOn)
 		{
 			pf = static_cast<pf_Frag *>(m_pfsTableStart);
@@ -2494,7 +2494,7 @@ bool IE_Imp_TableHelper::BlockFormat (const PP_PropertyVector & attributes)
 		{
 			Block(PTX_Block, PP_NOPROPS);
 		}
-	pf_Frag_Strux * pfs = nullptr;
+	pf_Frag_Strux * pfs = NULL;
 	if(m_bCaptionOn)
 		{
 			pfs = m_pfsTableStart;
@@ -2515,7 +2515,7 @@ bool IE_Imp_TableHelper::Inline (const UT_UCSChar * ucs4_str, UT_sint32 length)
 		{
 			Block(PTX_Block, PP_NOPROPS);
 		}
-	pf_Frag * pf = nullptr;
+	pf_Frag * pf = NULL;
 	if(m_bCaptionOn)
 		{
 			pf = static_cast<pf_Frag *>(m_pfsTableStart);
@@ -2574,7 +2574,7 @@ bool IE_Imp_TableHelper::InlineFormat (const PP_PropertyVector & attributes)
 		{
 			Block(PTX_Block, PP_NOPROPS);
 		}
-	pf_Frag * pf = nullptr;
+	pf_Frag * pf = NULL;
 	if(m_bCaptionOn)
 		{
 			pf = static_cast<pf_Frag *>(m_pfsTableStart);
@@ -2593,7 +2593,7 @@ bool IE_Imp_TableHelper::Object (PTObjectType pto, const PP_PropertyVector & att
 		{
 			Block(PTX_Block, PP_NOPROPS);
 		}
-	pf_Frag * pf = nullptr;
+	pf_Frag * pf = NULL;
 	if(m_bCaptionOn)
 		{
 			pf = static_cast<pf_Frag *>(m_pfsTableStart);
@@ -2607,12 +2607,12 @@ bool IE_Imp_TableHelper::Object (PTObjectType pto, const PP_PropertyVector & att
 }
 
 IE_Imp_TableHelperStack::IE_Imp_TableHelperStack (void) :
-	m_pDocument(nullptr),
+	m_pDocument(NULL),
 	m_count(0),
 	m_max(0),
-	m_stack(nullptr)
+	m_stack(0)
 {
-	UT_DEBUGMSG(("TableHelperStack created document = %p \n", (void*)m_pDocument)); 
+	UT_DEBUGMSG(("TableHelperStack created document = %p \n",m_pDocument)); 
 }
 
 IE_Imp_TableHelperStack::~IE_Imp_TableHelperStack ()
@@ -2634,31 +2634,31 @@ void IE_Imp_TableHelperStack::clear ()
 
 bool IE_Imp_TableHelperStack::push (const char * style)
 {
-	if (m_stack == nullptr)
+	if (m_stack == 0)
 		{
 			m_stack = reinterpret_cast<IE_Imp_TableHelper **>(g_try_malloc (16 * sizeof (IE_Imp_TableHelper *)));
-			if (m_stack == nullptr)
+			if (m_stack == 0)
 				return false;
 			m_count = 0;
 			m_max = 16;
 		}
 	else if (m_count == m_max)
 		{
-			IE_Imp_TableHelper ** more = nullptr;
+			IE_Imp_TableHelper ** more = 0;
 			more = reinterpret_cast<IE_Imp_TableHelper **>(g_try_realloc (m_stack, (m_max + 16) * sizeof (IE_Imp_TableHelper *)));
-			if (more == nullptr)
+			if (more == 0)
 				return false;
 			m_max += 16;
 			m_stack = more;
 		}
 
-	IE_Imp_TableHelper * th = nullptr;
+	IE_Imp_TableHelper * th = 0;
 
 	// TODO: not sure this needs to happen...
 	try
 		{
 			IE_Imp_TableHelper * prev = top();
-			pf_Frag_Strux * pfs = nullptr;
+			pf_Frag_Strux * pfs = NULL;
 			if(prev)
 			{
 				pfs = prev->getInsertionPoint ();
@@ -2667,10 +2667,10 @@ bool IE_Imp_TableHelperStack::push (const char * style)
 		}
     catch(...)
 		{
-			th = nullptr;
+			th = 0;
 		}
 
-	if (th == nullptr)
+	if (th == 0)
 		return false;
 	m_count++;
 	m_stack[m_count] = th;
@@ -2701,7 +2701,7 @@ IE_Imp_TableHelper * IE_Imp_TableHelperStack::top(void) const
 {
 	if(m_count == 0)
 		{
-			return nullptr;
+			return NULL;
 		}
 	return m_stack[m_count];
 }
@@ -2709,7 +2709,7 @@ IE_Imp_TableHelper * IE_Imp_TableHelperStack::top(void) const
 bool IE_Imp_TableHelperStack::tableEnd()
 {
 	IE_Imp_TableHelper * th = top ();
-	if (th == nullptr)
+	if (th == 0)
 		return false;
 
 	bool okay = th->tableEnd ();
@@ -2724,7 +2724,7 @@ bool IE_Imp_TableHelperStack::tableEnd()
 bool IE_Imp_TableHelperStack::theadStart (const char * style) const
 {
 	IE_Imp_TableHelper * th = top ();
-	if (th == nullptr)
+	if (th == 0)
 		return false;
 
 	return th->theadStart (style);
@@ -2733,7 +2733,7 @@ bool IE_Imp_TableHelperStack::theadStart (const char * style) const
 bool IE_Imp_TableHelperStack::tfootStart (const char * style) const
 {
 	IE_Imp_TableHelper * th = top ();
-	if (th == nullptr)
+	if (th == 0)
 		return false;
 
 	return th->tfootStart (style);
@@ -2742,7 +2742,7 @@ bool IE_Imp_TableHelperStack::tfootStart (const char * style) const
 bool IE_Imp_TableHelperStack::tbodyStart (const char * style) const
 {
 	IE_Imp_TableHelper * th = top ();
-	if (th == nullptr)
+	if (th == 0)
 		return false;
 
 	return th->tbodyStart (style);
@@ -2751,7 +2751,7 @@ bool IE_Imp_TableHelperStack::tbodyStart (const char * style) const
 bool IE_Imp_TableHelperStack::trStart (const char * style) const
 {
 	IE_Imp_TableHelper * th = top ();
-	if (th == nullptr)
+	if (th == 0)
 		return false;
 
 	return th->trStart (style);
@@ -2760,17 +2760,17 @@ bool IE_Imp_TableHelperStack::trStart (const char * style) const
 bool IE_Imp_TableHelperStack::tdStart (UT_sint32 rowspan, UT_sint32 colspan, const char * style) const
 {
 	IE_Imp_TableHelper * th = top ();
-	if (th == nullptr)
+	if (th == 0)
 		return false;
 
-	return th->tdStart (rowspan, colspan, style,nullptr);
+	return th->tdStart (rowspan, colspan, style,NULL);
 }
 
 
 bool IE_Imp_TableHelperStack::tdEnd (void) const
 {
 	IE_Imp_TableHelper * th = top ();
-	if (th == nullptr)
+	if (th == 0)
 		return false;
 
 	return th->tdEnd();

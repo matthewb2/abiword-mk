@@ -32,9 +32,9 @@
 
 const IE_SuffixConfidence *IE_ImpGraphicCocoa_Sniffer::getSuffixConfidence()
 {
-    static IE_SuffixConfidence *suffixConfidence = nullptr;
+    static IE_SuffixConfidence *suffixConfidence = NULL;
     int idx = 0;
-    NSArray *fileTypes = [NSImage imageTypes];
+    NSArray *fileTypes = [NSImage imageFileTypes];
 
     suffixConfidence = new IE_SuffixConfidence[[fileTypes count] + 1];
 
@@ -46,7 +46,7 @@ const IE_SuffixConfidence *IE_ImpGraphicCocoa_Sniffer::getSuffixConfidence()
         idx++;
     }
 
-    // NUL-terminator
+    // NULL-terminator
     suffixConfidence[idx].confidence = UT_CONFIDENCE_ZILCH;
 
     return suffixConfidence;
@@ -93,7 +93,7 @@ UT_Error IE_ImpGraphicCocoa_Sniffer::constructImporter(IE_ImpGraphic **ppieg)
 {
 	//fprintf(stderr, "importer constructed\n");
 	*ppieg = new IE_ImpGraphic_Cocoa();
-	if (*ppieg == nullptr)
+	if (*ppieg == NULL)
 	  return UT_IE_NOMEMORY;
 
 	return UT_OK;
@@ -108,7 +108,7 @@ UT_Error IE_ImpGraphic_Cocoa::importGraphic(const UT_ConstByteBufPtr & pBB,
 		return err;
 
 	FG_GraphicRasterPtr pFGR(new FG_GraphicRaster);
-	if(pFGR == nullptr)
+	if(pFGR == NULL)
 		return UT_IE_NOMEMORY;
 
 	if(!pFGR->setRaster_PNG(m_pPngBB)) {
@@ -137,10 +137,10 @@ UT_Error IE_ImpGraphic_Cocoa::convertGraphic(const UT_ConstByteBufPtr & pBB,
 
 static NSData* convertImageToPNG(NSImage* image)
 {
-	NSDictionary* props = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO],
+	NSDictionary* props = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO], 
 							NSImageInterlaced, nil];
 	NSBitmapImageRep* rep = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation]];
-	return [rep representationUsingType:NSBitmapImageFileTypePNG properties:props];
+	return [rep representationUsingType:NSPNGFileType properties:props];
 }
 
 static NSData* convertImageDataToPNG(NSData* data) 

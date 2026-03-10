@@ -38,10 +38,6 @@ libabiword_cpp += wp/main/gtk/libabiword.cpp
 main_cpp = wp/main/gtk/UnixMain.cpp
 endif
 
-if TOOLKIT_QT
-libabiword_cpp += wp/main/qt/libabiwordQt.cpp
-main_cpp = wp/main/qt/QtMain.cpp
-endif
 
 if TOOLKIT_WIN
 main_cpp = wp/main/win/Win32Main.cpp
@@ -93,24 +89,6 @@ if TOOLKIT_GTK_ALL
 libabiword_@ABIWORD_SERIES@_la_LIBADD += \
 	wp/impexp/gtk/libgtk.la \
 	text/fmt/gtk/libgtk.la
-
-## Resources compilation
-abi-resources.c: wp/main/gtk/resources.xml
-	$(AM_V_GEN) glib-compile-resources \
-                --sourcedir=$(srcdir) --target=$@ \
-                --generate-source --c-name abi $(srcdir)/wp/main/gtk/resources.xml
-
-abi-resources.h: wp/main/gtk/resources.xml
-	$(AM_V_GEN) glib-compile-resources                                  \
-                --sourcedir=$(srcdir) --target=$@ \
-		--generate-header --c-name abi $(srcdir)/wp/main/gtk/resources.xml
-
-BUILT_SOURCES = \
-        abi-resources.c \
-        abi-resources.h
-
-libabiword_cpp += abi-resources.c abi-resources.h
-## End of resources
 
 # headers are GTK only.
 libabiword_@ABIWORD_SERIES@_includedir = @ABIWORD_HEADERSDIR@

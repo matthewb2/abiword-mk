@@ -87,9 +87,9 @@ class ABI_EXPORT GR_XPItem : public GR_Item
   public:
 	virtual ~GR_XPItem(){};
 
-	virtual GR_ScriptType getType() const override {return m_eType;}
-	virtual GR_Item * makeCopy() const override {return new GR_XPItem(m_eType);}
-	virtual GRRI_Type getClassId() const override {return GRRI_XP;}
+	virtual GR_ScriptType getType() const {return m_eType;}
+	virtual GR_Item * makeCopy() const {return new GR_XPItem(m_eType);}
+	virtual GRRI_Type getClassId() const {return GRRI_XP;}
 
   protected:
 	GR_XPItem():
@@ -124,8 +124,8 @@ class ABI_EXPORT GR_Itemization
 	    m_iEmbedingLevel(0),
 		m_iDirOverride(0),
 		m_bShowControlChars(false),
-	    m_pLang(nullptr),
-	    m_pFont(nullptr)
+	    m_pLang(NULL),
+	    m_pFont(NULL)
 	{};
 
 	virtual ~GR_Itemization() {clear();} // do not delete the actual
@@ -210,13 +210,13 @@ class ABI_EXPORT GR_RenderInfo
 	GR_RenderInfo(GR_ScriptType type)
 		: m_iOffset(0), m_iLength(0), m_eShapingResult(GRSR_Unknown),
  		  m_eState(GRSR_Unknown), m_eScriptType(type),
-		  m_pText(nullptr), m_iVisDir(UT_BIDI_LTR),
+		  m_pText(NULL), m_iVisDir(UT_BIDI_LTR),
 	      m_xoff(0), m_yoff(),
-	      m_pGraphics(nullptr), m_pFont(nullptr),
+	      m_pGraphics(NULL), m_pFont(NULL),
 		  m_iJustificationPoints(0),
 		  m_iJustificationAmount(0),
 		  m_bLastOnLine(false),
-		  m_pItem(nullptr),
+		  m_pItem(NULL),
 		  m_bInvalidateFontCache(false){};
 
 
@@ -270,13 +270,13 @@ class ABI_EXPORT GR_XPRenderInfo : public GR_RenderInfo
 
 	virtual ~GR_XPRenderInfo();
 
-	virtual GRRI_Type getType() const override {return GRRI_XP;}
+	virtual GRRI_Type getType() const {return GRRI_XP;}
 
-	virtual bool append(GR_RenderInfo &ri, bool bReverse = false) override;
-	virtual bool split (GR_RenderInfo *&pri, bool bReverse = false) override;
-	virtual bool cut(UT_uint32 offset, UT_uint32 len, bool bReverse = false) override;
+	virtual bool append(GR_RenderInfo &ri, bool bReverse = false);
+	virtual bool split (GR_RenderInfo *&pri, bool bReverse = false);
+	virtual bool cut(UT_uint32 offset, UT_uint32 len, bool bReverse = false);
 
-	virtual bool isJustified() const override {return (m_iJustificationPoints != 0);}
+	virtual bool isJustified() const {return (m_iJustificationPoints != 0);}
 
 	void prepareToRenderChars();
 

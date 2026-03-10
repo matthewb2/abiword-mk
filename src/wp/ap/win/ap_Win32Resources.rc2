@@ -63,11 +63,11 @@
 #define AP_RID_DIALOG_META_GENERAL				234	// Property Page
 #define AP_RID_DIALOG_META_SUMMARY				235	// Property Page
 #define AP_RID_DIALOG_META_PERMISSIONS			236	// Property Page
-#define AP_RID_DIALOG_MERGECELLS				237	
+#define AP_RID_DIALOG_MERGECELLS				237
 #define AP_RID_DIALOG_OPT_LANGUAGE				238	// tab-sub-dlg
-#define AP_RID_DIALOG_FORMATTABLE				239	
+#define AP_RID_DIALOG_FORMATTABLE				239
 #define AP_RID_DIALOG_FORMATFOOTNOTES			240
-#define AP_RID_DIALOG_MAILMERGE					241 
+#define AP_RID_DIALOG_MAILMERGE					241
 #define AP_RID_DIALOG_FORMATFRAME				242
 #define AP_RID_DIALOG_STYLIST					243
 #define AP_RID_DIALOG_SPLITCELLS				244
@@ -77,8 +77,8 @@
 #define AP_RID_DIALOG_ANNOTATION				248
 #define AP_RID_DIALOG_OPT_SMARTQUOTES				249	// tab-sub-dlg
 
-//	Maleesh 6/8/2010 -  
-#define AP_RID_DIALOG_BORDER_SHADING			250	
+//	Maleesh 6/8/2010 -
+#define AP_RID_DIALOG_BORDER_SHADING			250
 
 // Bitmaps IDs
 #define AP_RID_TI_1COLUMN 3000
@@ -223,7 +223,7 @@
 #define AP_RID_TI_UNINDENT 3139
 #define AP_RID_TI_VIEW_SHOWPARA 3140
 
-// Maleesh - 
+// Maleesh -
 #define AP_RID_TI_BORDER_STYLE_DASHED	3141
 #define AP_RID_TI_BORDER_STYLE_DOTTED	3142
 #define AP_RID_TI_BORDER_STYLE_NONE		3143
@@ -269,5 +269,5 @@
 #include "ap_Win32Res_DlgLatex.rc2"
 #include "ap_Win32Res_DlgAnnotation.rc2"
 
-//	Maleesh 6/8/2010 - 
+//	Maleesh 6/8/2010 -
 #include "ap_Win32Res_Border_Shading.rc2"

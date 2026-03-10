@@ -17,7 +17,8 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef AP_UNIXDIALOG_PARAGRAPH_H
+#define AP_UNIXDIALOG_PARAGRAPH_H
 
 #include "ap_Dialog_Paragraph.h"
 
@@ -32,7 +33,7 @@ public:
 	AP_UnixDialog_Paragraph(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_UnixDialog_Paragraph(void);
 
-	virtual void runModal(XAP_Frame * pFrame) override;
+	virtual void			runModal(XAP_Frame * pFrame);
 
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 
@@ -59,7 +60,7 @@ public:
 		virtual void event_CheckToggled(GtkWidget * widget);
 
 	// Preview
-	virtual void event_PreviewAreaDraw(void);
+	virtual void event_PreviewAreaExposed(void);
 
  protected:
 
@@ -82,7 +83,7 @@ public:
 
 	void                 _populateWindowData(void);
 
-	virtual void         _syncControls(tControl changed, bool bAll = false) override;
+	virtual void         _syncControls(tControl changed, bool bAll = false);
 
 	// pointers to widgets we need to query/set
 	// there are a ton of them in this dialog
@@ -119,3 +120,5 @@ public:
 
 	GtkWidget * m_checkbuttonDomDirection;
 };
+
+#endif /* XAP_UNIXDIALOG_PARAGRAPH_H */

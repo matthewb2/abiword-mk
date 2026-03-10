@@ -31,7 +31,7 @@ public:
 
 	XAP_Win32ColourButton()
 	{
-		m_hBrush = nullptr;
+		m_hBrush = NULL;
 		m_bBtnEnabled = true;
 	}
 

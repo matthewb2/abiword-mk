@@ -28,7 +28,6 @@
 // This header defines some functions for Unix dialogs,
 // like centering them, measuring them, etc.
 #include "xap_UnixDialogHelper.h"
-#include "xap_GtkUtils.h"
 
 #include "xap_App.h"
 #include "xap_UnixApp.h"
@@ -40,8 +39,11 @@
 
 /*****************************************************************/
 
-static gboolean s_focus_out(GtkWidget *widget, GdkEvent *, gpointer /*user_data*/)
+static gboolean s_focus_out(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
+	UT_UNUSED(event);
+	UT_UNUSED(user_data);
+
 	gtk_editable_select_region(GTK_EDITABLE(widget), 0, 0);
 	return FALSE;
 }
@@ -94,7 +96,7 @@ void AP_UnixDialog_Annotation::eventCancel ()
 	setAnswer ( AP_Dialog_Annotation::a_CANCEL ) ;
 }
 
-#define GRAB_ENTRY_TEXT(name) txt = XAP_gtk_entry_get_text(GTK_ENTRY(m_entry##name)) ; \
+#define GRAB_ENTRY_TEXT(name) txt = gtk_entry_get_text(GTK_ENTRY(m_entry##name)) ; \
 if( txt ) \
 set##name ( txt )
 
@@ -103,7 +105,7 @@ void AP_UnixDialog_Annotation::eventOK ()
 	setAnswer ( AP_Dialog_Annotation::a_OK ) ;
 	
 	// TODO: gather data
-	const char * txt = nullptr ;
+	const char * txt = NULL ;
 	
 	GRAB_ENTRY_TEXT(Title);
 	GRAB_ENTRY_TEXT(Author);
@@ -128,7 +130,7 @@ void AP_UnixDialog_Annotation::eventApply ()
 	setAnswer ( AP_Dialog_Annotation::a_APPLY ) ;
 	
 	// TODO: gather data
-	const char * txt = nullptr ;
+	const char * txt = NULL ;
 	
 	GRAB_ENTRY_TEXT(Title);
 	GRAB_ENTRY_TEXT(Author);
@@ -156,7 +158,7 @@ GtkWidget * AP_UnixDialog_Annotation::_constructWindow ()
 	const XAP_StringSet * pSS = m_pApp->getStringSet();
 	
 	// load the dialog from the UI file
-	GtkBuilder* builder = newDialogBuilderFromResource("ap_UnixDialog_Annotation.ui");
+	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_Annotation.ui");
 	
 	// Update our member variables with the important widgets that 
 	// might need to be queried or altered later
@@ -185,7 +187,7 @@ GtkWidget * AP_UnixDialog_Annotation::_constructWindow ()
 	#define SET_ENTRY_TXT(name) \
 	prop = get##name () ;                      \
 	if ( !prop.empty() ) {                          \
-		XAP_gtk_entry_set_text (GTK_ENTRY(m_entry##name), prop.c_str() ) ; \
+		gtk_entry_set_text (GTK_ENTRY(m_entry##name), prop.c_str() ) ; \
 	}
 	
 	GtkWidget * wReplace = GTK_WIDGET(gtk_builder_get_object(builder, "btReplace"));

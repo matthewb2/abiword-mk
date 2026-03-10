@@ -1,19 +1,19 @@
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
  */
 
@@ -42,7 +42,7 @@
 
 
 GR_Win32Image::GR_Win32Image(const char* szName)
-:	m_pDIB(nullptr)
+:	m_pDIB(0)
 {
 	if (szName)
 	{
@@ -50,10 +50,19 @@ GR_Win32Image::GR_Win32Image(const char* szName)
 	}
 	else
 	{
-		
+
 	  setName( "Win32Image" );
 	}
 }
+
+//pascal
+/*
+struct _bb
+{
+	const UT_ByteBuf* pBB;
+	UT_uint32 iCurPos;
+};
+*/
 
 struct _bb
 {
@@ -71,7 +80,7 @@ static void _png_read(png_structp png_ptr, png_bytep data, png_size_t length)
 }
 
 
-/*! 
+/*!
  * Returns true if pixel at point (x,y) in device units is transparent.
  * See gr_UnixImage.cpp for how it's done in GTK.
  */
@@ -83,14 +92,14 @@ bool	GR_Win32Image::isTransparentAt(UT_sint32 /*x*/, UT_sint32 /*y*/)
 
 /*!
  * Returns true if there is any transparency in the image.
- */ 
+ */
 bool GR_Win32Image::hasAlpha(void) const
 {
-	UT_ASSERT_HARMLESS(0);
+	//pascal UT_ASSERT_HARMLESS(0);
 	return false;
 }
 
-bool GR_Win32Image::convertFromBuffer(const UT_ConstByteBufPtr & pBB, const std::string& mimetype, UT_sint32 iDisplayWidth, UT_sint32 iDisplayHeight)
+bool GR_Win32Image::convertFromBuffer(/*const UT_ByteBuf* pBB*/const UT_ConstByteBufPtr & pBB, const std::string& mimetype, UT_sint32 iDisplayWidth, UT_sint32 iDisplayHeight)
 {
 	if (mimetype == "image/png")
 		return _convertFromPNG(pBB, iDisplayWidth, iDisplayHeight);
@@ -127,7 +136,7 @@ static void _png_error(png_structp png_ptr, png_const_charp message)
 
 #endif
 
-bool GR_Win32Image::convertToBuffer(UT_ConstByteBufPtr& ppBB) const
+bool GR_Win32Image::convertToBuffer(/*UT_ByteBuf** ppBB*/UT_ConstByteBufPtr & ppBB) const
 {
 	/*
 	  The purpose of this routine is to convert our DIB (m_pDIB)
@@ -136,29 +145,36 @@ bool GR_Win32Image::convertToBuffer(UT_ConstByteBufPtr& ppBB) const
 	*/
 
 	// Create our bytebuf
-	UT_ByteBufPtr pBB(new UT_ByteBuf());
+	//pascal UT_ByteBuf* pBB = new UT_ByteBuf();
 
 	png_structp png_ptr;
 	png_infop info_ptr;
 
 	// initialize some libpng stuff
-	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, (png_voidp)nullptr,
-									  (png_error_ptr)nullptr, (png_error_ptr)nullptr);
-	
+	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
+									  (png_error_ptr)NULL, (png_error_ptr)NULL);
+
 	info_ptr = png_create_info_struct(png_ptr);
 
 	// libpng will longjmp back to here if a fatal error occurs
 	if (setjmp(png_jmpbuf(png_ptr)))
 	{
 		/* If we get here, we had a problem reading the file */
-		png_destroy_write_struct(&png_ptr,  (png_infopp)nullptr);
-		ppBB = UT_ByteBufPtr();
-		
+		png_destroy_write_struct(&png_ptr,  (png_infopp)NULL);
+		//pascal *ppBB = NULL;
+        //pascal ppBB = NULL;
 		return false;
 	}
 
+    // Create our bytebuf
+    UT_ConstByteBufPtr pBB(new UT_ByteBuf);
+
+
 	// We want libpng to write to our ByteBuf, not stdio
-	png_set_write_fn(png_ptr, (void *)pBB.get(), _png_write, _png_flush);
+	//pascal png_set_write_fn(png_ptr, (void *)pBB, _png_write, _png_flush);
+
+	png_set_write_fn(png_ptr, const_cast<void *>(reinterpret_cast<const void *>(pBB.get())),
+					 reinterpret_cast<png_rw_ptr>(_png_write), _png_flush);
 
 	UT_uint32 iWidth = m_pDIB->bmiHeader.biWidth;
 	UT_uint32 iHeight;
@@ -178,7 +194,7 @@ bool GR_Win32Image::convertToBuffer(UT_ConstByteBufPtr& ppBB) const
 	{
 		iHeight =  (m_pDIB->bmiHeader.biHeight);
 	}
-	
+
 	png_set_IHDR(png_ptr,
 				 info_ptr,
 				 iWidth,
@@ -197,14 +213,14 @@ bool GR_Win32Image::convertToBuffer(UT_ConstByteBufPtr& ppBB) const
 	  file.  We've got quite a bit of code here to handle various kinds
 	  of DIB images.
 	*/
-	
+
 	UT_uint32 iSizeOfColorData = m_pDIB->bmiHeader.biClrUsed * sizeof(RGBQUAD);
 	RGBQUAD* pColors = (RGBQUAD*) (((unsigned char*) m_pDIB) + m_pDIB->bmiHeader.biSize);
 	UT_Byte* pBits = ((unsigned char*) m_pDIB) + m_pDIB->bmiHeader.biSize + iSizeOfColorData;
-	
+
 	UT_Byte* pData = (UT_Byte*) g_try_malloc(iWidth * iHeight * 3);
 	UT_return_val_if_fail(pData, false); // TODO outofmem
-		
+
 	UT_uint32 	iRow;
 	UT_uint32 	iCol;
 	UT_Byte* 	pRow;
@@ -231,7 +247,7 @@ bool GR_Win32Image::convertToBuffer(UT_ConstByteBufPtr& ppBB) const
 		{
 			iBytesInRow += (4 - (iBytesInRow % 4));
 		}
-		
+
 		for (iRow = 0; iRow<iHeight; iRow++)
 		{
 			if (bTopDown)
@@ -266,7 +282,7 @@ bool GR_Win32Image::convertToBuffer(UT_ConstByteBufPtr& ppBB) const
 
 		break;
 	}
-	
+
 	case 8:
 	{
 		iBytesInRow = iWidth;
@@ -344,7 +360,7 @@ bool GR_Win32Image::convertToBuffer(UT_ConstByteBufPtr& ppBB) const
 	for (UT_uint32 i=0; i<iHeight; i++)
 	{
 		UT_Byte *pRow = pData + i * iWidth * 3;
-		
+
 		png_write_rows(png_ptr, &pRow, 1);
 	}
 
@@ -359,31 +375,32 @@ bool GR_Win32Image::convertToBuffer(UT_ConstByteBufPtr& ppBB) const
 	png_write_end(png_ptr, info_ptr);
 
 	/* clean up after the write, and g_free any memory allocated */
-	png_destroy_write_struct(&png_ptr, (png_infopp)nullptr);
+	png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
 
 	// And pass the ByteBuf back to our caller
-	ppBB = pBB;
+	//pascal *ppBB = pBB;
+    ppBB = pBB;
 
 	return true;
 }
 
 /*!
  * The idea is to create a
- * new image from the rectangular segment in device units defined by 
+ * new image from the rectangular segment in device units defined by
  * UT_Rect rec. The Image should be deleted by the calling routine.
  */
 GR_Image * GR_Win32Image::createImageSegment(GR_Graphics * pG,const UT_Rect & rec)
 {
 	// this code assumes 24 bit RGB bitmaps ...
-	UT_return_val_if_fail(pG && m_pDIB && m_pDIB->bmiHeader.biBitCount == 24, nullptr);
+	UT_return_val_if_fail(pG && m_pDIB && m_pDIB->bmiHeader.biBitCount == 24, NULL);
 
 	// the ration of x and y coords for the graphics class
 	double fXYRatio = ((GR_Win32Graphics *)pG)->getXYRatio();
 
 	// We have three different coordinate systems here:
-	//   
+	//
 	//   rec: the requested segment size, in layout units
-	//   
+	//
 	//   m_pDIB->bmiHeader.biHeight/Width(): physical size of the bitmap
 	//
 	//   getDisplayWidth()/Height() : size in device units for which this image was to be
@@ -401,7 +418,7 @@ GR_Image * GR_Win32Image::createImageSegment(GR_Graphics * pG,const UT_Rect & re
 	// for x and y axis, since the proportions of the DIB have no formal relationship to
 	// the dimensions of the displayed rectangle (e.g., the display image could be
 	// cropped).
-	
+
 	double fDibScaleFactorX = (double) dW / (double)getDisplayWidth();
 	double fDibScaleFactorY = (double) dH / (double)getDisplayHeight();
 
@@ -417,7 +434,7 @@ GR_Image * GR_Win32Image::createImageSegment(GR_Graphics * pG,const UT_Rect & re
 	UT_sint32 heightDIB = (UT_sint32)((double)heightDU * fDibScaleFactorY);
 	UT_sint32 xDIB = (UT_sint32)((double)xDU * fDibScaleFactorX);
 	UT_sint32 yDIB = (UT_sint32)((double)yDU * fDibScaleFactorY);
-	
+
 	if(xDIB < 0)
 	{
 		xDIB = 0;
@@ -453,7 +470,7 @@ GR_Image * GR_Win32Image::createImageSegment(GR_Graphics * pG,const UT_Rect & re
 		yDIB = dH -1;
 		heightDIB = 1;
 	}
-	
+
 	UT_String sName("");
 	getName(sName);
     UT_String sSub("");
@@ -461,8 +478,8 @@ GR_Image * GR_Win32Image::createImageSegment(GR_Graphics * pG,const UT_Rect & re
 	sName += sSub;
 	GR_Win32Image * pImage = new GR_Win32Image(sName.c_str());
 
-	UT_return_val_if_fail( pImage, nullptr );
-	
+	UT_return_val_if_fail( pImage, NULL );
+
 	// now allocate memory -- mostly copied from convertFromBuffer()
 	UT_uint32 iBytesInRow = widthDIB * 3;
 	if (iBytesInRow % 4)
@@ -471,7 +488,7 @@ GR_Image * GR_Win32Image::createImageSegment(GR_Graphics * pG,const UT_Rect & re
 	}
 
 	pImage->m_pDIB = (BITMAPINFO*) g_try_malloc(sizeof(BITMAPINFOHEADER) + heightDIB * iBytesInRow);
-	UT_return_val_if_fail( pImage->m_pDIB, nullptr );
+	UT_return_val_if_fail( pImage->m_pDIB, NULL );
 
 	// simply copy the whole header
 	memcpy(pImage->m_pDIB, m_pDIB, sizeof(BITMAPINFOHEADER));
@@ -504,42 +521,42 @@ GR_Image * GR_Win32Image::createImageSegment(GR_Graphics * pG,const UT_Rect & re
 	UT_Byte * pBits2 = ((UT_Byte*)pImage->m_pDIB) + sizeof(BITMAPINFOHEADER);
 
 	UT_uint32 iRow;
-	
+
 	for(iRow = iBottom; iRow < iTop; iRow++)
 	{
 		memcpy(pBits2, pBits1 + iRow * iOrigRowBytes + iLeft, iByteWidth);
 		pBits2 += iByteWidth;
-		
+
 		// now the padding ...
 		for(UT_uint32 iPad = iRight; iPad < iRightPadded; iPad++, pBits2++)
 		{
 			*pBits2 = 0;
 		}
 	}
-	
+
 	return static_cast<GR_Image *>(pImage);
 }
 
-bool GR_Win32Image::_convertFromPNG(const UT_ConstByteBufPtr& pBB, UT_sint32 iDisplayWidth, UT_sint32 iDisplayHeight)
+bool GR_Win32Image::_convertFromPNG(/*const UT_ByteBuf* pBB*/const UT_ConstByteBufPtr & pBB, UT_sint32 iDisplayWidth, UT_sint32 iDisplayHeight)
 {
 	png_structp png_ptr;
 	png_infop info_ptr;
 	png_uint_32 width, height;
 	int bit_depth, color_type, interlace_type;
 
-	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (void*) nullptr,
-									 nullptr, nullptr);
+	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (void*) NULL,
+									 NULL, NULL);
 
-	if (png_ptr == nullptr)
+	if (png_ptr == NULL)
 	{
 		return false;
 	}
 
 	/* Allocate/initialize the memory for image information.  REQUIRED. */
 	info_ptr = png_create_info_struct(png_ptr);
-	if (info_ptr == nullptr)
+	if (info_ptr == NULL)
 	{
-		png_destroy_read_struct(&png_ptr, (png_infopp)nullptr, (png_infopp)nullptr);
+		png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
 		return false;
 	}
 
@@ -550,7 +567,7 @@ bool GR_Win32Image::_convertFromPNG(const UT_ConstByteBufPtr& pBB, UT_sint32 iDi
 	if (setjmp(png_jmpbuf(png_ptr)))
 	{
 		/* Free all of the memory associated with the png_ptr and info_ptr */
-		png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)nullptr);
+		png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
 
 		/* If we get here, we had a problem reading the file */
 		return false;
@@ -559,8 +576,9 @@ bool GR_Win32Image::_convertFromPNG(const UT_ConstByteBufPtr& pBB, UT_sint32 iDi
 	struct _bb myBB;
 	myBB.pBB = pBB;
 	myBB.iCurPos = 0;
-	
-	png_set_read_fn(png_ptr, (void *)&myBB, _png_read);
+
+	//pascal png_set_read_fn(png_ptr, (void *)&myBB, _png_read);
+  png_set_read_fn(png_ptr, static_cast<void *>(&myBB), reinterpret_cast<png_rw_ptr>(_png_read));
 
 	/* The call to png_read_info() gives us all of the information from the
 	 * PNG file before the first IDAT (image data chunk).  REQUIRED
@@ -568,7 +586,7 @@ bool GR_Win32Image::_convertFromPNG(const UT_ConstByteBufPtr& pBB, UT_sint32 iDi
 	png_read_info(png_ptr, info_ptr);
 
 	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
-				 &interlace_type, nullptr, nullptr);
+				 &interlace_type, NULL, NULL);
 
 	/* Extract multiple pixels with bit depths of 1, 2, and 4 from a single
 	 * byte into separate bytes (useful for paletted and grayscale images).
@@ -587,7 +605,7 @@ bool GR_Win32Image::_convertFromPNG(const UT_ConstByteBufPtr& pBB, UT_sint32 iDi
 
 	/*  For simplicity, we'll ignore alpha */
 	png_set_strip_alpha(png_ptr);
-	
+
 	/*  We want libpng to deinterlace the image for us */
 	UT_uint32 iInterlacePasses = png_set_interlace_handling(png_ptr);
 
@@ -603,7 +621,7 @@ bool GR_Win32Image::_convertFromPNG(const UT_ConstByteBufPtr& pBB, UT_sint32 iDi
 	m_pDIB = (BITMAPINFO*) g_try_malloc(sizeof(BITMAPINFOHEADER) + height * iBytesInRow);
 	if (!m_pDIB)
 	{
-		png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)nullptr);
+		png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
 		return false;
 	}
 
@@ -635,7 +653,7 @@ bool GR_Win32Image::_convertFromPNG(const UT_ConstByteBufPtr& pBB, UT_sint32 iDi
 		{
 			UT_Byte* pRow = pBits + (height - iRow - 1) * iBytesInRow;
 
-			png_read_rows(png_ptr, &pRow, nullptr, 1);
+			png_read_rows(png_ptr, &pRow, NULL, 1);
 		}
 	}
 
@@ -643,12 +661,12 @@ bool GR_Win32Image::_convertFromPNG(const UT_ConstByteBufPtr& pBB, UT_sint32 iDi
 	png_read_end(png_ptr, info_ptr);
 
 	/* clean up after the read, and g_free any memory allocated - REQUIRED */
-	png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)nullptr);
+	png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
 
 	return true;
 }
 
-bool GR_Win32Image::_convertFromJPEG(const UT_ConstByteBufPtr& pBB, UT_sint32 iDisplayWidth, UT_sint32 iDisplayHeight)
+bool GR_Win32Image::_convertFromJPEG(/*const UT_ByteBuf* pBB*/const UT_ConstByteBufPtr & pBB, UT_sint32 iDisplayWidth, UT_sint32 iDisplayHeight)
 {
 	UT_sint32 iImageWidth;
 	UT_sint32 iImageHeight;
@@ -692,12 +710,12 @@ bool GR_Win32Image::_convertFromJPEG(const UT_ConstByteBufPtr& pBB, UT_sint32 iD
 	m_pDIB->bmiHeader.biClrImportant = 0;
 
 	UT_Byte* pBuf = ((unsigned char*) m_pDIB) + m_pDIB->bmiHeader.biSize;
-	
-	if (!UT_JPEG_getRGBData(pBB, pBuf, iBytesInRow, true, true))
+
+  if (!UT_JPEG_getRGBData(pBB, pBuf, iBytesInRow, true, true))
 	{
 		FREEP(m_pDIB);
 		return false;
 	}
-	
+
 	return true;
 }

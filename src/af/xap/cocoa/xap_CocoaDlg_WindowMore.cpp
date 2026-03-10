@@ -18,7 +18,6 @@
  * 02110-1301 USA.
  */
 
-#include <string>
 #include "ut_string.h"
 #include "ut_assert.h"
 #include "ut_debugmsg.h"
@@ -159,10 +158,10 @@ void XAP_CocoaDialog_WindowMore::_populateWindowData(void)
 	{
 		XAP_Frame * f = m_pApp->getFrame(i);
 		UT_ASSERT(f);
-		std::string s = f->getTitle();
-
-		[m_dataSource addString:[NSString stringWithUTF8String:s.c_str()]];
-	}
+		UT_UTF8String s = f->getTitle();
+		
+		[m_dataSource addString:[NSString stringWithUTF8String:s.utf8_str()]];
+	} 
 
 	// Select the one we're in
 	[m_dlg setSelected:m_ndxSelFrame];

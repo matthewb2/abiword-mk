@@ -35,10 +35,11 @@
 #include "fp_Page.h"
 
 fb_ColumnBreaker::fb_ColumnBreaker(fl_DocSectionLayout * pDSL) :
-	m_pStartPage(nullptr),
+	m_pStartPage(NULL),
 	m_bStartFromStart(true),
 	m_bReBreak(false),
-	m_pDocSec(pDSL)
+	m_pDocSec(pDSL),
+	m_pCurrentBlock(NULL)
 {
 }
 
@@ -46,7 +47,7 @@ void fb_ColumnBreaker::setStartPage(fp_Page * pPage)
 {
   //	if(!m_bStartFromStart)
 	{
-		if(m_pStartPage == nullptr)
+		if(m_pStartPage == NULL)
 		{
 			m_pStartPage = pPage;
 			return;
@@ -64,14 +65,14 @@ void fb_ColumnBreaker::setStartPage(fp_Page * pPage)
 		}
 		else if( (iNewPage < 0) && (iCurPage < 0))
 		{
-			m_pStartPage = nullptr;
+			m_pStartPage = NULL;
 			m_bStartFromStart = true;
 		}
 	}
-	if(pPage == nullptr)
+	if(pPage == NULL)
 	{
 		m_bStartFromStart = true;
-		m_pStartPage = nullptr;
+		m_pStartPage = NULL;
 	}
 	return;
 }
@@ -85,13 +86,13 @@ bool fb_ColumnBreaker::_displayAnnotations(void)
 }
 
 /*!
- * Returns nullptr if no rebreak is required.
- * Otherwise returns a pointer to the page requiring the rebreak.
+ * Returns NULL if no rebreak is required. 
+ Otherwise returns a pointer to the page requiring the rebreak.
 */
 fp_Page * fb_ColumnBreaker::needsRebreak(void)
 {
     fl_ContainerLayout * pCL = m_pDocSec->getLastLayout();
-    fl_BlockLayout * pBL = nullptr;
+    fl_BlockLayout * pBL = NULL;
     if(pCL && (pCL->getContainerType() == FL_CONTAINER_BLOCK))
     {
         pBL = static_cast<fl_BlockLayout *>(pCL);
@@ -107,12 +108,12 @@ fp_Page * fb_ColumnBreaker::needsRebreak(void)
     if(pBL)
     {
         fp_Line * pLine = static_cast<fp_Line *>(pBL->getLastContainer());
-	if(pLine == nullptr)
+	if(pLine == NULL)
 	{
 	     return _getLastValidPage();
 	}
 	fp_Page * pPage = pLine->getPage();
-	if(pPage == nullptr)
+	if(pPage == NULL)
 	{
 	     return _getLastValidPage();
 	}
@@ -129,7 +130,7 @@ fp_Page * fb_ColumnBreaker::needsRebreak(void)
 	    }
 	}
     }
-    return nullptr;
+    return NULL;
 }
 
 	
@@ -155,7 +156,7 @@ UT_sint32 fb_ColumnBreaker::breakSection()
   m_bStartFromStart = true;
   UT_sint32 iPage = pDL->findPage(pStartPage);  
   if(iPage < 0)
-       pStartPage = nullptr;
+       pStartPage = NULL;
   UT_sint32 iVal = _breakSection(pStartPage);
   UT_sint32 icnt = 0;
   pStartPage = needsRebreak();
@@ -171,7 +172,7 @@ UT_sint32 fb_ColumnBreaker::breakSection()
       iPage = pDL->findPage(pStartPage);
       if(iPage < 0)
       {
-	  pStartPage = nullptr;
+	  pStartPage = NULL;
       }
       else
       {
@@ -207,8 +208,8 @@ UT_sint32 fb_ColumnBreaker::breakSection()
 
 fp_Page * fb_ColumnBreaker::_getLastValidPage(void)
 {
-  fp_Page * pPage = nullptr;
-  fp_Page * pFoundPage = nullptr;
+  fp_Page * pPage = NULL;
+  fp_Page * pFoundPage = NULL;
   UT_sint32 i = 0;
   FL_DocLayout * pDL = m_pDocSec->getDocLayout();
   for(i=0; i<pDL->countPages();i++)
@@ -218,7 +219,7 @@ fp_Page * fb_ColumnBreaker::_getLastValidPage(void)
       {
 	  pFoundPage = pPage;
       }
-      else if(pFoundPage != nullptr)
+      else if(pFoundPage != NULL)
 	break;
   }
   return pFoundPage;
@@ -228,12 +229,12 @@ fp_Page * fb_ColumnBreaker::_getLastValidPage(void)
 UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 {
 	m_bReBreak = false;
-	m_pStartPage = nullptr;
+	m_pStartPage = NULL;
 	FL_DocLayout * pDocLayout = m_pDocSec->getDocLayout();
-	fl_ContainerLayout* pFirstLayout = nullptr;
-	fp_Container* pOuterContainer = nullptr;
-	fp_Column* pCurColumn = nullptr;
-	fp_Column* pPrevColumn = nullptr;
+	fl_ContainerLayout* pFirstLayout = NULL;
+	fp_Container* pOuterContainer = NULL;
+	fp_Column* pCurColumn = NULL;
+	fp_Column* pPrevColumn = NULL;
 	UT_sint32 iCurPage = 0;
 	UT_sint32 iColCons =  0;
 	xxx_UT_DEBUGMSG(("Doing ColumnBreak for section %x at page %x \n",m_pDecSec,m_pStartPage));
@@ -241,7 +242,7 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 	pFirstLayout = m_pDocSec->getFirstLayout();
 	if (!pFirstLayout)
 	{
-		m_pStartPage = nullptr;
+		m_pStartPage = NULL;
 		m_bStartFromStart = false;
 		return 0;
 	}
@@ -249,7 +250,7 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 	{
 		iCurPage =  pDocLayout->findPage(pStartPage);
 		if(iCurPage == 0)
-			pStartPage=nullptr;
+			pStartPage=NULL;
 	}
 	pOuterContainer = pFirstLayout->getFirstContainer();
 	if(pOuterContainer
@@ -288,15 +289,15 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 			pFirstLayout = static_cast<fl_ContainerLayout *>(pOuterContainer->getSectionLayout());
 		}
 	}
-	fp_Page * pPrevPage = nullptr;
-	// attachment 3627 from bug 9878 has pCurColumn == nullptr
+	fp_Page * pPrevPage = NULL;
+	// attachment 3627 from bug 9878 has pCurColumn == NULL
 	if (pCurColumn) {
 		pPrevPage = pCurColumn->getPage();
 	}
 	xxx_UT_DEBUGMSG(("Starting ColumnBreak now pOuterContainer %p \n",pOuterContainer));
 	while (pCurColumn)
 	{
-		if(  m_pStartPage != nullptr)
+		if(  m_pStartPage != NULL)
 		{
 			// Abort and start again
 			break;
@@ -353,13 +354,13 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 				fp_Container * pNextContainer = pPrevPage->updatePageForWrapping(pCurColumn);
 				//pOuterContainer->setAllowDelete(true);
 				xxx_UT_DEBUGMSG(("Returned container updatePage %x \n",pNextContainer));
-				if(pNextContainer != nullptr)
+				if(pNextContainer != NULL)
 				{
 					pOuterContainer = pNextContainer;
 				}
 			}
 		}
-		if((pDocLayout->getRebuiltBlock() == nullptr) && bSaveset)
+		if((pDocLayout->getRebuiltBlock() == NULL) && bSaveset)
 		{
 			pDocLayout->getSavedContainerPointer()->setAllowDelete(true);
 		}
@@ -378,8 +379,8 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 		pPrevPage = pCurColumn->getPage();
 		fp_Container* pFirstContainerToKeep = pOuterContainer;
 		xxx_UT_DEBUGMSG(("SEVIOR: first to keep 1 %x \n",pFirstContainerToKeep));
-		fp_Container* pLastContainerToKeep = nullptr;
-		fp_Container* pOffendingContainer = nullptr;
+		fp_Container* pLastContainerToKeep = NULL;
+		fp_Container* pOffendingContainer = NULL;
 		UT_sint32 iMaxSecCol = m_pDocSec->getActualColumnHeight();
  		UT_sint32 iMaxColHeight = pCurColumn->getMaxHeight();
 		bool bEquivColumnBreak = false;
@@ -427,7 +428,7 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 		UT_sint32 iTotalContainerSpace = 0;
 		while (pCurContainer)
 		{
-			//	pCurContainer->setMyBrokenContainer(nullptr);
+			//	pCurContainer->setMyBrokenContainer(NULL);
 			iColCons++;
 			xxx_UT_DEBUGMSG(("curContainer pointer %p type %s \n",iLoop,pCurContainer,pCurContainer->getContainerString()));
 			if(pCurContainer->getDocSectionLayout() != m_pDocSec)
@@ -566,7 +567,7 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 				*/
 
 				xxx_UT_DEBUGMSG(("SEVIOR: iWorkingColHeight %d iTotalContainerSpace %d iMaxColHeight %d pCurContainer %x height %d \n",iWorkingColHeight,iTotalContainerSpace,iMaxColHeight,   pCurContainer,  iContainerHeight));
-				if(pOffendingContainer == nullptr)
+				if(pOffendingContainer == NULL)
 				{
 					break;
 				}
@@ -586,9 +587,9 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 				UT_uint32 iWidows = 0;
 				UT_uint32 iOrphans = 0;
 				bool bIsTableOrTOC = false;
-				fl_BlockLayout* pBlock = nullptr;
-				fl_ContainerLayout * pConLayout = nullptr;
-				if(pOffendingContainer == nullptr)
+				fl_BlockLayout* pBlock = NULL;
+				fl_ContainerLayout * pConLayout = NULL;
+				if(pOffendingContainer == NULL)
 					break;
 				if(pOffendingContainer->getContainerType() == FP_CONTAINER_LINE)
 				{
@@ -601,7 +602,7 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 				{
 					pConLayout = static_cast<fl_ContainerLayout *>(pOffendingContainer->getSectionLayout());
 					pLastContainerToKeep = pOffendingContainer->getPrevContainerInSection();
-					if(pLastContainerToKeep == nullptr)
+					if(pLastContainerToKeep == NULL)
 					{
 						fl_DocSectionLayout * pDSL = pConLayout->getDocSectionLayout();
 						UT_ASSERT(pDSL);
@@ -819,11 +820,11 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 			}
 			else
 			{
-				pOuterContainer = nullptr;
+				pOuterContainer = NULL;
 			}
 		}
 		else
-			pOuterContainer = nullptr;
+			pOuterContainer = NULL;
 //
 // OK fill our column with content between pFirstContainerToKeep and pLastContainerToKeep
 //
@@ -855,7 +856,7 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 //
 				if(pCurContainer->getContainerType() == FP_CONTAINER_ENDNOTE)
 				{
-					if(pCurContainer->getContainer() == nullptr)
+					if(pCurContainer->getContainer() == NULL)
 					{
 						pCurColumn->addContainer(pCurContainer);
 					}
@@ -920,13 +921,13 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 					for(i=0; i< vecFootnotes.getItemCount();i++)
 					{
 						fp_FootnoteContainer * pFC = vecFootnotes.getNthItem(i);
-						if(pFC != nullptr)
+						if(pFC != NULL)
 						{
 							fp_Page * myPage = pFC->getPage();
 							xxx_UT_DEBUGMSG(("Footnote %x is on Page %x \n",pFC,myPage));
 							if(myPage != pCurPage)
 							{
-								if(myPage == nullptr)
+								if(myPage == NULL)
 								{
 									pCurPage->insertFootnoteContainer(pFC);
 								}
@@ -954,13 +955,13 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 					for(i=0; i< vecAnnotations.getItemCount();i++)
 					{
 						fp_AnnotationContainer * pAC = vecAnnotations.getNthItem(i);
-						if(pAC != nullptr)
+						if(pAC != NULL)
 						{
 							fp_Page * myPage = pAC->getPage();
-							UT_DEBUGMSG(("Annotation %p is on Page %p \n", (void*)pAC, (void*)myPage));
+							UT_DEBUGMSG(("Annotation %p is on Page %p \n",pAC,myPage));
 							if(myPage != pCurPage)
 							{
-								if(myPage == nullptr)
+								if(myPage == NULL)
 								{
 									pCurPage->insertAnnotationContainer(pAC);
 								}
@@ -1006,7 +1007,7 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 							if(myPage != pCurPage)
 							{
 								xxx_UT_DEBUGMSG((" Moving anchor from %x to %x \n",myPage,pCurPage));
-								if(myPage == nullptr)
+								if(myPage == NULL)
 								{
 									pCurPage->insertFootnoteContainer(pFC);
 								}
@@ -1038,7 +1039,7 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 							if(myPage != pCurPage)
 							{
 								xxx_UT_DEBUGMSG((" Moving anchor from %x to %x \n",myPage,pCurPage));
-								if(myPage == nullptr)
+								if(myPage == NULL)
 								{
 									pCurPage->insertAnnotationContainer(pAC);
 								}
@@ -1074,14 +1075,14 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 			}
 			else
 			{
-				if((pLastContainerToKeep!=nullptr) && (_getNext(pCurContainer) == nullptr))
+				if((pLastContainerToKeep!=NULL) && (_getNext(pCurContainer) == NULL))
 				{
-					UT_DEBUGMSG(("Non null LastContainerToKeep yet next container is nullptr!!!!!!!!!!!! \n"));
-					UT_DEBUGMSG((" CurContainer %p type %d \n", (void*)pCurContainer,pCurContainer->getContainerType()));
-					UT_DEBUGMSG((" FirstContainer to keep %p Last container to keep %p \n", (void*)pTab, (void*)pLastContainerToKeep));
+					UT_DEBUGMSG(("Non null LastContainerToKeep yet next container is NULL!!!!!!!!!!!! \n"));
+					UT_DEBUGMSG((" CurContainer %p type %d \n",pCurContainer,pCurContainer->getContainerType()));
+					UT_DEBUGMSG((" FirstContainer to keep %p Last container to keep %p \n",pTab,pLastContainerToKeep));
 					UT_DEBUGMSG(("Try to recover.... \n"));
 					//	UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
-					pLastContainerToKeep = nullptr;
+					pLastContainerToKeep = NULL;
 					break;
 				}
 				pCurContainer = _getNext(pCurContainer);
@@ -1109,10 +1110,10 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 				pNextColumn = static_cast<fp_Column *>(pNextColumn->getNext());
 				if(bBreakOnColumnBreak || bEquivColumnBreak)
 				{
-					if((pNextColumn != nullptr) &&
-					   (pNextColumn != pCurColumn->getFollower()) &&
+					if((pNextColumn != NULL) && 
+					   (pNextColumn != pCurColumn->getFollower()) && 
 					   (pNextColumn->getPage() != pCurColumn->getPage()))
-						pNextColumn = nullptr;
+						pNextColumn = NULL;
 				}
 				if (!pNextColumn)
 				{
@@ -1120,7 +1121,7 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 						pNextColumn = static_cast<fp_Column*>
 						 (m_pDocSec->getNewContainer(_getNext(pLastContainerToKeep)));
 					else
-						pNextColumn = static_cast<fp_Column*>(m_pDocSec->getNewContainer(nullptr));
+						pNextColumn = static_cast<fp_Column*>(m_pDocSec->getNewContainer(NULL));
 				}
 			}
 			while (pLastContainerToKeep->getContainerType()
@@ -1128,12 +1129,12 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 				   static_cast<fp_Line *>(pLastContainerToKeep)
 				        ->containsForcedPageBreak() &&
 				   (pNextColumn->getPage() == pPrevPage2));
-			if(pCurColumn != nullptr && (pCurColumn == pNextColumn))
+			if(pCurColumn != NULL && (pCurColumn == pNextColumn))
 			{
 				pCurColumn->layout();
 			}
 			// Bump content down the columns
-			while (pCurColumn != nullptr && pCurColumn != pNextColumn)
+			while (pCurColumn != NULL && pCurColumn != pNextColumn)
 			{
 				xxx_UT_DEBUGMSG(("Start of bump loop pNextColumn %x \n",pNextColumn));
 				bool isTOCTABLE = false;
@@ -1166,10 +1167,10 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 					}
 					else
 					{
-					      pOuterContainer = nullptr;
+					      pOuterContainer = NULL;
 					      pPrevColumn = pCurColumn;
-					      pCurColumn = nullptr;
-					      pLastContainerToKeep = nullptr;
+					      pCurColumn = NULL;
+					      pLastContainerToKeep = NULL;
 					      break;
 					}
 				}
@@ -1178,7 +1179,7 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 				pCurColumn = static_cast<fp_Column *>(pCurColumn->getNext());
 					// This is only relevant for the initial column. All
 					// other columns should flush their entire content.
-				pLastContainerToKeep = nullptr;
+				pLastContainerToKeep = NULL;
 				xxx_UT_DEBUGMSG(("Last of bump loop pCurColumn %x \n",pCurColumn));
 			}
 
@@ -1214,23 +1215,23 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 			//			pCurColumn->validate();
 			pPrevColumn = pCurColumn;
 			pCurColumn = static_cast<fp_Column *>(pCurColumn->getNext());
-			if(pCurColumn == nullptr && (bTableTest || bTOCTest) && pOuterContainer != nullptr)
+			if(pCurColumn == NULL && (bTableTest || bTOCTest) && pOuterContainer != NULL)
 			{
 				if(pOuterContainer->isVBreakable())
 				{
-					pCurColumn = static_cast<fp_Column *>(m_pDocSec->getNewContainer(nullptr));
+					pCurColumn = static_cast<fp_Column *>(m_pDocSec->getNewContainer(NULL));
 				}
 				else
 				{
 					pCurColumn = static_cast<fp_Column *>(m_pDocSec->getNewContainer(pOuterContainer));
 				}
 			}
-			else if(pCurColumn == nullptr && pLastContainerToKeep && _getNext(pLastContainerToKeep))
+			else if(pCurColumn == NULL && pLastContainerToKeep && _getNext(pLastContainerToKeep))
 			{
 				fp_Container * pCon = _getNext(pLastContainerToKeep);
 				if(pCon->isVBreakable())
 				{
-					pCurColumn =  static_cast<fp_Column *>(m_pDocSec->getNewContainer(nullptr));
+					pCurColumn =  static_cast<fp_Column *>(m_pDocSec->getNewContainer(NULL));
 				}
 				else
 				{
@@ -1238,12 +1239,12 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 				}
 			}
 		}
-		if(pCurColumn == nullptr && pLastContainerToKeep && _getNext(pLastContainerToKeep))
+		if(pCurColumn == NULL && pLastContainerToKeep && _getNext(pLastContainerToKeep))
 		{
 			fp_Container * pCon = _getNext(pLastContainerToKeep);
 			if(pCon->isVBreakable())
 			{
-				pCurColumn =  static_cast<fp_Column *>(m_pDocSec->getNewContainer(nullptr));
+				pCurColumn =  static_cast<fp_Column *>(m_pDocSec->getNewContainer(NULL));
 			}
 			else
 			{
@@ -1253,18 +1254,18 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 //
 // check for wrapped objects on last page
 //
-		if(pCurColumn == nullptr)
+		if(pCurColumn == NULL)
 		{
-			UT_ASSERT(pOuterContainer == nullptr);
+			UT_ASSERT(pOuterContainer == NULL);
 			fp_Page * pPage = pPrevColumn->getPage();
 			UT_sint32 iPage = m_pDocSec->getDocLayout()->findPage(pPage);
 			m_pDocSec->getDocLayout()->setFramePageNumbers(iPage);
 			fp_Container * pNextContainer = pPage->updatePageForWrapping(pCurColumn);
 			xxx_UT_DEBUGMSG(("Returned container updatePage %x \n",pNextContainer));
-			if(pNextContainer == nullptr)
+			if(pNextContainer == NULL)
 			{
-				pCurColumn = nullptr;
-				pOuterContainer = nullptr;
+				pCurColumn = NULL;
+				pOuterContainer = NULL;
 			}
 			else
 			{
@@ -1273,10 +1274,10 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 		}
 		if(pCurContainer && (pCurContainer->getDocSectionLayout() != m_pDocSec))
 		{
-		        pCurColumn = nullptr;
+		        pCurColumn = NULL;
 		}
 //
-// Loop back for next pCurContainer. Finish if pCurColumn == nullptr.
+// Loop back for next pCurContainer. Finish if pCurColumn == NULL.
 //
 		xxx_UT_DEBUGMSG(("fb_ColumnBreaker:: Finished this column, doing next now. \n"));
 	}
@@ -1286,7 +1287,7 @@ UT_sint32 fb_ColumnBreaker::_breakSection(fp_Page * pStartPage)
 	if(m_bReBreak)
 	{
 		UT_ASSERT(0);
-		m_pStartPage = nullptr;
+		m_pStartPage = NULL;
 		m_bStartFromStart = false;
 		breakSection();
 	}
@@ -1357,7 +1358,7 @@ bool fb_ColumnBreaker::_checkVBreakableContainer(fp_Container * pContainer, UT_s
 		return false;
 	}
 
-	fp_VerticalContainer * pBroke = nullptr;
+	fp_VerticalContainer * pBroke = NULL;
 	UT_ASSERT(iBreakAt <= (iAvail-1));
 
 	//
@@ -1402,22 +1403,22 @@ bool fb_ColumnBreaker::_checkVBreakableContainer(fp_Container * pContainer, UT_s
 }
 
 /*
-  get the container that follows pCon in the section. Returns nullptr
+  get the container that follows pCon in the section. Returns NULL
   if pCon is the last container of the section.
  */
 
 fp_Container * fb_ColumnBreaker::_getNext(fp_Container * pCon)
 {
-	UT_return_val_if_fail(pCon,nullptr);
-	fp_Container * pNext = nullptr;
+	UT_return_val_if_fail(pCon,NULL);
+	fp_Container * pNext = NULL;
 	if(pCon->getContainerType() != FP_CONTAINER_ENDNOTE)
 	{
 		pNext = pCon->getNextContainerInSection();
 		if(pNext)
 		{
-			UT_return_val_if_fail(pNext->getDocSectionLayout() == m_pDocSec,nullptr);
+			UT_return_val_if_fail(pNext->getDocSectionLayout() == m_pDocSec,NULL);
 		}
-		if(pNext != nullptr)
+		if(pNext != NULL)
 		{
 			xxx_UT_DEBUGMSG(("_getNext: 1 Returning %p \n",pNext));
 			return pNext;

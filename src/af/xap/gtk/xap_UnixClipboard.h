@@ -19,17 +19,19 @@
  * 02110-1301 USA.
  */
 
-#pragma once
-
-#include <vector>
+#ifndef XAP_UNIXCLIPBOARD_H
+#define XAP_UNIXCLIPBOARD_H
 
 #include "ut_compiler.h"
 
 #include <glib.h>
+ABI_W_NO_CONST_QUAL
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
+ABI_W_POP
 
 #include "ut_types.h"
+#include "ut_vector.h"
 #include "ut_bytebuf.h"
 #include "xap_FakeClipboard.h"
 #include "xap_UnixApp.h"
@@ -61,7 +63,7 @@ public:
 	bool				getTextData(T_AllowGet tFrom, void ** ppData,
 									UT_uint32 * pLen);
 
-	bool canPaste(T_AllowGet tFrom) const;
+	bool canPaste(T_AllowGet tFrom);
 
 	GtkTargetEntry * getTargets () const { return m_Targets ; }
 	UT_uint32 getNumTargets () const { return m_nTargets; }
@@ -73,7 +75,7 @@ protected:
 
  private:
 
-	GtkClipboard * gtkClipboardForTarget(XAP_UnixClipboard::_T_AllowGet get) const;
+	GtkClipboard * gtkClipboardForTarget(XAP_UnixClipboard::_T_AllowGet get);
 
 	bool				_getDataFromServer(T_AllowGet tFrom, const char** formatList,
 							   void ** ppData, UT_uint32 * pLen,
@@ -130,8 +132,8 @@ protected:
 			     GtkSelectionData *selection_data,
 			     guint info, T_AllowGet which);
 
-	std::vector<const char*>  m_vecFormat_AP_Name;
-	std::vector<GdkAtom>  m_vecFormat_GdkAtom;
+	UT_GenericVector<const char*>  m_vecFormat_AP_Name;
+	UT_GenericVector<GdkAtom>  m_vecFormat_GdkAtom;
 
 	UT_ByteBuf m_databuf; // for gets only
 
@@ -145,3 +147,5 @@ protected:
 	GtkClipboard * m_clip;
 	GtkClipboard * m_primary;
 };
+
+#endif /* XAP_UNIXCLIPBOARD_H */

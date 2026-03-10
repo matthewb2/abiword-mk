@@ -44,7 +44,7 @@ static std::vector<std::string> 	IE_IMP_MimeClasses;
 static std::vector<std::string> 	IE_IMP_Suffixes;
 
 #include "ie_imp_XML.h"
-IE_Imp_XML * abi_ie_imp_xml_instance = nullptr;
+IE_Imp_XML * abi_ie_imp_xml_instance = 0;
 
 /*****************************************************************/
 /*****************************************************************/
@@ -111,7 +111,7 @@ bool IE_Imp::appendStruxFmt(pf_Frag_Strux * pfs, const PP_PropertyVector & attri
 	{
 		bool bRes;
 
-		if (pfs == nullptr)
+		if (pfs == NULL)
 		{
 			UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
 			bRes = false;
@@ -141,7 +141,7 @@ bool IE_Imp::appendSpan (const UT_UCSChar * p, UT_uint32 length)
 	else
 		{
 			UT_uint32 fragLength = 0;
-			bool bRes = m_pDocument->insertSpan (m_dpos, p, length, nullptr, &fragLength);
+			bool bRes = m_pDocument->insertSpan (m_dpos, p, length, NULL, &fragLength);
 			m_dpos += fragLength;
 			return bRes;
 		}
@@ -250,7 +250,7 @@ void IE_Imp::unregisterImporter (IE_ImpSniffer * s)
 	IE_IMP_Sniffers.deleteNthItem (ndx-1);
 
 	// Refactor the indexes
-	IE_ImpSniffer * pSniffer = nullptr;
+	IE_ImpSniffer * pSniffer = 0;
 	UT_uint32 size  = IE_IMP_Sniffers.size();
 	UT_uint32 i     = 0;
 	for( i = ndx-1; i < size; i++)
@@ -267,7 +267,7 @@ void IE_Imp::unregisterImporter (IE_ImpSniffer * s)
 
 void IE_Imp::unregisterAllImporters ()
 {
-	IE_ImpSniffer * pSniffer = nullptr;
+	IE_ImpSniffer * pSniffer = 0;
 	UT_uint32 size = IE_IMP_Sniffers.size();
 
 	for (UT_uint32 i = 0; i < size; i++)
@@ -350,12 +350,12 @@ const std::vector<std::string> & IE_Imp::getSupportedSuffixes()
 }
 
 /*!
- * Map mime type to a suffix. Returns nullptr if not found.
+ * Map mime type to a suffix. Returns NULL if not found.
  */
 const char * IE_Imp::getMimeTypeForSuffix(const char * suffix)
 {
 	if (!suffix || !(*suffix))
-		return nullptr;
+		return NULL;
 	
 	if (suffix[0] == '.') {
 		suffix++;
@@ -372,14 +372,14 @@ const char * IE_Imp::getMimeTypeForSuffix(const char * suffix)
 					return mc->mimetype.c_str();
 				}
 				else {
-					return nullptr;
+					return NULL;
 				}
 			}
 			sc++;
 		}
 	}
 
-	return nullptr;
+	return NULL;
 }
 
 /*****************************************************************/
@@ -565,7 +565,7 @@ IEFileType IE_Imp::fileTypeForDescription(const char * szDescription)
 		IE_ImpSniffer * pSniffer = static_cast<IE_ImpSniffer *>(IE_IMP_Sniffers.getNthItem(k));
 
 		const char * szDummy;
-		const char * szDescription2 = nullptr;
+		const char * szDescription2 = 0;
 
 		if (pSniffer->getDlgLabels(&szDescription2,&szDummy,&ieft))
 		{
@@ -638,7 +638,7 @@ IE_ImpSniffer * IE_Imp::snifferForFileType(IEFileType ieft)
 	}
 
 	// The passed in filetype is invalid.
-	return nullptr;
+	return 0;
 }
 
 /*! 
@@ -651,12 +651,12 @@ IE_ImpSniffer * IE_Imp::snifferForFileType(IEFileType ieft)
 const char * IE_Imp::suffixesForFileType(IEFileType ieft)
 {
 	const char * szDummy;
-	const char * szSuffixes = nullptr;
+	const char * szSuffixes = 0;
 	IEFileType ieftDummy;
 
 	IE_ImpSniffer * pSniffer = snifferForFileType(ieft);
 
-	UT_return_val_if_fail(pSniffer != nullptr, nullptr);
+	UT_return_val_if_fail(pSniffer != NULL, 0);
 
 	if (pSniffer->getDlgLabels(&szDummy,&szSuffixes,&ieftDummy))
 	{
@@ -668,7 +668,7 @@ const char * IE_Imp::suffixesForFileType(IEFileType ieft)
 	}
 
 	// The passed in filetype is invalid.
-	return nullptr;
+	return 0;
 }
 
 /*! 
@@ -681,7 +681,7 @@ const char * IE_Imp::suffixesForFileType(IEFileType ieft)
 const char * IE_Imp::descriptionForFileType(IEFileType ieft)
 {
 	const char * szDummy;
-	const char * szDescription = nullptr;
+	const char * szDescription = 0;
 	IEFileType ieftDummy;
 
 	IE_ImpSniffer * pSniffer = snifferForFileType(ieft);
@@ -696,7 +696,7 @@ const char * IE_Imp::descriptionForFileType(IEFileType ieft)
 	}
 
 	// The passed in filetype is invalid.
-	return nullptr;
+	return 0;
 }
 
 static UT_Confidence_t s_confidence_heuristic ( UT_Confidence_t content_confidence, 
@@ -721,7 +721,7 @@ UT_Error IE_Imp::constructImporter(PD_Document * pDocument,
 								   IE_Imp ** ppie,
 								   IEFileType * pieft)
 {
-	return constructImporter(pDocument, static_cast<const char*>(nullptr), ieft, ppie, pieft);
+	return constructImporter(pDocument, (const char *)NULL, ieft, ppie, pieft);
 }
 
 /*! 
@@ -742,12 +742,12 @@ UT_Error IE_Imp::constructImporter(PD_Document * pDocument,
 								   IE_Imp ** ppie,
 								   IEFileType * pieft)
 {
-	GsfInput * input = nullptr;
+	GsfInput * input = NULL;
 
 	if (szFilename)
-		input = UT_go_file_open (szFilename, nullptr);
+		input = UT_go_file_open (szFilename, NULL);
 
-	if (input || (szFilename == nullptr))
+	if (input || (szFilename == NULL))
 		{
 			UT_Error result = constructImporter(pDocument, input, ieft, ppie, pieft);
 			if (input)
@@ -793,7 +793,7 @@ UT_Error IE_Imp::constructImporter(PD_Document * pDocument,
 	if (ieft == IEFT_Unknown && input)
 	{
 		UT_Confidence_t   best_confidence = UT_CONFIDENCE_ZILCH;
-		IE_ImpSniffer * best_sniffer = nullptr;
+		IE_ImpSniffer * best_sniffer = 0;
 
 		gchar *filename = g_ascii_strdown(gsf_input_name (input), -1);
 
@@ -840,9 +840,7 @@ UT_Error IE_Imp::constructImporter(PD_Document * pDocument,
 		
 		if (best_sniffer)
 			{
-				if (pieft != nullptr) {
-					*pieft = ieft;
-				}
+				if (pieft != NULL) *pieft = ieft;
 				return best_sniffer->constructImporter (pDocument, ppie);
 			}
 	}
@@ -855,9 +853,7 @@ UT_Error IE_Imp::constructImporter(PD_Document * pDocument,
 		if (!errorCode && pIEG) 
  		{
 			// tell the caller the type of importer they got
-			if (pieft != nullptr) {
-				*pieft = IEFT_Unknown; // to force a save-as
-			}
+		   	if (pieft != NULL) *pieft = IEFT_Unknown; // to force a save-as
 
 		   	// create the importer 
 			*ppie = new IE_Imp_GraphicAsDocument(pDocument);
@@ -880,7 +876,7 @@ UT_Error IE_Imp::constructImporter(PD_Document * pDocument,
 	UT_ASSERT_HARMLESS(ieft != IEFT_Unknown);
 
 	// tell the caller the type of importer they got
-	if (pieft != nullptr)
+	if (pieft != NULL) 
 		*pieft = ieft;
 
 	for (UT_uint32 k=0; k < nrElements; k++)
@@ -927,7 +923,7 @@ UT_Error IE_Imp::loadFile(PD_Document * doc, const char * szFilename, IEFileType
 {
 	GsfInput * input;
 
-	input = UT_go_file_open (szFilename, nullptr);
+	input = UT_go_file_open (szFilename, NULL);
 
 	if (!input)
 		return UT_IE_FILENOTFOUND;
@@ -940,11 +936,11 @@ UT_Error IE_Imp::loadFile(PD_Document * doc, const char * szFilename, IEFileType
 
 UT_Error IE_Imp::loadFile(PD_Document * doc, GsfInput * input, IEFileType ieft, const char * props, IEFileType * savedAsType)
 {
-	UT_return_val_if_fail (input != nullptr, UT_IE_FILENOTFOUND);
+	UT_return_val_if_fail (input != NULL, UT_IE_FILENOTFOUND);
 
 	UT_Error result = UT_ERROR;
 
-	IE_Imp * importer = nullptr;
+	IE_Imp * importer = NULL;
 
 	result = constructImporter(doc, input, ieft, &importer, savedAsType);
 	if (result != UT_OK || !importer)
@@ -964,7 +960,7 @@ UT_Error IE_Imp::importFile (const char * szFilename)
 {
 	GsfInput * input;
 
-	input = UT_go_file_open (szFilename, nullptr);
+	input = UT_go_file_open (szFilename, NULL);
 	if (!input)
 		return UT_IE_FILENOTFOUND;
 

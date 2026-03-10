@@ -32,6 +32,14 @@
 #include <glib/gi18n-lib.h>
 #endif
 #include "ut_go_file.h"
+#include <gsf/gsf-impl-utils.h>
+#include <gsf/gsf-input.h>
+#include <gsf/gsf-input-impl.h>
+#include <gsf/gsf-output-impl.h>
+#include <gsf/gsf-input-memory.h>
+#include <gsf/gsf-output-memory.h>
+#include <gsf/gsf-input-stdio.h>
+#include <gsf/gsf-output-stdio.h>
 #include <glib/gstdio.h>
 #include <libxml/encoding.h>
 
@@ -40,7 +48,13 @@
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
+#ifdef WITH_GSF_INPUT_HTTP
+#include <gsf/gsf-input-http.h>
+#endif
 #include <stdio.h>
+
+#include <gsf/gsf-input-gio.h>
+#include <gsf/gsf-output-gio.h>
 
 #ifdef TOOLKIT_GTK_ALL
 #include <gdk/gdk.h>
@@ -86,9 +100,9 @@ GsfInput *
 gsf_input_memory_new_from_file (FILE * input)
 {
 	GsfOutput *memory_output;
-	GsfInput  *memory_input = nullptr;
+	GsfInput  *memory_input = NULL;
 
-	g_return_val_if_fail (input != nullptr, nullptr);
+	g_return_val_if_fail (input != NULL, NULL);
 
 	memory_output = gsf_output_memory_new ();
 	while (TRUE) {
@@ -102,7 +116,7 @@ gsf_input_memory_new_from_file (FILE * input)
 		if (ferror (input) || !res) {
 			/* trouble reading from @input or trouble writing to @memory_output */
 			g_object_unref (G_OBJECT (memory_output));
-			return nullptr;
+			return NULL;
 		}
 		else if ((nread < sizeof(buf)) && feof (input)) /* hit eof */
 			break;
@@ -152,15 +166,15 @@ typedef struct {
 /**
  * gsf_output_proxy_new :
  *
- * Returns a new file or nullptr.
+ * Returns a new file or NULL.
  **/
 GsfOutput *
 gsf_output_proxy_new (GsfOutput * sink)
 {
-	g_return_val_if_fail (sink != nullptr, nullptr);
-	g_return_val_if_fail (GSF_IS_OUTPUT (sink), nullptr);
+	g_return_val_if_fail (sink != NULL, NULL);
+	g_return_val_if_fail (GSF_IS_OUTPUT (sink), NULL);
 
-	return (GsfOutput *)g_object_new (GSF_OUTPUT_PROXY_TYPE, "sink", sink, (void *)nullptr);
+	return (GsfOutput *)g_object_new (GSF_OUTPUT_PROXY_TYPE, "sink", sink, (void *)NULL);	
 }
 
 static gboolean
@@ -273,16 +287,16 @@ gsf_output_proxy_set_property (GObject      *object,
 }
 
 static void
-gsf_output_proxy_init (GObject *object, gpointer)
+gsf_output_proxy_init (GObject *object)
 {
 	GsfOutputProxy *proxy = (GsfOutputProxy *)object;
 
 	proxy->memory_output = gsf_output_memory_new ();
-	proxy->sink = nullptr;
+	proxy->sink = NULL;
 }
 
 static void
-gsf_output_proxy_class_init (GObjectClass *gobject_class, gpointer)
+gsf_output_proxy_class_init (GObjectClass *gobject_class)
 {
 	GsfOutputClass *output_class = GSF_OUTPUT_CLASS (gobject_class);
 	
@@ -329,12 +343,12 @@ UT_go_path_is_uri (const char * path)
 	if (g_str_has_prefix (path, "mailto:"))
 		return TRUE;
 	else
-		return (strstr (path, "://") != nullptr);
+		return (strstr (path, "://") != NULL);
 }
 
 gboolean UT_go_path_is_path (const char * path)
 {
-	return (strstr (path, G_DIR_SEPARATOR_S) != nullptr);
+	return (strstr (path, G_DIR_SEPARATOR_S) != NULL);
 }
 
 /*
@@ -343,7 +357,7 @@ gboolean UT_go_path_is_path (const char * path)
 char *
 UT_go_filename_from_uri (const char *uri)
 {
-	return g_filename_from_uri (uri, nullptr, nullptr);
+	return g_filename_from_uri (uri, NULL, NULL);
 }
 
 /*
@@ -354,11 +368,11 @@ UT_go_filename_to_uri (const char *filename)
 {
 	char *simp, *uri;
 
-	g_return_val_if_fail (filename != nullptr, nullptr);
+	g_return_val_if_fail (filename != NULL, NULL);
 
 	simp = UT_go_filename_simplify (filename, UT_GO_DOTDOT_TEST, TRUE);
 
-	uri = g_filename_to_uri (simp, nullptr, nullptr);
+	uri = g_filename_to_uri (simp, NULL, NULL);
 	g_free (simp);
 	return uri;
 }
@@ -369,7 +383,7 @@ UT_go_filename_simplify (const char *filename, UT_GODotDot dotdot,
 {
 	char *simp, *p, *q;
 
-	g_return_val_if_fail (filename != nullptr, nullptr);
+	g_return_val_if_fail (filename != NULL, NULL);
 
 	if (make_absolute && !g_path_is_absolute (filename)) {
 		/*
@@ -377,7 +391,7 @@ UT_go_filename_simplify (const char *filename, UT_GODotDot dotdot,
 		 * Win32.
 		 */
 		char *current_dir = g_get_current_dir ();
-		simp = g_build_filename (current_dir, filename, nullptr);
+		simp = g_build_filename (current_dir, filename, NULL);
 		g_free (current_dir);
 	} else
 		simp = g_strdup (filename);
@@ -535,11 +549,11 @@ UT_go_url_simplify (const char *uri)
 {
 	char *simp, *p;
 
-	g_return_val_if_fail (uri != nullptr, nullptr);
+	g_return_val_if_fail (uri != NULL, NULL);
 
 	if (g_ascii_strncasecmp (uri, "file:///", 8) == 0) {
 		char *filename = UT_go_filename_from_uri (uri);
-		simp = filename ? UT_go_filename_to_uri (filename) : nullptr;
+		simp = filename ? UT_go_filename_to_uri (filename) : NULL;
 		g_free (filename);
 		return simp;
 	}
@@ -589,7 +603,7 @@ remove_internal_relative_components (char *uri_current)
 	gsize len_prev, len_cur;
 
 	len_prev = len_cur = 0;
-	segment_prev = nullptr;
+	segment_prev = NULL;
 
 	segment_cur = uri_current;
 
@@ -624,7 +638,7 @@ remove_internal_relative_components (char *uri_current)
 
 						/* now we find the previous segment_prev */
 						if (segment_prev == uri_current) {
-							segment_prev = nullptr;
+							segment_prev = NULL;
 						} else if (segment_prev - uri_current >= 2) {
 							segment_prev -= 2;
 							for ( ; segment_prev > uri_current && segment_prev[0] != '/' 
@@ -656,7 +670,7 @@ remove_internal_relative_components (char *uri_current)
 static char *
 make_full_uri_from_relative (const char *base_uri, const char *uri)
 {
-	char *result = nullptr;
+	char *result = NULL;
 
 	char *mutable_base_uri;
 	char *mutable_uri;
@@ -741,7 +755,7 @@ make_full_uri_from_relative (const char *base_uri, const char *uri)
 				} else {
 					/* Maybe there is no domain part and this is a toplevel URI's child */
 					char *tmp2 = strstr (mutable_base_uri, ":///");
-					if (tmp2 != nullptr && tmp2 + 3 == separator) {
+					if (tmp2 != NULL && tmp2 + 3 == separator) {
 						*(separator + 1) = '\0';
 					}
 				}
@@ -778,7 +792,7 @@ make_full_uri_from_relative (const char *base_uri, const char *uri)
 		mutable_base_uri [strlen(mutable_base_uri)] = '/';
 	}
 
-	result = g_strconcat (mutable_base_uri, uri_current, nullptr);
+	result = g_strconcat (mutable_base_uri, uri_current, NULL);
 	g_free (mutable_base_uri); 
 	g_free (mutable_uri); 
 	
@@ -793,10 +807,10 @@ UT_go_url_resolve_relative (const char *ref_uri, const char *rel_uri)
 {
 	char *simp, *uri;
 
-	g_return_val_if_fail (rel_uri != nullptr, nullptr);
+	g_return_val_if_fail (rel_uri != NULL, NULL);
 
 	if (is_uri_relative (rel_uri)) {
-		g_return_val_if_fail (ref_uri != nullptr, nullptr);
+		g_return_val_if_fail (ref_uri != NULL, NULL);
 		uri = make_full_uri_from_relative (ref_uri, 
 						   rel_uri);
 	} else {
@@ -817,11 +831,11 @@ make_rel (const char *uri, const char *ref_uri,
 	GString *res;
 
 	if (!slash)
-		return nullptr;
+		return NULL;
 
-	if (uri_host != nullptr &&
+	if (uri_host != NULL &&
 	    strncmp (uri_host, ref_uri + (uri_host - uri), slash - uri_host))
-		return nullptr;
+		return NULL;
 
 	for (p = slash; *p; p++) {
 		if (*p != ref_uri[p - uri])
@@ -842,7 +856,7 @@ make_rel (const char *uri, const char *ref_uri,
 			break;
 	}
 
-	res = g_string_new (nullptr);
+	res = g_string_new (NULL);
 	while (n-- > 0)
 		g_string_append (res, "../");
 	g_string_append (res, slash + 1);
@@ -860,20 +874,20 @@ UT_go_url_make_relative (const char *uri, const char *ref_uri)
 		char rc = ref_uri[i];
 
 		if (c == 0)
-			return nullptr;
+			return NULL;
 
 		if (c == ':') {
 			if (rc == ':')
 				break;
-			return nullptr;
+			return NULL;
 		}
 
 		if (g_ascii_tolower (c) != g_ascii_tolower (rc))
-			return nullptr;
+			return NULL;
 	}
 
 	if (g_ascii_strncasecmp (uri, "file:///", 8) == 0)
-		return make_rel (uri, ref_uri, nullptr, uri + 7);  /* Yes, 7.  */
+		return make_rel (uri, ref_uri, NULL, uri + 7);  /* Yes, 7.  */
 
 	if (g_ascii_strncasecmp (uri, "http://", 7) == 0)
 		return make_rel (uri, ref_uri, uri + 7, strchr (uri + 7, '/'));
@@ -884,7 +898,7 @@ UT_go_url_make_relative (const char *uri, const char *ref_uri)
 	if (g_ascii_strncasecmp (uri, "ftp://", 6) == 0)
 		return make_rel (uri, ref_uri, uri + 6, strchr (uri + 6, '/'));
 
-	return nullptr;
+	return NULL;
 }
 
 /*
@@ -896,10 +910,10 @@ UT_go_shell_arg_to_uri (const char *arg)
 {
 	gchar *tmp;
 
-	if (is_fd_uri (arg, nullptr))
+	if (is_fd_uri (arg, NULL))
 		return g_strdup (arg);
 
-	if (g_path_is_absolute (arg) || strchr (arg, ':') == nullptr)
+	if (g_path_is_absolute (arg) || strchr (arg, ':') == NULL)
 		return UT_go_filename_to_uri (arg);
 
 	tmp = UT_go_filename_from_uri (arg);
@@ -952,7 +966,7 @@ UT_go_basename_from_uri (const char *uri)
 	char *basename = g_file_get_basename (f);
 	g_object_unref (G_OBJECT (f));
 
-	res = basename ? g_filename_display_name (basename) : nullptr;
+	res = basename ? g_filename_display_name (basename) : NULL;
 	g_free (basename);
 	return res;
 }
@@ -971,11 +985,11 @@ UT_go_dirname_from_uri (const char *uri, gboolean brief)
 	char *dirname_utf8, *dirname;
 
 	char *uri_dirname = g_path_get_dirname (uri);
-	dirname = uri_dirname ? UT_go_filename_from_uri (uri_dirname) : nullptr;
+	dirname = uri_dirname ? UT_go_filename_from_uri (uri_dirname) : NULL;
 	if(uri_dirname) {
 		g_free (uri_dirname);
 	}
-	uri_dirname = dirname ? g_strconcat ("file://", dirname, nullptr) : nullptr;
+	uri_dirname = dirname ? g_strconcat ("file://", dirname, NULL) : NULL;
 	if(dirname) {
 		g_free (dirname);
 	}
@@ -988,7 +1002,7 @@ UT_go_dirname_from_uri (const char *uri, gboolean brief)
 		dirname = temp;
 	}
 
-	dirname_utf8 = dirname ? g_filename_display_name (dirname) : nullptr;
+	dirname_utf8 = dirname ? g_filename_display_name (dirname) : NULL;
 	g_free (dirname);
 	return dirname_utf8;
 }
@@ -998,7 +1012,7 @@ gboolean
 UT_go_directory_create (char const *uri, GError **error)
 {
 	GFile *f = g_file_new_for_uri (uri);
-	gboolean res = g_file_make_directory (f, nullptr, error);
+	gboolean res = g_file_make_directory (f, NULL, error);
 	g_object_unref (G_OBJECT (f));
 	return res;
 }
@@ -1021,7 +1035,7 @@ is_fd_uri (const char *uri, int *fd)
 	if (*end != 0 || ul > INT_MAX)
 		return FALSE;
 
-	if (fd != nullptr)
+	if (fd != NULL)
 		*fd = (int)ul;
 	return TRUE;
 }
@@ -1031,8 +1045,8 @@ is_fd_uri (const char *uri, int *fd)
 static GsfInput *
 open_plain_file (const char *path, GError **err)
 {
-	GsfInput *input = gsf_input_mmap_new (path, nullptr);
-	if (input != nullptr)
+	GsfInput *input = gsf_input_mmap_new (path, NULL);
+	if (input != NULL)
 		return input;
 	/* Only report error if stdio fails too */
 	return gsf_input_stdio_new (path, err);
@@ -1044,9 +1058,9 @@ UT_go_file_open_impl (char const *uri, GError **err)
 	char *filename;
 	int fd;
 
-	if (err != nullptr)
-		*err = nullptr;
-	g_return_val_if_fail (uri != nullptr, nullptr);
+	if (err != NULL)
+		*err = NULL;
+	g_return_val_if_fail (uri != NULL, NULL);
 
 	if (uri[0] == G_DIR_SEPARATOR) {
 		g_warning ("Got plain filename %s in UT_go_file_open.", uri);
@@ -1065,13 +1079,13 @@ UT_go_file_open_impl (char const *uri, GError **err)
 		setmode (fd, O_BINARY);
 #endif
 		int fd2 = dup (fd);
-		FILE *fil = fd2 != -1 ? fdopen (fd2, "rb") : nullptr;
+		FILE *fil = fd2 != -1 ? fdopen (fd2, "rb") : NULL;
 		GsfInput *result;
 
 		if (!fil) {
 			g_set_error (err, gsf_output_error_id (), 0,
 				     "Unable to read from %s", uri);
-			return nullptr;
+			return NULL;
 		}
 
 		/* guarantee that file descriptors will be seekable */
@@ -1100,13 +1114,13 @@ UT_go_file_open (char const *uri, GError **err)
 	GsfInput * input;
 
 	input = UT_go_file_open_impl (uri, err);
-	if (input != nullptr)
+	if (input != NULL)
 	{
 		GsfInput * uncompress = gsf_input_uncompress (input);
 		gsf_input_set_name (uncompress, uri);
 		return uncompress;
 	}
-	return nullptr;
+	return NULL;
 }
 
 static GsfOutput *
@@ -1115,7 +1129,7 @@ gsf_output_proxy_create (GsfOutput *wrapped, char const *uri, GError **err)
 	if (!wrapped) {
 		g_set_error (err, gsf_output_error_id (), 0,
 			     "Unable to write to %s", uri);
-		return nullptr;
+		return NULL;
 	}
 	
 	/* guarantee that file descriptors will be seekable */
@@ -1127,7 +1141,7 @@ UT_go_file_create_impl (char const *uri, GError **err)
 {
 	char *filename;
 	int fd;
-	g_return_val_if_fail (uri != nullptr, nullptr);
+	g_return_val_if_fail (uri != NULL, NULL);
 
 	std::string path = uri;
         bool is_uri = UT_go_path_is_uri(path.c_str());
@@ -1147,8 +1161,8 @@ UT_go_file_create_impl (char const *uri, GError **err)
 		setmode (fd, O_BINARY);
 #endif
 		int fd2 = dup (fd);
-		FILE *fil = fd2 != -1 ? fdopen (fd2, "wb") : nullptr;
-		GsfOutput *result = fil ? gsf_output_stdio_new_FILE (uri, fil, FALSE) : nullptr;
+		FILE *fil = fd2 != -1 ? fdopen (fd2, "wb") : NULL;
+		GsfOutput *result = fil ? gsf_output_stdio_new_FILE (uri, fil, FALSE) : NULL;
 
 		/* guarantee that file descriptors will be seekable */
 		return gsf_output_proxy_create(result, uri, err);
@@ -1163,12 +1177,12 @@ UT_go_file_create (char const *uri, GError **err)
 	GsfOutput * output;
 
 	output = UT_go_file_create_impl (uri, err);
-	if (output != nullptr)
+	if (output != NULL)
 	{
 		gsf_output_set_name (output, uri);
 		return output;
 	}
-	return nullptr;
+	return NULL;
 }
 
 gboolean
@@ -1176,7 +1190,7 @@ UT_go_file_remove (char const *uri, GError ** err)
 {
 	char *filename;
 
-	g_return_val_if_fail (uri != nullptr, FALSE);
+	g_return_val_if_fail (uri != NULL, FALSE);
 
 	filename = UT_go_filename_from_uri (uri);
 	if (filename) {
@@ -1188,7 +1202,7 @@ UT_go_file_remove (char const *uri, GError ** err)
 
 
 	GFile *f = g_file_new_for_uri (uri);
-	gboolean res = g_file_delete (f, nullptr, err);
+	gboolean res = g_file_delete (f, NULL, err);
 	g_object_unref (G_OBJECT (f));
 
 	return res;
@@ -1198,7 +1212,7 @@ gboolean
 UT_go_file_exists (char const *uri)
 {
 	GFile *f = g_file_new_for_uri (uri);
-	gboolean res = g_file_query_exists (f, nullptr);
+	gboolean res = g_file_query_exists (f, NULL);
 	g_object_unref (G_OBJECT (f));
 	return res;
 }
@@ -1206,7 +1220,7 @@ UT_go_file_exists (char const *uri)
 UT_GOFilePermissions *
 UT_go_get_file_permissions (char const *uri)
 {
-	UT_GOFilePermissions * file_permissions = nullptr;
+	UT_GOFilePermissions * file_permissions = NULL;
 
 #if GLIB_CHECK_VERSION(2,26,0) || defined(G_OS_WIN32)
 	GStatBuf file_stat;
@@ -1366,26 +1380,26 @@ UT_go_file_get_date_changed (char const *uri)
 static char *
 check_program (char const *prog)
 {
-	if (nullptr == prog)
-		return nullptr;
+	if (NULL == prog)
+		return NULL;
 	if (g_path_is_absolute (prog)) {
 		if (!g_file_test (prog, G_FILE_TEST_IS_EXECUTABLE))
-			return nullptr;
+			return NULL;
 	} else if (!g_find_program_in_path (prog))
-		return nullptr;
+		return NULL;
 	return g_strdup (prog);
 }
 
 static void 
 fallback_open_uri(const gchar* url, GError** err)
 {
-	gchar *browser = nullptr;
-	gchar *clean_url = nullptr;
+	gchar *browser = NULL;
+	gchar *clean_url = NULL;
 
 	/* 1) Check BROWSER env var */
 	browser = check_program (getenv ("BROWSER"));
 
-	if (browser == nullptr) {
+	if (browser == NULL) {
 		static char const * const browsers[] = {
 			"xdg-open",             /* XDG. you shouldn't need anything else */
 			"sensible-browser",	/* debian */
@@ -1403,14 +1417,14 @@ fallback_open_uri(const gchar* url, GError** err)
 		};
 		unsigned i;
 		for (i = 0 ; i < G_N_ELEMENTS (browsers) ; i++)
-			if (nullptr != (browser = check_program (browsers[i])))
+			if (NULL != (browser = check_program (browsers[i])))
 				break;
   	}
 
-	if (browser != nullptr) {
+	if (browser != NULL) {
 		gint    argc;
-		gchar **argv = nullptr;
-		char   *cmd_line = g_strconcat (browser, " %1", nullptr);
+		gchar **argv = NULL;
+		char   *cmd_line = g_strconcat (browser, " %1", NULL);
 
 		if (g_shell_parse_argv (cmd_line, &argc, &argv, err)) {
 			/* check for '%1' in an argument and substitute the url
@@ -1419,11 +1433,11 @@ fallback_open_uri(const gchar* url, GError** err)
 			char *tmp;
 
 			for (i = 1 ; i < argc ; i++)
-				if (nullptr != (tmp = strstr (argv[i], "%1"))) {
+				if (NULL != (tmp = strstr (argv[i], "%1"))) {
 					*tmp = '\0';
 					tmp = g_strconcat (argv[i],
-						(clean_url != nullptr) ? (char const *)clean_url : url,
-						tmp+2, nullptr);
+						(clean_url != NULL) ? (char const *)clean_url : url,
+						tmp+2, NULL);
 					g_free (argv[i]);
 					argv[i] = tmp;
 					break;
@@ -1432,10 +1446,10 @@ fallback_open_uri(const gchar* url, GError** err)
 			/* there was actually a %1, drop the one we added */
 			if (i != argc-1) {
 				g_free (argv[argc-1]);
-				argv[argc-1] = nullptr;
+				argv[argc-1] = NULL;
 			}
-			g_spawn_async (nullptr, argv, nullptr, G_SPAWN_SEARCH_PATH,
-				nullptr, nullptr, nullptr, err);
+			g_spawn_async (NULL, argv, NULL, G_SPAWN_SEARCH_PATH,
+				NULL, NULL, NULL, err);
 			g_strfreev (argv);
 		}
 		g_free (cmd_line);
@@ -1456,26 +1470,26 @@ UT_go_url_show (gchar const *url)
 #ifdef G_OS_WIN32
 	UT_Win32LocaleString str;
 	str.fromUTF8 (url);
-	ShellExecuteW (nullptr, L"open", str.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
-	return nullptr;
+	ShellExecuteW (NULL, L"open", str.c_str(), NULL, NULL, SW_SHOWNORMAL);
+	return NULL;
 #elif TOOLKIT_COCOA
 	CFStringRef urlStr = CFStringCreateWithCString(kCFAllocatorDefault, url, kCFStringEncodingUTF8);
-	CFURLRef cfUrl = CFURLCreateWithString(kCFAllocatorDefault, urlStr, nullptr);
-	OSStatus err = LSOpenCFURLRef(cfUrl, nullptr);
+	CFURLRef cfUrl = CFURLCreateWithString(kCFAllocatorDefault, urlStr, NULL);
+	OSStatus err = LSOpenCFURLRef(cfUrl, NULL);
 	CFRelease(cfUrl);
 	CFRelease(urlStr);
 	if (err != noErr) {
 		;
 	}
-	return nullptr;
+	return NULL;
 #elif TOOLKIT_QT
 	if(!QDesktopServices::openUrl(QUrl(url, QUrl::TolerantMode))) {
 		;
 	}
-	return nullptr;
+	return NULL;
 #else
-	GError *err = nullptr;
-	if (!gtk_show_uri_on_window(nullptr, url, GDK_CURRENT_TIME, &err)) {
+	GError *err = NULL;
+	if(!gtk_show_uri (NULL, url, GDK_CURRENT_TIME, &err)) {
 		fallback_open_uri(url, &err);
 	}
 	return err;
@@ -1486,7 +1500,7 @@ gchar *
 UT_go_get_mime_type (gchar const *uri)
 {
 	gboolean content_type_uncertain = FALSE;
-	char *content_type = g_content_type_guess (uri, nullptr, 0, &content_type_uncertain);
+	char *content_type = g_content_type_guess (uri, NULL, 0, &content_type_uncertain);
 	if (content_type) {
 		char *mime_type = g_content_type_get_mime_type (content_type);
 		g_free (content_type);

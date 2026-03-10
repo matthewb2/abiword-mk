@@ -31,7 +31,7 @@ XAP_Args::XAP_Args(int argc, char ** argv)
 {
 	m_argc = argc;
 	m_argv = argv;
-	m_szBuf = nullptr;
+	m_szBuf = NULL;
 }
 
 #ifdef _WIN32
@@ -65,8 +65,8 @@ XAP_Args::XAP_Args(const char * szCmdLine)
 	// build an argc,argv for this command line
 
 	m_argc = 0;
-	m_argv = nullptr;
-	m_szBuf = nullptr;
+	m_argv = NULL;
+	m_szBuf = NULL;
 	
 	if (!szCmdLine || !*szCmdLine)
 		return;

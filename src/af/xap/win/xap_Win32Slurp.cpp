@@ -62,7 +62,7 @@
 // are only creating one of these classes), we make a static reference
 // to the only instance we create.
 
-static XAP_Win32Slurp * s_Slurp = nullptr;
+static XAP_Win32Slurp * s_Slurp = NULL;
 
 //////////////////////////////////////////////////////////////////
 
@@ -73,14 +73,14 @@ XAP_Win32Slurp::XAP_Win32Slurp(XAP_Win32App * pApp)
 	m_pApp = pApp;
 	m_bInitialized = false;
 	s_Slurp = this;
-	m_hszServerName = nullptr;
-	m_hszTopic = nullptr;
+	m_hszServerName = NULL;
+	m_hszTopic = NULL;
 }
 
 XAP_Win32Slurp::~XAP_Win32Slurp(void)
 {
 	UT_ASSERT_HARMLESS(s_Slurp);
-	s_Slurp = nullptr;
+	s_Slurp = NULL;
 }
 
 static HDDEDATA CALLBACK s_DdeServerCallback(UINT uType, UINT uFmt, HCONV hConv, 
@@ -105,7 +105,7 @@ HDDEDATA CALLBACK XAP_Win32Slurp::doCallback(UINT uType, UINT /*uFmt*/, HCONV /*
 	switch (uType)
 	{
 	case XTYP_DISCONNECT:
-		return nullptr;
+		return 0;
 
 	case XTYP_CONNECT:
 		{
@@ -121,10 +121,10 @@ HDDEDATA CALLBACK XAP_Win32Slurp::doCallback(UINT uType, UINT /*uFmt*/, HCONV /*
 
 	case XTYP_ERROR:
 		UT_DEBUGMSG(("DDEML error in callback\n"));
-		return nullptr;
+		return 0;
 
 	default:
-		return nullptr;
+		return 0;
 	}
 }
 
@@ -162,7 +162,7 @@ bool XAP_Win32Slurp::connectSlurper(void)
 	m_hszTopic = DdeCreateStringHandleW(m_idDdeServerInst, MY_DDE_TOPICNAME, CP_WINUNICODE);
 
 	// register the server Name
-	HDDEDATA bRegistered = DdeNameService(m_idDdeServerInst, m_hszServerName, nullptr, DNS_REGISTER);
+	HDDEDATA bRegistered = DdeNameService(m_idDdeServerInst, m_hszServerName, NULL, DNS_REGISTER);
 	if (!bRegistered)
 	{
 		UT_DEBUGMSG(("Unable to register NameService with DDEML.\n"));
@@ -189,7 +189,7 @@ bool XAP_Win32Slurp::disconnectSlurper(void)
 
 void XAP_Win32Slurp::processCommand(HDDEDATA hData)
 {
-	DWORD bufSize = DdeGetData(hData,nullptr,0,0);
+	DWORD bufSize = DdeGetData(hData,NULL,0,0);
 
 	char * pBuf = (char *)UT_calloc(sizeof(char),bufSize+100);
 	if (!pBuf)
@@ -197,14 +197,14 @@ void XAP_Win32Slurp::processCommand(HDDEDATA hData)
 		UT_DEBUGMSG(("No memory to allocate DDE buffer [size %d]\n",bufSize));
 		return;
 	}
-
+	
 	DdeGetData(hData,(LPBYTE)pBuf,bufSize+99,0);
 	UT_Win32LocaleString wstr;
 	UT_UTF8String astr;
 	wstr.fromLocale((LPCWSTR)pBuf);
 	astr=wstr.utf8_str();
 	UT_DEBUGMSG(("DDEML received command '%s'\n",astr.utf8_str()));
-
+	
 	// we expect something of the form:
 	//     [Open("<pathname>")]
 	// if anything more complicated is needed, it may be a
@@ -214,14 +214,13 @@ void XAP_Win32Slurp::processCommand(HDDEDATA hData)
 
 	// pointer to work through the incoming string
 	const char * next = astr.utf8_str();
-
+	
 	// pointer used to copy into command and pathname
-	char * dest = nullptr;
-
+	char * dest = 0;
+	
 	// chomp the [
-	if ( *next++ != '[' )
-		goto Finished;
-
+	if ( *next++ != '[' ) goto Finished;
+	
 	// find the next sequence of non ( characters
 	// this will be the dde command
 	char command[1024];
@@ -297,9 +296,9 @@ typedef enum { X_Error, X_CreatedKey, X_ExistingKey } XX_Status;
 static XX_Status _fetchKey(HKEY k1, const char * szSubKey, HKEY * pkNew)
 {
 	DWORD dwDisposition;
-	LONG eResult = RegCreateKeyEx(k1, szSubKey, 0, nullptr,
+	LONG eResult = RegCreateKeyEx(k1, szSubKey, 0, NULL,
 				      REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS,
-				      nullptr,
+				      NULL,
 				      pkNew, &dwDisposition);
 	if (eResult != ERROR_SUCCESS)
 	{
@@ -313,7 +312,7 @@ static XX_Status _fetchKey(HKEY k1, const char * szSubKey, HKEY * pkNew)
 		UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
 		if (*pkNew)
 			RegCloseKey(*pkNew);
-		*pkNew = nullptr;
+		*pkNew = 0;
 		return X_Error;
 
 	case REG_CREATED_NEW_KEY:
@@ -367,15 +366,15 @@ void XAP_Win32Slurp::stuffRegistry(const char * szSuffix,
 	bool bUpdateContentType;
 	bool bCreateOrOverwrite = false;
 
-	HKEY hKeyFoo = nullptr;
-	HKEY hKeySuffix = nullptr;
-	HKEY hKeyShell = nullptr;
-	HKEY hKeyCommand = nullptr;
-	HKEY hKeyOpen = nullptr;
-	HKEY hKeyDdeExec = nullptr;
-	HKEY hKeyApplication = nullptr;
-	HKEY hKeyTopic = nullptr;
-	HKEY hKeyDefaultIcon = nullptr;
+	HKEY hKeyFoo = 0;
+	HKEY hKeySuffix = 0;
+	HKEY hKeyShell = 0;
+	HKEY hKeyCommand = 0;
+	HKEY hKeyOpen = 0;
+	HKEY hKeyDdeExec = 0;
+	HKEY hKeyApplication = 0;
+	HKEY hKeyTopic = 0;
+	HKEY hKeyDefaultIcon = 0;
 	
 	sprintf(bufOurFoo,"AbiSuite.%s",szApplicationName);
 	strtok(bufOurFoo," ");				// trim key at first whitespace
@@ -409,7 +408,7 @@ void XAP_Win32Slurp::stuffRegistry(const char * szSuffix,
 			///////////////////////////////////////////////////////////////////
 
 			len = G_N_ELEMENTS(buf);
-			eResult = RegQueryValueEx(hKeySuffix,nullptr,nullptr,&dType,(LPBYTE)buf,&len);
+			eResult = RegQueryValueEx(hKeySuffix,NULL,NULL,&dType,(LPBYTE)buf,&len);
 
 			if ((eResult != ERROR_SUCCESS) || (dType != REG_SZ) || (len==0))
 				break;					// bogus data, overwrite it.
@@ -436,7 +435,7 @@ void XAP_Win32Slurp::stuffRegistry(const char * szSuffix,
 		///////////////////////////////////////////////////////////////////
 
 		UT_ASSERT(hKeySuffix);
-		eResult = RegSetValueEx(hKeySuffix,nullptr,0,REG_SZ,xx(bufOurFoo));
+		eResult = RegSetValueEx(hKeySuffix,NULL,0,REG_SZ,xx(bufOurFoo));
 
 		UT_DEBUGMSG(("Register: HKEY_CLASSES_ROOT\\%s <-- %s [error %d]\n",
 					 szSuffix,bufOurFoo,eResult));
@@ -452,7 +451,7 @@ void XAP_Win32Slurp::stuffRegistry(const char * szSuffix,
 
 	bUpdateContentType = true;
 	len = G_N_ELEMENTS(buf);
-	eResult = RegQueryValueEx(hKeySuffix,CONTENT_TYPE_KEY,nullptr,&dType,(LPBYTE)buf,&len);
+	eResult = RegQueryValueEx(hKeySuffix,CONTENT_TYPE_KEY,NULL,&dType,(LPBYTE)buf,&len);
 	if ((eResult == ERROR_SUCCESS) && (dType == REG_SZ))
 	{
 		UT_DEBUGMSG(("Registry: Existing ContentType [%s]\n",buf));
@@ -492,7 +491,7 @@ void XAP_Win32Slurp::stuffRegistry(const char * szSuffix,
 	case X_ExistingKey:
 		UT_ASSERT(hKeyFoo);
 		len = G_N_ELEMENTS(buf);
-		eResult = RegQueryValueExW(hKeyFoo, nullptr, nullptr, &dType, (LPBYTE)buf, &len);
+		eResult = RegQueryValueExW(hKeyFoo,NULL,0,&dType,(LPBYTE)buf,&len);
 		if ((eResult==ERROR_SUCCESS) && (dType==REG_SZ) && (lstrcmpiW((LPCWSTR)buf,bufOurFooValue)==0))
 			break;					// already has correct value, no need to overwrite.
 
@@ -501,7 +500,7 @@ void XAP_Win32Slurp::stuffRegistry(const char * szSuffix,
 
 	case X_CreatedKey:
 		UT_ASSERT(hKeyFoo);
-		eResult = RegSetValueExW(hKeyFoo, nullptr, 0, REG_SZ, xxw(bufOurFooValue));
+		eResult = RegSetValueExW(hKeyFoo,NULL,0,REG_SZ,xxw(bufOurFooValue));
 		if (eResult != ERROR_SUCCESS)
 			goto CleanupMess;
 		break;
@@ -527,7 +526,7 @@ void XAP_Win32Slurp::stuffRegistry(const char * szSuffix,
 	case X_ExistingKey:	
 		UT_ASSERT(hKeyCommand);
 		len = G_N_ELEMENTS((LPWSTR)buf);
-		eResult = RegQueryValueExW(hKeyCommand, nullptr, nullptr, &dType, (LPBYTE)buf, &len);
+		eResult = RegQueryValueExW(hKeyCommand,NULL,0,&dType,(LPBYTE)buf,&len);
 		if ((eResult==ERROR_SUCCESS) && (dType==REG_SZ))
 		{
 			if (lstrcmpiW((LPCWSTR)buf,commandPathWithParam) == 0)
@@ -553,7 +552,7 @@ void XAP_Win32Slurp::stuffRegistry(const char * szSuffix,
 		
 	case X_CreatedKey:
 		UT_ASSERT(hKeyCommand);
-		eResult = RegSetValueExW(hKeyCommand,nullptr,0,REG_SZ,xxw(commandPathWithParam));
+		eResult = RegSetValueExW(hKeyCommand,NULL,0,REG_SZ,xxw(commandPathWithParam));
 		if (eResult != ERROR_SUCCESS)
 			goto CleanupMess;
 		break;
@@ -572,7 +571,7 @@ void XAP_Win32Slurp::stuffRegistry(const char * szSuffix,
 	case X_ExistingKey:	
 		UT_ASSERT(hKeyDdeExec);
 		len = G_N_ELEMENTS(buf);
-		eResult = RegQueryValueEx(hKeyDdeExec, nullptr, nullptr, &dType, (LPBYTE)buf, &len);
+		eResult = RegQueryValueEx(hKeyDdeExec,NULL,0,&dType,(LPBYTE)buf,&len);
 		if ((eResult==ERROR_SUCCESS) && (dType==REG_SZ) && (g_ascii_strcasecmp(buf,VALUE_DDEEXEC_OPEN)==0))
 			break;						// already has correct value, no need to overwrite.
 
@@ -581,7 +580,7 @@ void XAP_Win32Slurp::stuffRegistry(const char * szSuffix,
 		
 	case X_CreatedKey:
 		UT_ASSERT(hKeyDdeExec);
-		eResult = RegSetValueEx(hKeyDdeExec, nullptr, 0, REG_SZ, xx(VALUE_DDEEXEC_OPEN));
+		eResult = RegSetValueEx(hKeyDdeExec,NULL,0,REG_SZ,xx(VALUE_DDEEXEC_OPEN));
 		if (eResult != ERROR_SUCCESS)
 			goto CleanupMess;
 		break;
@@ -600,7 +599,7 @@ void XAP_Win32Slurp::stuffRegistry(const char * szSuffix,
 	case X_ExistingKey:	
 		UT_ASSERT(hKeyApplication);
 		len = G_N_ELEMENTS(buf);
-		eResult = RegQueryValueEx(hKeyApplication, nullptr, nullptr, &dType, (LPBYTE)buf, &len);
+		eResult = RegQueryValueEx(hKeyApplication,NULL,0,&dType,(LPBYTE)buf,&len);
 		if ((eResult==ERROR_SUCCESS) && (dType==REG_SZ) && (g_ascii_strcasecmp(buf,szApplicationName)==0))
 			break;						// already has correct value, no need to overwrite.
 
@@ -609,7 +608,7 @@ void XAP_Win32Slurp::stuffRegistry(const char * szSuffix,
 		
 	case X_CreatedKey:
 		UT_ASSERT(hKeyApplication);
-		eResult = RegSetValueEx(hKeyApplication,nullptr,0,REG_SZ,xx(szApplicationName));
+		eResult = RegSetValueEx(hKeyApplication,NULL,0,REG_SZ,xx(szApplicationName));
 		if (eResult != ERROR_SUCCESS)
 			goto CleanupMess;
 		break;
@@ -628,7 +627,7 @@ void XAP_Win32Slurp::stuffRegistry(const char * szSuffix,
 	case X_ExistingKey:	
 		UT_ASSERT(hKeyTopic);
 		len = G_N_ELEMENTS((LPWSTR)buf);
-		eResult = RegQueryValueExW(hKeyTopic, nullptr, nullptr, &dType, (LPBYTE)buf, &len);
+		eResult = RegQueryValueExW(hKeyTopic,NULL,0,&dType,(LPBYTE)buf,&len);
 		if ((eResult==ERROR_SUCCESS) && (dType==REG_SZ) && (wcsicmp((LPWSTR)buf,MY_DDE_TOPICNAME)==0))
 			break;						// already has correct value, no need to overwrite.
 
@@ -637,7 +636,7 @@ void XAP_Win32Slurp::stuffRegistry(const char * szSuffix,
 		
 	case X_CreatedKey:
 		UT_ASSERT(hKeyTopic);
-		eResult = RegSetValueExW(hKeyTopic,nullptr,0,REG_SZ,xxw(MY_DDE_TOPICNAME));
+		eResult = RegSetValueExW(hKeyTopic,NULL,0,REG_SZ,xxw(MY_DDE_TOPICNAME));
 		if (eResult != ERROR_SUCCESS)
 			goto CleanupMess;
 		break;
@@ -657,7 +656,7 @@ void XAP_Win32Slurp::stuffRegistry(const char * szSuffix,
 	case X_ExistingKey:	
 		UT_ASSERT(hKeyDefaultIcon);
 		len = G_N_ELEMENTS((LPWSTR)buf);
-		eResult = RegQueryValueExW(hKeyDefaultIcon, nullptr, nullptr, &dType, (LPBYTE)buf, &len);
+		eResult = RegQueryValueExW(hKeyDefaultIcon,NULL,0,&dType,(LPBYTE)buf,&len);
 		if ((eResult==ERROR_SUCCESS) && (dType==REG_SZ) && (lstrcmpiW((LPWSTR)buf,bufDefaultIconValue)==0))
 			break;						// already has correct value, no need to overwrite.
 
@@ -666,7 +665,7 @@ void XAP_Win32Slurp::stuffRegistry(const char * szSuffix,
 		
 	case X_CreatedKey:
 		UT_ASSERT(hKeyDefaultIcon);
-		eResult = RegSetValueExW(hKeyDefaultIcon,nullptr,0,REG_SZ,xxw(bufDefaultIconValue));
+		eResult = RegSetValueExW(hKeyDefaultIcon,NULL,0,REG_SZ,xxw(bufDefaultIconValue));
 		if (eResult != ERROR_SUCCESS)
 			goto CleanupMess;
 		break;
@@ -679,8 +678,8 @@ void XAP_Win32Slurp::stuffRegistry(const char * szSuffix,
 	UT_DEBUGMSG(("Successfully stuffed the registry for suffix [%s].\n",szSuffix));
 	
 CleanupMess:
-
-#define KILLKEY(k)		do { if (k) RegCloseKey(k); (k) = nullptr; } while (0)
+		
+#define KILLKEY(k)		do { if (k) RegCloseKey(k); (k) = 0; } while (0)
 
 	KILLKEY(hKeyFoo);
 	KILLKEY(hKeySuffix);

@@ -26,8 +26,9 @@ class PD_Document;
 class PD_Style;
 class PP_AttrProp;
 
-#include <functional>
+
 #include <list>
+#include <boost/function.hpp>
 
 /**
  * Collect a sequence of APFilter objects and apply them in turn when
@@ -75,11 +76,12 @@ class PP_AttrProp;
  * };
  */
 class APFilterList
-    : public std::function<const gchar*(const gchar*, const gchar*)>
+    :
+    public std::binary_function< const gchar *, const gchar *, const gchar * >
 {
 protected:
     mutable std::string m_cache;
-    typedef std::function<std::string(const gchar*, const std::string&)> m_filter_t;
+    typedef boost::function2< std::string, const gchar *, const std::string& > m_filter_t;
     typedef std::list< m_filter_t > m_filterlist_t;
     m_filterlist_t m_filterlist;
 
@@ -113,7 +115,7 @@ public:
  * Template for new APFilter classes. Check the name or value and return something
  * else if desired.
  */
-struct APFilternullptr
+struct APFilterNULL
 {
     std::string operator()( const gchar * szName, const std::string& value ) const
     {
@@ -133,7 +135,7 @@ struct APFilternullptr
  *
  * s_RTF_AttrPropAdapter is an abstract class for accessing properties.
  * The function getProperty takes a property name as argument
- * and returns the value, or nullptr if that property isn't defined.
+ * and returns the value, or NULL if that property isn't defined.
  */
 
 class ABI_EXPORT s_RTF_AttrPropAdapter
@@ -154,8 +156,8 @@ public:
 	virtual ~s_RTF_AttrPropAdapter_Style() {}
     s_RTF_AttrPropAdapter_Style(const PD_Style * pStyle) : m_pStyle(pStyle) {}
 
-    virtual const gchar * getAttribute(const gchar * szName) const override;
-    virtual const gchar * getProperty(const gchar * szName) const override;
+    virtual const gchar * getAttribute(const gchar * szName) const;
+    virtual const gchar * getProperty(const gchar * szName) const;
 };
 
 class ABI_EXPORT s_RTF_AttrPropAdapter_AP : public s_RTF_AttrPropAdapter
@@ -174,8 +176,8 @@ public:
                              PD_Document * pDoc);
 	virtual ~s_RTF_AttrPropAdapter_AP();
 
-    virtual const gchar * getAttribute(const gchar * szName) const override;
-    virtual const gchar * getProperty(const gchar * szName) const override;
+    virtual const gchar * getAttribute(const gchar * szName) const;
+    virtual const gchar * getProperty(const gchar * szName) const;
 };
 
 #endif

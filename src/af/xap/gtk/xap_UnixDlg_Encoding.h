@@ -38,7 +38,7 @@ public:
 	XAP_UnixDialog_Encoding(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~XAP_UnixDialog_Encoding(void);
 
-	virtual void runModal(XAP_Frame * pFrame) override;
+	virtual void			runModal(XAP_Frame * pFrame);
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 
  private:

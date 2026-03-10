@@ -86,46 +86,46 @@ protected:
 
 	GtkIMContext * getIMContext();
 
-	virtual bool _close() override;
-	virtual bool _raise() override;
-	virtual bool _show() override;
+	virtual bool _close();
+	virtual bool _raise();
+	virtual bool _show();
 
 	virtual GtkWidget *  _createInternalWindow (void);
 
-	virtual void _nullUpdate () const override; // a virtual member function in xap_Frame
-	virtual void _initialize() override;
+	virtual void _nullUpdate () const; // a virtual member function in xap_Frame
+	virtual void _initialize();
 
 	virtual void _setWindowIcon() = 0; // should eventually be handled be the inherited helper
 
 	virtual GtkWidget * _createDocumentWindow() = 0;
 	virtual GtkWidget * _createStatusBarWindow() = 0;
 
-	void _createTopLevelWindow(void) override;
-	bool _updateTitle() override;
+	void _createTopLevelWindow(void);
+	bool _updateTitle();
 	void _createIMContext(GdkWindow* w);
 	UT_sint32 _setInputMode(const char * szName);
-	virtual void _setCursor(GR_Graphics::Cursor cursor) override;
+	virtual void _setCursor(GR_Graphics::Cursor cursor);
 
-	virtual XAP_DialogFactory * _getDialogFactory() override;
-	virtual EV_Menu * _getMainMenu() override;
+	virtual XAP_DialogFactory * _getDialogFactory();
+	virtual EV_Menu * _getMainMenu();
 	virtual EV_Toolbar * _newToolbar(XAP_Frame *pFrame,
 				 const char *szLayout,
-				 const char *szLanguage) override;
+				 const char *szLanguage);
 
 	virtual bool _runModalContextMenu(AV_View * pView, const char * szMenuName,
-					  UT_sint32 x, UT_sint32 y) override;
+					  UT_sint32 x, UT_sint32 y);
 	void setTimeOfLastEvent(guint32 eventTime);
 
-	virtual void _queue_resize() override;
-	virtual void _rebuildMenus(void) override;
-	virtual void _rebuildToolbar(UT_uint32 ibar) override;
+	virtual void _queue_resize();
+	virtual void _rebuildMenus(void);
+	virtual void _rebuildToolbar(UT_uint32 ibar);
 	GtkWidget * _getSunkenBox(void) {return m_wSunkenBox;}
 
-	virtual void _setFullScreen(bool changeToFullScreen) override;
+	virtual void _setFullScreen(bool changeToFullScreen);
 
 	void _imCommit (GtkIMContext * imc, const gchar * text);
 
-	virtual void dragText() override;
+	virtual void dragText();
 
 	static void _imCommit_cb(GtkIMContext *imc, const gchar* text, gpointer data);
 	static void _imPreeditStart_cb (GtkIMContext *context, gpointer data);

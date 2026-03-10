@@ -76,7 +76,7 @@ void AP_CocoaDialog_Annotation::runModal(XAP_Frame *)
 
 -(void)discardXAP
 {
-	_xap = nullptr;
+	_xap = NULL; 
 }
 
 -(void)dealloc

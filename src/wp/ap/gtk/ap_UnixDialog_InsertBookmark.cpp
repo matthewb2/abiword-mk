@@ -31,7 +31,6 @@
 // This header defines some functions for Unix dialogs,
 // like centering them, measuring them, etc.
 #include "xap_UnixDialogHelper.h"
-#include "xap_GtkUtils.h"
 
 #include "xap_App.h"
 #include "xap_UnixApp.h"
@@ -58,8 +57,8 @@ XAP_Dialog * AP_UnixDialog_InsertBookmark::static_constructor(XAP_DialogFactory 
 AP_UnixDialog_InsertBookmark::AP_UnixDialog_InsertBookmark(XAP_DialogFactory * pDlgFactory,
 										 XAP_Dialog_Id id)
 	: AP_Dialog_InsertBookmark(pDlgFactory,id)
-	, m_windowMain(nullptr)
-	, m_buttonInsert(nullptr)
+	, m_windowMain(NULL)
+	, m_buttonInsert(NULL)
 {
 }
 
@@ -100,7 +99,7 @@ void AP_UnixDialog_InsertBookmark::event_OK(void)
 	// get the bookmark name, if any (return cancel if no name given)
 	GtkEntry *entry = GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_comboBookmark)));
 	UT_ASSERT(entry);
-	const gchar *mark = XAP_gtk_entry_get_text(entry);
+	const gchar *mark = gtk_entry_get_text(entry);
 	if(mark && *mark)
 	{
 		xxx_UT_DEBUGMSG(("InsertBookmark: OK pressed, first char 0x%x\n", (UT_uint32)*mark));
@@ -122,7 +121,7 @@ void AP_UnixDialog_InsertBookmark::event_Delete(void)
 {
 	GtkEntry *entry = GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_comboBookmark)));
 	UT_ASSERT(entry);
-	const gchar *mark = XAP_gtk_entry_get_text(entry);
+	const gchar *mark = gtk_entry_get_text(entry);
 	if (mark && *mark)
 		setBookmark(mark);
 	setAnswer(AP_Dialog_InsertBookmark::a_DELETE);
@@ -150,7 +149,7 @@ void AP_UnixDialog_InsertBookmark::_setList(void)
 	GtkEntry *entry = GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_comboBookmark)));
 	if (getBookmark() && strlen(getBookmark()) > 0)
 	{
-	    XAP_gtk_entry_set_text(entry, getBookmark());
+	    gtk_entry_set_text(entry, getBookmark());
 	}
 	else
 	{
@@ -158,7 +157,7 @@ void AP_UnixDialog_InsertBookmark::_setList(void)
 	    if (suggestion.size()>0)
 		{
 			UT_UTF8String utf8 (suggestion);
-			XAP_gtk_entry_set_text (entry, utf8.utf8_str());
+			gtk_entry_set_text (entry, utf8.utf8_str());
 		}
 	}
 }
@@ -191,7 +190,7 @@ GtkWidget*  AP_UnixDialog_InsertBookmark::_constructWindow(void)
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
   gtk_widget_show (vbox);
   gtk_container_add (GTK_CONTAINER (gtk_dialog_get_content_area(GTK_DIALOG (m_windowMain))), vbox);
-  XAP_gtk_widget_set_margin(vbox, 5);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
 
   _constructWindowContents ( vbox );
 

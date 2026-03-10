@@ -32,7 +32,7 @@
  */
 int UT_Unicode::UTF8_ByteLength (UT_UCS4Char u)
 {
-	return g_unichar_to_utf8 (u, nullptr);
+	return g_unichar_to_utf8 (u, NULL);
 }
 
 /* appends to the buffer the UTF-8 sequence corresponding to the UCS-4 value;

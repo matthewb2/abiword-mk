@@ -57,7 +57,6 @@
 #include "fp_Column.h"
 #include "fp_Line.h"
 #include "fp_Run.h"
-#include "fp_AnnotationRun.h"
 #include "fp_TextRun.h"
 #include "fg_Graphic.h"
 #include "fg_GraphicRaster.h"
@@ -243,7 +242,7 @@ bool FV_View::cmdSplitCells(AP_CellSplitType iSplitType)
 	// Get the attributes and properties of the current block. These attributes and properties
 	// will be copied in the new cell.
 	fl_BlockLayout * pBL = getBlockAtPosition(getPoint());
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	m_pDoc->getAttrProp(m_pDoc->getAPIFromSDH(pBL->getStruxDocHandle()), &pAP);
 	UT_return_val_if_fail(pAP, false);
 
@@ -435,7 +434,7 @@ bool FV_View::cmdSplitCells(AP_CellSplitType iSplitType)
 //
 // Place right before endTable Strux
 //
-				if(endTableSDH == nullptr)
+				if(endTableSDH == NULL)
 				{
 					//
 					// Disaster! the table structure in the piecetable is screwed.
@@ -454,10 +453,10 @@ bool FV_View::cmdSplitCells(AP_CellSplitType iSplitType)
 				while(!bFound)
 				{
 					curSDH = m_pDoc-> getCellSDHFromRowCol(tableSDH,isShowRevisions(), getRevisionLevel(), jTop,jLeft);
-					if(curSDH == nullptr)
+					if(curSDH == NULL)
 					{
 						endTableSDH = m_pDoc->getEndTableStruxFromTableSDH(tableSDH);
-						if(endTableSDH == nullptr)
+						if(endTableSDH == NULL)
 						{
 							//
 							// Disaster! the table structure in the piecetable is screwed.
@@ -490,7 +489,7 @@ bool FV_View::cmdSplitCells(AP_CellSplitType iSplitType)
 						if(jTop >= numRows)
 						{
 							endTableSDH = m_pDoc->getEndTableStruxFromTableSDH(tableSDH);
-							if(endTableSDH == nullptr)
+							if(endTableSDH == NULL)
 							{
 								//
 								// Disaster! the table structure in the piecetable is screwed.
@@ -780,8 +779,8 @@ bool FV_View::cmdSelectColumn(PT_DocPosition posOfColumn)
 //
 	m_Selection.setMode(FV_SelectionMode_TableColumn);
 
-	fl_BlockLayout * pBlock = nullptr;
-	fp_Run * pRun = nullptr;
+	fl_BlockLayout * pBlock = NULL;
+	fp_Run * pRun = NULL;
 	UT_sint32 xCaret, yCaret;
 	UT_uint32 heightCaret;
 	UT_sint32 xCaret2, yCaret2;
@@ -868,8 +867,8 @@ bool FV_View::cmdTableToText(PT_DocPosition posSource,UT_sint32 iSepType)
 
 	UT_sint32 i,j =0;
 	fp_TableContainer * pTAB = static_cast<fp_TableContainer *>(pTL->getFirstContainer());
-	fp_CellContainer * pCCell = nullptr;
-	fl_CellLayout * pCellL = nullptr;
+	fp_CellContainer * pCCell = NULL;
+	fl_CellLayout * pCellL = NULL;
 	UT_GrowBufElement iComma = static_cast<UT_GrowBufElement>(',');
 	UT_GrowBufElement iTab = static_cast<UT_GrowBufElement>(UCS_TAB);
 	for(i=0;i<numRows;i++)
@@ -877,12 +876,12 @@ bool FV_View::cmdTableToText(PT_DocPosition posSource,UT_sint32 iSepType)
 	  for(j=0; j< numCols;j++)
 	  {
 	    pCCell = pTAB->getCellAtRowColumn(i,j);
-	    if(pCCell == nullptr)
+	    if(pCCell == NULL)
 	    {
 	         continue;
 	    }
 	    pCellL = static_cast<fl_CellLayout *>(pCCell->getSectionLayout());
-	    if(pCellL == nullptr)
+	    if(pCellL == NULL)
 	    {
 	         continue;
 	    }
@@ -1278,9 +1277,9 @@ bool FV_View::cmdMergeCells(PT_DocPosition posSource, PT_DocPosition posDestinat
 // top and Bottom attach
 //
 			UT_sint32 diff = dBot - dTop -1;
-			pf_Frag_Strux* sdhCell = nullptr;
-			pf_Frag_Strux* sdhNextCell = nullptr;
-			pf_Frag_Strux* sdhEndTable = nullptr;
+			pf_Frag_Strux* sdhCell = NULL;
+			pf_Frag_Strux* sdhNextCell = NULL;
+			pf_Frag_Strux* sdhEndTable = NULL;
 			PT_DocPosition posEndTable = 0;
 			PT_DocPosition posCell = 0;
 			bRes = m_pDoc->getStruxOfTypeFromPosition(posDestination,PTX_SectionCell,&sdhCell);
@@ -1347,7 +1346,7 @@ bool FV_View::cmdMergeCells(PT_DocPosition posSource, PT_DocPosition posDestinat
 			UT_sint32 diff = dRight - dLeft -1;
 			UT_sint32 origLeft = dLeft;
 			UT_sint32 origRight = dRight;
-			pf_Frag_Strux* sdhCell = nullptr;
+			pf_Frag_Strux* sdhCell = NULL;
 			PT_DocPosition posCell = 0;
 			UT_GenericVector<pf_Frag_Strux*> vecCells;
 			posCell = findCellPosAt(posTable, dTop, dLeft)+1;
@@ -1363,7 +1362,7 @@ bool FV_View::cmdMergeCells(PT_DocPosition posSource, PT_DocPosition posDestinat
 				{
 					posCell = findCellPosAt(posTable, row, col)+1;
 					m_pDoc->getStruxOfTypeFromPosition(posCell,PTX_SectionCell,&sdhCell);
-					if((sdhCell==nullptr) || (vecCells.findItem(sdhCell) >= 0))
+					if((sdhCell==NULL) || (vecCells.findItem(sdhCell) >= 0))
 					{
 						continue;
 					}
@@ -1414,8 +1413,8 @@ bool FV_View::cmdAdvanceNextPrevCell(bool bGoNext)
 		return false;
 	}
 
-	pf_Frag_Strux* sdhCell = nullptr;
-	pf_Frag_Strux* sdhNextPrevCell = nullptr;
+	pf_Frag_Strux* sdhCell = NULL;
+	pf_Frag_Strux* sdhNextPrevCell = NULL;
 	bool bRes = m_pDoc->getStruxOfTypeFromPosition(getPoint(),PTX_SectionCell,&sdhCell);
 	UT_return_val_if_fail(bRes,false);
 	fl_CellLayout * pCL = static_cast<fl_CellLayout *>(m_pDoc->getNthFmtHandle(sdhCell,m_pLayout->getLID()));
@@ -1462,13 +1461,13 @@ bool FV_View::cmdTextToTable(UT_uint32 iDelim)
 	UT_GenericVector<fl_BlockLayout *> vecBlocks;
 	getBlocksInSelection(&vecBlocks, false);
 	UT_return_val_if_fail(vecBlocks.getItemCount() > 0, false);
-	fl_BlockLayout * pBL = nullptr;
+	fl_BlockLayout * pBL = NULL;
 	UT_uint32 numCols = 0;
 	PT_DocPosition posStart = 0;
 	PT_DocPosition begPos = 0;
 	PT_DocPosition endPos = 0;
 	UT_UTF8String sWords;
-	UT_GrowBuf * pBuf = nullptr;
+	UT_GrowBuf * pBuf = NULL;
 	for (UT_sint32 k = 0; k < vecBlocks.getItemCount(); k++)
 	{
 		pBL = vecBlocks.getNthItem(k);
@@ -1553,8 +1552,8 @@ bool FV_View::cmdTextToTable(UT_uint32 iDelim)
 // Done! Now fill it.
 //
 	posTableStart +=3;
-	pf_Frag_Strux* sdhTable = nullptr;
-	pf_Frag_Strux* sdhCell = nullptr;
+	pf_Frag_Strux* sdhTable = NULL;
+	pf_Frag_Strux* sdhCell = NULL;
 	bool b =m_pDoc->getStruxOfTypeFromPosition(posTableStart,PTX_SectionTable,&sdhTable);
 	UT_return_val_if_fail(b,false);
 	PT_DocPosition posCell = posTableStart;
@@ -1598,7 +1597,7 @@ bool FV_View::cmdTextToTable(UT_uint32 iDelim)
 	endPos = pBL->getPosition(true) + pBL->getLength();
 	UT_uint32 iRealDeleteCount;
 
-	m_pDoc->deleteSpan(begPos,endPos,nullptr,iRealDeleteCount);
+	m_pDoc->deleteSpan(begPos,endPos,NULL,iRealDeleteCount);
 	
 
 	// Signal PieceTable Changes have finished
@@ -1804,7 +1803,7 @@ bool FV_View::cmdInsertCol(PT_DocPosition posCol, bool bBefore)
 	// Get the attributes and properties of the block containing posCol. These attributes and properties
 	// will be copied in the new cells.
 	fl_BlockLayout * pBL = getBlockAtPosition(posCol);
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	m_pDoc->getAttrProp(m_pDoc->getAPIFromSDH(pBL->getStruxDocHandle()), &pAP);
 	UT_return_val_if_fail(pAP, false);
 
@@ -1986,7 +1985,7 @@ bool FV_View::cmdInsertRow(PT_DocPosition posRow, bool bBefore)
 	// Get the attributes and properties of the block containing posRow. These attributes and properties
 	// will be copied in the new cell. 
 	fl_BlockLayout * pBL = getBlockAtPosition(posRow);
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	m_pDoc->getAttrProp(m_pDoc->getAPIFromSDH(pBL->getStruxDocHandle()), &pAP);
 	UT_return_val_if_fail(pAP, false);
 
@@ -1996,8 +1995,8 @@ bool FV_View::cmdInsertRow(PT_DocPosition posRow, bool bBefore)
 	// interferes with the insert cmd and set bComplexInsert to true in that case.
 	// Then create a vector of columns where a new cell should be inserted
 
-	fl_CellLayout* pCL = nullptr;
-	fp_CellContainer* pCell = nullptr;
+	fl_CellLayout* pCL = NULL;
+	fp_CellContainer* pCell = NULL;
 	bool bComplexInsert = false;
 	UT_sint32 iTopInsert = (bBefore ? iTop:iBot);
 	UT_sint32 prevTop = iTopInsert;
@@ -2408,7 +2407,7 @@ bool FV_View::cmdDeleteTable(PT_DocPosition posTable, bool bDontNotify)
 	UT_uint32 iRealDeleteCount;
 	//	if(m_pDoc->isFrameAtPos(posStartTable-1))
 	//   posStartTable--;
-	m_pDoc->deleteSpan( posStartTable, posEndTable, nullptr,iRealDeleteCount,true);
+	m_pDoc->deleteSpan( posStartTable, posEndTable, NULL,iRealDeleteCount,true);
 //
 // OK finish everything off with the various parameters which allow the formatter to
 // be updated.
@@ -2461,10 +2460,10 @@ bool FV_View::cmdDeleteRow(PT_DocPosition posRow)
 // get from the table container
 //
 	fl_TableLayout * pTabL = getTableAtPos(posRow);
-	if(pTabL == nullptr)
+	if(pTabL == NULL)
 	{
 	    pTabL = getTableAtPos(posRow+1);
-	    if(pTabL == nullptr)
+	    if(pTabL == NULL)
 	    {
 		pTabL = getTableAtPos(posRow+2);
 		UT_return_val_if_fail(pTabL, false);
@@ -2542,7 +2541,7 @@ bool FV_View::cmdDeleteRow(PT_DocPosition posRow)
 // the endTable strux. So lets's get that now.
 //
 	endTableSDH = m_pDoc->getEndTableStruxFromTableSDH(tableSDH);
-	if(!bRes || (endTableSDH == nullptr))
+	if(!bRes || (endTableSDH == NULL))
 	{
 		//
 		// Disaster! the table structure in the piecetable is screwed.
@@ -2648,8 +2647,8 @@ bool FV_View::cmdDeleteCell(PT_DocPosition /*cellPos*/ )
   return true ;
 #else
 	pf_Frag_Strux* cellSDH;
-	const char * pszLeftAttach =nullptr;
-	const char * pszTopAttach = nullptr;
+	const char * pszLeftAttach =NULL;
+	const char * pszTopAttach = NULL;
 	UT_sint32 iLeft =-999;
 	UT_sint32 iTop = -999;
 	bool bRes = m_pDoc->getStruxOfTypeFromPosition(cellPos,PTX_SectionCell,&cellSDH);
@@ -2772,7 +2771,7 @@ UT_Error FV_View::cmdInsertTable(UT_sint32 numRows, UT_sint32 numCols, const PP_
 	{
 		m_pDoc->setDontImmediatelyLayout(true);
 	}
-	if(getHyperLinkRun(getPoint()) != nullptr)
+	if(getHyperLinkRun(getPoint()) != NULL)
 	{
 
 	// Signal PieceTable Changes have finished
@@ -2846,17 +2845,17 @@ UT_Error FV_View::cmdInsertTable(UT_sint32 numRows, UT_sint32 numCols, const PP_
 //
 // Handle special case of not putting a table immediately after a section break
 //
-	pf_Frag_Strux* secSDH = nullptr;
+	pf_Frag_Strux* secSDH = NULL;
 	UT_DebugOnly<bool> bres = m_pDoc->getStruxOfTypeFromPosition(pointBreak-1,PTX_Section,&secSDH);
 #if DEBUG
 	UT_ASSERT(bres);
 	PT_DocPosition secPos2 = m_pDoc->getStruxPosition(secSDH);
 	UT_DEBUGMSG(("SEVIOR: SecPos %d pointBreak %d \n",secPos2,pointBreak));
 #endif
-	secSDH = nullptr;
+	secSDH = NULL;
 	bres = m_pDoc->getStruxOfTypeFromPosition(pointBreak,PTX_SectionCell,&secSDH);
 #if DEBUG
-	if(secSDH != nullptr)
+	if(secSDH != NULL)
 	{
 		PT_DocPosition secPos = m_pDoc->getStruxPosition(secSDH);
 		UT_DEBUGMSG(("SEVIOR: Cell Pos %d pointBreak %d \n",secPos,pointBreak));	
@@ -2890,8 +2889,8 @@ UT_Error FV_View::cmdInsertTable(UT_sint32 numRows, UT_sint32 numCols, const PP_
 	const gchar * propSize = "font-size";
 	std::string szFamily;
 	std::string szSize;
-	const gchar * szNormalFamily = nullptr;
-	const gchar * szNormalSize = nullptr;
+	const gchar * szNormalFamily = NULL;
+	const gchar * szNormalSize = NULL;
 	getCharFormat(props_in);
 	if (!props_in.empty())
 	{
@@ -3030,20 +3029,21 @@ bool FV_View::cmdCharInsert(const UT_UCSChar * text, UT_uint32 count, bool bForc
 
 	// we only do this for space ... (certain other chars can be handled in ap_EditMethods.cpp
 	// because they do not need knowledge of block direction)
-	fl_BlockLayout * pBlock = nullptr;
+	fl_BlockLayout * pBlock = NULL;
 	if(count == 1 && text[0] == UCS_SPACE)
 	{
 		bool bLang = false, bMarker = false;
 
-		XAP_App::getApp()->getPrefsValueBool(XAP_PREF_KEY_ChangeLanguageWithKeyboard, bLang);
+		XAP_App::getApp()->getPrefsValueBool(static_cast<const gchar *>(XAP_PREF_KEY_ChangeLanguageWithKeyboard),
+											 &bLang);
 
-		const UT_LangRecord * pLR = nullptr;
+		const UT_LangRecord * pLR = NULL;
 	
 		if(bLang)
 		{
 			pLR = XAP_App::getApp()->getKbdLanguage();
-
-			XAP_App::getApp()->getPrefsValueBool(XAP_PREF_KEY_DirMarkerAfterClosingParenthesis, bMarker);
+		
+			XAP_App::getApp()->getPrefsValueBool(static_cast<const gchar *>(XAP_PREF_KEY_DirMarkerAfterClosingParenthesis), &bMarker);
 		}
 
 		if(bMarker && pLR)
@@ -3137,8 +3137,8 @@ void FV_View::cmdCharDelete(bool bForward, UT_uint32 count)
 	STD_DOUBLE_BUFFERING_FOR_THIS_FUNCTION
 
 	bool bisList = false;
-	fl_BlockLayout * curBlock = nullptr;
-	fl_BlockLayout * nBlock = nullptr;
+	fl_BlockLayout * curBlock = NULL;
+	fl_BlockLayout * nBlock = NULL;
 	UT_uint32 iRealDeleteCount = 0;
 	bool bSimple = false;
 
@@ -3203,8 +3203,8 @@ void FV_View::cmdCharDelete(bool bForward, UT_uint32 count)
 // together). Also keep frame at the same position with respect to the top of the first block.
 // 
 //
-		fl_BlockLayout * pFirstBlock = nullptr;
-		fl_BlockLayout * pSecondBlock = nullptr;
+		fl_BlockLayout * pFirstBlock = NULL;
+		fl_BlockLayout * pSecondBlock = NULL;
 
 		if((bForward == false) && (count == 1)) 
 		{
@@ -3272,8 +3272,8 @@ void FV_View::cmdCharDelete(bool bForward, UT_uint32 count)
 				}
 				if(pFL->getFramePositionTo() == FL_FRAME_POSITIONED_TO_BLOCK)
 				{
-					const PP_AttrProp* pAP = nullptr;
-					const gchar * pszYPos = nullptr;
+					const PP_AttrProp* pAP = NULL;
+					const gchar * pszYPos = NULL;
 					double ypos = 0.;
 					pFL->getAP(pAP);
 					if(!pAP || !pAP->getProperty("ypos",pszYPos))
@@ -3532,7 +3532,7 @@ void FV_View::cmdCharDelete(bool bForward, UT_uint32 count)
 		if(isInFrame(posCur) && !isInFrame(posCur+amt))
 		{
 			fl_FrameLayout * pFL = getFrameLayout(posCur+amt);
-			if(pFL != nullptr)
+			if(pFL != NULL)
 			{
 			  //
 			  // Delete to edge of text box
@@ -3545,7 +3545,7 @@ void FV_View::cmdCharDelete(bool bForward, UT_uint32 count)
 		if(!isInFrame(posCur) && isInFrame(posCur+amt) && (amt > 1))
 		{
 			fl_FrameLayout * pFL = getFrameLayout(posCur+amt);
-			if(pFL != nullptr)
+			if(pFL != NULL)
 			{
 			  //
 			  // delete to start of text box
@@ -3605,18 +3605,18 @@ void FV_View::cmdCharDelete(bool bForward, UT_uint32 count)
 				else if(bisList == true)
 				{
 
-					m_pDoc->deleteSpan(posCur, posCur+amt,nullptr, iRealDeleteCount);
+					m_pDoc->deleteSpan(posCur, posCur+amt,NULL, iRealDeleteCount);
 					nBlock->remItemFromList();
 				}
 				else
 				{
-					m_pDoc->deleteSpan(posCur, posCur+amt,nullptr, iRealDeleteCount);
+					m_pDoc->deleteSpan(posCur, posCur+amt,NULL, iRealDeleteCount);
 				}
 			}
 			else
 			{
 				UT_DEBUGMSG(("deleteSpan - 2: posCur %d amt %d \n",posCur,amt));
-				m_pDoc->deleteSpan(posCur, posCur+amt,nullptr, iRealDeleteCount);
+				m_pDoc->deleteSpan(posCur, posCur+amt,NULL, iRealDeleteCount);
 			}
 
 			if(fontFlag)
@@ -3632,7 +3632,7 @@ void FV_View::cmdCharDelete(bool bForward, UT_uint32 count)
 		{
 			UT_uint32 iRealDeleteCount2;
 
-			m_pDoc->deleteSpan(getPoint(), getPoint()+2,nullptr,iRealDeleteCount2);
+			m_pDoc->deleteSpan(getPoint(), getPoint()+2,NULL,iRealDeleteCount2);
 			iRealDeleteCount += iRealDeleteCount2;
 		}
 		else if(count == 1)
@@ -3940,7 +3940,7 @@ void FV_View::cmdHyperlinkJump(PT_DocPosition pos)
 		}
 		UT_uint32 aid = pAN->getPID();
 		fl_AnnotationLayout * pAL = getAnnotationLayout(aid);
-		if(pAL == nullptr)
+		if(pAL == NULL)
 		{
 			return;
 		}
@@ -4366,7 +4366,7 @@ void FV_View::cmdPasteSelectionAt(UT_sint32 xPos, UT_sint32 yPos)
 	cmdCopy(false);
 	warpInsPtToXY(xPos,yPos,true);
 	_doPaste(false, true);
-	m_pApp->cacheCurrentSelection(nullptr);
+	m_pApp->cacheCurrentSelection(NULL);
 
 	// Signal PieceTable Changes have finished
 	_restorePieceTableState();
@@ -4407,7 +4407,7 @@ UT_Error FV_View::cmdHyperlinkStatusBar(UT_sint32 xPos, UT_sint32 yPos)
 	pPage->mapXYToPosition(xClick, yClick, pos, bBOL, bEOL,isTOC);
 
 	// now get the run at the position and the hyperlink run
-	fp_HyperlinkRun * pH1 = nullptr;
+	fp_HyperlinkRun * pH1 = 0;
 
 	fl_BlockLayout *pBlock = _findBlockAtPosition(pos);
 	PT_DocPosition curPos = pos - pBlock->getPosition(false);
@@ -4510,7 +4510,7 @@ bool FV_View::cmdEditAnnotationWithDialog(UT_uint32 aID)
 	pDialog->runModal(pFrame);
 	bool bOK = (pDialog->getAnswer() == AP_Dialog_Annotation::a_OK);
 	bool bApply = (pDialog->getAnswer() == AP_Dialog_Annotation::a_APPLY);
-	fl_AnnotationLayout * pAL = nullptr;
+	fl_AnnotationLayout * pAL = NULL;
 
 	if (bOK)
 	{
@@ -4549,27 +4549,27 @@ bool FV_View::cmdEditAnnotationWithDialog(UT_uint32 aID)
 fl_AnnotationLayout *FV_View::insertAnnotationDescription(UT_uint32 aID, AP_Dialog_Annotation *pDialog)
 {
 	fl_AnnotationLayout *pAL = getAnnotationLayout(aID);
-	UT_return_val_if_fail(pAL, nullptr);
+	UT_return_val_if_fail(pAL, NULL);
 
 	UT_UCS4String sDescr(pDialog->getDescription());  
 	pf_Frag_Strux *sdhAnn = pAL->getStruxDocHandle();
-	pf_Frag_Strux *sdhEnd = nullptr;
+	pf_Frag_Strux *sdhEnd = NULL;
 
 	getDocument()->getNextStruxOfType(sdhAnn, PTX_EndAnnotation, &sdhEnd);
-	UT_return_val_if_fail(sdhEnd, nullptr);
+	UT_return_val_if_fail(sdhEnd, NULL);
 
 	// Start of the text covered by the annotations
 	PT_DocPosition posStart = getDocument()->getStruxPosition(sdhEnd); 
 	posStart++;
 
 	fp_Run *pRun = getHyperLinkRun(posStart);
-	UT_return_val_if_fail(pRun, nullptr);
+	UT_return_val_if_fail(pRun, NULL);
 
 	pRun = pRun->getNextRun();
 	while (pRun && (pRun->getType() != FPRUN_HYPERLINK))
 		pRun = pRun->getNextRun();
-	UT_return_val_if_fail(pRun, nullptr);
-	UT_return_val_if_fail(pRun->getType() == FPRUN_HYPERLINK, nullptr);
+	UT_return_val_if_fail(pRun, NULL);
+	UT_return_val_if_fail(pRun->getType() == FPRUN_HYPERLINK, NULL);
 
 	PT_DocPosition posEnd = pRun->getBlock()->getPosition(false) + pRun->getBlockOffset();
 
@@ -4646,7 +4646,7 @@ UT_Error FV_View::cmdInsertHyperlink(const char * szName, const char * szTitle)
 //
 	if(isInFootnote(posStart))
 	{
-		if((pBl1 != nullptr) && (pBl1->getPosition(true) == posStart))
+		if((pBl1 != NULL) && (pBl1->getPosition(true) == posStart))
 		{
 			if(posEnd > posStart+1)
 			{
@@ -4656,7 +4656,7 @@ UT_Error FV_View::cmdInsertHyperlink(const char * szName, const char * szTitle)
 	}
 	if(isInEndnote(posStart))
 	{
-		if((pBl1 != nullptr) && (pBl1->getPosition(true) == posStart))
+		if((pBl1 != NULL) && (pBl1->getPosition(true) == posStart))
 		{
 			if(posEnd > posStart+1)
 			{
@@ -4682,7 +4682,7 @@ UT_Error FV_View::cmdInsertHyperlink(const char * szName, const char * szTitle)
 
 	}
 	// Silently fail (TODO: pop up message) if we try to nest hyperlinks.
-	if (_getHyperlinkInRange(posStart, posEnd) != nullptr)
+	if (_getHyperlinkInRange(posStart, posEnd) != NULL)
 		return false;
 //
 // Under sum1 induced conditions posEnd could give the same block pointer
@@ -4785,14 +4785,14 @@ void FV_View::getCmdInsertRangeVariables( PT_DocPosition& posStart,
 	//
 	// Handle corner case of selection from outside the left column
 	//
-	if((pBL1!= nullptr) && isInFootnote(posStart) && (pBL1->getPosition(true) == posStart))
+	if((pBL1!= NULL) && isInFootnote(posStart) && (pBL1->getPosition(true) == posStart))
 	{
 		if(posEnd > posStart+1)
 		{
 			posStart++;
 		}
 	}
-	if((pBL1 != nullptr) && isInEndnote(posStart) && (pBL1->getPosition(true) == posStart))
+	if((pBL1 != NULL) && isInEndnote(posStart) && (pBL1->getPosition(true) == posStart))
 	{
 		if(posEnd > posStart+1)
 		{
@@ -4809,8 +4809,8 @@ UT_Error FV_View::cmdInsertBookmark(const char * szName)
 	bool bRet;
 
 	PT_DocPosition posStart = 0, posEnd = 0;
-	fl_BlockLayout* pBL1 = nullptr;
-	fl_BlockLayout* pBL2 = nullptr;
+	fl_BlockLayout* pBL1 = 0;
+	fl_BlockLayout* pBL2 = 0;
 	getCmdInsertRangeVariables( posStart, posEnd, pBL1, pBL2 );
 	
 	if(pBL1 != pBL2)
@@ -4892,8 +4892,8 @@ FV_View::cmdInsertXMLID( const std::string& xmlid )
 	UT_Error ret;
 
 	PT_DocPosition posStart = 0, posEnd = 0;
-	fl_BlockLayout* pBL1 = nullptr;
-	fl_BlockLayout* pBL2 = nullptr;
+	fl_BlockLayout* pBL1 = 0;
+	fl_BlockLayout* pBL2 = 0;
 	getCmdInsertRangeVariables( posStart, posEnd, pBL1, pBL2 );
 	UT_DEBUGMSG(("fv_View::cmdInsertXMLID: posStart:%d posEnd:%d\n", posStart, posEnd ));
 
@@ -4995,7 +4995,7 @@ UT_Error FV_View::cmdInsertTOC(void)
 		_deleteSelection();
 		_generalUpdate();
 		fl_BlockLayout * pBL = _findBlockAtPosition(getPoint());
-		if(pBL != nullptr)
+		if(pBL != NULL)
 		{
 			fl_ContainerLayout * pCL = pBL->myContainingLayout();
 			if(pCL->getContainerType() != FL_CONTAINER_DOCSECTION)
@@ -5023,7 +5023,7 @@ UT_Error FV_View::cmdInsertTOC(void)
 //
 // Check if there is a hyperlink here
 //
-	if(getHyperLinkRun(getPoint()) != nullptr)
+	if(getHyperLinkRun(getPoint()) != NULL)
 	{
 		return false;
 	}
@@ -5053,13 +5053,13 @@ UT_Error FV_View::cmdInsertTOC(void)
 //
 	fl_BlockLayout * pBL = getCurrentBlock();
 	PT_DocPosition pos = pBL->getPosition(true);
-	if((pBL->getNext() == nullptr) || (pBL->getPrev() == nullptr))
+	if((pBL->getNext() == NULL) || (pBL->getPrev() == NULL))
 	{
 		insertParagraphBreak();
 		pBL = getCurrentBlock();
 		pos = pBL->getPosition(true);
 	}
-	if(pBL != nullptr)
+	if(pBL != NULL)
 	{
 		fl_ContainerLayout * pCL = pBL->myContainingLayout();
 		if(pCL->getContainerType() != FL_CONTAINER_DOCSECTION)
@@ -5160,7 +5160,7 @@ UT_Error FV_View::cmdInsertGraphic(const FG_ConstGraphicPtr& pFG)
 	  Create a unique identifier for the data item.
 	*/
 	UT_UUIDPtr uuid = m_pDoc->getNewUUID();
-	UT_return_val_if_fail(uuid != nullptr, UT_ERROR);
+	UT_return_val_if_fail(uuid != NULL, UT_ERROR);
 	std::string s = uuid->toString().unwrap_or("");
 
 	UT_Error errorCode = _insertGraphic(pFG, s.c_str());
@@ -5181,8 +5181,8 @@ UT_Error FV_View::cmdInsertGraphic(const FG_ConstGraphicPtr& pFG)
 
 UT_Error FV_View::cmdInsertPositionedGraphic(const FG_ConstGraphicPtr& pFG)
 {
-	fl_BlockLayout * pBlock = nullptr;
-	fp_Run * pRun = nullptr;
+	fl_BlockLayout * pBlock = NULL;
+	fp_Run * pRun = NULL;
 	UT_sint32 xCaret, yCaret;
 	UT_uint32 heightCaret;
 	UT_sint32 xCaret2, yCaret2;
@@ -5211,14 +5211,14 @@ UT_Error FV_View::cmdInsertPositionedGraphic(const FG_ConstGraphicPtr& pFG, UT_s
 	  Create a unique identifier for the data item.
 	*/
 	UT_UUIDPtr uuid = m_pDoc->getNewUUID();
-	UT_return_val_if_fail(uuid != nullptr, UT_ERROR);
+	UT_return_val_if_fail(uuid != NULL, UT_ERROR);
 	std::string s = uuid->toString().unwrap_or("");
 	//
 	// Find a document position close to the requested position
 	//
 	PT_DocPosition pos = getDocPositionFromXY(mouseX,mouseY);
 	fl_BlockLayout * pBlock = getBlockAtPosition(pos);
-	fp_Run *  pRun = nullptr;
+	fp_Run *  pRun = NULL;
 	bool bEOL,bDir;
 	bEOL = false;
 	UT_sint32 x1,y1,x2,y2,iHeight;
@@ -5227,7 +5227,7 @@ UT_Error FV_View::cmdInsertPositionedGraphic(const FG_ConstGraphicPtr& pFG, UT_s
 		pRun = pBlock->findPointCoords(pos,bEOL,x1,y1,x2,y2,iHeight,bDir);
 	}
 	fp_Line * pLine = pRun->getLine();
-	if(pLine == nullptr)
+	if(pLine == NULL)
 	{
 	        return false;
 	}
@@ -5267,8 +5267,8 @@ UT_Error FV_View::cmdInsertPositionedGraphic(const FG_ConstGraphicPtr& pFG, UT_s
 	// This preserves the aspect ratio and limits the size of the images
 	dw = dw*rat;
 	dh = dh*rat;
-	sWidth =  UT_formatDimensionedValue(dw,"in", nullptr);
-	sHeight =  UT_formatDimensionedValue(dh,"in", nullptr);
+	sWidth =  UT_formatDimensionedValue(dw,"in", NULL);
+	sHeight =  UT_formatDimensionedValue(dh,"in", NULL);
 //
 // Create a dataid for the object
 //
@@ -5325,7 +5325,7 @@ UT_Error FV_View::cmdInsertPositionedGraphic(const FG_ConstGraphicPtr& pFG, UT_s
 	UT_sint32 iposy = mouseY - iyoff - iHeight/2;
 	ypos = static_cast<double>(iposy)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 	sProp = "frame-col-ypos";
-	sVal = UT_formatDimensionedValue(ypos,"in", nullptr);
+	sVal = UT_formatDimensionedValue(ypos,"in", NULL);
 	UT_std_string_setProperty(sFrameProps, sProp, sVal);
 	sProp = "wrap-mode";
 	sVal = "wrapped-both";
@@ -5368,25 +5368,25 @@ UT_Error FV_View::cmdInsertPositionedGraphic(const FG_ConstGraphicPtr& pFG, UT_s
 // It returns the Frag_Strux of the new frame.
 //
 	fl_BlockLayout * pBL = pBlock;
-	if((pBL == nullptr) || (pRun == nullptr))
+	if((pBL == NULL) || (pRun == NULL))
 	{
 	  return UT_ERROR;
 	}
 	fl_BlockLayout * pPrevBL = pBL;
 	while(pBL && ((pBL->myContainingLayout()->getContainerType() == FL_CONTAINER_ENDNOTE) || (pBL->myContainingLayout()->getContainerType() == FL_CONTAINER_FOOTNOTE) || (pBL->myContainingLayout()->getContainerType() == FL_CONTAINER_TOC)|| (pBL->myContainingLayout()->getContainerType() == FL_CONTAINER_FRAME)))
 	{
-        UT_DEBUGMSG(("Skipping Block %p \n", (void*)pBL));
+        UT_DEBUGMSG(("Skipping Block %p \n",pBL));
 		pPrevBL = pBL;
 		pBL = pBL->getPrevBlockInDocument();
 	}
-	if(pBL == nullptr)
+	if(pBL == NULL)
 	{
 		pBL = pPrevBL;
 	}
 	UT_ASSERT((pBL->myContainingLayout()->getContainerType() != FL_CONTAINER_HDRFTR) 
 		  && (pBL->myContainingLayout()->getContainerType() != FL_CONTAINER_SHADOW));
 	pos = pBL->getPosition();
-	pf_Frag_Strux * pfFrame = nullptr;
+	pf_Frag_Strux * pfFrame = NULL;
 	m_pDoc->insertStrux(pos, PTX_SectionFrame, attributes, PP_NOPROPS, &pfFrame);
 	PT_DocPosition posFrame = pfFrame->getPos();
 	m_pDoc->insertStrux(posFrame+1,PTX_EndFrame);
@@ -5424,7 +5424,7 @@ bool FV_View::cmdInsertLatexMath(UT_UTF8String & sLatex,
 	  Create a unique identifier for the data item.
 	*/
 	UT_UUIDPtr uuid = m_pDoc->getNewUUID();
-	UT_return_val_if_fail(uuid != nullptr, false);
+	UT_return_val_if_fail(uuid != NULL, false);
 	auto result = uuid->toString();
 	if (!result.empty()) {
 		std::string s = result.unwrap();
@@ -5440,8 +5440,8 @@ bool FV_View::cmdInsertLatexMath(UT_UTF8String & sLatex,
 	UT_ByteBufPtr latexBuf(new UT_ByteBuf);
 	mathBuf->ins(0, reinterpret_cast<const UT_Byte *>(sMath.utf8_str()), static_cast<UT_uint32>(sMath.size()));
 	latexBuf->ins(0, reinterpret_cast<const UT_Byte *>(sLatex.utf8_str()), static_cast<UT_uint32>(sLatex.size()));
-	m_pDoc->createDataItem(sMathName.utf8_str(), false, mathBuf, "", nullptr);
-	m_pDoc->createDataItem(sLatexName.utf8_str(), false, latexBuf, "", nullptr);
+	m_pDoc->createDataItem(sMathName.utf8_str(), false, mathBuf, "", NULL);
+	m_pDoc->createDataItem(sLatexName.utf8_str(), false, latexBuf, "", NULL);
 
 	// OK Insert the MathML Object
 	PP_PropertyVector atts = {
@@ -5450,9 +5450,9 @@ bool FV_View::cmdInsertLatexMath(UT_UTF8String & sLatex,
 		"props", ""
 	};
 
-	const gchar *cur_style = nullptr;
+	const gchar *cur_style = NULL;
 	getStyle(&cur_style);
-	if((cur_style != nullptr) && (*cur_style) && (strcmp(cur_style,"None") != 0))
+	if((cur_style != NULL) && (*cur_style) && (strcmp(cur_style,"None") != 0))
 	{
 		atts.push_back(PT_STYLE_ATTRIBUTE_NAME);
 		atts.push_back(cur_style);
@@ -5509,9 +5509,9 @@ bool FV_View::cmdInsertMathML(const char * szUID,PT_DocPosition pos)
 	PP_PropertyVector atts = {
 		"dataid", szUID
 	};
-	const gchar *cur_style = nullptr;
+	const gchar *cur_style = NULL;
 	getStyle(&cur_style);
-	if((cur_style != nullptr) && (*cur_style) && (strcmp(cur_style,"None") != 0))
+	if((cur_style != NULL) && (*cur_style) && (strcmp(cur_style,"None") != 0))
 	{
 		atts.push_back(PT_STYLE_ATTRIBUTE_NAME);
 		atts.push_back(cur_style);
@@ -5556,7 +5556,7 @@ bool FV_View::cmdInsertEmbed(const UT_ConstByteBufPtr & pBuf, PT_DocPosition pos
 {
 	std::string sUID = "obj-";
 	UT_UUIDPtr uuid = m_pDoc->getNewUUID();
-	UT_return_val_if_fail(uuid != nullptr, false);
+	UT_return_val_if_fail(uuid != NULL, false);
 	auto result = uuid->toString();
 	if (result) {
 		sUID += result.unwrap();
@@ -5566,16 +5566,16 @@ bool FV_View::cmdInsertEmbed(const UT_ConstByteBufPtr & pBuf, PT_DocPosition pos
 		"dataid", sUID,
 		"props", ""
 	};
-	const gchar *cur_style = nullptr;
+	const gchar *cur_style = NULL;
 	UT_String sBuf(reinterpret_cast<const char *>(pBuf->getPointer(0)),pBuf->getLength());
 	UT_DEBUGMSG(("Chart text is... \n %s \n",sBuf.c_str()));
-	bool created = m_pDoc->createDataItem(sUID.c_str(), false, pBuf, szMime, nullptr);
+	bool created = m_pDoc->createDataItem(sUID.c_str(), false, pBuf, szMime, NULL);
 	if(!created)
 	{
 	    return created;
 	}
 	getStyle(&cur_style);
-	if((cur_style != nullptr) && (*cur_style) && (strcmp(cur_style,"None") != 0))
+	if((cur_style != NULL) && (*cur_style) && (strcmp(cur_style,"None") != 0))
 	{
 		atts.push_back(PT_STYLE_ATTRIBUTE_NAME);
 		atts.push_back(cur_style);
@@ -5656,7 +5656,7 @@ bool FV_View::cmdUpdateEmbed(const UT_ConstByteBufPtr & pBuf, const char * szMim
 	pRun = pBL->findPointCoords(pos1, false, xPoint,
 								yPoint, xPoint2, yPoint2,
 								iPointHeight, bDirection);
-	if(pRun == nullptr)
+	if(pRun == NULL)
 	{
 	  return false;
 	}
@@ -5667,7 +5667,7 @@ bool FV_View::cmdUpdateEmbed(const UT_ConstByteBufPtr & pBuf, const char * szMim
 
 	std::string sUID="obj-";
 	UT_UUIDPtr uuid = m_pDoc->getNewUUID();
-	UT_return_val_if_fail(uuid != nullptr, false);
+	UT_return_val_if_fail(uuid != NULL, false);
 	auto result = uuid->toString();
 	if (result) {
 		sUID += result.unwrap();
@@ -5677,12 +5677,12 @@ bool FV_View::cmdUpdateEmbed(const UT_ConstByteBufPtr & pBuf, const char * szMim
 		"props", ""
 	};
 
-	bool bres = m_pDoc->createDataItem(sUID.c_str(),false,pBuf, szMime, nullptr);
+	bool bres = m_pDoc->createDataItem(sUID.c_str(),false,pBuf, szMime, NULL);
 	UT_return_val_if_fail(bres,false)
 
-	const gchar *cur_style = nullptr;
+	const gchar *cur_style = NULL;
 	getStyle(&cur_style);
-	if((cur_style != nullptr) && (*cur_style) && (strcmp(cur_style,"None") != 0))
+	if((cur_style != NULL) && (*cur_style) && (strcmp(cur_style,"None") != 0))
 	{
 		atts.push_back(PT_STYLE_ATTRIBUTE_NAME);
 		atts.push_back(cur_style);
@@ -5727,7 +5727,7 @@ bool FV_View::cmdUpdateEmbed(const UT_ConstByteBufPtr & pBuf, const char * szMim
  */
 bool FV_View::cmdUpdateEmbed(fp_Run * pRun, const UT_ConstByteBufPtr & pBuf, const char * szMime, const char * szProps)
 {
-	if(pRun == nullptr || pRun->getType() != FPRUN_EMBED)
+	if(pRun == NULL || pRun->getType() != FPRUN_EMBED)
 	{
 	  return false;
 	}
@@ -5738,7 +5738,7 @@ bool FV_View::cmdUpdateEmbed(fp_Run * pRun, const UT_ConstByteBufPtr & pBuf, con
 	std::string sUID = "obj-";
 	std::string s;
 	UT_UUIDPtr uuid = m_pDoc->getNewUUID();
-	UT_return_val_if_fail(uuid != nullptr, false);
+	UT_return_val_if_fail(uuid != NULL, false);
 	auto result = uuid->toString();
 	if (result) {
 		sUID += result.unwrap();
@@ -5748,11 +5748,11 @@ bool FV_View::cmdUpdateEmbed(fp_Run * pRun, const UT_ConstByteBufPtr & pBuf, con
 		"dataid", sUID,
 		"props", ""
 	};
-	bool bres = m_pDoc->createDataItem(sUID.c_str(), false, pBuf, szMime, nullptr);
+	bool bres = m_pDoc->createDataItem(sUID.c_str(), false, pBuf, szMime, NULL);
 	UT_return_val_if_fail(bres, false)
-	const gchar *cur_style = nullptr;
+	const gchar *cur_style = NULL;
 	getStyle(&cur_style);
-	if((cur_style != nullptr) && (*cur_style) && (strcmp(cur_style,"None") != 0))
+	if((cur_style != NULL) && (*cur_style) && (strcmp(cur_style,"None") != 0))
 	{
 		atts.push_back(PT_STYLE_ATTRIBUTE_NAME);
 		atts.push_back(cur_style);
@@ -5798,7 +5798,7 @@ bool FV_View::cmdUpdateEmbed(fp_Run * pRun, const UT_ConstByteBufPtr & pBuf, con
  */
 bool FV_View::cmdDeleteEmbed(fp_Run * pRun)
 {
-	if(pRun == nullptr || pRun->getType() != FPRUN_EMBED)
+	if(pRun == NULL || pRun->getType() != FPRUN_EMBED)
 	{
 	  return false;
 	}
@@ -5834,7 +5834,7 @@ UT_Error FV_View::cmdInsertGraphicAtStrux(const FG_ConstGraphicPtr& pFG, PT_DocP
 	  Create a unique identifier for the data item.
 	*/
 	UT_UUIDPtr uuid = m_pDoc->getNewUUID();
-	UT_return_val_if_fail(uuid != nullptr, UT_ERROR);
+	UT_return_val_if_fail(uuid != NULL, UT_ERROR);
 	std::string s = uuid->toString().unwrap_or("");
 
 	UT_Error errorCode = pFG->insertAtStrux(m_pDoc,
@@ -6006,15 +6006,15 @@ void FV_View::cmdRemoveHdrFtr( bool isHeader)
 //
 // Branch to Header/Footer sections.
 //
-	fp_ShadowContainer * pHFCon = nullptr;
-	fl_HdrFtrShadow * pShadow = nullptr;
-	fl_HdrFtrSectionLayout * pHdrFtr = nullptr;
+	fp_ShadowContainer * pHFCon = NULL;
+	fl_HdrFtrShadow * pShadow = NULL;
+	fl_HdrFtrSectionLayout * pHdrFtr = NULL;
 
 	if(isHeader)
 	{
 		fp_Page * pPage = getCurrentPage();
 		pHFCon = pPage->getHdrFtrP(FL_HDRFTR_HEADER);
-		if(pHFCon == nullptr)
+		if(pHFCon == NULL)
 		{
 			return;
 		}
@@ -6033,7 +6033,7 @@ void FV_View::cmdRemoveHdrFtr( bool isHeader)
 	{
 		fp_Page * pPage = getCurrentPage();
 		pHFCon = pPage->getHdrFtrP(FL_HDRFTR_FOOTER);
-		if(pHFCon == nullptr)
+		if(pHFCon == NULL)
 		{
 			return;
 		}
@@ -6126,7 +6126,7 @@ void FV_View::cmdRemoveHdrFtr( bool isHeader)
 	_restorePieceTableState();
 
 	_generalUpdate();
-	updateScreen(true); // fix 1803, force screen update/redraw
+	updateScreen (); // fix 1803, force screen update/redraw
 
 	_updateInsertionPoint();
 	m_pDoc->endUserAtomicGlob();
@@ -6159,8 +6159,8 @@ void FV_View::cmdAcceptRejectRevision(bool bReject, UT_sint32 xPos, UT_sint32 yP
 	UT_DEBUGMSG(( "FV_View::cmdAcceptRejectRevision [bReject=%d]\n",bReject ));
 
 	PT_DocPosition iStart, iEnd;
-	fl_BlockLayout * pBlock = nullptr;
-	fp_Run *pRun = nullptr;
+	fl_BlockLayout * pBlock = NULL;
+	fp_Run *pRun = NULL;
 
 	// Signal PieceTable Change
 	_saveAndNotifyPieceTableChange();
@@ -6216,7 +6216,7 @@ void FV_View::cmdSetRevisionLevel(UT_uint32 i)
 		m_pLayout->rebuildFromHere(static_cast<fl_DocSectionLayout *>(m_pLayout->getFirstSection()));
 
 		// we have to force redraw here, see bug 10486
-		queueDraw(nullptr);
+		draw(NULL);
 	}
 }
 
@@ -6367,7 +6367,7 @@ bool FV_View::cmdFindRevision(bool bNext, UT_sint32 xPos, UT_sint32 yPos)
 
 void FV_View::_updateDatesBeforeSave(bool bOverwriteCreated)
 {
-    time_t now = time(nullptr);
+    time_t now = time(NULL);
     std::string timeStr = ctime(&now);
     
     if (bOverwriteCreated)

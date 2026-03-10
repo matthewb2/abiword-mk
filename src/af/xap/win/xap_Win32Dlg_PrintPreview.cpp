@@ -1,19 +1,19 @@
 /* AbiSource Application Framework
  * Copyright (C) 1998 AbiSource, Inc.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
  */
 
@@ -121,7 +121,7 @@ enum EncoderValue
 #define    PixelFormatAlpha        0x00040000 // Has an alpha component
 #define    PixelFormatPAlpha       0x00080000 // Pre-multiplied alpha
 #define    PixelFormatExtended     0x00100000 // Extended color 16 bits/channel
-#define    PixelFormatCanonical    0x00200000 
+#define    PixelFormatCanonical    0x00200000
 
 #define    PixelFormatUndefined       0
 #define    PixelFormatDontCare        0
@@ -145,12 +145,12 @@ typedef DWORD ARGB;
 
 typedef GpStatus (WINGDIPAPI* GdiplusStartupFunc) (gpointer, const gpointer, gpointer);
 typedef GpStatus (WINGDIPAPI* GdipDisposeImageFunc) (GpImage*);
-typedef GpStatus (WINGDIPAPI* GdipSaveImageToFileFunc) (GpImage *image, GDIPCONST WCHAR* filename, 
-							GDIPCONST CLSID* clsidEncoder, 
+typedef GpStatus (WINGDIPAPI* GdipSaveImageToFileFunc) (GpImage *image, GDIPCONST WCHAR* filename,
+							GDIPCONST CLSID* clsidEncoder,
 							GDIPCONST EncoderParameters* encoderParams);
 typedef GpStatus (WINGDIPAPI* GdipLoadImageFromFileFunc) (GDIPCONST WCHAR* filename, GpImage **image);
 typedef GpStatus (WINGDIPAPI* GdipSaveAddFunc) (GpImage *image, GDIPCONST EncoderParameters* encoderParams);
-typedef GpStatus (WINGDIPAPI* GdipSaveAddImageFunc) (GpImage *orig, GpImage *image, 
+typedef GpStatus (WINGDIPAPI* GdipSaveAddImageFunc) (GpImage *orig, GpImage *image,
 						     GDIPCONST EncoderParameters* encoderParams);
 typedef GpStatus (WINGDIPAPI* GdipCreateMetafileFromEmfFunc) (HENHMETAFILE hEmf, BOOL deleteEmf, GpMetafile **image);
 typedef GpStatus (WINGDIPAPI* GdipCreateMetafileFromFileFunc) (GDIPCONST WCHAR* file, GpMetafile **metafile);
@@ -168,26 +168,26 @@ typedef GpStatus (WINGDIPAPI* GdipBitmapSetResolutionFunc) (GpBitmap* bitmap, fl
 typedef GpStatus (WINGDIPAPI* GdipGetImageHorizontalResolutionFunc) (GpImage *image, float *resolution);
 typedef GpStatus (WINGDIPAPI* GdipGetImageVerticalResolutionFunc) (GpImage *image, float *resolution);
 
-static GdiplusStartupFunc GdiplusStartup = nullptr;
-static GdipDisposeImageFunc GdipDisposeImage = nullptr;
-static GdipSaveImageToFileFunc GdipSaveImageToFile = nullptr;
-static GdipLoadImageFromFileFunc GdipLoadImageFromFile = nullptr;
-static GdipSaveAddImageFunc GdipSaveAddImage = nullptr;
-static GdipSaveAddFunc GdipSaveAdd = nullptr;
-static GdipCreateMetafileFromEmfFunc GdipCreateMetafileFromEmf = nullptr;
-static GdipCreateMetafileFromFileFunc GdipCreateMetafileFromFile = nullptr;
-static GdipCreateBitmapFromFileFunc GdipCreateBitmapFromFile = nullptr;
-static GdipDeleteGraphicsFunc GdipDeleteGraphics = nullptr;
-static GdipCreateBitmapFromScan0Func GdipCreateBitmapFromScan0 = nullptr;
-static GdipGetImageWidthFunc GdipGetImageWidth = nullptr;
-static GdipGetImageHeightFunc GdipGetImageHeight = nullptr;
-static GdipDrawImageIFunc GdipDrawImageI = nullptr;
-static GdipGetImageGraphicsContextFunc GdipGetImageGraphicsContext = nullptr;
-static GdipFlushFunc GdipFlush = nullptr;
-static GdipGraphicsClearFunc GdipGraphicsClear = nullptr;
-static GdipBitmapSetResolutionFunc GdipBitmapSetResolution = nullptr;
-static GdipGetImageHorizontalResolutionFunc GdipGetImageHorizontalResolution = nullptr;
-static GdipGetImageVerticalResolutionFunc GdipGetImageVerticalResolution = nullptr;
+static GdiplusStartupFunc GdiplusStartup = 0;
+static GdipDisposeImageFunc GdipDisposeImage = 0;
+static GdipSaveImageToFileFunc GdipSaveImageToFile = 0;
+static GdipLoadImageFromFileFunc GdipLoadImageFromFile = 0;
+static GdipSaveAddImageFunc GdipSaveAddImage = 0;
+static GdipSaveAddFunc GdipSaveAdd = 0;
+static GdipCreateMetafileFromEmfFunc GdipCreateMetafileFromEmf = 0;
+static GdipCreateMetafileFromFileFunc GdipCreateMetafileFromFile = 0;
+static GdipCreateBitmapFromFileFunc GdipCreateBitmapFromFile = 0;
+static GdipDeleteGraphicsFunc GdipDeleteGraphics = 0;
+static GdipCreateBitmapFromScan0Func GdipCreateBitmapFromScan0 = 0;
+static GdipGetImageWidthFunc GdipGetImageWidth = 0;
+static GdipGetImageHeightFunc GdipGetImageHeight = 0;
+static GdipDrawImageIFunc GdipDrawImageI = 0;
+static GdipGetImageGraphicsContextFunc GdipGetImageGraphicsContext = 0;
+static GdipFlushFunc GdipFlush = 0;
+static GdipGraphicsClearFunc GdipGraphicsClear = 0;
+static GdipBitmapSetResolutionFunc GdipBitmapSetResolution = 0;
+static GdipGetImageHorizontalResolutionFunc GdipGetImageHorizontalResolution = 0;
+static GdipGetImageVerticalResolutionFunc GdipGetImageVerticalResolution = 0;
 
 static GDIPCONST CLSID tiff_clsid = { 0x557cf405, 0x1a04, 0x11d3, { 0x9a, 0x73, 0x0, 0x0, 0xf8, 0x1e, 0xf3, 0x2e } };
 static GDIPCONST GUID EncoderSaveFlag = { 0x292266FC, 0xac40, 0x47bf, { 0x8c, 0xfc, 0xa8, 0x5b, 0x89, 0xa6,0x55, 0xde } };
@@ -203,7 +203,7 @@ gdip_init (void)
 {
   GdiplusStartupInput input;
   ULONG_PTR gdiplusToken = 0;
-  static HINSTANCE gdipluslib = nullptr;
+  static HINSTANCE gdipluslib = NULL;
 
   if (!gdipluslib)
     gdipluslib = LoadLibraryW (L"gdiplus.dll");
@@ -211,7 +211,7 @@ gdip_init (void)
     return 0; /* gdip_init() is idempotent */
 
   if (!gdipluslib)
-    return 18; // GdiplusNotInitialized 
+    return 18; // GdiplusNotInitialized
 
 #define LOOKUP(func) \
   G_STMT_START { \
@@ -246,10 +246,10 @@ gdip_init (void)
 #undef LOOKUP
 
   input.GdiplusVersion = 1;
-  input.DebugEventCallback = nullptr;
+  input.DebugEventCallback = NULL;
   input.SuppressBackgroundThread = input.SuppressExternalCodecs = FALSE;
-  
-  return GdiplusStartup (&gdiplusToken, &input, nullptr);
+
+  return GdiplusStartup (&gdiplusToken, &input, NULL);
 }
 
 #define ASSERT_GDIP_SUCCESS(status, func) \
@@ -266,11 +266,11 @@ public:
 
   GR_Win32PrintPreviewGraphics(const RECT &rect)
     : GR_Win32Graphics(createbestmetafilehdc(), getDocInfo()),
-      m_pGraphics(nullptr),
+      m_pGraphics(0),
       page_rect(rect),
-      metafile_dc(nullptr),
-      m_multiPageTiff(nullptr),
-      m_tiffFilename(nullptr)
+      metafile_dc(0),
+      m_multiPageTiff(0),
+      m_tiffFilename(0)
   {
     GpStatus status = gdip_init ();
     ASSERT_GDIP_SUCCESS (status, gdip_init);
@@ -296,21 +296,21 @@ public:
   }
 
   virtual UT_uint32 getClassId() {return s_getClassId();}
-  
+
   virtual GR_Capability getCapability() {return GRCAP_PRINTER_ONLY;}
-  
+
   static const char * graphicsDescriptor(){return "Win32 Print Preview";}
 
   virtual void drawGlyph(UT_uint32 glyph_idx, UT_sint32 xoff, UT_sint32 yoff)
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("drawGlyph()\n"));
     m_pGraphics->drawGlyph(glyph_idx, xoff, yoff);
   }
 
   virtual void drawChar(UT_UCSChar Char, UT_sint32 xoff, UT_sint32 yoff)
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("drawChar()\n"));
     m_pGraphics->drawChar(Char, xoff, yoff);
   }
@@ -320,7 +320,7 @@ public:
 			 UT_sint32 xoff, UT_sint32 yoff,
 			 int * pCharWidth)
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("drawChars()\n"));
     m_pGraphics->drawChars(pChars, iCharOffset, iLength, xoff, yoff, pCharWidth);
   }
@@ -347,35 +347,35 @@ public:
 
   virtual void setColor(const UT_RGBColor& clr)
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("setColor()\n"));
     m_pGraphics->setColor(clr);
   }
 
   virtual void getColor(UT_RGBColor& clr)
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("getColor()\n"));
     m_pGraphics->getColor(clr);
   }
 
   virtual void drawLine(UT_sint32 a, UT_sint32 b, UT_sint32 c, UT_sint32 d)
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("drawLine()\n"));
     m_pGraphics->drawLine(a, b, c, d);
   }
 
   virtual void xorLine(UT_sint32 a, UT_sint32 b, UT_sint32 c, UT_sint32 d)
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("xorLine()\n"));
     m_pGraphics->xorLine(a, b, c, d);
   }
 
   virtual void setLineWidth(UT_sint32 w)
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("setLineWidth()\n"));
     m_pGraphics->setLineWidth(w);
   }
@@ -385,14 +385,14 @@ public:
 				   CapStyle inCapStyle   = CAP_BUTT,
 				   LineStyle inLineStyle = LINE_SOLID )
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("setLineProperties()\n"));
     m_pGraphics->setLineProperties(inWidthPixels, inJoinStyle, inCapStyle, inLineStyle);
   }
 
   virtual void polyLine(const UT_Point * pts, UT_uint32 nPoints)
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("polyLine()\n"));
     m_pGraphics->polyLine(pts, nPoints);
   }
@@ -401,33 +401,33 @@ public:
 			UT_sint32 x, UT_sint32 y,
 			UT_sint32 w, UT_sint32 h)
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("fillRect()\n"));
     m_pGraphics->fillRect(c, x, y, w, h);
   }
 
   virtual void invertRect(const UT_Rect* pRect)
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("invertRect()\n"));
     m_pGraphics->invertRect(pRect);
   }
 
   virtual void setClipRect(const UT_Rect* pRect)
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("setClipRect()\n"));
     m_pGraphics->setClipRect(pRect);
   }
 
   virtual void clearArea(UT_sint32 a, UT_sint32 b, UT_sint32 c, UT_sint32 d)
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("clearArea()\n"));
     m_pGraphics->clearArea(a, b, c, d);
   }
 
-  virtual GR_Image* createNewImage(const char* pszName, const UT_ConstByteBufPtr& pBB, const std::string& mimetype,
+  virtual GR_Image* createNewImage(const char* pszName, /*const UT_ByteBuf* pBB*/const UT_ConstByteBufPtr & pBB, const std::string& mimetype,
 				   UT_sint32 iDisplayWidth, UT_sint32 iDisplayHeight,
 				   GR_Image::GRType iType)
   {
@@ -440,7 +440,7 @@ public:
 
   virtual void drawImage(GR_Image* pImg, UT_sint32 xDest, UT_sint32 yDest)
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("drawImage()\n"));
     m_pGraphics->drawImage(pImg, xDest, yDest);
   }
@@ -453,35 +453,35 @@ public:
 
   virtual void polygon(const UT_RGBColor& c, const UT_Point *pts, UT_uint32 nPoints)
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("polygon()\n"));
     m_pGraphics->polygon(c, pts, nPoints);
   }
 
   virtual GR_Image * genImageFromRectangle(const UT_Rect & r)
   {
-    UT_return_val_if_fail(m_pGraphics != nullptr, nullptr);
+    UT_return_val_if_fail(m_pGraphics != 0, 0);
     d (g_print ("genImageFromRectangle()\n"));
     return m_pGraphics->genImageFromRectangle(r);
   }
 
   virtual void saveRectangle(UT_Rect & r, UT_uint32 iIndx)
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("saveRectangle()\n"));
     m_pGraphics->saveRectangle(r, iIndx);
   }
 
   virtual void restoreRectangle(UT_uint32 iIndx)
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("restoreRectangle()\n"));
     m_pGraphics->restoreRectangle(iIndx);
   }
 
   virtual void flush(void)
   {
-    UT_return_if_fail(m_pGraphics != nullptr);
+    UT_return_if_fail(m_pGraphics != 0);
     d (g_print ("flush()\n"));
     m_pGraphics->flush();
   }
@@ -491,7 +491,7 @@ public:
     std::string sName = UT_createTmpFile("pr", ".tif");
 
     d (g_print ("saving to %s\n", sName.c_str()));
-    m_tiffFilename = g_utf8_to_utf16 (sName.c_str(), -1, nullptr, nullptr, nullptr);
+    m_tiffFilename = g_utf8_to_utf16 (sName.c_str(), -1, NULL, NULL, NULL);
 
     return true;
   }
@@ -503,9 +503,10 @@ public:
 
     d (g_print ("startPage(%d)\n", pageNumber));
 
-    metafile_dc = CreateEnhMetaFileW (getPrimaryDC(), nullptr, &page_rect, L"AbiWord\0Print Preview\0\0");
-    
-    GR_Win32AllocInfo ai(metafile_dc, m_pDocInfo, nullptr);
+    metafile_dc = CreateEnhMetaFileW (getPrimaryDC(), NULL, &page_rect, L"AbiWord\0Print Preview\0\0");
+
+    GR_Win32AllocInfo ai(metafile_dc, m_pDocInfo, NULL);
+
     m_pGraphics = (GR_Win32Graphics *)XAP_App::getApp()->newGraphics(ai);
 
     return true;
@@ -528,12 +529,12 @@ public:
     ASSERT_GDIP_SUCCESS (status, GdipSaveAdd);
 
     status = GdipDisposeImage (m_multiPageTiff);
-    m_multiPageTiff = nullptr;
+    m_multiPageTiff = 0;
     ASSERT_GDIP_SUCCESS (status, GdipDisposeImage);
 
     d (g_print("endPrint()\n"));
 
-    ShellExecuteW (nullptr, L"open", (WCHAR *)m_tiffFilename, nullptr, nullptr, SW_SHOW);
+    ShellExecuteW (NULL, L"open", (WCHAR *)m_tiffFilename, NULL, NULL, SW_SHOW);
 
     return true;
   }
@@ -547,7 +548,7 @@ public:
       {
 	GpStatus status;
 	HENHMETAFILE metafile;
-	
+
 	metafile = CloseEnhMetaFile (metafile_dc);
 	d (g_print ("metafile = %p\n", metafile));
 
@@ -560,14 +561,14 @@ public:
 	GpImage *m;
 	status = GdipCreateMetafileFromEmf(metafile, TRUE, &m);
 	ASSERT_GDIP_SUCCESS (status, GdipCreateMetafileFromEmf);
-	
+
 	guint width, height;
 	GdipGetImageWidth(m, &width);
 	GdipGetImageHeight(m, &height);
 
 	d (g_print ("w: %d | h: %d\n", width, height));
 
-	status = GdipCreateBitmapFromScan0 (width, height, 0, PixelFormat32bppARGB, nullptr, &meta);
+	status = GdipCreateBitmapFromScan0 (width, height, 0, PixelFormat32bppARGB, NULL, &meta);
 	ASSERT_GDIP_SUCCESS (status, GdipCreateBitmapFromScan0);
 
 	status = GdipBitmapSetResolution (meta, metafile_xres, metafile_yres);
@@ -576,17 +577,17 @@ public:
 	GpGraphics *g;
 	status = GdipGetImageGraphicsContext (meta, &g);
 	ASSERT_GDIP_SUCCESS (status, GdipGetImageGraphicsContext);
-	
+
 	// gotta clear the bitmap
 	status = GdipGraphicsClear(g, 0xffffffff);
 	ASSERT_GDIP_SUCCESS (status, GdipGraphicsClear);
-	
+
 	status = GdipDrawImageI(g, m, 0, 0);
 	ASSERT_GDIP_SUCCESS (status, GdipDrawImage);
-	
+
 	status = GdipFlush(g, 1);
 	ASSERT_GDIP_SUCCESS (status, GdipFlush);
-	
+
 	GdipDeleteGraphics(g);
 	GdipDisposeImage(m);
 
@@ -627,7 +628,7 @@ public:
 	    GdipDisposeImage (meta);
 	  }
 
-	metafile_dc = nullptr;
+	metafile_dc = 0;
 	DELETEP(m_pGraphics);
       }
   }
@@ -658,7 +659,7 @@ protected:
 };
 
 XAP_Win32Dialog_PrintPreview::XAP_Win32Dialog_PrintPreview(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id)
-  : XAP_Dialog_PrintPreview(pDlgFactory,id), m_pPrintGraphics(nullptr), m_emfFilename(nullptr)
+  : XAP_Dialog_PrintPreview(pDlgFactory,id), m_pPrintGraphics(0), m_emfFilename(0)
 {
 }
 
@@ -697,10 +698,12 @@ void XAP_Win32Dialog_PrintPreview::runModal(XAP_Frame * pFrame)
 
   try
     {
-      m_pPrintGraphics = new GR_Win32PrintPreviewGraphics(rect);
+        //m_pGraphics = new GR_Win32PrintPreviewGraphics(rect);
+     m_pPrintGraphics = new GR_Win32PrintPreviewGraphics(rect);
     }
   catch (...)
     {
-      m_pPrintGraphics = nullptr;
+    // m_pGraphics = 0;
+      m_pPrintGraphics = 0;
     }
 }

@@ -28,8 +28,8 @@
 
 
 // Abiword includes
-#include "pd_Document.h"
-#include "pl_Listener.h"
+#include <pd_Document.h>
+#include <pl_Listener.h>
 
 //#include "ie_exp_HTML_MainListener.h"
 //#include "ie_exp_HTML_Writer.h"
@@ -85,29 +85,29 @@ public:
 
     ~IE_Exp_HTML_HeaderFooterListener();
 
-    virtual bool populate(fl_ContainerLayout* sfh,
-            const PX_ChangeRecord * pcr) override;
+    bool populate(fl_ContainerLayout* sfh,
+            const PX_ChangeRecord * pcr);
 
-    virtual bool populateStrux(pf_Frag_Strux* sdh,
+    bool populateStrux(pf_Frag_Strux* sdh,
             const PX_ChangeRecord * pcr,
-            fl_ContainerLayout* * psfh)  override;
+            fl_ContainerLayout* * psfh);
 
     //See note in _writeDocument
     //bool 	startOfDocument ();
     bool endOfDocument();
 
-    virtual bool change(fl_ContainerLayout* sfh,
-            const PX_ChangeRecord * pcr) override;
+    bool change(fl_ContainerLayout* sfh,
+            const PX_ChangeRecord * pcr);
 
-    virtual bool insertStrux(fl_ContainerLayout* sfh,
+    bool insertStrux(fl_ContainerLayout* sfh,
             const PX_ChangeRecord * pcr,
             pf_Frag_Strux* sdh,
             PL_ListenerId lid,
             void (*pfnBindHandles) (pf_Frag_Strux* sdhNew,
             PL_ListenerId lid,
-            fl_ContainerLayout* sfhNew)) override;
+            fl_ContainerLayout* sfhNew));
 
-    virtual bool signal(UT_uint32 iSignal) override;
+    bool signal(UT_uint32 iSignal);
     void doHdrFtr(bool bHeader);
 private:
     PD_DocumentRange * m_pHdrDocRange;

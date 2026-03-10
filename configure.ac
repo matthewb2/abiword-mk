@@ -1,26 +1,17 @@
 
 m4_define([abi_version_major], [3])
-m4_define([abi_version_minor], [1])
-m4_define([abi_version_micro], [0])
+m4_define([abi_version_minor], [0])
+m4_define([abi_version_micro], [2])
 m4_define([abi_series], [abi_version_major.abi_version_minor])
 m4_define([abi_version], [abi_version_major.abi_version_minor.abi_version_micro])
 
-AC_PREREQ([2.69])
 AC_INIT([abiword],[abi_version],[http://www.abisource.com/])
-
 AC_CANONICAL_HOST
-AC_PROG_CC
-AC_PROG_CXX
-AC_PROG_INSTALL
-AC_PROG_MAKE_SET
-LT_INIT
-
-
 AC_CONFIG_HEADERS(config.h)
-AC_CONFIG_MACRO_DIRS([m4])
 
+#AM_INIT_AUTOMAKE([1.9 tar-ustar])
+AM_INIT_AUTOMAKE([1.9 foreign subdir-objects])
 
-AM_INIT_AUTOMAKE([1.9 tar-ustar dist-bzip2 subdir-objects])
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
 dnl we use AM_MAINTAINER_MODE and enable it to allow to disable it.
@@ -28,58 +19,61 @@ dnl very usefull to build in scratchbox where the maintainer mode is used for th
 dnl build but the embedded build just use pregenerated one (with a different version)
 AM_MAINTAINER_MODE([enable])
 
-
 #
-# Dependency requirements
+# Dependency requirements 
 #
 
 #
 # versions requested.
 #
-GTK_VERSION_REQ=3.24.0
-GTK_ENCODED_VERSION="GDK_VERSION_3_24"
+GTK_VERSION_REQ=3.0.8
+GTK_ENCODED_VERSION="GDK_VERSION_3_0"
+GTK2_VERSION_REQ=2.12.0
+
+AC_ARG_WITH([gtk2], 
+	[AS_HELP_STRING([--with-gtk2], [use Gtk library version 2.x])], 
+[
+	abi_cv_gtk2="$withval"
+])
+
 
 # This check MUST be done early.
 #
 # We define EMBEDDED_TARGET to a numerical value so that we can do like
-# #if EMBEDDED_TARGET = EMBEDDED_TARGET_POKY
+# #if EMBEDDED_TARGET = EMBEDDED_TARGET_HILDON
 #
 # The following have to be defined unconditionally, because we want 
 # EMBEDDED_TARGET to be undefined if not building for embedded so that we 
 # can use #ifdef and #ifndef on it (two undefined symbols will return 
 # true if tested for equality in #if construct)
 AC_DEFINE([EMBEDDED_TARGET_GENERIC], [1], [Generic embedded platform])
+AC_DEFINE([EMBEDDED_TARGET_HILDON],  [2], [Hildon embedded platform])
 AC_DEFINE([EMBEDDED_TARGET_POKY],    [3], [Poky embedded platform])
 
 AC_ARG_ENABLE([embedded],
-	[AS_HELP_STRING([--enable-embedded], [=generic|poky, (Gtk+ only), build for embedded platform])],
+	[AS_HELP_STRING([--enable-embedded], [=generic|hildon|poky, (Gtk+ only), build for embedded platform])],
 [
 	abi_cv_embedded_platform="$enableval"
 	case "$enableval" in
+	hildon) 
+		abi_cv_embedded_target=EMBEDDED_TARGET_HILDON 
+		GTK2_VERSION_REQ=2.12.0
+		;;
 	poky)
 		abi_cv_embedded_target=EMBEDDED_TARGET_POKY ;;
 	generic)
 		abi_cv_embedded_target=EMBEDDED_TARGET_GENERIC ;;
-	yes)
+	yes)	
 		abi_cv_embedded_target=EMBEDDED_TARGET_GENERIC 
 		abi_cv_embedded_platform="generic" ;;
 	no)
 		;;
-	*)
-		AC_MSG_ERROR([bad value for --enable-embedded]) ;;
+	*) 
+		AC_MSG_ERROR(bad value $enableval for --enable-embedded) ;;
 	esac
-],[
+],[	
 	abi_cv_embedded_platform="no"
 	abi_cv_embedded_target="no"
-])
-
-AC_ARG_ENABLE([qt],
-	[AS_HELP_STRING([--enable-qt], [Build using Qt4])],
-[
-	abi_cv_qt="yes"
-],
-[
-	abi_cv_qt="no"
 ])
 
 #
@@ -89,16 +83,9 @@ AC_ARG_ENABLE([qt],
 # cross platform deps
 fribidi_req='fribidi >= 0.10.4'
 glib_req='glib-2.0 >= 2.6.0 gthread-2.0 >= 2.6.0 gobject-2.0 >= 2.6.0'
-gsf_req='libgsf-1 >= 1.14.26'
+gsf_req='libgsf-1 >= 1.14.18'
+gsf_gio_req='libgsf-1 >= 1.14.9'
 wv_req='wv-1.0 >= 1.2.0'
-
-dnl Do NOT get goffice on Qt
-dnl It will link Gtk+ 3 but Qt will dlopen Gtk+ 2
-dnl This cause kaboom.
-if test "x$abi_cv_qt" = "xno"; then
-goffice_req='libgoffice-0.10 >= 0.10.12'
-fi
-
 xslt_req='libxslt'
 xp_pkgs="
   ${fribidi_req}
@@ -109,9 +96,11 @@ xp_pkgs="
 "
 
 # optional deps
-enchant_req='enchant-2'
+enchant_req='enchant >= 1.2.0'
 gio_req='gio-2.0'
+goffice_req='libgoffice-0.10 >= 0.10.0'
 
+hildon_pkgs='hildon-1 hildon-fm-2 dbus-1 libosso'
 dnl libosso-gsf-1'
 # placeholder for accumulated optional deps
 opt_pkgs=''
@@ -119,16 +108,20 @@ opt_pkgs=''
 # gtk deps
 cairo_req='cairo-pdf cairo-ps pangocairo'
 #
-# 수정 후 (이 자리에는 gtk_req 정의만 남김)
-gtk_req="gtk+-3.0 >= $GTK_VERSION_REQ gtk+-unix-print-3.0 librsvg-2.0 >= 2.32.0"
-dnl cairo-fc check moved after AC_PROG_CC (requires pkg-config m4 macros)
-
-
-# qt5 deps
-qt_pkgs="Qt5Gui Qt5Widgets   ${cairo_req}"
-
+if test "x$abi_cv_gtk2" = "xyes"; then
+gtk_req="gtk+-2.0 >= $GTK2_VERSION_REQ gtk+-unix-print-2.0 librsvg-2.0 >= 2.16.0"
+else
+gtk_req="gtk+-3.0 >= $GTK_VERSION_REQ gtk+-unix-print-3.0 librsvg-2.0 >= 2.16.0"
+fi
+dnl cairo-fc is needed but only available on cairo > 1.10
+dnl http://bugzilla.abisource.com/show_bug.cgi?id=13265
+PKG_CHECK_EXISTS(cairo >= 1.10, [gtk_req="$gtk_req cairo-fc"],[])
+gtk_pkgs="
+  ${cairo_req}
+  ${gtk_req}
+"
 # cocoa deps
-cocoa_pkgs="$enchant_req $cairo_req gmodule-2.0   ${goffice_req}"
+cocoa_pkgs="$enchant_req $cairo_req"
 
 
 # win32 deps
@@ -139,28 +132,12 @@ win_pkgs="$enchant_req"
 #
 
 AC_PROG_CC
-dnl Force mingw64 pkg-config
-AS_CASE([$host],
-  [*-mingw*], [
-    PKG_CONFIG=/mingw64/bin/pkg-config
-    PKG_CONFIG_LIBDIR=/mingw64/lib/pkgconfig
-    export PKG_CONFIG PKG_CONFIG_LIBDIR
-  ])
-dnl cairo-fc is needed but only available on cairo > 1.10
-dnl http://bugzilla.abisource.com/show_bug.cgi?id=13265
-PKG_CHECK_EXISTS(cairo >= 1.10, [gtk_req="$gtk_req cairo-fc"],[])
-gtk_pkgs="
-  ${cairo_req}
-  ${gtk_req}
-  ${goffice_req}
-"
 AC_PROG_CXX
-AX_CXX_COMPILE_STDCXX_11(noext,mandatory)
 #AC_PROG_OBJC
 AC_PROG_INSTALL
 # For libtool 1.5.x compatability (AC_PROG_LIBTOOL is deprecated version of LT_INIT)
-PKG_PROG_PKG_CONFIG
-m4_ifdef([LT_INIT], [LT_INIT([disable-static])], [AC_LIBTOOL_WIN32_DLL])
+m4_ifdef([LT_INIT], [LT_INIT([disable-static win32-dll])], [AC_LIBTOOL_WIN32_DLL])
+m4_ifdef([LT_INIT], [], [AC_PROG_LIBTOOL])
 AC_PROG_LN_S
 
 AC_CHECK_PROG(HAVE_PERL, perl, yes, no)
@@ -169,12 +146,12 @@ if test "x$HAVE_PERL" = "xno"; then
 fi
 
 
+TOOLKIT_IS_GTK2="no"
 AC_MSG_CHECKING([for platform and toolkit])
 case ${host_os} in
   *darwin*)
     PLATFORM="unix"
     TOOLKIT="cocoa"
-    CXXFLAGS="$CXXFLAGS -stdlib=libc++"
     ;;
   *mingw*)
     PLATFORM="win"
@@ -182,11 +159,10 @@ case ${host_os} in
     ;;
   *)
     PLATFORM="unix"
-    if test "x$abi_cv_qt" = "xyes"; then
-      TOOLKIT="qt"
-    else
-      TOOLKIT="gtk"
+    if test "x$abi_cv_gtk2" = "xyes"; then
+      TOOLKIT_IS_GTK2="yes"
     fi
+    TOOLKIT="gtk"
     ;;
 esac
 AC_MSG_RESULT([$PLATFORM / $TOOLKIT])
@@ -201,18 +177,15 @@ function_err='Your operating system or setup seems to be missing one or more req
 header_err='Your operating system or setup seems to be missing one or more required header files'
 
 cocoa_funcs='floor mkdir'
-unix_funcs='gettimeofday'
-win_funcs='gettimeofday'
+unix_funcs='alarm gettimeofday'
+win_funcs=
 xp_funcs='localeconv strcspn strncasecmp strtoul' # "sqrt" test fails, hmm
 funcs=
 
 if test "$PLATFORM" = "cocoa"; then
 	funcs="$cocoa_funcs $xp_funcs"
 elif test "$PLATFORM" = "unix"; then
-	AC_CHECK_HEADERS([sys/time.h])
-if test "x$ac_cv_header_sys_time_h" != "xyes"; then
-  AC_MSG_ERROR([required header not found])
-fi
+	AC_CHECK_HEADERS([sys/time.h], [], [$header_err])
 	AC_FUNC_STRTOD
 	AC_TYPE_UINT32_T
 	funcs="$unix_funcs $xp_funcs"
@@ -220,13 +193,10 @@ elif test "$PLATFORM" = "win"; then
 	funcs="$win_funcs $xp_funcs"
 fi
 
-# 수정 후
-AC_CHECK_FUNCS([fork vfork])
-
-if test "x$ac_cv_func_fork" != "xyes" &&
-   test "x$ac_cv_func_vfork" != "xyes"; then
-  AC_MSG_ERROR([required function missing])
-fi
+AC_CHECK_FUNCS([ $funcs ], 
+[], [
+	AC_MSG_ERROR([$function_err])
+])
 
 #
 # Features
@@ -240,7 +210,7 @@ AC_ARG_ENABLE([default-plugins],
 	fi
 ])
 
-m4_define([plugin_list], m4_include([m4/plugin-list.m4]))
+m4_define([plugin_list], m4_include([plugin-list.m4]))
 
 AC_ARG_ENABLE([plugins], 
 	[AS_HELP_STRING([--enable-plugins], [="foo bar baz", list of plugins to build. Use --disable-plugins to disable plugin loading support, resulting in a smaller binary size. The list of plugins : ]m4_n([plugin_list]))], 
@@ -356,6 +326,14 @@ AC_ARG_ENABLE([templates],
 	abi_cv_templates="no"
 ])
 
+#
+# deferred from the "enable-embedded"
+#
+if test "$abi_cv_embedded_platform" = "hildon"; then
+	opt_pkgs="$opt_pkgs $hildon_pkgs"
+fi
+
+
 AC_ARG_ENABLE([debug], 
 	[AS_HELP_STRING([--enable-debug], [Enable debugging functionality, verbose terminal output])], 
 [
@@ -369,6 +347,29 @@ AC_ARG_ENABLE([debug],
 #
 # Optional packages
 #
+if test "x$abi_cv_gtk2" = "xyes"; then
+AC_ARG_WITH([gnomevfs], 	 
+         [AS_HELP_STRING([--with-gnomevfs], [(Gtk+-2 only) use gnome-vfs library])], 	 
+	[ 	 
+	        abi_cv_gnomevfs="$withval" 	 
+	],[ 	 
+	        # use gnomevfs if detected 	 
+	        if test "$TOOLKIT_IS_GTK2" = "yes"; then 	 
+	                PKG_CHECK_EXISTS([ $gnomevfs_req ], 	 
+	                [ 	 
+	                        abi_cv_gnomevfs="yes" 	 
+	                ], [ 	 
+	                        abi_cv_gnomevfs="no" 	 
+	                ]) 	 
+	        else 	 
+	                abi_cv_gnomevfs="no" 	 
+	        fi 	 
+	]) 	 
+ 	 
+	if test "$abi_cv_gnomevfs" = "yes"; then 	 
+	        opt_pkgs="$opt_pkgs $gnomevfs_req" 	 
+	fi 	 
+fi
 
 AC_ARG_WITH([gio], 
 	[AS_HELP_STRING([--with-gio], [use GIO library])], 
@@ -386,6 +387,39 @@ AC_ARG_WITH([gio],
 
 if test "$abi_cv_gio" = "yes"; then
 	opt_pkgs="$opt_pkgs $gio_req"
+fi
+
+AC_ARG_WITH([goffice], 
+	[AS_HELP_STRING([--with-goffice], [(Gtk+ only) use goffice library])], 
+[
+	abi_cv_goffice="$withval"
+],[
+	# use goffice if detected
+	if test "$TOOLKIT" = "gtk"; then
+	PKG_CHECK_EXISTS([ $goffice_req ],
+	[
+		abi_cv_goffice="yes"
+	], [
+		abi_cv_goffice="no"
+	])
+	fi
+])
+
+GOFFICE_BUILTIN_CPPFLAGS=
+GOFFICE_BUILTIN_LIBS=
+if test "$TOOLKIT_IS_GTK2" = "yes"; then
+	GOFFICE_BUILTIN_CPPFLAGS='-I${top_srcdir}/goffice-bits2'
+	GOFFICE_BUILTIN_LIBS='${top_builddir}/goffice-bits2/libgoffice.la'
+	AC_SUBST(GOFFICE_BUILTIN_CPPFLAGS)
+	AC_SUBST(GOFFICE_BUILTIN_LIBS)
+elif test "$PLATFORM" = "unix" && \
+   test "$abi_cv_goffice" = "yes"; then
+	opt_pkgs="$opt_pkgs $goffice_req"
+else
+	GOFFICE_BUILTIN_CPPFLAGS='-I${top_srcdir}/goffice-bits'
+	GOFFICE_BUILTIN_LIBS='${top_builddir}/goffice-bits/libgoffice.la'
+	AC_SUBST(GOFFICE_BUILTIN_CPPFLAGS)
+	AC_SUBST(GOFFICE_BUILTIN_LIBS)
 fi
 
 AC_ARG_WITH([darwinports],
@@ -445,9 +479,9 @@ AM_CONDITIONAL([WITH_REDLAND], test "$abi_cv_redland" = "yes")
 AM_CONDITIONAL([HAVE_REDLAND], test "$abi_cv_redland" = "yes")
 
 
-evolution_data_server_req='libebook-1.2 >= 3.6'
+evolution_data_server_req='libebook-1.2 >= 3.6 libecal-1.2'
 AC_ARG_WITH([evolution_data_server], 
-	[AS_HELP_STRING([--with-evolution-data-server], [Use Evolution Data Server to get at contact information])], 
+	[AS_HELP_STRING([--with-evolution-data-server], [Use Evolution Data Server to get at contact and calendar information])], 
 [
 	abi_cv_evolution_data_server="$withval"
 ],[
@@ -497,10 +531,6 @@ champlain_req=' champlain-gtk-0.12 '
 AC_ARG_WITH([champlain], 
 	[AS_HELP_STRING([--with-champlain], [use champlain to display maps])],
 	,[with_champlain="check"])
-
-if test "$TOOLKIT" = "qt"; then
-    with_champlain=no
-fi
 
 if test "x$with_champlain" != "xno"; then
     PKG_CHECK_MODULES(CHAMPLAIN, [ $champlain_req ],,
@@ -588,70 +618,47 @@ if test "$abi_cv_icondir" = "" -o \
 fi
 AC_SUBST(ABIWORD_ICONDIR, "$abi_cv_icondir")
 
-dnl ***********************************************************************
-dnl GCC/Clang sanitizer support
-dnl ***********************************************************************
-AC_ARG_WITH([sanitizer],
-            [AS_HELP_STRING([--with-sanitizer=@<:@address/undefined/no@:>@],
-                            [Use specific GCC/Clang analyzer])],
-            [with_sanitizer=$withval],
-            [with_sanitizer=no])
-AS_IF([test "x$with_sanitizer" != "xno"],[
-AX_CHECK_COMPILE_FLAG([-fsanitize=$with_sanitizer],
-  [CFLAGS="$CFLAGS -fsanitize=$with_sanitizer"
-   CXXFLAGS="$CXXFLAGS -fsanitize=$with_sanitizer"],
-  [AC_MSG_ERROR([requested sanitizer is not supported])])
-        AX_APPEND_COMPILE_FLAGS([-fno-omit-frame-pointer])
-        AC_LANG_PUSH(C++)
-        AX_APPEND_COMPILE_FLAGS([-fno-omit-frame-pointer])
-        AC_LANG_POP
-])
 
-dnl ***************************************************************
-dnl Excessive warnings
-dnl ***************************************************************
+#
+# Compiler settings (from gnumeric's configure.in)
+#
+# TODO enable -Wshadow
 AC_LANG_PUSH(C++)
-AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option], [
-	ax_compiler_flags_test="-Werror=unknown-warning-option"
-], [
-	ax_compiler_flags_test=""
-])
-dnl XXX enable these
-dnl -Wformat-nonliteral
-AX_APPEND_COMPILE_FLAGS([ \
-   -Wcast-align \
-   -Wchar-subscripts \
-   -Wconst-qual \
-   -Wextra \
-   -Wformat \
-   -Wformat-security \
-   -Wformat-overflow=2 \
-   -Wheader-guard \
-   -Wimplicit-fallthrough=2 \
-   -Wlogical-not-parentheses \
-   -Wlogical-op \
-   -Wmisleading-indentation \
-   -Wmissing-noreturn \
-   -Wno-overloaded-virtual \
-   -Wparentheses-equality \
-   -Wpointer-arith \
-   -Wpointer-bool-conversion \
-   -Wredundant-decls \
-   -Wshadow \
-   -Wsign-compare \
-   -Wsuggest-override \
-   -Wunreachable-code \
-   -Wunreachable-code-loop-increment \
-   -Wunused \
-   -Wunused-const-variable \
-   -Wunused-label \
-   -Wunused-local-typedef \
-   -Wunused-private-field \
-   -Wunused-value \
-   -Wunused-variable \
-   -Wwrite-strings \
-   -Wzero-as-null-pointer-constant \
-], [], [$ax_compiler_flags_test])
+if test "$GCC" = "yes"; then
+	for option in -Wall -Wextra -Wsign-compare -Wpointer-arith \
+		      -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn \
+		      -Wunused -Wpointer-arith -Wshadow; do
+		SAVE_CPPFLAGS="$CPPFLAGS"
+		CPPFLAGS="$CPPFLAGS $option"
+		AC_MSG_CHECKING([whether gcc understands $option])
+		AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [])],
+			has_option=yes,
+			has_option=no)
+		if test $has_option = no; then
+		  CPPFLAGS="$SAVE_CPPFLAGS"
+		fi
+		AC_MSG_RESULT($has_option)
+		unset has_option
+		unset SAVE_CPPFLAGS
+	done
+	unset option
+
+	for option in -Wno-overloaded-virtual; do
+		SAVE_CXXFLAGS="$CXXFLAGS"
+		CXXFLAGS="$CXXFLAGS $option"
+		AC_MSG_CHECKING([whether gcc understands $option])
+		AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [])],
+			has_option=yes,
+			has_option=no)
+		if test $has_option = no; then
+		  CXXFLAGS="$SAVE_CXXFLAGS"
+		fi
+		AC_MSG_RESULT($has_option)
+		unset has_option
+		unset SAVE_CXXFLAGS
+	done
+	unset option
+fi
 AC_LANG_POP
 
 #
@@ -670,38 +677,32 @@ for l in libpng libpng16 libpng14 libpng12; do
   fi
 done
 if test x$abi_cv_png != xyes; then
-  AC_CHECK_HEADER([png.h])
-if test "x$ac_cv_header_png_h" != "xyes"; then
-  AC_MSG_ERROR([png.h not found. Install libpng or adjust CPPFLAGS.])
-fi
+  AC_CHECK_HEADER([png.h], [], 
+  [
+    AC_MSG_ERROR([`png.h' not found, install libpng or specify CPPFLAGS to include custom locations])
+  ])
   PNG_CFLAGS=
   PNG_LIBS=-lpng
 fi
 
 # We need ljpeg
-AC_CHECK_HEADER([jpeglib.h])
-if test "x$ac_cv_header_jpeglib_h" != "xyes"; then
-  AC_MSG_ERROR([jpeg.h not found])
-fi
-
-AC_CHECK_LIB([jpeg],[jpeg_read_header])
-if test "x$ac_cv_lib_jpeg_jpeg_read_header" != "xyes"; then
-  AC_MSG_ERROR([libjpeg not found])
-fi
+AC_CHECK_HEADER(jpeglib.h,[
+	AC_CHECK_LIB(jpeg,jpeg_read_header,
+	[], 
+	[
+	  AC_MSG_ERROR([libjpeg not found])
+	])
+],[
+	  AC_MSG_ERROR([jpeg.h not found])
+])
 
 # TODO need to check for libz too, at least on win32
-PKG_CHECK_MODULES([ZLIB], [zlib])
-SYSTEM_LIBS="$SYSTEM_LIBS $ZLIB_LIBS"
+AC_CHECK_HEADER([zlib.h], [], 
+[
+	AC_MSG_ERROR([`zlib.h' not found, install zlib or specify CPPFLAGS to include custom locations])
+])
 
-AC_CHECK_HEADER([zlib.h])
-if test "x$ac_cv_header_zlib_h" != "xyes"; then
-  AC_MSG_ERROR([zlib.h not found. Install zlib or adjust CPPFLAGS.])
-fi
-
-AX_BOOST_BASE([1.40.0])
-if test "x$BOOST_CPPFLAGS" = "x"; then
-  AC_MSG_ERROR([boost not found])
-fi
+AX_BOOST_BASE([1.40.0],,[AC_MSG_ERROR([`boost' not found.])])
 
 deps_pkgs="$xp_pkgs $opt_pkgs"
 SYSTEM_LIBS=
@@ -711,48 +712,43 @@ if test "$TOOLKIT" = "win"; then
 	# nonstandard dlls go below the blank line
 	SYSTEM_LIBS="-ladvapi32 -lcomctl32 -lcomdlg32 -lgdi32 -lkernel32 -lole32 -loleaut32 -lshell32 -luser32 -luuid -lversion -lwinspool \
 		      $PNG_LIBS -lz -ljpeg"
-	SYSTEM_CFLAGS=""
+	SYSTEM_CFLAGS="-mthreads"
 elif test "$TOOLKIT" = "cocoa"; then
 	deps_pkgs="$deps_pkgs $cocoa_pkgs"
-	SYSTEM_CLFLAGS="-DMAC_OS_X_VERSION_MIN_REQUIRED=MAC_OS_X_VERSION_10_11"
 	SYSTEM_LIBS="-framework Cocoa"
-	AC_CHECK_PROG([CONVERT], [convert], convert)
-if test -z "$CONVERT"; then
-  AC_MSG_ERROR([Cannot find ImageMagick convert])
-fi
-elif test "$TOOLKIT" = "qt"; then
-        deps_pkgs="$deps_pkgs $qt_pkgs"
+	AC_CHECK_PROG([CONVERT], [convert], convert, AC_MSG_ERROR(Cannot find ImageMagick convert))
 else
-    SYSTEM_CFLAGS=$PNG_CFLAGS
-    SYSTEM_LIBS="$PNG_LIBS -ljpeg"
-    if test "$PLATFORM" != "win"; then
-        deps_pkgs="$deps_pkgs $gtk_pkgs x11"
-    else
-        deps_pkgs="$deps_pkgs $gtk_pkgs"
-    fi
+	SYSTEM_CFLAGS=$PNG_CFLAGS
+	SYSTEM_LIBS="$PNG_LIBS -ljpeg"
+	deps_pkgs="$deps_pkgs $gtk_pkgs x11"
 fi
 
 PKG_CHECK_MODULES(DEPS,[$deps_pkgs])
 
 if test "$TOOLKIT" = "gtk"; then
-       DEPS_CFLAGS="$DEPS_CFLAGS -DGDK_VERSION_MIN_REQUIRED=$GTK_ENCODED_VERSION -DGDK_VERSION_MAX_ALLOWED=$GTK_ENCODED_VERSION"
+       DEPS_CFLAGS="$DEPS_CFLAGS -DGDK_VERSION_MIN_REQUIRED=$GTK_ENCODED_VERSION"
 fi
+dnl -DGDK_VERSION_MAX_ALLOWED=$GTK_ENCODED_VERSION"
 
 dnl make that for all.
-if test "$TOOLKIT" = "gtk" -o "$TOOLKIT" = "qt"; then
+if test "$TOOLKIT" = "gtk" -o "$TOOLKIT" = "cocoa"; then
 	dnl move away
 	AC_DEFINE([WITH_CAIRO], [1], [Using Cairo])
 	WITH_CAIRO=1
 fi
 AM_CONDITIONAL([WITH_CAIRO], test "$WITH_CAIRO" = "1")
 
-MOC=moc
-if test "$TOOLKIT" = qt; then
-   MOC=`pkg-config Qt5 --variable=moc`
-fi
-AC_SUBST([MOC])
 
 AC_SUBST([DEPS_CFLAGS])
+if test "$abi_cv_gio" = "yes"; then
+	PKG_CHECK_MODULES(GSFGI, [$gsf_gio_req], [abi_cv_gsf_gio=yes], 
+                 [abi_cv_gsf_gio=no])
+	if test "$abi_cv_gsf_gio" = "yes" ; then
+		AC_DEFINE([HAVE_GSF_GIO], [1], [GSF has GIO support])
+	fi
+else
+	abi_cv_gsf_gio=no
+fi
 
 DEPS_LIBS="$SYSTEM_LIBS $DEPS_LIBS"
 AC_SUBST([DEPS_LIBS])
@@ -850,37 +846,42 @@ AC_SUBST(ABIWORD_PLUGINSDIR, "${ABIWORD_LIBDIR}/plugins")
 fi
 
 # maybe just switch on TOOLKIT instead of the fancy TARGET defines
+# also for embedded, e.g. hildon would set TOOLKIT_GTK and TOOLKIT_HILDON
 AM_CONDITIONAL([TOOLKIT_COCOA], test "$TOOLKIT" = "cocoa")
-AM_CONDITIONAL([TOOLKIT_GTK], test "$TOOLKIT" = "gtk")
-AM_CONDITIONAL([TOOLKIT_QT], test "$TOOLKIT" = "qt")
+AM_CONDITIONAL([TOOLKIT_GTK_ALL], test "$TOOLKIT" = "gtk")
+AM_CONDITIONAL([TOOLKIT_GTK], test "$TOOLKIT" = "gtk" -a "$TOOLKIT_IS_GTK2" = "no")
+AM_CONDITIONAL([TOOLKIT_GTK2], test "$TOOLKIT_IS_GTK2" = "yes")
 AM_CONDITIONAL([TOOLKIT_WIN], test "$TOOLKIT" = "win")
 
-if test "$TOOLKIT" = "win"; then
-	enable_shared="yes"
-	enable_static="no"
+if test "$enable_shared" = ""; then
+	enable_shared="no"
 fi
 
 if test "$enable_static" = ""; then
 	enable_static="no"
 fi
 
-# 수정 후
 if test "$TOOLKIT" = "win"; then
 	AC_DEFINE([TOOLKIT_WIN], [1], [Build win32 user interface])
-	if test "$PLATFORM" = "win"; then
-		AC_DEFINE([UNICODE], [1], [Unicode build])
-		AC_DEFINE([_UNICODE], [1], [Unicode build])
-	fi
-	AC_DEFINE([_WIN32_IE], [0x0501], [minimal comctl.dll v4.70 for toolbars])
-	AC_DEFINE([_WIN32_WINNT], [0x0500], [support collaboration plugin in Windows 2000 or higher])
-	
+	#AC_DEFINE([_WIN32_IE], [0x0501], [minimal comctl.dll v4.70 for toolbars])
+	#AC_DEFINE([_WIN32_WINNT], [0x0500], [support collaboration plugin in Windows 2000 or higher])
+	case ${host} in 
+	  *-w64-mingw*)
+		AC_DEFINE([UNICODE], [1], [Build a full unicode AbiWord])
+		;;
+	  *)
+	  	;;
+	esac
 elif test "$TOOLKIT" = "cocoa"; then
 	AC_DEFINE([TOOLKIT_COCOA], [1], [Build cocoa user interface])
-	AC_DEFINE([XAP_DONTUSE_XOR], [1], [do not use XOR drawing functions])
 	# override static/shared, on cocoa. shared only
 	enable_shared="yes"
 	enable_static="no"
 elif test "$TOOLKIT" = "gtk"; then
+     if test "$TOOLKIT_IS_GTK2" = "yes"; then
+	AC_DEFINE([TOOLKIT_GTK2], [1], [Build gtk+ user interface])
+	AC_DEFINE([TOOLKIT_GTK_ALL], [1], [Build gtk+ user interface])
+     else
 	AC_DEFINE([TOOLKIT_GTK], [1], [Build gtk+ user interface])
 	AC_DEFINE([TOOLKIT_GTK_ALL], [1], [Build gtk+ user interface])
 dnl We have no reason to mess with that.
@@ -890,16 +891,15 @@ dnl	   test "$enable_static" = "no"; then
 dnl		enable_shared="no"
 dnl		enable_static="yes"
 dnl	fi
-elif test "$TOOLKIT" = "qt"; then
-     AC_DEFINE([TOOLKIT_QT], [1], [Build using Qt5])
+     fi
 fi
 AM_CONDITIONAL([ENABLE_DYNAMIC], test "$enable_shared" = "yes")
 AM_CONDITIONAL([ENABLE_STATIC], test "$enable_static" = "yes")
 
 PKG_CHECK_MODULES(PLUGIN,[$glib_req])
 PLUGIN_CFLAGS="$PLUGIN_CFLAGS "'${WP_CPPFLAGS} -DABI_DLL'
-if test "$TOOLKIT" = "gtk" || \
-   { test "$TOOLKIT" = "qt" && test "$enable_shared" = "yes"; }; then
+if test "$TOOLKIT" = "gtk"  && 
+   test "$enable_shared" = "yes"; then
 	# link plugins to work around gcc visibility issue with 
 	# derived classes in dlopened modules
 	PLUGIN_LIBS='${top_builddir}/src/libabiword-'"$ABIWORD_SERIES"'.la'" $PLUGIN_LIBS"
@@ -941,6 +941,7 @@ AM_CONDITIONAL([ENABLE_STATUSBAR], test "$abi_cv_statusbar" = "yes")
 if test "$abi_cv_embedded_target" != "no"; then
 	AC_DEFINE_UNQUOTED(EMBEDDED_TARGET, $abi_cv_embedded_target, [Whether we are building for embedded device])
 fi
+AM_CONDITIONAL(EMBEDDED_HILDON, test "$abi_cv_embedded_target" = "EMBEDDED_TARGET_HILDON")
 
 if test "$abi_cv_emacs_keybinding" = "yes"; then
 	AC_DEFINE([ENABLE_EMACS_KEYBINDING], [1], [Define to enable include emacs-compatible keyboard commands])
@@ -965,21 +966,30 @@ AM_CONDITIONAL(DEBUG, test "$abi_cv_debug" = "yes")
 #
 # Optional dependencies handling
 #
-PKG_CHECK_MODULES([LIBGCRYPT], [libgcrypt], [
-  AC_DEFINE([HAVE_GCRYPT], [1], [Use gcrypt])
-  abi_cv_gcrypt=yes
-], [
-  abi_cv_gcrypt=no
-])
+AM_PATH_LIBGCRYPT( 1.4.5,
+		   [
+		   abi_cv_gcrypt=no
+ 		   AC_DEFINE([HAVE_GCRYPT], [1], [Use gcrypt for the cryptos])
+		   ],
+		   [
+		   abi_cv_gcrypt=yes
+		   ] )
 AM_CONDITIONAL(HAVE_GCRYPT, test "$abi_cv_gcrypt" = "yes")
 
+if test "$abi_cv_gnomevfs" = "yes"; then 	 
+    AC_DEFINE([WITH_GNOMEVFS], [1], [Define if using gnome-vfs]) 	 
+fi 	 
+	
 if test "$abi_cv_gio" = "yes"; then
 	AC_DEFINE([WITH_GIO], [1], [Define if using GIO])
 fi
 
-dnl It's always on with goffice.
-AC_DEFINE([HAVE_GO_MATH_EDITOR_NEW], [1], [Always defined to goffice])
+if test "$abi_cv_goffice" = "yes"; then
+	AC_DEFINE([WITH_GOFFICE], [1], [Define if using goffice])
+fi
 AM_CONDITIONAL([TOOLKIT_GTK_ALL], test "$TOOLKIT" = "gtk")
+AM_CONDITIONAL([WITH_GOFFICE_BUILTIN], test "$TOOLKIT" = "gtk" && test "$abi_cv_goffice" != "yes")
+AC_SUBST([GOFFICE_BUILTIN_LIBS])
 
 ALL_PLUGINS_="\
   m4_n([plugin_list])"
@@ -1038,9 +1048,9 @@ for plugin in `echo $BUILTIN_PLUGINS`; do
 	BUILTIN_PLUGINS_LA="$BUILTIN_PLUGINS_LA ../../plugins/$plugin/$plugin.la"
 done
 
-m4_include([m4/plugin-builtin.m4])
+m4_include([plugin-builtin.m4])
 
-m4_include([m4/plugin-configure.m4])
+m4_include([plugin-configure.m4])
 
 AC_SUBST([PLUGINS])
 AC_SUBST([BUILTIN_PLUGINS])
@@ -1054,9 +1064,7 @@ done
 AC_SUBST(ABIWORD_REQUIRED_PKGS)
 
 dnl Check for valgrind for the UniTest
-if test "$PLATFORM" != "win"; then
-    AC_CHECK_PROG(VALGRIND, valgrind, valgrind)
-fi
+AC_CHECK_PROG(VALGRIND, valgrind, valgrind)
 AC_CHECK_HEADERS(valgrind/memcheck.h)
 if test "$VALGRIND" = ""; then
         AC_MSG_WARN([Valgrind is missing. UnitTesting will run without])
@@ -1072,7 +1080,7 @@ fi
 AC_SUBST(VALGRIND)
 
 dnl Introspection support
-if test "$TOOLKIT" = "gtk" && test "$PLATFORM" != "win"; then
+if test "$TOOLKIT" = "gtk"; then
 GIR_REQ=1.0.0
 AC_ARG_ENABLE(introspection,
           AS_HELP_STRING([--enable-introspection[=@<:@no/auto/yes@:>@]],
@@ -1091,7 +1099,7 @@ AS_CASE([$enable_introspection],
                      AC_MSG_ERROR([gobject-introspection-1.0 is not installed]))
     PKG_CHECK_EXISTS([gobject-introspection-1.0 >= $GIR_REQ],
                      found_introspection=yes,
-                     AC_MSG_ERROR([gobject-introspection version is too old])
+                     AC_MSG_ERROR([You need to have gobject-introspection >= $1 installed to build AC_PACKAGE_NAME]))
 ],
 [auto],[
     PKG_CHECK_EXISTS([gobject-introspection-1.0 >= $GIR_REQ], found_introspection=yes, found_introspection=no)
@@ -1161,8 +1169,7 @@ fi
 
 AM_CONDITIONAL(HAVE_INTROSPECTION, test "x$found_introspection" = "xyes")
 
-# 수정 후
-AC_CONFIG_FILES([
+AC_OUTPUT(
   libabiword.pc
   Makefile
   icons/Makefile
@@ -1172,17 +1179,16 @@ AC_CONFIG_FILES([
   src/af/ev/Makefile
   src/af/ev/cocoa/Makefile
   src/af/ev/gtk/Makefile
-  src/af/ev/qt/Makefile
   src/af/ev/win/bmp/Makefile
   src/af/ev/win/Makefile
   src/af/ev/xp/Makefile
   src/af/gr/Makefile
   src/af/gr/cocoa/Makefile
   src/af/gr/gtk/Makefile
-  src/af/gr/qt/Makefile
   src/af/gr/win/Makefile
   src/af/gr/xp/Makefile
   src/af/tf/Makefile
+  src/af/tf/xp/Makefile
   src/af/util/Makefile
   src/af/util/unix/Makefile
   src/af/util/win/Makefile
@@ -1192,10 +1198,8 @@ AC_CONFIG_FILES([
   src/af/xap/cocoa/Makefile
   src/af/xap/gtk/Makefile
   src/af/xap/gtk/t/Makefile
-  src/af/xap/qt/Makefile
   src/af/xap/win/Makefile
   src/af/xap/xp/Makefile
-  src/af/xap/xp/t/Makefile
   src/gi-overrides/Makefile
   src/plugins/Makefile
   src/text/Makefile
@@ -1210,14 +1214,12 @@ AC_CONFIG_FILES([
   src/wp/ap/Makefile
   src/wp/ap/cocoa/Makefile
   src/wp/ap/gtk/Makefile
-  src/wp/ap/qt/Makefile
   src/wp/ap/win/Makefile
   src/wp/ap/xp/Makefile
   src/wp/ap/xp/ToolbarIcons/Makefile
   src/wp/impexp/Makefile
   src/wp/impexp/cocoa/Makefile
   src/wp/impexp/gtk/Makefile
-  src/wp/impexp/qt/Makefile
   src/wp/impexp/win/Makefile
   src/wp/impexp/xp/Makefile
   src/wp/test/Makefile
@@ -1239,10 +1241,11 @@ AC_CONFIG_FILES([
   tools/Makefile
   tools/cdump/Makefile
   tools/cdump/xp/Makefile
-  com.abisource.AbiWord.appdata.xml
-])
+)
 
-AC_OUTPUT
+AC_OUTPUT(
+  m4_include([plugin-makefiles.m4])
+)
 
 echo "
 Configuration:
@@ -1265,6 +1268,8 @@ Optional features:
 
 Optional dependencies:
   gio			${abi_cv_gio}
+  gsf-gio               ${abi_cv_gsf_gio}
+  goffice               ${abi_cv_goffice}
   redland               ${abi_cv_redland}
   evolution_data_server ${abi_cv_evolution_data_server}
   libical               ${abi_cv_libical}
@@ -1273,3 +1278,4 @@ Optional dependencies:
 Builtin plugins         ${BUILTIN_PLUGINS}
 Plugins                 ${PLUGINS}
 "
+

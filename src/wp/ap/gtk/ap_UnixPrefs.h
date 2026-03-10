@@ -27,10 +27,10 @@ class AP_UnixPrefs : public AP_Prefs
 public:
 	AP_UnixPrefs();
 
-	virtual void overlayEnvironmentPrefs(void) override;
+	virtual void			overlayEnvironmentPrefs(void);
 
 protected:
-	virtual const char *_getPrefsPathname(void) const override;
+	virtual const char *	_getPrefsPathname(void) const;
 };
 
 #endif /* AP_UNIXPREFS_H */

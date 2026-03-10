@@ -38,13 +38,13 @@ protected:
 	XAP_Win32Module();
 	virtual ~XAP_Win32Module();
 
-	virtual bool load(const char* name) override;
-	virtual bool unload() override;
+	virtual bool load(const char* name);
+	virtual bool unload();
 
 public:
-	virtual bool resolveSymbol(const char* symbol_name, void** symbol) override;
-	virtual bool getModuleName(char** dest) const override;
-	virtual bool getErrorMsg(char** dest) const override;
+	virtual bool resolveSymbol(const char* symbol_name, void** symbol);
+	virtual bool getModuleName(char** dest) const;
+	virtual bool getErrorMsg(char** dest) const;
 
 	class XAP_Win32ModuleImpl* pimpl;
 };

@@ -1,21 +1,21 @@
 /* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (c) 2016-2021 Hubert Figuière
- *
+ * Copyright (c) 2016 Hubert Figuière
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
 
@@ -56,8 +56,8 @@ bool pt_VarSet::_finishConstruction(void)
 		
 	// create a default A/P as entry zero in each AP table.
 
-	if (!m_tableAttrProp[0].createAP(nullptr)
-		|| !m_tableAttrProp[1].createAP(nullptr))
+	if (!m_tableAttrProp[0].createAP(NULL)
+		|| !m_tableAttrProp[1].createAP(NULL))
 		return false;
 
 	m_bInitialized = true;
@@ -243,8 +243,8 @@ bool pt_VarSet::mergeAP(PTChangeFmt ptc, PT_AttrPropIndex apiOld,
 		bool bFound = papOld->getAttribute
 			(PT_STYLE_ATTRIBUTE_NAME, szStyle);
 
-		PP_AttrProp * pNew1 = nullptr;
-		PD_Style * pStyle = nullptr;
+		PP_AttrProp * pNew1 = NULL;
+		PD_Style * pStyle = NULL;
 
         if(bFound && szStyle && (strcmp(szStyle, "None") != 0))
         {
@@ -299,11 +299,25 @@ bool pt_VarSet::mergeAP(PTChangeFmt ptc, PT_AttrPropIndex apiOld,
 				}
 			}
 
+			UT_Vector vProps, vAttribs;
+
+			pStyle->getAllProperties(&vProps,0);
+
 			PP_PropertyVector sProps;
-			pStyle->getAllProperties(sProps, 0);
+			UT_uint32 countp = vProps.getItemCount();
+			UT_uint32 i;
+			for(i = 0; i < countp; i++)	{
+				sProps.push_back((const gchar *)vProps.getNthItem(i));
+			}
+
+			pStyle->getAllAttributes(&vAttribs,0);
 
 			PP_PropertyVector sAttribs;
-			pStyle->getAllAttributes(sAttribs, 0);
+			countp = vAttribs.getItemCount();
+
+			for(i = 0; i < countp; i++) {
+				sAttribs.push_back((const char *)vAttribs.getNthItem(i));
+			}
 
 			PP_AttrProp * pNew0;
 

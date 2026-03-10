@@ -2,7 +2,6 @@
 
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2021 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -68,7 +67,7 @@ IE_Exp_RTF::IE_Exp_RTF(PD_Document * pDocument)
 	: IE_Exp(pDocument)
 {
 	m_error = 0;
-	m_pListenerWriteDoc = nullptr;
+	m_pListenerWriteDoc = NULL;
 	m_bNeedUnicodeText = false;
 	m_braceLevel = 0;
 	m_bLastWasKeyword = false;
@@ -81,7 +80,7 @@ IE_Exp_RTF::IE_Exp_RTF(PD_Document * pDocument,bool atticFormat)
 	: IE_Exp(pDocument)
 {
 	m_error = 0;
-	m_pListenerWriteDoc = nullptr;
+	m_pListenerWriteDoc = NULL;
 	m_bNeedUnicodeText = false;
 	m_braceLevel = 0;
 	m_bLastWasKeyword = false;
@@ -254,7 +253,7 @@ UT_Error IE_Exp_RTF::_writeDocumentLocal(bool bSkipHeader)
 	// create and install a listener to receive the document
 	// and write its content in rtf.
 
-	m_pListenerWriteDoc = new s_RTF_ListenerWriteDoc(getDoc(),this, (getDocRange()!=nullptr), hasBlock);
+	m_pListenerWriteDoc = new s_RTF_ListenerWriteDoc(getDoc(),this, (getDocRange()!=NULL), hasBlock);
 	if (!m_pListenerWriteDoc)
 		return UT_IE_NOMEMORY;
     PL_ListenerCoupleCloser* pCloser = new PL_ListenerCoupleCloser();
@@ -298,17 +297,17 @@ void IE_Exp_RTF::exportHdrFtr(const char * pszHdrFtr , const char * pszHdrFtrID,
 
 	pf_Frag_Strux* hdrSDH = getDoc()->findHdrFtrStrux((const gchar *) pszHdrFtr,(const gchar * ) pszHdrFtrID);
 
-	if(hdrSDH == nullptr)
+	if(hdrSDH == NULL)
 	{
 	  UT_ASSERT_NOT_REACHED();
 		return;
 	}
 	PT_DocPosition posStart = getDoc()->getStruxPosition(hdrSDH);
 	PT_DocPosition posEnd = 0;
-	pf_Frag_Strux* nextSDH = nullptr;
+	pf_Frag_Strux* nextSDH = NULL;
 	bool found = getDoc()->getNextStruxOfType(hdrSDH,PTX_SectionHdrFtr ,&nextSDH);
 
-	if(!found || (nextSDH == nullptr ))
+	if(!found || (nextSDH == NULL ))
 	{
 		getDoc()->getBounds(true, posEnd);
 	}
@@ -358,7 +357,7 @@ void s_RTF_Listener::_handleDataItems(void)
 
 	UT_ByteBuf bb64(1024);
 
-	for (UT_uint32 k=0; (m_pDocument->enumDataItems(k,nullptr,&szName,&pByteBuf,nullptr)); k++)
+	for (UT_uint32 k=0; (m_pDocument->enumDataItems(k,NULL,&szName,&pByteBuf,NULL)); k++)
 	{
 		if (!bWroteOpenDataSection)
 		{
@@ -471,7 +470,7 @@ void IE_Exp_RTF::_rtf_nonascii_hex2 (UT_sint32 d)
 }
 
 /* write a non-ascii char into a string class pointer */
-void IE_Exp_RTF::_rtf_nonascii_hex2 (UT_sint32 d, UT_String & pStr) const
+void IE_Exp_RTF::_rtf_nonascii_hex2 (UT_sint32 d, UT_String & pStr)
 {
 	pStr = "\\'";
 	pStr += UT_String_sprintf("%02x",d);
@@ -816,11 +815,11 @@ bool IE_Exp_RTF::_write_rtf_header(void)
 	_rtf_keyword("fet",2);				// Allow both footnotes and endnotes
 	_rtf_keyword("ftnstart",1);			// First footnote is one - later use
 	                                    // document properties
-	const gchar * pszFootnoteType = nullptr;
+	const gchar * pszFootnoteType = NULL;
 	const PP_AttrProp* pDocAP = getDoc()->getAttrProp();
 	UT_return_val_if_fail (pDocAP, false);
 	pDocAP->getProperty("document-footnote-type", (const gchar *&)pszFootnoteType);
-	if (pszFootnoteType == nullptr)
+	if (pszFootnoteType == NULL)
 	{
 		_rtf_keyword("ftnnar");			// Numeric Footnotes
 	}
@@ -889,9 +888,9 @@ bool IE_Exp_RTF::_write_rtf_header(void)
 		_rtf_keyword("ftnnar");			// Numeric Footnotes
 	}
 
-	const gchar * pszEndnoteType = nullptr;
+	const gchar * pszEndnoteType = NULL;
 	pDocAP->getProperty("document-endnote-type", (const gchar *&)pszEndnoteType);
-	if (pszEndnoteType == nullptr)
+	if (pszEndnoteType == NULL)
 	{
 		_rtf_keyword("aftnnar");			// Numeric Endnotes
 	}
@@ -960,7 +959,7 @@ bool IE_Exp_RTF::_write_rtf_header(void)
 		_rtf_keyword("aftnnar");			// Numeric Endnotes
 	}
 
-	const gchar * pszTmp = nullptr;
+	const gchar * pszTmp = NULL;
 	pDocAP->getProperty("document-footnote-initial", (const gchar *&)pszTmp);
 	if(pszTmp && pszTmp[0])
 	{
@@ -1024,15 +1023,15 @@ bool IE_Exp_RTF::_write_rtf_header(void)
 // Write out the facingp and titlepg keywords so that we can export our fancy
 // header-footers to RTF
 //
-	pf_Frag_Strux* sdh = nullptr;
+	pf_Frag_Strux* sdh = NULL;
 	getDoc()->getStruxOfTypeFromPosition(2,PTX_Section,&sdh);
-	if(sdh != nullptr)
+	if(sdh != NULL)
 	{
 	        PT_AttrPropIndex api = getDoc()->getAPIFromSDH(sdh);
-		const PP_AttrProp * pSectionAP = nullptr;
+		const PP_AttrProp * pSectionAP = NULL;
 		getDoc()->getAttrProp(api,&pSectionAP);
-		const char * pszAtt = nullptr;
-		if(pSectionAP != nullptr)
+		const char * pszAtt = NULL;
+		if(pSectionAP != NULL)
 		{
 		     if(pSectionAP->getAttribute("header-even",pszAtt))
 		     {
@@ -1054,9 +1053,9 @@ bool IE_Exp_RTF::_write_rtf_header(void)
 		
 	}
 	// revisions stuff
-	const auto Revs = getDoc()->getRevisions();
+	const UT_GenericVector<AD_Revision*> & Revs = getDoc()->getRevisions();
 
-	if(!Revs.empty())
+	if(Revs.getItemCount())
 	{
 		_rtf_open_brace();
 		_rtf_keyword("*");
@@ -1072,15 +1071,16 @@ bool IE_Exp_RTF::_write_rtf_header(void)
 		_rtf_semi();
 		_rtf_close_brace();
 		
-		for (UT_uint32 i = 0; i < Revs.size(); ++i)
+		for(UT_sint32 i = 0; i < Revs.getItemCount(); ++i)
 		{
-			const AD_Revision& rev = Revs[i];
+			AD_Revision* pRev = Revs.getNthItem(i);
+			UT_continue_if_fail(pRev);
 
-			s4 = rev.getDescription();
+			s4 = pRev->getDescription();
 
 			// construct author name from our numerical id and comment
 			// (the id guarantees us uniqueness)
-			UT_UTF8String_sprintf(s, "rev %d (%s)", rev.getId(), s4.utf8_str());
+			UT_UTF8String_sprintf(s, "rev %d (%s)",pRev->getId(),s4.utf8_str());
 			_rtf_open_brace();
 			_rtf_chardata(s.utf8_str(),s.byteLength());
 			_rtf_semi();
@@ -1163,7 +1163,7 @@ void IE_Exp_RTF::_write_prop_ifnotdefault(const PD_Style * pStyle,
 					  const gchar * szPropName,
 					  const char * szRTFName)
 {
-	const gchar * sz = nullptr;
+	const gchar * sz = NULL;
 	if (pStyle->getProperty((const gchar *)szPropName, sz)) {
 		_rtf_keyword_ifnotdefault_twips(szRTFName, sz, 0);
 	}
@@ -1176,7 +1176,7 @@ void IE_Exp_RTF::_write_prop_ifyes(const PD_Style * pStyle,
 				   const gchar * szPropName,
 				   const char * szRTFName)
 {
-    const gchar * sz = nullptr;
+    const gchar * sz = NULL;
     if (pStyle->getProperty((const gchar *)szPropName, sz) && strcmp(sz, "yes") == 0) {
 	    _rtf_keyword(szRTFName);
     }
@@ -1230,8 +1230,8 @@ void IE_Exp_RTF::_write_tabdef(const char * szTabStops)
 		while (*pStart)
 		{
 			const char * szTT = "tx";	// TabType -- assume text tab (use "tb" for bar tab)
-			const char * szTK = nullptr;	// TabKind -- assume left tab
-			const char * szTL = nullptr;    // TabLeader
+			const char * szTK = NULL;	// TabKind -- assume left tab
+			const char * szTL = NULL;    // TabLeader
 			const char* pEnd = pStart;
 			while (*pEnd && (*pEnd != ','))
 				pEnd++;
@@ -1245,16 +1245,16 @@ void IE_Exp_RTF::_write_tabdef(const char * szTabStops)
 				switch (p1[1])
 				{
 				default:
-				case 'L': 	szTK = nullptr; 	break;
+				case 'L': 	szTK = NULL; 	break;
 				case 'R':	szTK = "tqr";	break;
 				case 'C':	szTK = "tqc";	break;
 				case 'D':	szTK = "tqdec";	break;
-				case 'B':	szTT = "tb";    szTK= nullptr;	break; // TabKind == bar tab
+				case 'B':	szTT = "tb";    szTK= NULL;	break; // TabKind == bar tab
 				}
 				switch (p1[2])
 				{
 				default:
-				case '0': szTL = nullptr;      break;
+				case '0': szTL = NULL;      break;
 				case '1': szTL = "tldot";   break;
 				case '2': szTL = "tlhyph";    break;
 				case '3': szTL = "tlul";    break;
@@ -1317,17 +1317,17 @@ const gchar * IE_Exp_RTF::_getStyleProp(
 	const s_RTF_AttrPropAdapter * apa,
 	const char * szProp)
 {
-	const gchar *szVal = nullptr;
-	if(pADStyle != nullptr)
+	const gchar *szVal = NULL;
+	if(pADStyle != NULL)
 	{
 		szVal = pADStyle->getProperty(szProp);
-		if(szVal == nullptr)
+		if(szVal == NULL)
 		{
 			szVal = apa->getProperty(szProp);
 		}
 		else
 		{
-			szVal = nullptr;
+			szVal = NULL;
 		}
 	}
 	else
@@ -1360,25 +1360,25 @@ void IE_Exp_RTF::_write_parafmt(const PP_AttrProp * pSpanAP, const PP_AttrProp *
 
 	const gchar * pszCanMergeBorders = PP_evalProperty("border-merge",pSpanAP,pBlockAP,pSectionAP,getDoc(),true);
 	const gchar * pszBotBorderColor = PP_evalProperty("bot-color",pSpanAP,pBlockAP,pSectionAP,getDoc(),true);
-	const gchar * pszBotBorderStyle = nullptr;
+	const gchar * pszBotBorderStyle = NULL;
 	pBlockAP->getProperty ("bot-style",pszBotBorderStyle );
 	const gchar * pszBotBorderWidth = PP_evalProperty("bot-thickness",pSpanAP,pBlockAP,pSectionAP,getDoc(),true);
 	const gchar * pszBotBorderSpacing = PP_evalProperty("bot-space",pSpanAP,pBlockAP,pSectionAP,getDoc(),true);
 
 	const gchar * pszLeftBorderColor = PP_evalProperty("left-color",pSpanAP,pBlockAP,pSectionAP,getDoc(),true);
-	const gchar * pszLeftBorderStyle = nullptr;
+	const gchar * pszLeftBorderStyle = NULL;
 	pBlockAP->getProperty ("left-style",pszLeftBorderStyle );
 	const gchar * pszLeftBorderWidth = PP_evalProperty("left-thickness",pSpanAP,pBlockAP,pSectionAP,getDoc(),true);
 	const gchar * pszLeftBorderSpacing = PP_evalProperty("left-space",pSpanAP,pBlockAP,pSectionAP,getDoc(),true);
 
 	const gchar * pszRightBorderColor = PP_evalProperty("right-color",pSpanAP,pBlockAP,pSectionAP,getDoc(),true);
-	const gchar * pszRightBorderStyle = nullptr;
+	const gchar * pszRightBorderStyle = NULL;
 	pBlockAP->getProperty ("right-style",pszRightBorderStyle );
 	const gchar * pszRightBorderWidth = PP_evalProperty("right-thickness",pSpanAP,pBlockAP,pSectionAP,getDoc(),true);
 	const gchar * pszRightBorderSpacing = PP_evalProperty("right-space",pSpanAP,pBlockAP,pSectionAP,getDoc(),true);
 
 	const gchar * pszTopBorderColor = PP_evalProperty("top-color",pSpanAP,pBlockAP,pSectionAP,getDoc(),true);
-	const gchar * pszTopBorderStyle = nullptr;
+	const gchar * pszTopBorderStyle = NULL;
 	pBlockAP->getProperty ("top-style",pszTopBorderStyle );
 	const gchar * pszTopBorderWidth = PP_evalProperty("top-thickness",pSpanAP,pBlockAP,pSectionAP,getDoc(),true);
 	const gchar * pszTopBorderSpacing = PP_evalProperty("top-space",pSpanAP,pBlockAP,pSectionAP,getDoc(),true);
@@ -1394,22 +1394,19 @@ void IE_Exp_RTF::_write_parafmt(const PP_AttrProp * pSpanAP, const PP_AttrProp *
 
 	// Do abi specific list information.
 
-	const gchar * szListid=nullptr;
-	const gchar * szParentid=nullptr;
-	const gchar * szListStyle=nullptr;
+	const gchar * szListid=NULL;
+	const gchar * szParentid=NULL;
+	const gchar * szListStyle=NULL;
 
-	if (!pBlockAP || !pBlockAP->getAttribute(static_cast<const gchar*>("listid"), szListid)) {
-		szListid = nullptr;
-	}
-	if (!pBlockAP || !pBlockAP->getAttribute(static_cast<const gchar*>("parentid"), szParentid)) {
-		szParentid = nullptr;
-	}
+	if (!pBlockAP || !pBlockAP->getAttribute(static_cast<const gchar*>("listid"), szListid))		szListid = NULL;
+	if (!pBlockAP || !pBlockAP->getAttribute(static_cast<const gchar*>("parentid"), szParentid))
+		szParentid = NULL;
 	UT_uint32 listid = 0;
-	const gchar * szAbiListDelim = nullptr;
-	const gchar * szAbiListDecimal = nullptr;
+	const gchar * szAbiListDelim = NULL;
+	const gchar * szAbiListDecimal = NULL;
 	static UT_String szAbiStartValue;
 	static UT_String szLevel;
-	if(szListid!=nullptr)
+	if(szListid!=NULL)
 	{
 		listid = atoi(szListid);
 		if(listid != 0)
@@ -1429,7 +1426,7 @@ void IE_Exp_RTF::_write_parafmt(const PP_AttrProp * pSpanAP, const PP_AttrProp *
 
 		
 	UT_uint32 id = 0;
-	if(szListid != nullptr)
+	if(szListid != NULL)
 		id = atoi(szListid);
 	if(id == 0)
 	{
@@ -1472,7 +1469,7 @@ void IE_Exp_RTF::_write_parafmt(const PP_AttrProp * pSpanAP, const PP_AttrProp *
 		{
 			const UT_UCSChar * lab = pAuto->getLabel(sdh);
 
-			if(lab != nullptr)
+			if(lab != NULL)
 			{
 				UT_UTF8String tmp = lab;
 				_rtf_chardata(tmp.utf8_str(),tmp.byteLength());
@@ -1539,7 +1536,7 @@ void IE_Exp_RTF::_write_parafmt(const PP_AttrProp * pSpanAP, const PP_AttrProp *
 	_rtf_keyword_ifnotdefault_twips("sb",static_cast<const char*>(szTopMargin),0);
 	_rtf_keyword_ifnotdefault_twips("sa",static_cast<const char*>(szBottomMargin),0);
 
-	const gchar * szStyle = nullptr;
+	const gchar * szStyle = NULL;
 	if (pBlockAP->getAttribute("style", szStyle))
 	{
 	    _rtf_keyword("s", _getStyleNumber(szStyle));
@@ -1554,9 +1551,9 @@ void IE_Exp_RTF::_write_parafmt(const PP_AttrProp * pSpanAP, const PP_AttrProp *
 #if 0 //#TF
 	if(id != 0)
 	{
-		const PP_AttrProp * pSpanAP = nullptr;
-		const PP_AttrProp * pBlockAP = nullptr;
-		const PP_AttrProp * pSectionAP = nullptr;
+		const PP_AttrProp * pSpanAP = NULL;
+		const PP_AttrProp * pBlockAP = NULL;
+		const PP_AttrProp * pSectionAP = NULL;
 
 		getDoc()->getAttrProp(m_apiThisSection,&pSectionAP);
 		getDoc()->getAttrProp(m_apiThisBlock,&pBlockAP);
@@ -1652,7 +1649,7 @@ void IE_Exp_RTF::_write_parafmt(const PP_AttrProp * pSpanAP, const PP_AttrProp *
 		rightDelim[i - rTmp] = '\0';
 
 		fl_AutoNumConstPtr pParent = pAuto->getParent();
-		if(pParent == nullptr && (lType < BULLETED_LIST))
+		if(pParent == NULL && (lType < BULLETED_LIST))
 		{
 			_rtf_keyword("pnlvlbody");
 		}
@@ -1730,7 +1727,7 @@ void IE_Exp_RTF::_write_parafmt(const PP_AttrProp * pSpanAP, const PP_AttrProp *
 			UT_return_if_fail(iOver);
 //			fl_AutoNum * pAuto = getDoc()->getListByID(id);
 			UT_return_if_fail(pAuto);
-			while(pAuto->getParent() != nullptr)
+			while(pAuto->getParent() != NULL)
 			{
 				pAuto = pAuto->getParent();
 				iLevel++;
@@ -1799,11 +1796,11 @@ void IE_Exp_RTF::_write_parafmt(const PP_AttrProp * pSpanAP, const PP_AttrProp *
 
 	// Export Borders
 	UT_sint32 ndx_col = 0;
-	if(pszCanMergeBorders != nullptr && strcmp(pszCanMergeBorders,"0") != 0)
+	if(pszCanMergeBorders != NULL && strcmp(pszCanMergeBorders,"0") != 0)
 	{
 		_rtf_keyword("brdrbtw");
 	}
-	if(pszBotBorderStyle != nullptr && *pszBotBorderStyle && strcmp(pszBotBorderStyle,"0") != 0)
+	if(pszBotBorderStyle != NULL && *pszBotBorderStyle && strcmp(pszBotBorderStyle,"0") != 0)
 	{
 		UT_DEBUGMSG(("pszBotBorderStyle is %s \n",pszBotBorderStyle));
 		write(" ");
@@ -1823,7 +1820,7 @@ void IE_Exp_RTF::_write_parafmt(const PP_AttrProp * pSpanAP, const PP_AttrProp *
 		}
 		write(" ");
 	}	
-	if(pszLeftBorderStyle != nullptr && *pszLeftBorderStyle && strcmp(pszLeftBorderStyle,"0") != 0)
+	if(pszLeftBorderStyle != NULL && *pszLeftBorderStyle && strcmp(pszLeftBorderStyle,"0") != 0)
 	{
 		_rtf_keyword("brdrl");
 		_rtf_keyword("brdrs");
@@ -1841,7 +1838,7 @@ void IE_Exp_RTF::_write_parafmt(const PP_AttrProp * pSpanAP, const PP_AttrProp *
 		}
 		write(" ");
 	}	
-	if(pszRightBorderStyle != nullptr && *pszRightBorderStyle && strcmp(pszRightBorderStyle,"0") != 0)
+	if(pszRightBorderStyle != NULL && *pszRightBorderStyle && strcmp(pszRightBorderStyle,"0") != 0)
 	{
 		_rtf_keyword("brdrr");
 		_rtf_keyword("brdrs");
@@ -1859,7 +1856,7 @@ void IE_Exp_RTF::_write_parafmt(const PP_AttrProp * pSpanAP, const PP_AttrProp *
 		}
 		write(" ");
 	}	
-	if(pszTopBorderStyle != nullptr && *pszTopBorderStyle && strcmp(pszTopBorderStyle,"0") != 0)
+	if(pszTopBorderStyle != NULL && *pszTopBorderStyle && strcmp(pszTopBorderStyle,"0") != 0)
 	{
 		_rtf_keyword("brdrt");
 		_rtf_keyword("brdrs");
@@ -1880,7 +1877,7 @@ void IE_Exp_RTF::_write_parafmt(const PP_AttrProp * pSpanAP, const PP_AttrProp *
 
 	// export shadings
 
-	if(szPattern != nullptr && *szPattern && strcmp(szPattern,"1") == 0)
+	if(szPattern != NULL && *szPattern && strcmp(szPattern,"1") == 0)
 	{
 		// Can only handle solid shadings right now
 		ndx_col =_findOrAddColor(szShadingForeCol);
@@ -1901,11 +1898,11 @@ void IE_Exp_RTF::_write_charfmt(const s_RTF_AttrPropAdapter & apa)
 {
 	//const gchar * szStyle = apa.getAttribute(PT_STYLE_ATTRIBUTE_NAME);
 	//UT_sint32 iStyle = -1;
-	s_RTF_AttrPropAdapter_Style * pADStyle = nullptr;
+	s_RTF_AttrPropAdapter_Style * pADStyle = NULL;
 #if 0
-	if(szStyle != nullptr)
+	if(szStyle != NULL)
 	{
-		PD_Style * pStyle = nullptr;
+		PD_Style * pStyle = NULL;
 		iStyle = static_cast<UT_sint32>(_getStyleNumber(szStyle));
 		getDoc()->getStyle(szStyle,&pStyle);
 		pADStyle = new s_RTF_AttrPropAdapter_Style(pStyle);
@@ -1942,12 +1939,12 @@ void IE_Exp_RTF::_write_charfmt(const s_RTF_AttrPropAdapter & apa)
 			_rtf_keyword("highlight",ndxColor);
 		}
 	}
-	const gchar * szFont = nullptr;
-	if(pADStyle != nullptr)
+	const gchar * szFont = NULL;
+	if(pADStyle != NULL)
 	{
 		szFont = pADStyle->getProperty("font-family");
 	}
-	if(szFont == nullptr)
+	if(szFont == NULL)
 	{
 		UT_sint32 ndxFont = _findFont(&apa);
 		if(ndxFont != -1)
@@ -1959,7 +1956,7 @@ void IE_Exp_RTF::_write_charfmt(const s_RTF_AttrPropAdapter & apa)
 	UT_sint32 d = (UT_sint32)(dbl*2.0);
 
 	// if (d != 24) - always write this out
-	if(szFontSize != nullptr)
+	if(szFontSize != NULL)
 	{
 		if(d == 0)
 			d = 24;
@@ -1976,17 +1973,17 @@ void IE_Exp_RTF::_write_charfmt(const s_RTF_AttrPropAdapter & apa)
 	const gchar * szFontDecoration = _getStyleProp(pADStyle,&apa,"text-decoration");
 	if (szFontDecoration && *szFontDecoration)
 	{
-		if (strstr(szFontDecoration,"underline") != nullptr)
+		if (strstr(szFontDecoration,"underline") != 0)
 			_rtf_keyword("ul");
-		if (strstr(szFontDecoration,"overline") != nullptr)
+		if (strstr(szFontDecoration,"overline") != 0)
 			_rtf_keyword("ol");
-		if (strstr(szFontDecoration,"line-through") != nullptr)
+		if (strstr(szFontDecoration,"line-through") != 0)
 			_rtf_keyword("strike");
-		if (strstr(szFontDecoration,"topline") != nullptr)
+		if (strstr(szFontDecoration,"topline") != 0)
 		{
 			_rtf_keyword("abitopline"); // abiword extension
 		}
-		if (strstr(szFontDecoration,"bottomline") != nullptr)
+		if (strstr(szFontDecoration,"bottomline") != 0)
 		{
 			_rtf_keyword("abibotline"); // abiword extension
 		}
@@ -2062,7 +2059,7 @@ void IE_Exp_RTF::_write_charfmt(const s_RTF_AttrPropAdapter & apa)
 
 	// MUST BE LAST after all other props have been processed
 	bool b1,b2; UT_uint32 u1; // these are only used if the bPara parameter is true
-	_output_revision(apa, false, nullptr, 0, b1, b2, u1);
+	_output_revision(apa, false, NULL, 0, b1, b2, u1);
 }
 
 void IE_Exp_RTF::_output_revision(const s_RTF_AttrPropAdapter & apa, bool bPara,
@@ -2115,18 +2112,19 @@ void IE_Exp_RTF::_output_revision(const s_RTF_AttrPropAdapter & apa, bool bPara,
 			// now we translated the revision id to and index into the revision table of
 			// the document
 			UT_sint32 iIndx = getDoc()->getRevisionIndxFromId(iId);
-			const auto RevTbl = getDoc()->getRevisions();
-			if (iIndx < 0 || RevTbl.empty())
+			const UT_GenericVector<AD_Revision*> & RevTbl = getDoc()->getRevisions();
+			if(iIndx < 0 || RevTbl.getItemCount() == 0)
 			{
 				UT_ASSERT_HARMLESS( UT_SHOULD_NOT_HAPPEN );
 				continue;
 			}
 
-			const AD_Revision& revTblItem = RevTbl[iIndx];
-
+			AD_Revision * pRevTblItem = RevTbl.getNthItem(iIndx);
+			UT_continue_if_fail(pRevTblItem);			
+			
 			// the revisions in rtf are marked by a peculiar timestamp, which we now need
 			// to construct
-			time_t t = revTblItem.getStartTime();
+			time_t t = pRevTblItem->getStartTime();
 			struct tm * pT = gmtime(&t);
 
 			// NB: gmtime counts months 0-11, while dttm 1-12
@@ -2189,8 +2187,8 @@ void IE_Exp_RTF::_output_revision(const s_RTF_AttrPropAdapter & apa, bool bPara,
 			const char pDELdttm[] = "revdttmdel";
 
 			// it seems that block props cannot be changed in rev mode
-			const char * pCHauth = bPara ? nullptr : "crauth";
-			const char * pCHdttm = bPara ? nullptr : "crdate";
+			const char * pCHauth = bPara ? NULL : "crauth";
+			const char * pCHdttm = bPara ? NULL : "crdate";
 
 			switch(pRev->getType())
 			{
@@ -2231,8 +2229,8 @@ void IE_Exp_RTF::_output_revision(const s_RTF_AttrPropAdapter & apa, bool bPara,
 				// NB: this might be a recursive call, since _output_revision()
 				// gets (among others) called by _write_charfmt()
 				const PP_AttrProp * pSpanAP = pRev;
-				const PP_AttrProp * pBlockAP = nullptr;
-				const PP_AttrProp * pSectionAP = nullptr;
+				const PP_AttrProp * pBlockAP = NULL;
+				const PP_AttrProp * pSectionAP = NULL;
 				
 				_write_charfmt(s_RTF_AttrPropAdapter_AP(pSpanAP, pBlockAP, pSectionAP, getDoc()));
 
@@ -2240,7 +2238,7 @@ void IE_Exp_RTF::_output_revision(const s_RTF_AttrPropAdapter & apa, bool bPara,
 				{
 					UT_continue_if_fail(sdh);
 					
-					_write_parafmt(nullptr, pRev, nullptr,
+					_write_parafmt(NULL, pRev, NULL,
 								   bStartedList, sdh, iCurrID, bIsListBlock, iNestLevel);
 				}
 				
@@ -2263,7 +2261,7 @@ void IE_Exp_RTF::_write_style_fmt(const PD_Style * pStyle)
     _write_prop_ifyes(pStyle, "keep-together", "keep");
     _write_prop_ifyes(pStyle, "keep-with-next", "keepn");
 
-    const gchar * sz = nullptr;
+    const gchar * sz = NULL;
     if (pStyle->getProperty((const gchar *)"text-align", sz))
 	{
 		if (strcmp(sz, "left") == 0)
@@ -2288,7 +2286,7 @@ void IE_Exp_RTF::_write_style_fmt(const PD_Style * pStyle)
 		}
     }
 
-    const gchar * szLineHeight = nullptr;
+    const gchar * szLineHeight = NULL;
     if (pStyle->getProperty((const gchar *) "line-height", szLineHeight)
 		&& strcmp(szLineHeight,"1.0") != 0)
 	{
@@ -2361,7 +2359,7 @@ void IE_Exp_RTF::_selectStyles()
 	UT_GenericVector<PD_Style*> vecStyles;
 	getDoc()->getAllUsedStyles(&vecStyles);
 
-	UT_GenericVector<PD_Style*> * pStyles = nullptr;
+	UT_GenericVector<PD_Style*> * pStyles = NULL;
 	getDoc()->enumStyles(pStyles);
 	UT_return_if_fail( pStyles );
 	UT_uint32 iStyleCount = getDoc()->getStyleCount();
@@ -2383,7 +2381,7 @@ void IE_Exp_RTF::_selectStyles()
 			// Add this style to the hash
 			//
 			NumberedStyle * pns = (NumberedStyle *) m_hashStyles.pick(szName);
-			if(pns == nullptr)
+			if(pns == NULL)
 			{
 				m_hashStyles.insert(szName, new NumberedStyle(pStyle, ++nStyleNumber));
 				{
@@ -2434,7 +2432,7 @@ UT_uint32 IE_Exp_RTF::_getStyleNumber(const gchar * szStyle)
 	}
 	NumberedStyle * pns = (NumberedStyle*)m_hashStyles.pick(szStyle);
 	UT_ASSERT_HARMLESS(pns);
-	if(pns != nullptr )
+	if(pns != NULL )
 	{
 		return pns->n;
 	}
@@ -2478,15 +2476,15 @@ void IE_Exp_RTF::_write_stylesheets(void)
 		_write_style_fmt(pStyle);
 
 		const PD_Style * pStyleBasedOn =  reinterpret_cast<const PD_Style *> (pStyle->getBasedOn());
-		// TODO: Can this really return nullptr?
-		if (pStyleBasedOn != nullptr)
+		// TODO: Can this really return NULL?
+		if (pStyleBasedOn != NULL)
 		{
 			_rtf_keyword("sbasedon", _getStyleNumber(pStyleBasedOn));
 		}
 
 		const PD_Style * pStyleNext = reinterpret_cast<const PD_Style *> (pStyle->getFollowedBy());
-		// TODO: Can this really return nullptr?
-		if (pStyleNext != nullptr)
+		// TODO: Can this really return NULL?
+		if (pStyleNext != NULL)
 		{
 			_rtf_keyword("snext", _getStyleNumber(pStyleNext));
 		}
@@ -2516,16 +2514,19 @@ void IE_Exp_RTF::_write_listtable(void)
 // OK scan the lists in the document to build up the list info.
 // The first loop just builds a vector of parentless lists.
 //
+	UT_sint32 i,j =0;
 	bool bFoundChild = false;
 	fl_AutoNumConstPtr pAuto;
 	fl_AutoNumConstPtr pInner;
-	ie_exp_RTF_MsWord97ListMulti* pList97 = nullptr;
-	for (UT_sint32 i = 0; i < iCount; i++) {
+	ie_exp_RTF_MsWord97ListMulti * pList97 = NULL;
+	for(i=0; i< iCount; i++)
+	{
 		pAuto = getDoc()->getNthList(i);
 		if (!pAuto->getParent())
 		{
 			bFoundChild = false;
-			for (UT_sint32 j = 0; (j < iCount) && !bFoundChild; j++) {
+			for(j =0; (j< iCount) && !bFoundChild; j++)
+			{
 				pInner = getDoc()->getNthList(j);
 				if(pInner->getParentID() == pAuto->getID())
 //
@@ -2533,7 +2534,7 @@ void IE_Exp_RTF::_write_listtable(void)
 //
 				{
 					xxx_UT_DEBUGMSG(("SEVIOR: Adding %x to multi-level \n",pAuto));
-					m_vecMultiLevel.push_back(ie_exp_RTF_MsWord97ListMulti(pAuto));
+					m_vecMultiLevel.addItem((void *) new ie_exp_RTF_MsWord97ListMulti(pAuto));
 					bFoundChild = true;
 					break;
 				}
@@ -2541,7 +2542,7 @@ void IE_Exp_RTF::_write_listtable(void)
 			if(!bFoundChild)
 			{
 				xxx_UT_DEBUGMSG(("SEVIOR: Adding %x to simple \n",pAuto));
-				m_vecSimpleList.push_back(ie_exp_RTF_MsWord97ListSimple(pAuto));
+				m_vecSimpleList.addItem((void *) new ie_exp_RTF_MsWord97ListSimple(pAuto));
 			}
 		}
 	}
@@ -2549,9 +2550,10 @@ void IE_Exp_RTF::_write_listtable(void)
 // OK now fill the MultiLevel list structure.
 //
 
-	for (decltype(m_vecMultiLevel)::size_type k = 0; k < m_vecMultiLevel.size(); k++)
+	UT_sint32 k;
+	for(k=0; k < m_vecMultiLevel.getItemCount(); k++)
 	{
-		pList97 = &m_vecMultiLevel[k];
+		pList97 = (ie_exp_RTF_MsWord97ListMulti *) m_vecMultiLevel.getNthItem(k);
 //
 // For each level in the list RTF97 structure find the first matching
 // List.
@@ -2569,13 +2571,13 @@ void IE_Exp_RTF::_write_listtable(void)
 			if(!bFoundAtPrevLevel)
 			{
 				ie_exp_RTF_MsWord97List * pCur97 = new ie_exp_RTF_MsWord97List(pList97->getAuto());
-				xxx_UT_DEBUGMSG(("SEVIOR: Adding nullptr level at depth %d \n",depth));
+				xxx_UT_DEBUGMSG(("SEVIOR: Adding NULL level at depth %d \n",depth));
 				pList97->addLevel(depth, pCur97);
 			}
 			else
 			{
 				bFoundAtPrevLevel = false;
-				for (UT_sint32 i = 0; i < iCount; i++)
+				for(i=0; i < iCount; i++)
 				{
 					pAuto = getDoc()->getNthList(i);
 					pInner = pAuto->getParent();
@@ -2583,7 +2585,7 @@ void IE_Exp_RTF::_write_listtable(void)
 //
 // OK got it! pAuto is the one we want.
 //
-					if(pInner != nullptr && pInner == pAutoLevel)
+					if(pInner != NULL && pInner == pAutoLevel)
 					{
 						bFoundAtPrevLevel = true;
 						ie_exp_RTF_MsWord97List * pCur97 = new ie_exp_RTF_MsWord97List(pAuto);
@@ -2595,7 +2597,7 @@ void IE_Exp_RTF::_write_listtable(void)
 			if(!bFoundAtPrevLevel)
 			{
 				ie_exp_RTF_MsWord97List * pCur97 = new ie_exp_RTF_MsWord97List(pList97->getAuto());
-				xxx_UT_DEBUGMSG(("SEVIOR: Adding nullptr level at depth %d \n",depth));
+				xxx_UT_DEBUGMSG(("SEVIOR: Adding NULL level at depth %d \n",depth));
 				pList97->addLevel(depth, pCur97);
 			}
 
@@ -2604,19 +2606,19 @@ void IE_Exp_RTF::_write_listtable(void)
 //
 // OK we got the simple and multi-list structures full.
 // Now fill the override structure.
-	for (UT_sint32 i = 0; i < iCount; i++)
+	for(i=0; i< iCount; i++)
 	{
 		pAuto = getDoc()->getNthList(i);
-		ie_exp_RTF_ListOveride pOver(pAuto);
-		pOver.setOverideID(i+1);
-		m_vecOverides.push_back(std::move(pOver));
+		ie_exp_RTF_ListOveride * pOver = new ie_exp_RTF_ListOveride(pAuto);
+		pOver->setOverideID(i+1);
+		m_vecOverides.addItem((void *) pOver);
 	}
 //
 // OK that's everything. Now generate the RTF Header.
 //
 // MultiLevel lists
 //
-	for (decltype(m_vecMultiLevel)::size_type k = 0; k < m_vecMultiLevel.size(); k++)
+	for(k=0; k< m_vecMultiLevel.getItemCount(); k++)
 	{
 		_rtf_nl();
 		_output_MultiLevelRTF(getNthMultiLevel(k));
@@ -2624,7 +2626,8 @@ void IE_Exp_RTF::_write_listtable(void)
 //
 // Simple Lists
 //
-	for (decltype(m_vecSimpleList)::size_type k = 0; k < m_vecSimpleList.size(); k++) {
+	for(k=0; k< m_vecSimpleList.getItemCount(); k++)
+	{
 		_rtf_nl();
 		_output_SimpleListRTF(getNthSimple(k));
 	}
@@ -2639,7 +2642,8 @@ void IE_Exp_RTF::_write_listtable(void)
     _rtf_open_brace();
     _rtf_keyword("*");
     _rtf_keyword("listoverridetable");
-	for (decltype(m_vecOverides)::size_type i = 0; i < m_vecOverides.size(); i++) {
+	for(i=0; i< m_vecOverides.getItemCount(); i++)
+	{
 		_rtf_nl();
 		_output_OveridesRTF(getNthOveride(i),i);
 	}
@@ -2653,25 +2657,25 @@ void IE_Exp_RTF::_write_listtable(void)
 /*!
  * Get ith Multilevel list
  */
-const ie_exp_RTF_MsWord97ListMulti& IE_Exp_RTF::getNthMultiLevel(UT_uint32 i) const
+ie_exp_RTF_MsWord97ListMulti * IE_Exp_RTF::getNthMultiLevel(UT_uint32 i) const
 {
-	return m_vecMultiLevel[i];
+	return (ie_exp_RTF_MsWord97ListMulti *) m_vecMultiLevel.getNthItem(i);
 }
 
 /*!
  * Get ith Simple list
  */
-const ie_exp_RTF_MsWord97ListSimple& IE_Exp_RTF::getNthSimple(UT_uint32 i) const
+ie_exp_RTF_MsWord97ListSimple *  IE_Exp_RTF::getNthSimple(UT_uint32 i) const
 {
-	return m_vecSimpleList[i];
+	return (ie_exp_RTF_MsWord97ListSimple *) m_vecSimpleList.getNthItem(i);
 }
 
 /*!
  * Get ith Overide
  */
-const ie_exp_RTF_ListOveride& IE_Exp_RTF::getNthOveride(UT_uint32 i) const
+ie_exp_RTF_ListOveride *  IE_Exp_RTF::getNthOveride(UT_uint32 i) const
 {
-	return m_vecOverides[i];
+	return (ie_exp_RTF_ListOveride *) m_vecOverides.getNthItem(i);
 }
 
 /*!
@@ -2679,7 +2683,7 @@ const ie_exp_RTF_ListOveride& IE_Exp_RTF::getNthOveride(UT_uint32 i) const
  */
 UT_uint32  IE_Exp_RTF::getMultiLevelCount(void) const
 {
-	return m_vecMultiLevel.size();
+	return m_vecMultiLevel.getItemCount();
 }
 
 /*!
@@ -2687,27 +2691,30 @@ UT_uint32  IE_Exp_RTF::getMultiLevelCount(void) const
  */
 UT_uint32  IE_Exp_RTF::getSimpleListCount(void) const
 {
-	return m_vecSimpleList.size();
+	return m_vecSimpleList.getItemCount();
 }
 /*!
  * Get Number of overides in the document
  */
 UT_uint32  IE_Exp_RTF::getOverideCount(void) const
 {
-	return m_vecOverides.size();
+	return m_vecOverides.getItemCount();
 }
 
 /*!
  * Return the the number of the overide that matches the given ID.
  * Returns 0 on failure to find a matching ID.
  */
-UT_uint32 IE_Exp_RTF::getMatchingOverideNum(UT_uint32 ID) const
+UT_uint32 IE_Exp_RTF::getMatchingOverideNum(UT_uint32 ID)
 {
 	UT_uint32 baseid = ID;
-	for (decltype(m_vecOverides)::size_type i = 0; i < getOverideCount(); i++) {
-		const ie_exp_RTF_ListOveride& pOver = getNthOveride(i);
-		if (pOver.doesOverideMatch(baseid)) {
-			return pOver.getOverideID();
+	UT_uint32 i=0;
+	for(i=0; i< getOverideCount(); i++)
+	{
+		ie_exp_RTF_ListOveride * pOver = getNthOveride(i);
+		if(pOver->doesOverideMatch(baseid))
+		{
+			return pOver->getOverideID();
 		}
 	}
 	return 0;
@@ -2718,7 +2725,7 @@ UT_uint32 IE_Exp_RTF::getMatchingOverideNum(UT_uint32 ID) const
  \param ie_exp_RTF_MsWord97ListMulti * pMulti pointer to a multi-level list
  * structure.
  */
-void IE_Exp_RTF::_output_MultiLevelRTF(const ie_exp_RTF_MsWord97ListMulti& pMulti)
+void IE_Exp_RTF::_output_MultiLevelRTF(ie_exp_RTF_MsWord97ListMulti * pMulti)
 {
 	_rtf_open_brace();
 	_rtf_keyword("list");
@@ -2735,20 +2742,20 @@ void IE_Exp_RTF::_output_MultiLevelRTF(const ie_exp_RTF_MsWord97ListMulti& pMult
 	_rtf_keyword("listtemplateid",tempID);
 	UT_uint32 i = 0;
 	fl_AutoNumConstPtr pAuto;
-	ie_exp_RTF_MsWord97List * pList97 = nullptr;
+	ie_exp_RTF_MsWord97List * pList97 = NULL;
 	for(i=0; i < 9 ; i++)
 	{
 		_rtf_open_brace();
 		_rtf_keyword("listlevel");
-		pList97 = pMulti.getListAtLevel(i, 0);
-		if(pList97 != nullptr)
+		pList97 = pMulti->getListAtLevel(i,0);
+		if(pList97 != NULL)
 		{
 //
 // Strategy: Dump out all the list info for the first list in each level. Then
 // use the overides to redefine subsequent lists at each level.
 //
 			pAuto = pList97->getAuto();
-			if(i==0 && pAuto->getParent() != nullptr)
+			if(i==0 && pAuto->getParent() != NULL)
 			{
 				UT_ASSERT_NOT_REACHED();
 			}
@@ -2756,11 +2763,11 @@ void IE_Exp_RTF::_output_MultiLevelRTF(const ie_exp_RTF_MsWord97ListMulti& pMult
 		}
 		else
 		{
-			_output_ListRTF(nullptr,i);
+			_output_ListRTF(NULL,i);
 		}
 		_rtf_close_brace();
 	}
-	_rtf_keyword("listid", pMulti.getID());
+	_rtf_keyword("listid",pMulti->getID());
 	_rtf_close_brace();
 }
 
@@ -2820,7 +2827,7 @@ void IE_Exp_RTF::_generate_level_Text(const fl_AutoNumConstPtr & pAuto, UT_Strin
 	{
 		xxx_UT_DEBUGMSG(("SEVIOR: pAuto-getParent() %x \n",pAuto->getParent()));
 	}
-	if(pAuto && (pAuto->getParent() == nullptr))
+	if(pAuto && (pAuto->getParent() == NULL))
 	{
 		UT_String LeftSide = pAuto->getDelim();
 		UT_String RightSide;
@@ -2847,7 +2854,7 @@ void IE_Exp_RTF::_generate_level_Text(const fl_AutoNumConstPtr & pAuto, UT_Strin
 		xxx_UT_DEBUGMSG(("SEVIOR: Level %d LevelText %s  \n",ifoundLevel,LevelText.c_str()));
 		return;
 	}
-	else if((pAuto != nullptr) && ( pAuto->getParent() != nullptr))
+	else if((pAuto != NULL) && ( pAuto->getParent() != NULL))
 	{
 		_generate_level_Text(pAuto->getParent(),LevelText,LevelNumbers,lenText,
 							 ifoundLevel);
@@ -2925,7 +2932,7 @@ void IE_Exp_RTF::_get_LeftRight_Side(UT_String & LeftSide, UT_String & RightSide
 {
 	const char * psz = strstr(LeftSide.c_str(),"%L");
 	xxx_UT_DEBUGMSG(("SEVIOR: Substring = %s Total is %s \n",psz,LeftSide.c_str()));
-	if(psz != nullptr)
+	if(psz != NULL)
 	{
 		UT_uint32 index = (UT_uint32) (psz - LeftSide.c_str());
 		UT_uint32 len = (UT_uint32) strlen(LeftSide.c_str());
@@ -2962,7 +2969,7 @@ void IE_Exp_RTF::_output_ListRTF(const fl_AutoNumConstPtr & pAuto, UT_uint32 iLe
 	UT_sint32 Param = 0;
 	UT_UCSChar bulletsym=0;
 	FL_ListType lType = NUMBERED_LIST;
-	if(pAuto != nullptr)
+	if(pAuto != NULL)
 	{
 		lType = pAuto->getType();
 	}
@@ -3053,7 +3060,7 @@ void IE_Exp_RTF::_output_ListRTF(const fl_AutoNumConstPtr & pAuto, UT_uint32 iLe
 	_rtf_keyword("levelstartat",startParam);
 	_rtf_keyword("levelspace",0);
 	_rtf_keyword("levelfollow",0);
-	if(pAuto == nullptr)
+	if(pAuto == NULL)
 	{
 		float marg = LIST_DEFAULT_INDENT;
 		float indent =  (float)LIST_DEFAULT_INDENT_LABEL;
@@ -3071,13 +3078,13 @@ void IE_Exp_RTF::_output_ListRTF(const fl_AutoNumConstPtr & pAuto, UT_uint32 iLe
 	else
 	{
 		pf_Frag_Strux* sdh = pAuto->getFirstItem();
-		const char * szIndent = nullptr;
-		const char * szAlign = nullptr;
+		const char * szIndent = NULL;
+		const char * szAlign = NULL;
 		// TODO -- we have a problem here; props and attrs are, due to revisions, view dependent and
 		// we have no access to the view, so we will assume that revisions are showing and will ask
 		// for the cumulative result of all of them (revision level PD_MAX_REVISION)
 		// 
-		if(sdh != nullptr)
+		if(sdh != NULL)
 		{
 			bool bres = getDoc()->getPropertyFromSDH(sdh,true,PD_MAX_REVISION,"text-indent",&szIndent);
 			if(bres)
@@ -3102,7 +3109,7 @@ void IE_Exp_RTF::_output_ListRTF(const fl_AutoNumConstPtr & pAuto, UT_uint32 iLe
  \param ie_exp_RTF_MsWord97ListSimple * pSimple pointer to a Simple list
  * structure.
  */
-void IE_Exp_RTF::_output_SimpleListRTF(const ie_exp_RTF_MsWord97ListSimple& pSimple)
+void IE_Exp_RTF::_output_SimpleListRTF(ie_exp_RTF_MsWord97ListSimple * pSimple)
 {
 	_rtf_open_brace();
 	_rtf_keyword("list");
@@ -3117,7 +3124,7 @@ void IE_Exp_RTF::_output_SimpleListRTF(const ie_exp_RTF_MsWord97ListSimple& pSim
 #endif
 	_rtf_keyword("listtemplateid",tempID);
 	_rtf_keyword("listsimple");
-	fl_AutoNumConstPtr pAuto = pSimple.getAuto();
+	fl_AutoNumConstPtr pAuto = pSimple->getAuto();
 	_rtf_open_brace();
 	_rtf_keyword("listlevel");
 //
@@ -3125,7 +3132,7 @@ void IE_Exp_RTF::_output_SimpleListRTF(const ie_exp_RTF_MsWord97ListSimple& pSim
 //
 	_output_ListRTF(pAuto,0);
 	_rtf_close_brace();
-	_rtf_keyword("listid", pSimple.getID());
+	_rtf_keyword("listid",pSimple->getID());
 	_rtf_close_brace();
 }
 
@@ -3133,12 +3140,12 @@ void IE_Exp_RTF::_output_SimpleListRTF(const ie_exp_RTF_MsWord97ListSimple& pSim
  * Actually output the RTF from an Overide
  \param ie_exp_RTF_Overide * pOver pointer to an Overide definition
  */
-void IE_Exp_RTF::_output_OveridesRTF(const ie_exp_RTF_ListOveride& pOver, UT_uint32 /*iOver*/)
+void IE_Exp_RTF::_output_OveridesRTF(ie_exp_RTF_ListOveride * pOver, UT_uint32 /*iOver*/)
 {
 	_rtf_open_brace();
 	_rtf_keyword("listoverride");
 	_rtf_keyword("listoverridecount",0);
-	fl_AutoNumConstPtr pAuto = pOver.getAutoNum();
+	fl_AutoNumConstPtr pAuto = pOver->getAutoNum();
 	fl_AutoNumConstPtr pTop = pAuto;
 	while(pTop->getParent())
 	{
@@ -3149,7 +3156,7 @@ void IE_Exp_RTF::_output_OveridesRTF(const ie_exp_RTF_ListOveride& pOver, UT_uin
 // Strategy: Dump out all the list info for the first list in each level.
 //
 	_output_ListRTF(pAuto,0);
-	_rtf_keyword("ls", pOver.getOverideID());
+	_rtf_keyword("ls",pOver->getOverideID());
 	_rtf_close_brace();
 }
 
@@ -3268,7 +3275,7 @@ bool IE_Exp_RTF::s_escapeString(UT_UTF8String &sOutStr,
  */
 bool IE_Exp_RTF::s_escapeString(UT_UTF8String &sOutStr, 
                                 const char * szInStr,
-                                UT_uint32 iSize,  /* 0 == nullptr terminated */
+                                UT_uint32 iSize,  /* 0 == NULL terminated */
                                 UT_uint32 iAltChars)
 {
 	UT_UCS4String sUCS4InStr(szInStr, iSize);
@@ -3315,11 +3322,11 @@ bool _rtf_font_info::init(const s_RTF_AttrPropAdapter & apa, bool bDoFieldFont)
 {
 	// Not a typo. The AbiWord "font-family" property is what RTF
 	// calls font name. It has values like "Courier New".
-	const char * szName = nullptr;
+	const char * szName = NULL;
 	if(!bDoFieldFont)
 	{
 		szName = apa.getProperty("font-family");
-		if(szName != nullptr)
+		if(szName != NULL)
 		{
 			m_szName = szName;
 		}
@@ -3327,12 +3334,12 @@ bool _rtf_font_info::init(const s_RTF_AttrPropAdapter & apa, bool bDoFieldFont)
 	else
 	{
 		szName = apa.getProperty("field-font");
-		if(szName != nullptr)
+		if(szName != NULL)
 		{
 			m_szName = szName;
 		}
 	}
-	if (szName == nullptr || strcmp(szName, "NULL") == 0)  // Field-font is "NULL" when there is no special field-font.
+	if (szName == NULL || strcmp(szName, "NULL") == 0)  // Field-font is "NULL" when there is no special field-font.
 	{                                                      // We don't want it in the \fonttbl
 		return false;
 	}
@@ -3362,7 +3369,7 @@ bool _rtf_font_info::init(const char * szFontName)
 {
     // Not a typo. The AbiWord "font-family" property is what RTF
     // calls font name. It has values like "Courier New".
-    if (szFontName == nullptr)
+    if (szFontName == NULL)
 	{
 		return false;
 	}
@@ -3401,7 +3408,7 @@ bool _rtf_font_info::_is_same(const _rtf_font_info & fi) const
 	{
 		bMatchFontFamily = true;
 	}
-	else if (  szFamily && fi.szFamily && *szFamily == *fi.szFamily) // Both pointer to nullptrs
+	else if (  szFamily && fi.szFamily && *szFamily == *fi.szFamily) // Both pointer to NULLs
 	{
 		bMatchFontFamily = true;
 	}
@@ -3447,7 +3454,7 @@ ie_exp_RTF_MsWord97ListMulti::ie_exp_RTF_MsWord97ListMulti(const fl_AutoNumConst
 	UT_uint32 i = 0;
 	for(i=0; i < 9 ; i++)
 	{
-		m_vLevels[i] = nullptr;
+		m_vLevels[i] = NULL;
 	}
 	addLevel(0, (ie_exp_RTF_MsWord97List *) this);
 }
@@ -3459,12 +3466,12 @@ ie_exp_RTF_MsWord97ListMulti::~ie_exp_RTF_MsWord97ListMulti(void)
 	delete m_vLevels[0];
 	for(i=1; i < 9 ; i++)
 	{
-		if(m_vLevels[i] != nullptr)
+		if(m_vLevels[i] != NULL)
 		{
 			UT_Vector * pV = m_vLevels[i];
 			UT_VECTOR_PURGEALL(ie_exp_RTF_MsWord97List *, (*pV));
 			delete pV;
-			m_vLevels[i]  = nullptr;
+			m_vLevels[i]  = NULL;
 		}
 	}
 }
@@ -3480,7 +3487,7 @@ void ie_exp_RTF_MsWord97ListMulti::addLevel(UT_uint32 iLevel, ie_exp_RTF_MsWord9
 	{
 		iLevel = 8;
 	}
-	if(m_vLevels[iLevel] == nullptr)
+	if(m_vLevels[iLevel] == NULL)
 	{
 		UT_Vector * pVecList97 = new UT_Vector;
 		pVecList97->addItem((void *) pList97);
@@ -3498,15 +3505,15 @@ void ie_exp_RTF_MsWord97ListMulti::addLevel(UT_uint32 iLevel, ie_exp_RTF_MsWord9
  \param iLevel the level which we want to lists for
  \param nthList the list at the level we want
  */
-ie_exp_RTF_MsWord97List * ie_exp_RTF_MsWord97ListMulti::getListAtLevel(UT_uint32 iLevel, UT_uint32 nthList) const
+ie_exp_RTF_MsWord97List * ie_exp_RTF_MsWord97ListMulti::getListAtLevel(UT_uint32 iLevel, UT_uint32 nthList)
 {
 	if(iLevel > 8)
 	{
 		iLevel = 8;
 	}
-	if(m_vLevels[iLevel] == nullptr)
+	if(m_vLevels[iLevel] == NULL)
 	{
-		return nullptr;
+		return NULL;
 	}
 	UT_uint32 icount = m_vLevels[iLevel]->getItemCount();
 	if(icount > nthList)
@@ -3516,7 +3523,7 @@ ie_exp_RTF_MsWord97List * ie_exp_RTF_MsWord97ListMulti::getListAtLevel(UT_uint32
 	}
 	else
 	{
-		return nullptr;
+		return NULL;
 	}
 }
 
@@ -3528,11 +3535,11 @@ ie_exp_RTF_MsWord97List * ie_exp_RTF_MsWord97ListMulti::getListAtLevel(UT_uint32
  \retval the List ID number of the first list on the level that contains
  the ID. Return 0 if there is no match in the structure.
  */
-UT_uint32 ie_exp_RTF_MsWord97ListMulti::getMatchingID(UT_uint32 listID) const
+UT_uint32 ie_exp_RTF_MsWord97ListMulti::getMatchingID(UT_uint32 listID)
 {
 	UT_uint32 i;
 	UT_sint32 j;
-	ie_exp_RTF_MsWord97List * pList97 = nullptr;
+	ie_exp_RTF_MsWord97List * pList97 = NULL;
 	bool bFound = false;
 	UT_uint32 foundID = 0;
 	UT_uint32 firstID = 0;

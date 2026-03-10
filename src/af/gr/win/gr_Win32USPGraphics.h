@@ -89,7 +89,7 @@ public:
 													   int iLength,
 													   UT_sint32 xoff,
 													   UT_sint32 yoff,
-													   int* pCharWidths = nullptr);
+													   int* pCharWidths = NULL);
 
 	virtual UT_uint32		getFontHeight();
 	virtual UT_uint32		getFontAscent();
@@ -108,6 +108,7 @@ public:
 	virtual void prepareToRenderChars(GR_RenderInfo & ri);
 	virtual void renderChars(GR_RenderInfo & ri);
 	virtual void measureRenderedCharWidths(GR_RenderInfo & ri);
+
 	virtual void appendRenderedCharsToBuff(GR_RenderInfo & ri, UT_GrowBuf & buf) const;
 
 	virtual bool canBreak(GR_RenderInfo & ri, UT_sint32 &iNext, bool bAfter);
@@ -144,8 +145,7 @@ public:
   protected:
 	// all instances have to be created via GR_GraphicsFactory; see gr_Graphics.h
 	GR_Win32USPGraphics(HDC, HWND);
-	GR_Win32USPGraphics(HDC, const DOCINFOW *, HGLOBAL hDevMode = nullptr);
-	virtual void queueDraw(const UT_Rect* pRect) override;
+	GR_Win32USPGraphics(HDC, const DOCINFOW *, HGLOBAL hDevMode = NULL);
 
   private:
 	bool      _constructorCommonCode();

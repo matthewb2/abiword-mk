@@ -2,21 +2,20 @@
 
 /* AbiWord
  * Copyright (C) 1998-2000 AbiSource, Inc.
- * Copyright (C) 2016-2021 Hubert Figuière
- *
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
 
@@ -178,7 +177,7 @@ bool	IE_Imp_XHTML_Sniffer::getDlgLabels(const char ** pszDesc,
     "start-value", "1",
     "list-delim", "%L.",
     "list-decimal", ".",
-    nullptr, nullptr
+    NULL, NULL
   };
 
   static const gchar *ol_p_atts[] = 
@@ -186,13 +185,13 @@ bool	IE_Imp_XHTML_Sniffer::getDlgLabels(const char ** pszDesc,
     "level", "1",
     "listid", "1",
     "parentid", "0",
-    "props", "list-style:Numbered List; start-value:1; text-indent:-0.3in; field-font: nullptr;",
+    "props", "list-style:Numbered List; start-value:1; text-indent:-0.3in; field-font: NULL;",
 	/* margin-left is purposefully left out of the props.  It is computed
 	   based on the depth of the list, and appended to this list of
 	   attributes.
 	*/
     "style", "Normal",
-    nullptr, nullptr
+    NULL, NULL
   };
 
   static const gchar *ul_atts[] =
@@ -203,7 +202,7 @@ bool	IE_Imp_XHTML_Sniffer::getDlgLabels(const char ** pszDesc,
     "start-value", "0",
     "list-delim", "%L",
     "list-decimal", "NULL",
-    nullptr, nullptr
+    NULL, NULL
   };
 
   static const gchar *ul_p_atts[] =
@@ -211,13 +210,13 @@ bool	IE_Imp_XHTML_Sniffer::getDlgLabels(const char ** pszDesc,
     "level", "1",
     "listid", "2",
     "parentid", "0",
-    "props", "list-style:Bullet List; start-value:0; text-indent:-0.3in; field-font: nullptr;",
+    "props", "list-style:Bullet List; start-value:0; text-indent:-0.3in; field-font: NULL;",
 	/* margin-left is purposefully left out of the props.  It is computed
 	   based on the depth of the list, and appended to this list of
 	   attributes.
 	*/
     "style", "Normal",
-    nullptr, nullptr
+    NULL, NULL
   };
 
 IE_Imp_XHTML::IE_Imp_XHTML(PD_Document * pDocument) :
@@ -354,8 +353,7 @@ static struct xmlToIdMapping s_Tokens[] =
 
 static SectionClass s_class_query (const char * class_value)
 {
-	if (class_value == nullptr)
-		return sc_other;
+	if ( class_value == 0) return sc_other;
 	if (*class_value == 0) return sc_other;
 
 	SectionClass sc = sc_other;
@@ -388,8 +386,7 @@ static void s_append_font_family (UT_UTF8String & style, const char * face)
 		}
 
 	char * value = g_strdup (face);
-	if (value == nullptr)
-		return;
+	if (value == 0) return;
 
 	char * ptr = value;
 	while (*ptr)
@@ -505,8 +502,7 @@ static void s_append_color (UT_UTF8String & style, const char * color, const cha
 	if (*color == 0) return;
 
 	char * value = g_strdup (color);
-	if (value == nullptr)
-		return;
+	if (value == 0) return;
 
 	int length = 0;
 
@@ -529,11 +525,10 @@ static void s_append_color (UT_UTF8String & style, const char * color, const cha
 					bValid = false;
 					break;
 				}
-			if (bHexal) {
-				if (!isxdigit(u)) {
-					bHexal = false;
-				}
-			}
+			if (bHexal)
+				if (!isdigit (static_cast<int>(u)))
+					if (((c < 'a') && (c > 'f')) && ((c < 'A') && (c > 'F')))
+						bHexal = false;
 			++ptr;
 			++length;
 		}
@@ -663,7 +658,7 @@ UT_Error IE_Imp_XHTML::_loadFile(GsfInput * input)
 			
 	setParser (parser);
 	e = IE_Imp_XML::_loadFile(input);
-	setParser(nullptr);
+	setParser(0);
 	delete parser;
 
 	// m_parseState = _PS_Sec; // no point having another sections the end
@@ -812,18 +807,18 @@ void IE_Imp_XHTML::startElement(const gchar *name,
 			const std::string & classVal = PP_getAttribute("class", atts);
 			SectionClass sc = childOfSection () ? sc_other : s_class_query (classVal.c_str());
 			if (sc == sc_other)
-				m_divClasses.push_back(nullptr);
+				m_divClasses.push_back (0);
 			else
 				m_divClasses.push_back (s_section_classes[sc]);
 
 			/* <div> elements can specify block-level styles; concatenate and stack...
 			 */
-			UT_UTF8String * prev = nullptr;
+			UT_UTF8String * prev = 0;
 			if (m_divStyles.getItemCount ())
 				{
 					prev = m_divStyles.getLastItem ();
 				}
-			UT_UTF8String * style = nullptr;
+			UT_UTF8String * style = 0;
 			if (prev)
 				style = new UT_UTF8String(*prev);
 			else
@@ -940,7 +935,7 @@ void IE_Imp_XHTML::startElement(const gchar *name,
 		if (m_parseState == _PS_Block) m_parseState = _PS_Sec;
 
 		const std::string & style = PP_getAttribute("style", atts);
-		newBlock ("Plain Text", style.c_str(), nullptr);
+		newBlock ("Plain Text", style.c_str(), NULL);
 
 		m_iPreCount++;
 		m_bWhiteSignificant = true;
@@ -1073,7 +1068,7 @@ void IE_Imp_XHTML::startElement(const gchar *name,
 			std::string szListID, szParentID, szLevel, szMarginLeft;
 			szListID = UT_std_string_sprintf("%u", thisID);
 			szParentID = UT_std_string_sprintf("%u", parentID);
-			szLevel = UT_std_string_sprintf("%lu", (unsigned long)m_utsParents.size());
+			szLevel = UT_std_string_sprintf("%lu", m_utsParents.size());
 
 			{
 				UT_LocaleTransactor t(LC_NUMERIC, "C");
@@ -1207,7 +1202,7 @@ void IE_Imp_XHTML::startElement(const gchar *name,
 			pfg = importImage (szSrc.c_str());
 		}
 
-		if (pfg == nullptr) {
+		if (pfg == 0) {
             break;
 		}
 
@@ -1241,7 +1236,7 @@ void IE_Imp_XHTML::startElement(const gchar *name,
 				utf8val = s_parseCSStyle (utf8val, CSS_MASK_IMAGE);
 				UT_DEBUGMSG(("CSS->Props (utf8val): [%s]\n",utf8val.utf8_str()));
 			}
-		if (!szWidth.empty() && (strstr(utf8val.utf8_str(), "width") == nullptr))
+		if (!szWidth.empty() && (strstr (utf8val.utf8_str (), "width") == 0))
 			{
 				UT_Dimension units = UT_determineDimension (szWidth.c_str(), DIM_PX);
 				double d = UT_convertDimensionless (szWidth.c_str());
@@ -1261,7 +1256,7 @@ void IE_Imp_XHTML::startElement(const gchar *name,
 					utf8val += tmp;
 				}
 			}
-		if (!szHeight.empty() && (strstr(utf8val.utf8_str(), "height") == nullptr))
+		if (!szHeight.empty() && (strstr (utf8val.utf8_str (), "height") == 0))
 			{
 				UT_Dimension units = UT_determineDimension (szHeight.c_str(), DIM_PX);
 				double d = UT_convertDimensionless (szHeight.c_str());
@@ -1281,8 +1276,8 @@ void IE_Imp_XHTML::startElement(const gchar *name,
 						utf8val += tmp;
 					}
 			}
-		if ((strstr(utf8val.utf8_str(), "width") == nullptr) ||
-			(strstr(utf8val.utf8_str(), "height") == nullptr))
+		if ((strstr (utf8val.utf8_str (), "width")  == 0) ||
+			(strstr (utf8val.utf8_str (), "height") == 0))
 		{
 			float width  = static_cast<float>(pfg->getWidth ());
 			float height = static_cast<float>(pfg->getHeight ());
@@ -1290,7 +1285,7 @@ void IE_Imp_XHTML::startElement(const gchar *name,
 	   		{
 				UT_DEBUGMSG(("missing width or height; reverting to image defaults\n"));
 #if 0
-				if (strstr(utf8val.utf8_str(), "width") != nullptr)
+				if(strstr (utf8val.utf8_str (), "width")  != 0)
 				{
 					float rat = height/width;
 					float fwidth = UT_convertToInches(szWidth.c_str());
@@ -1349,7 +1344,7 @@ void IE_Imp_XHTML::startElement(const gchar *name,
 
 		X_CheckError(appendObject (PTO_Image, api_atts));
 		X_CheckError(getDoc()->createDataItem (dataid.c_str(), false, pBB,
-                                               pfg->getMimeType(), nullptr));
+                                               pfg->getMimeType(), NULL));
 
 		UT_DEBUGMSG(("insertion successful\n"));
 		}
@@ -1421,13 +1416,13 @@ void IE_Imp_XHTML::startElement(const gchar *name,
 			UT_uint32 colspan = 1;
 			UT_uint32 rowspan = 1;
 			if (!szColSpan.empty())	{
-					int span = atoi(szColSpan.c_str());
+					int span = stoi(szColSpan);
 					if (span > 1) {
 						colspan = static_cast<UT_uint32>(span);
 					}
 				}
 			if (!szRowSpan.empty()) {
-					int span = atoi(szRowSpan.c_str());
+					int span = stoi(szRowSpan);
 					if (span > 1) {
 						rowspan = static_cast<UT_uint32>(span);
 					}
@@ -1538,9 +1533,9 @@ void IE_Imp_XHTML::endElement(const gchar *name)
 		 */
 		requireSection ();
 		// m_parseState = _PS_Sec; // no point having two sections at the end
-		newBlock("Normal", nullptr, nullptr);
+		newBlock ("Normal", 0, 0);
 		m_parseState = _PS_Sec; // no point having two sections at the end
-		newBlock("Normal", nullptr, nullptr);
+		newBlock ("Normal", 0, 0);
 
 		m_parseState = _PS_Init;
 		return;
@@ -1553,7 +1548,7 @@ void IE_Imp_XHTML::endElement(const gchar *name)
 
 			if (m_divStyles.getItemCount ())
 				{
-					UT_UTF8String * prev = nullptr;
+					UT_UTF8String * prev = 0;
 					prev = m_divStyles.getLastItem ();
 					DELETEP(prev);
 				}
@@ -1747,7 +1742,7 @@ void IE_Imp_XHTML::endElement(const gchar *name)
 
 		uid = getDoc()->getUID(UT_UniqueId::Math);
 		std::string sUID = UT_std_string_sprintf("MathLatex%d",uid);
-		X_CheckError(getDoc()->createDataItem(sUID.c_str(), false, m_pMathBB, "", nullptr));
+		X_CheckError(getDoc()->createDataItem(sUID.c_str(), false, m_pMathBB, "", NULL));
 
 		PP_PropertyVector new_atts = {
 			"dataid", sUID
@@ -1836,7 +1831,7 @@ FG_ConstGraphicPtr IE_Imp_XHTML::importDataURLImage (const gchar * szData)
 	if (strncmp (szData, "image/", 6))
 		{
 			UT_DEBUGMSG(("importDataURLImage: URL-embedded data does not appear to be an image...\n"));
-			return nullptr;
+			return 0;
 		}
 	const char * b64bufptr = static_cast<const char *>(szData);
 
@@ -1845,16 +1840,16 @@ FG_ConstGraphicPtr IE_Imp_XHTML::importDataURLImage (const gchar * szData)
 	if (b64length == 0)
 		{
 			UT_DEBUGMSG(("importDataURLImage: URL-embedded data has no data?\n"));
-			return nullptr;
+			return 0;
 		}
 
 	size_t binmaxlen = ((b64length >> 2) + 1) * 3;
 	size_t binlength = binmaxlen;
 	char * binbuffer = static_cast<char *>(g_try_malloc (binmaxlen));
-	if (binbuffer == nullptr)
+	if (binbuffer == 0)
 		{
 			UT_DEBUGMSG(("importDataURLImage: out of memory\n"));
-			return nullptr;
+			return 0;
 		}
 	char * binbufptr = binbuffer;
 
@@ -1862,7 +1857,7 @@ FG_ConstGraphicPtr IE_Imp_XHTML::importDataURLImage (const gchar * szData)
 		{
 			UT_DEBUGMSG(("importDataURLImage: error decoding Base64 data - I assume that's what it is...\n"));
 			FREEP(binbuffer);
-			return nullptr;
+			return 0;
 		}
 	binlength = binmaxlen - binlength;
 
@@ -1875,7 +1870,7 @@ FG_ConstGraphicPtr IE_Imp_XHTML::importDataURLImage (const gchar * szData)
 	if (IE_ImpGraphic::loadGraphic (pBB, IEGFT_Unknown, pfg) != UT_OK || !pfg)
 		{
 			UT_DEBUGMSG(("unable to construct image importer!\n"));
-			return nullptr;
+			return 0;
 		}
 	UT_DEBUGMSG(("image loaded successfully\n"));
 
@@ -1888,7 +1883,7 @@ FG_ConstGraphicPtr IE_Imp_XHTML::importImage (const gchar * szSrc)
 
 	char * relative_file = UT_go_url_resolve_relative(m_szFileName, szFile);
 	if(!relative_file)
-		return nullptr;
+		return 0;
 
 	UT_DEBUGMSG(("found image reference (%s) - loading... \n", relative_file));
 
@@ -1899,7 +1894,7 @@ FG_ConstGraphicPtr IE_Imp_XHTML::importImage (const gchar * szSrc)
 		{
 			UT_DEBUGMSG(("unable to import image\n"));
 			g_free(relative_file);
-			return nullptr;
+			return 0;
 		}
 
 	g_free(relative_file);
@@ -1928,7 +1923,7 @@ bool IE_Imp_XHTML::newBlock (const char * style_name, const char * css_style, co
 		}
 
 
-	UT_UTF8String * div_style = nullptr;
+	UT_UTF8String * div_style = 0;
 	if (m_divStyles.getItemCount ())
 		div_style = m_divStyles.getLastItem ();
 
@@ -1983,7 +1978,7 @@ bool IE_Imp_XHTML::requireBlock ()
 {
 	if (m_parseState == _PS_Block) return true;
 
-	return m_bWhiteSignificant ? newBlock("Plain Text", nullptr, nullptr) : newBlock("Normal", nullptr, nullptr);
+	return m_bWhiteSignificant ? newBlock ("Plain Text", 0, 0) : newBlock ("Normal", 0, 0);
 }
 
 /* forces document into section state; returns false on failure
@@ -2004,7 +1999,7 @@ bool IE_Imp_XHTML::requireSection ()
 
 bool IE_Imp_XHTML::appendStrux(PTStruxType pts, const PP_PropertyVector & attributes)
 {
-	UT_DEBUGMSG(("XHTML Import - appendStruxStrux type %d document %p \n", pts, (void*)getDoc()));
+	UT_DEBUGMSG(("XHTML Import - appendStruxStrux type %d document %p \n",pts,getDoc()));
 	if(pts == PTX_Section)
 	{
 		m_bFirstBlock = false;
@@ -2098,7 +2093,7 @@ bool IE_Imp_XHTML::appendObject(PTObjectType pto, const PP_PropertyVector & attr
  */
 bool IE_Imp_XHTML::bInTable(void)
 {
-	return !(m_TableHelperStack->top() == nullptr);
+	return !(m_TableHelperStack->top() == NULL);
 }
 
 /* returns true if child of a <div> with a recognized "class" attribute
@@ -2273,7 +2268,7 @@ static void s_props_append (UT_UTF8String & props, UT_uint32 css_mask,
 	UT_HashColor color;
 	UT_UTF8String sLineHeight;
 
-	const char * verbatim = nullptr;
+	const char * verbatim = 0;
 
 	if (css_mask & CSS_MASK_INLINE)
 		{
@@ -2363,10 +2358,10 @@ static void s_props_append (UT_UTF8String & props, UT_uint32 css_mask,
 				}
 			else if (strcmp (name, "text-decoration") == 0)
 				{
-					bool bInherit     = (strstr (value, "inherit")      != nullptr);
-					bool bUnderline   = (strstr (value, "underline")    != nullptr);
-					bool bLineThrough = (strstr (value, "line-through") != nullptr);
-					bool bOverline    = (strstr (value, "overline")     != nullptr);
+					bool bInherit     = (strstr (value, "inherit")      != NULL);
+					bool bUnderline   = (strstr (value, "underline")    != NULL);
+					bool bLineThrough = (strstr (value, "line-through") != NULL);
+					bool bOverline    = (strstr (value, "overline")     != NULL);
 
 					if (bUnderline || bLineThrough || bOverline)
 						{

@@ -43,6 +43,8 @@
 #include "fl_DocLayout.h"
 #include "pd_Document.h"
 
+#include <gsf/gsf-output-impl.h>
+
 static UT_GenericVector<IE_ExpSniffer *> m_sniffers(20);
 
 /*****************************************************************/
@@ -71,7 +73,7 @@ public:
 		if (graphics)
 			{
 				FL_DocLayout * pDocLayout = new FL_DocLayout(pDoc, graphics);
-				FV_View * printView = new FV_View(XAP_App::getApp(), nullptr, pDocLayout);
+				FV_View * printView = new FV_View(XAP_App::getApp(), 0, pDocLayout);
 				
 				printView->getLayout()->fillLayouts();
 				printView->getLayout()->formatAll();
@@ -107,7 +109,7 @@ IE_ExpSniffer::~IE_ExpSniffer ()
 UT_UTF8String IE_ExpSniffer::getPreferredSuffix()
 {
 	const char * szDummy;
-	const char * szSuffixes = nullptr;
+	const char * szSuffixes = 0;
 	IEFileType ieftDummy;
 	
 	if (!getDlgLabels(&szDummy,&szSuffixes,&ieftDummy))
@@ -146,7 +148,7 @@ void IE_Exp::unregisterExporter (IE_ExpSniffer * s)
 	m_sniffers.deleteNthItem (ndx-1);
 
 	// Refactor the indexes
-	IE_ExpSniffer * pSniffer = nullptr;
+	IE_ExpSniffer * pSniffer = 0;
 	UT_uint32 size  = m_sniffers.size();
 	UT_uint32 i     = 0;
 	for( i = ndx-1; i < size; i++)
@@ -159,7 +161,7 @@ void IE_Exp::unregisterExporter (IE_ExpSniffer * s)
 
 void IE_Exp::unregisterAllExporters ()
 {
-	IE_ExpSniffer * pSniffer = nullptr;
+	IE_ExpSniffer * pSniffer = 0;
 	UT_uint32 size = m_sniffers.size();
 
 	for (UT_uint32 i = 0; i < size; i++)
@@ -176,9 +178,9 @@ void IE_Exp::unregisterAllExporters ()
 
 IE_Exp::IE_Exp(PD_Document * pDocument, UT_Confidence_t fidelity)
 	: m_error(false), m_pDocument(pDocument),
-	  m_pDocRange(nullptr), m_pByteBuf(nullptr),
-	  m_fp(nullptr), m_bOwnsFp(false), m_fidelity(fidelity),
-	  m_fieldUpdater(nullptr)
+	  m_pDocRange (0), m_pByteBuf(0),
+	  m_fp(0), m_bOwnsFp(false), m_fidelity(fidelity),
+	  m_fieldUpdater(0)
 {
 	m_pDocument->invalidateCache();
 }
@@ -213,13 +215,13 @@ void IE_Exp::setProps (const char * props)
 
 GsfOutput* IE_Exp::_openFile(const char *szFilename)
 {
-	return UT_go_file_create(szFilename, nullptr);
+	return UT_go_file_create(szFilename, NULL);
 }
 
 GsfOutput* IE_Exp::openFile(const char * szFilename)
 {
-	UT_return_val_if_fail(!m_fp, nullptr);
-	UT_return_val_if_fail(szFilename, nullptr);
+	UT_return_val_if_fail(!m_fp, NULL);
+	UT_return_val_if_fail(szFilename, NULL);
 
 	m_szFileName = szFilename;
 
@@ -256,11 +258,11 @@ bool IE_Exp::_closeFile(void)
 			res = gsf_output_close(m_fp);
 
 		g_object_unref(G_OBJECT(m_fp));
-		m_fp = nullptr;
+		m_fp = 0;
 
 		if (!res) {
 			// then remove the unwritten file
-			(void)UT_go_file_remove (m_szFileName.c_str(), nullptr);
+			(void)UT_go_file_remove (m_szFileName.c_str(), NULL);
 		}
 
 		return (res == TRUE);
@@ -277,7 +279,7 @@ void IE_Exp::_abortFile(void)
         _closeFile();
 
         // then remove the unwanted file
-        (void)UT_go_file_remove (m_szFileName.c_str(), nullptr);
+        (void)UT_go_file_remove (m_szFileName.c_str(), NULL);
     }
 }
 
@@ -553,7 +555,7 @@ IEFileType IE_Exp::fileTypeForDescription(const char * szDescription)
 		IE_ExpSniffer * pSniffer = m_sniffers.getNthItem(k);
 
 		const char * szDummy;
-		const char * szDescription2 = nullptr;
+		const char * szDescription2 = 0;
 
 		if (pSniffer->getDlgLabels(&szDescription2,&szDummy,&ieft))
 		{
@@ -591,7 +593,7 @@ IE_ExpSniffer * IE_Exp::snifferForFileType(IEFileType ieft)
 	}
 
 	// The passed in filetype is invalid.
-	return nullptr;
+	return 0;
 }
 
 /*! 
@@ -604,12 +606,12 @@ IE_ExpSniffer * IE_Exp::snifferForFileType(IEFileType ieft)
 const char * IE_Exp::suffixesForFileType(IEFileType ieft)
 {
 	const char * szDummy;
-	const char * szSuffixes = nullptr;
+	const char * szSuffixes = 0;
 	IEFileType ieftDummy;
 
 	IE_ExpSniffer * pSniffer = snifferForFileType(ieft);
 
-	UT_return_val_if_fail(pSniffer != nullptr, nullptr);
+	UT_return_val_if_fail (pSniffer != NULL, 0);
 
 	if (pSniffer->getDlgLabels(&szDummy,&szSuffixes,&ieftDummy))
 	{
@@ -621,7 +623,7 @@ const char * IE_Exp::suffixesForFileType(IEFileType ieft)
 	}
 
 	// The passed in filetype is invalid.
-	return nullptr;
+	return 0;
 }
 
 /*! 
@@ -634,7 +636,7 @@ UT_UTF8String IE_Exp::preferredSuffixForFileType(IEFileType ieft)
 {
 	IE_ExpSniffer * pSniffer = snifferForFileType(ieft);
 
-	UT_return_val_if_fail (pSniffer != nullptr, "");
+	UT_return_val_if_fail (pSniffer != NULL, "");
 
 	return pSniffer->getPreferredSuffix();
 }
@@ -649,7 +651,7 @@ UT_UTF8String IE_Exp::preferredSuffixForFileType(IEFileType ieft)
 const char * IE_Exp::descriptionForFileType(IEFileType ieft)
 {
 	const char * szDummy;
-	const char * szDescription = nullptr;
+	const char * szDescription = 0;
 	IEFileType ieftDummy;
 
 	IE_ExpSniffer * pSniffer = snifferForFileType(ieft);
@@ -664,7 +666,7 @@ const char * IE_Exp::descriptionForFileType(IEFileType ieft)
 	}
 
 	// The passed in filetype is invalid.
-	return nullptr;
+	return 0;
 }
 
 UT_Error IE_Exp::constructExporter(PD_Document * pDocument,
@@ -673,7 +675,7 @@ UT_Error IE_Exp::constructExporter(PD_Document * pDocument,
 								   IE_Exp ** ppie,
 								   IEFileType * pieft)
 {
-	UT_return_val_if_fail(output != nullptr, UT_ERROR);
+	UT_return_val_if_fail(output != NULL, UT_ERROR);
 
 	return constructExporter(pDocument, gsf_output_name(output), ieft, ppie, pieft);
 }
@@ -713,9 +715,9 @@ UT_Error IE_Exp::constructExporter(PD_Document * pDocument,
 	UT_return_val_if_fail (ieft != IEFT_Bogus, UT_ERROR);
 
    	// let the caller know what kind of exporter they're getting
-	if (pieft != nullptr)
+   	if (pieft != NULL) 
 		*pieft = ieft;
-
+   
 	// use the exporter for the specified file type
 	UT_uint32 nrElements = getExporterCount ();
 	for (UT_uint32 k=0; k < nrElements; k++)
@@ -732,7 +734,7 @@ UT_Error IE_Exp::constructExporter(PD_Document * pDocument,
 	// assume it is our format and try to write it.
 	// if that fails, just give up.
 	*ppie = new IE_Exp_AbiWord_1(pDocument);
-	if (pieft != nullptr)
+	if (pieft != NULL) 
 		*pieft = IE_Exp::fileTypeForSuffix(".abw");
  	return ((*ppie) ? UT_OK : UT_IE_NOMEMORY);
 }
@@ -763,11 +765,11 @@ UT_Error IE_Exp::writeBufferToFile(const UT_ConstByteBufPtr & pByteBuf,
                                    const std::string & imagedir,
                                    const std::string & filename)
 {
-    UT_go_directory_create(imagedir.c_str(), nullptr);
+    UT_go_directory_create(imagedir.c_str(), NULL);
 
     std::string path = imagedir + "/" + filename;
 
-    GError * error = nullptr;
+    GError * error = NULL;
 	GsfOutput * out = UT_go_file_create (path.c_str (), &error);
 	if (out)
 	{

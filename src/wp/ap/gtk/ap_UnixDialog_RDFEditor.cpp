@@ -175,19 +175,19 @@ AP_UnixDialog_RDFEditor::static_constructor( XAP_DialogFactory *pFactory,
 AP_UnixDialog_RDFEditor::AP_UnixDialog_RDFEditor( XAP_DialogFactory *pDlgFactory,
                                                   XAP_Dialog_Id 	 id )
 	: AP_Dialog_RDFEditor   (pDlgFactory, id)
-    , m_wDialog(nullptr)
-    , m_btClose(nullptr)
-    , m_btShowAll(nullptr)
-    , m_resultsView(nullptr)
-    , m_resultsModel(nullptr)
-    , m_status(nullptr)
-    , m_anewtriple(nullptr)
-    , m_acopytriple(nullptr)
-    , m_adeletetriple(nullptr)
-    , m_aimportrdfxml(nullptr)
-    , m_aexportrdfxml(nullptr)
-    , m_selectedxmlid(nullptr)
-    , m_restrictxmlidhidew(nullptr)
+    , m_wDialog 	   (0)
+    , m_btClose 	   (0)
+    , m_btShowAll      (0)
+    , m_resultsView    (0)
+	, m_resultsModel   (0)
+    , m_status         (0)
+    , m_anewtriple     (0)
+    , m_acopytriple    (0)
+    , m_adeletetriple  (0)
+    , m_aimportrdfxml  (0)
+    , m_aexportrdfxml  (0)
+    , m_selectedxmlid  (0)
+    , m_restrictxmlidhidew (0)
 {
 }
 
@@ -216,7 +216,7 @@ AP_UnixDialog_RDFEditor::addStatement( const PD_RDFStatement& stc )
     
     GtkTreeStore* m = m_resultsModel;
     GtkTreeIter iter;
-    gtk_tree_store_append(m, &iter, nullptr);
+    gtk_tree_store_append( m, &iter, 0 );
     gtk_tree_store_set( m, &iter,
                         C_SUBJ_COLUMN, st.getSubject().  toString().c_str(),
                         C_PRED_COLUMN, st.getPredicate().toString().c_str(),
@@ -421,7 +421,7 @@ AP_UnixDialog_RDFEditor::onCellEdited( GtkCellRendererText * /*cell*/,
 static std::string tostr( GsfInput* gsf )
 {
     gsf_off_t sz = gsf_input_size( gsf );
-    guint8 const * d = gsf_input_read(gsf, sz, nullptr);
+    guint8 const * d =  gsf_input_read( gsf, sz, 0 );
     std::string ret = std::string((char*)d);
     return ret;
 }
@@ -438,7 +438,7 @@ AP_UnixDialog_RDFEditor::onImportRDFXML()
     if( afp.run( getActiveFrame() ) )
     {
         xxx_UT_DEBUGMSG(("onImportRDFXML() path: %s", afp.getPath().utf8_str()));
-        GError* err = nullptr;
+        GError* err = 0;
         GsfInput* gsf = UT_go_file_open( afp.getPath().c_str(), &err );
         std::string rdfxml = tostr( gsf );
         g_object_unref (G_OBJECT (gsf));
@@ -468,7 +468,7 @@ AP_UnixDialog_RDFEditor::onExportRDFXML()
     {
         xxx_UT_DEBUGMSG(("onExportRDFXML() path: %s\n", afp.getPath().utf8_str()));
         std::string rdfxml = toRDFXML( getModel() );
-        GError* err = nullptr;
+        GError* err = 0;
         GsfOutput* gsf = UT_go_file_create( afp.getPath().c_str(), &err );
         gsf_output_write( gsf, rdfxml.size(), (const guint8*)rdfxml.data() );
         gsf_output_close( gsf );
@@ -498,7 +498,7 @@ AP_UnixDialog_RDFEditor::_constructWindow (XAP_Frame * /*pFrame*/)
 	std::string text;
 
 	// load the dialog from the UI file
-	GtkBuilder* builder = newDialogBuilderFromResource("ap_UnixDialog_RDFEditor.ui");
+	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_RDFEditor.ui");
 
 	m_wDialog = GTK_WIDGET(gtk_builder_get_object(builder, "ap_UnixDialog_RDFEditor"));
 	m_btClose = GTK_WIDGET(gtk_builder_get_object(builder, "btClose"));
@@ -512,15 +512,15 @@ AP_UnixDialog_RDFEditor::_constructWindow (XAP_Frame * /*pFrame*/)
     GSimpleActionGroup* action_group = g_simple_action_group_new();
     gtk_widget_insert_action_group(m_wDialog, "rdf", G_ACTION_GROUP(action_group));
     g_object_unref(action_group);
-    m_anewtriple = g_simple_action_new("newtriple", nullptr);
+    m_anewtriple = g_simple_action_new("newtriple", NULL);
     g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(m_anewtriple));
-    m_acopytriple = g_simple_action_new("copytriple", nullptr);
+    m_acopytriple = g_simple_action_new("copytriple", NULL);
     g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(m_acopytriple));
-    m_adeletetriple = g_simple_action_new("deletetriple", nullptr);
+    m_adeletetriple = g_simple_action_new("deletetriple", NULL);
     g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(m_adeletetriple));
-    m_aimportrdfxml = g_simple_action_new("importrdfxml", nullptr);
+    m_aimportrdfxml = g_simple_action_new("importrdfxml", NULL);
     g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(m_aimportrdfxml));
-    m_aexportrdfxml = g_simple_action_new("exportrdfxml", nullptr);
+    m_aexportrdfxml = g_simple_action_new("exportrdfxml", NULL);
     g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(m_aexportrdfxml));
 
     // localization
@@ -539,43 +539,43 @@ AP_UnixDialog_RDFEditor::_constructWindow (XAP_Frame * /*pFrame*/)
     m_resultsModel = m;
 
     int colid = 0;
-    GtkCellRenderer* ren = nullptr;
+    GtkCellRenderer* ren = 0;
 
     colid = C_SUBJ_COLUMN;
     ren = gtk_cell_renderer_text_new ();
-    g_object_set(ren, "editable", 1, 0, nullptr);
+    g_object_set(ren, "editable", 1, 0, NULL);
     g_object_set_data( G_OBJECT(ren), GOBJ_COL_NUM,  GINT_TO_POINTER(colid));
     g_signal_connect_data( G_OBJECT( ren ), "edited",
                            G_CALLBACK (cell_edited_cb),
-                           (gpointer)this, nullptr, GConnectFlags(0));
+                           (gpointer)this, 0, GConnectFlags(0));
     pSS->getValueUTF8(AP_STRING_ID_DLG_RDF_Query_Column_Subject, text);
-    w_cols[ colid ] = gtk_tree_view_column_new_with_attributes( text.c_str(), ren, "text", colid, nullptr);
+    w_cols[ colid ] = gtk_tree_view_column_new_with_attributes( text.c_str(), ren, "text", colid, NULL);
     gtk_tree_view_append_column( GTK_TREE_VIEW( m_resultsView ), w_cols[ colid ] );
     gtk_tree_view_column_set_sort_column_id( w_cols[ colid ], colid );
     gtk_tree_view_column_set_resizable ( w_cols[ colid ], true );
     
     colid = C_PRED_COLUMN;
     ren = gtk_cell_renderer_text_new ();
-    g_object_set(ren, "editable", 1, 0, nullptr );
+    g_object_set(ren, "editable", 1, 0, NULL );
     g_object_set_data( G_OBJECT(ren), GOBJ_COL_NUM, GINT_TO_POINTER(colid) );
     g_signal_connect_data( G_OBJECT( ren ), "edited",
                            G_CALLBACK (cell_edited_cb),
-                           (gpointer)this, nullptr, GConnectFlags(0));
+                           (gpointer)this, 0, GConnectFlags(0));
     pSS->getValueUTF8(AP_STRING_ID_DLG_RDF_Query_Column_Predicate, text);
-    w_cols[ colid ] = gtk_tree_view_column_new_with_attributes( text.c_str(), ren, "text", colid, nullptr);
+    w_cols[ colid ] = gtk_tree_view_column_new_with_attributes( text.c_str(), ren, "text", colid, NULL);
     gtk_tree_view_append_column( GTK_TREE_VIEW( m_resultsView ), w_cols[ colid ] );
     gtk_tree_view_column_set_sort_column_id( w_cols[ colid ], colid );
     gtk_tree_view_column_set_resizable ( w_cols[ colid ], true );
 
     colid = C_OBJ_COLUMN;
     ren = gtk_cell_renderer_text_new ();
-    g_object_set(ren, "editable", 1, 0, nullptr );
+    g_object_set(ren, "editable", 1, 0, NULL );
     g_object_set_data( G_OBJECT(ren), GOBJ_COL_NUM, GINT_TO_POINTER(colid) );
     g_signal_connect_data( G_OBJECT( ren ), "edited",
                            G_CALLBACK (cell_edited_cb),
-                           (gpointer)this, nullptr, GConnectFlags(0));
+                           (gpointer)this, 0, GConnectFlags(0));
     pSS->getValueUTF8(AP_STRING_ID_DLG_RDF_Query_Column_Object, text);
-    w_cols[ colid ] = gtk_tree_view_column_new_with_attributes( text.c_str(), ren, "text", colid, nullptr);
+    w_cols[ colid ] = gtk_tree_view_column_new_with_attributes( text.c_str(), ren, "text", colid, NULL);
     gtk_tree_view_append_column( GTK_TREE_VIEW( m_resultsView ), w_cols[ colid ] );
     gtk_tree_view_column_set_sort_column_id( w_cols[ colid ], colid );
     gtk_tree_view_column_set_resizable ( w_cols[ colid ], true );
@@ -694,9 +694,15 @@ AP_UnixDialog_RDFEditor::runModeless (XAP_Frame * pFrame)
 	_constructWindow (pFrame);
 	UT_ASSERT (m_wDialog);
 	_updateWindow ();
+    GtkWidget* parent = pFrame ?
+        static_cast<XAP_UnixFrameImpl*>(pFrame->getFrameImpl())->getTopLevelWindow() :
+        NULL;
+    if (parent) {
+        gtk_window_set_transient_for(GTK_WINDOW(m_wDialog), GTK_WINDOW(parent));
+    }
 
 	abiSetupModelessDialog (GTK_DIALOG (m_wDialog), pFrame, this, GTK_RESPONSE_CLOSE);
-	showAllRDF();
+    showAllRDF();
 	gtk_widget_show_all (m_wDialog);
 	gtk_window_present (GTK_WINDOW (m_wDialog));
 }
@@ -724,8 +730,8 @@ AP_UnixDialog_RDFEditor::destroy ()
 	UT_DEBUGMSG (("MIQ: AP_UnixDialog_RDFEditor::destroy ()\n"));
 	modeless_cleanup ();
 	if (m_wDialog) {
-		gtk_widget_destroy(m_wDialog); // TOPLEVEL
-		m_wDialog = nullptr;
+		gtk_widget_destroy (m_wDialog);
+		m_wDialog = NULL;
 	}
 }
 

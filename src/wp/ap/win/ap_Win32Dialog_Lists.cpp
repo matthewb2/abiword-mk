@@ -63,11 +63,11 @@ AP_Win32Dialog_Lists::AP_Win32Dialog_Lists(	XAP_DialogFactory* pDlgFactory,
 :	AP_Dialog_Lists(pDlgFactory,id),
 	m_bDestroy_says_stopupdating(false),
 	m_bAutoUpdate_happening_now(false),
-	m_pAutoUpdateLists(nullptr),
+	m_pAutoUpdateLists(0),
 	_win32Dialog(this),
-	m_pPreviewWidget(nullptr),
+	m_pPreviewWidget(0),
 	m_bEnableCustomControls(true),
-	m_hThisDlg(nullptr)
+	m_hThisDlg(0)
 {
 }
 
@@ -111,8 +111,7 @@ void AP_Win32Dialog_Lists::runModeless(XAP_Frame * pFrame)
 
 BOOL AP_Win32Dialog_Lists::_onInitDialog(HWND hWnd, WPARAM /*wParam*/, LPARAM /*lParam*/)
 {
-	delete m_pPreviewWidget;
-	m_pPreviewWidget = nullptr;
+	delete m_pPreviewWidget; m_pPreviewWidget = NULL;
 
 	register unsigned int i;
 
@@ -225,7 +224,7 @@ void AP_Win32Dialog_Lists::setFoldLevelInGUI(void)
 	_setFoldingComboCurSel(getCurrentFold());
 }
 
-bool AP_Win32Dialog_Lists::isPageLists(void) const
+bool AP_Win32Dialog_Lists::isPageLists(void)
 {
 	if(isModal())
 	{
@@ -389,7 +388,7 @@ void AP_Win32Dialog_Lists::destroy(void)
 	{
 		setAnswer(AP_Dialog_Lists::a_QUIT);
 		EndDialog(m_hThisDlg, 0);
-		m_hThisDlg = nullptr;
+		m_hThisDlg = 0;
 		return;
 	}
 
@@ -405,7 +404,7 @@ void AP_Win32Dialog_Lists::destroy(void)
 		_win32Dialog.destroyWindow();
 	}
 
-	m_hThisDlg = nullptr;
+	m_hThisDlg = 0;
 }
 
 void AP_Win32Dialog_Lists::activate(void)
@@ -530,7 +529,7 @@ void AP_Win32Dialog_Lists::_onApply()
 	{
 		setAnswer(AP_Dialog_Lists::a_OK);
 		EndDialog(m_hThisDlg, 0);
-		m_hThisDlg = nullptr;
+		m_hThisDlg = 0;
 		return;
 	}
 

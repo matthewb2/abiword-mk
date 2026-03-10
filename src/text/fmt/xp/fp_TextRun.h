@@ -45,27 +45,27 @@ public:
 	fp_TextRun(fl_BlockLayout* pBL, UT_uint32 iOffsetFirst, UT_uint32 iLen, bool bLookupProperties=true);
 	virtual ~fp_TextRun();
 
-	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool &isTOC) override;
-	virtual void			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection) override;
-	virtual bool			canBreakAfter(void) const override;
-	virtual bool			canBreakBefore(void) const override;
-	virtual bool			alwaysFits(void) const override;
-	virtual bool findMaxLeftFitSplitPoint(UT_sint32 iMaxLeftWidth, fp_RunSplitInfo& si, bool bForce=false) override;
-	virtual UT_sint32 findTrailingSpaceDistance(void) const override;
+	virtual void			mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool &isTOC);
+	virtual void			findPointCoords(UT_uint32 iOffset, UT_sint32& x, UT_sint32& y, UT_sint32& x2, UT_sint32& y2, UT_sint32& height, bool& bDirection);
+	virtual bool			canBreakAfter(void) const;
+	virtual bool			canBreakBefore(void) const;
+	virtual bool			alwaysFits(void) const;
+	virtual bool			findMaxLeftFitSplitPoint(UT_sint32 iMaxLeftWidth, fp_RunSplitInfo& si, bool bForce=false);
+	virtual UT_sint32		findTrailingSpaceDistance(void) const;
 #ifdef ENABLE_SPELL
 	void				drawSquiggle(UT_uint32, UT_uint32,FL_SQUIGGLE_TYPE iSquiggle);
 #endif
 	bool				split(UT_uint32 iSplitOffset,UT_sint32 iLenSkip=0);
 #if DEBUG
-	virtual void            printText(void) override;
+	virtual void            printText(void);
 #endif
 	void                    appendTextToBuf(UT_GrowBuf & buf) const;
-	virtual bool			hasLayoutProperties(void) const override;
+	virtual bool			hasLayoutProperties(void) const;
 	//virtual void			fetchCharWidths(fl_CharWidths * pgbCharWidths);
-	bool canMergeWithNext(void) const;
+	bool					canMergeWithNext(void);
 	void					mergeWithNext(void);
-	virtual bool findFirstNonBlankSplitPoint(fp_RunSplitInfo & splitInfo) override;
-	bool isOneItem(const fp_Run* pNext) const;
+	bool                    findFirstNonBlankSplitPoint(fp_RunSplitInfo & splitInfo);
+	bool                    isOneItem(fp_Run * pNext);
 	enum
 	{
 		Calculate_full_width = -1
@@ -80,9 +80,9 @@ public:
 	UT_sint32				findCharacter(UT_uint32 startPosition, UT_UCSChar Character) const;
 	bool					isFirstCharacter(UT_UCSChar Character) const;
 	bool					isLastCharacter(UT_UCSChar Character) const;
-	virtual bool	doesContainNonBlankData(void) const override;
-	virtual bool isSuperscript(void) const override;
-	virtual bool isSubscript(void) const override;
+	virtual bool			doesContainNonBlankData(void) const;
+	inline virtual bool isSuperscript(void) const;
+	inline virtual bool isSubscript(void) const;
 	const GR_Font*				getFont(void) const
 		{ return _getFont(); }
 	const gchar *			getLanguage() const;
@@ -95,7 +95,7 @@ public:
 
 	// the usability of the following function is *very* limited, see the note in cpp file
 	void					setDirOverride(UT_BidiCharType dir);
-	virtual UT_BidiCharType getDirection() const override;
+	virtual UT_BidiCharType getDirection() const;
 
 	UT_BidiCharType 		getDirOverride() const { return m_iDirOverride; }
 
@@ -115,10 +115,10 @@ public:
 	const GR_Item *           getItem() const {return m_pItem;}
 
 
-	virtual void        updateOnDelete(UT_uint32 offset, UT_uint32 iLen) override;
+	virtual void        updateOnDelete(UT_uint32 offset, UT_uint32 iLen);
 
-	virtual UT_uint32 adjustCaretPosition(UT_uint32 iDocumentPosition, bool bForward) override;
-	virtual void adjustDeletePosition(UT_uint32 &pos1, UT_uint32 &count) override;
+	virtual UT_uint32   adjustCaretPosition(UT_uint32 iDocumentPosition, bool bForward);
+	virtual void        adjustDeletePosition(UT_uint32 &pos1, UT_uint32 &count);
 
 	static UT_uint32	s_iClassInstanceCount;
 	UT_BidiCharType 	m_iDirOverride;
@@ -137,7 +137,7 @@ private:
 	virtual void        _lookupProperties(const PP_AttrProp * pSpanAP,
 										   const PP_AttrProp * pBlockAP,
 										   const PP_AttrProp * pSectionAP,
-										  GR_Graphics * pG) override;
+										  GR_Graphics * pG);
 
 #ifdef FMT_TEST
 public:
@@ -145,10 +145,10 @@ public:
 #endif
 
 protected:
-	virtual bool			_recalcWidth(void) override;
-	virtual bool			_canContainPoint(void) const override;
-	virtual void			_draw(dg_DrawArgs*) override;
-	virtual void			_clearScreen(bool bFullLineHeightRect = true) override;
+	virtual bool			_recalcWidth(void);
+	virtual bool			_canContainPoint(void) const;
+	virtual void			_draw(dg_DrawArgs*);
+	virtual void			_clearScreen(bool bFullLineHeightRect = true);
 
 	void					_drawInvisibleSpaces(UT_sint32, UT_sint32);
 	void					_drawInvisibles(UT_sint32, UT_sint32);

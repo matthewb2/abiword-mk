@@ -43,28 +43,28 @@ public:
 	fp_TOCContainer(fl_SectionLayout* pSectionLayout);
 	fp_TOCContainer(fl_SectionLayout* pSectionLayout,fp_TOCContainer * pMaster);
 	virtual ~fp_TOCContainer();
-	virtual void mapXYToPosition(UT_sint32 x, UT_sint32 y,
+    virtual void        mapXYToPosition(UT_sint32 x, UT_sint32 y,
 										PT_DocPosition& pos,
-										bool& bBOL, bool& bEOL, bool &isTOC) override;
+										bool& bBOL, bool& bEOL, bool &isTOC);
 	UT_sint32           getValue(void);
 	void				layout(void);
 	void		        forceClearScreen(void);
 	UT_sint32		getTotalTOCHeight(void) const;
-	virtual UT_sint32   getHeight(void) const override;
-	virtual void		clearScreen(void) override;
-	virtual void		draw(dg_DrawArgs*) override;
-	virtual void		draw(GR_Graphics*) override;
-	virtual void        setContainer(fp_Container * pContainer) override;
-	virtual void        setY(UT_sint32 iY) override;
-	virtual fp_Container * getNextContainerInSection(void) const override;
-	virtual fp_Container * getPrevContainerInSection(void) const override;
+	virtual UT_sint32   getHeight(void) const;
+	virtual void		clearScreen(void);
+	virtual void		draw(dg_DrawArgs*);
+	virtual void		draw(GR_Graphics*);
+	virtual void        setContainer(fp_Container * pContainer);
+	virtual void        setY(UT_sint32 iY);
+	virtual fp_Container * getNextContainerInSection(void) const;
+	virtual fp_Container * getPrevContainerInSection(void) const;
 	fp_Column *         getBrokenColumn(void);
-	virtual bool        isVBreakable(void) override;
-	virtual bool        isHBreakable(void) override {return false;}
-	virtual UT_sint32   wantVBreakAt(UT_sint32) override;
-	virtual UT_sint32   wantHBreakAt(UT_sint32) override {return 0;}
-	virtual fp_ContainerObject * VBreakAt(UT_sint32) override;
-	virtual fp_ContainerObject * HBreakAt(UT_sint32) override {return nullptr;}
+	virtual bool        isVBreakable(void);
+	virtual bool        isHBreakable(void) {return false;}
+	virtual UT_sint32   wantVBreakAt(UT_sint32);
+	virtual UT_sint32   wantHBreakAt(UT_sint32) {return 0;}
+	virtual fp_ContainerObject * VBreakAt(UT_sint32);
+	virtual fp_ContainerObject * HBreakAt(UT_sint32) {return NULL;}
 
 	fl_DocSectionLayout * getDocSectionLayout(void);
 	void                  setSelected(bool bIsSelected);
@@ -99,12 +99,12 @@ public:
 	void                setBrokenBot(UT_sint32 iBot)
 		{ m_iBrokenBottom = iBot;}
 	UT_sint32           getBrokenNumber(void);
-	virtual void setLastWantedVBreak(UT_sint32 iBreakAt) override
+	virtual void setLastWantedVBreak(UT_sint32 iBreakAt)
 		{m_iLastWantedVBreak = iBreakAt;}
-	virtual UT_sint32 getLastWantedVBreak(void) const override
+	virtual UT_sint32 getLastWantedVBreak(void) const
 		{return m_iLastWantedVBreak;}
-	virtual fp_Container * getFirstBrokenContainer() const override;
-	virtual void    deleteBrokenAfter(bool bClearFirst) override;
+	virtual fp_Container * getFirstBrokenContainer() const;
+	virtual void    deleteBrokenAfter(bool bClearFirst);
 
 private:
 //

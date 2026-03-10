@@ -72,8 +72,8 @@ g_i18n_get_language_list (const gchar *category_name);
 
 #include <glib.h>
 
-static GHashTable *alias_table = nullptr;
-static GHashTable *category_table = nullptr;
+static GHashTable *alias_table = NULL;
+static GHashTable *category_table= NULL;
 bool prepped_table = 0;
 
 /*read an alias file for the locales*/
@@ -98,7 +98,7 @@ read_aliases (const char *file)
       p = strtok (buf,"\t ");
       if (!p)
 	continue;
-      p = strtok (nullptr,"\t ");
+      p = strtok (NULL,"\t ");
       if(!p)
 	continue;
       if (!g_hash_table_lookup (alias_table, buf))
@@ -225,7 +225,7 @@ explode_locale (const gchar *locale,
 static GList *
 compute_locale_variants (const gchar *locale)
 {
-  GList *retval = nullptr;
+  GList *retval = NULL;
 
   gchar *language;
   gchar *territory;
@@ -235,7 +235,7 @@ compute_locale_variants (const gchar *locale)
   guint mask;
   guint i;
 
-  UT_return_val_if_fail (locale != nullptr, nullptr);
+  UT_return_val_if_fail (locale != NULL, NULL);
 
   mask = explode_locale (locale, &language, &territory, &codeset, &modifier);
 
@@ -249,7 +249,7 @@ compute_locale_variants (const gchar *locale)
 				 (i & COMPONENT_TERRITORY) ? territory : "",
 				 (i & COMPONENT_CODESET) ? codeset : "",
 				 (i & COMPONENT_MODIFIER) ? modifier : "",
-				 nullptr);
+				 NULL);
 	retval = g_list_prepend (retval, val);
       }
 
@@ -274,13 +274,13 @@ guess_category_value (const gchar *categoryname)
 	
 	/* Let's check passed category.  */
 	retval = g_getenv (categoryname);
-	if (retval != nullptr && retval[0] != '\0')
+	if (retval != NULL && retval[0] != '\0')
 		return retval;
 	
 	/* The highest priority value after passed category is the `LANGUAGE' 
 	environment variable.  This is a GNU extension.  */
 	retval = g_getenv ("LANGUAGE");
-	if (retval != nullptr && retval[0] != '\0')
+	if (retval != NULL && retval[0] != '\0')
 		return retval;
 
 	/* `LANGUAGE' is not set.  So we have to proceed with the POSIX
@@ -289,16 +289,16 @@ guess_category_value (const gchar *categoryname)
 
 	/* Setting of LC_ALL overwrites all other.  */
 	retval = g_getenv ("LC_ALL");
-	if (retval != nullptr && retval[0] != '\0')
+	if (retval != NULL && retval[0] != '\0')
 		return retval;
 
 
 	/* Last possibility is the LANG environment variable.  */
 	retval = g_getenv ("LANG");
-	if (retval != nullptr && retval[0] != '\0')
+	if (retval != NULL && retval[0] != '\0')
 		return retval;
 
-	return nullptr;
+	return NULL;
 }
 
 /**
@@ -309,7 +309,7 @@ guess_category_value (const gchar *categoryname)
  * standard environment variables to find the list, which is sorted
  * in order from most desirable to least desirable.  The `C' locale
  * is appended to the list if it does not already appear (other routines depend on this behaviour).
- * If @category_name is %nullptr, then LC_ALL is assumed.
+ * If @category_name is %NULL, then LC_ALL is assumed.
  * 
  * Return value: the list of languages, this list should not be freed as it is owned by gnome-i18n
  **/
@@ -332,20 +332,20 @@ g_i18n_get_language_list (const gchar *category_name)
 		xxx_UT_DEBUGMSG(("recreating hash table\n"));
 		g_hash_table_destroy (category_table);
         category_table= g_hash_table_new (g_str_hash, g_str_equal);
-        list = nullptr;
-
+        list= NULL;
+		
 #endif
     }
 	else
     {
 		category_table= g_hash_table_new (g_str_hash, g_str_equal);
-		list = nullptr;
+		list= NULL;
     }
 
 	if (!list)
     {
 		gint c_locale_defined= FALSE;
-
+	  
 		const gchar *category_value;
 		gchar *category_memory, *orig_category_memory;
 
@@ -387,7 +387,7 @@ g_i18n_get_language_list (const gchar *category_name)
 		g_hash_table_insert (category_table, reinterpret_cast<gpointer>(const_cast<gchar *>(category_name)), list);
     }
 
-   g_hash_table_foreach(alias_table, free_entry, nullptr);
+   g_hash_table_foreach(alias_table, free_entry, NULL);
    g_hash_table_destroy(alias_table);  
    prepped_table = 0;
 
@@ -398,7 +398,7 @@ g_i18n_get_language_list (const gchar *category_name)
 
 XAP_EncodingManager *XAP_EncodingManager::get_instance()
 {
-	if (_instance == nullptr)
+	if (_instance == 0)
 	{
 		UT_DEBUGMSG(("Building XAP_EncodingManager\n"));
 		_instance = new XAP_UnixEncodingManager();
@@ -481,10 +481,10 @@ void  XAP_UnixEncodingManager::initialize()
 	}
 	else
 	{
-		char * lang = nullptr;
-		char * terr = nullptr;
-		char * cs   = nullptr;
-		char * mod  = nullptr;
+		char * lang = NULL;
+		char * terr = NULL;
+		char * cs   = NULL;
+		char * mod  = NULL;
 
 		int mask = explode_locale (locname,&lang,&terr,&cs,&mod);
 

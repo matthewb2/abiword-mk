@@ -30,7 +30,7 @@
 
 AP_Win32Preview_Annotation::AP_Win32Preview_Annotation(XAP_DialogFactory * pDlgFactory,XAP_Dialog_Id id)
 	: AP_Preview_Annotation(pDlgFactory,id),
-	m_hToolTip(nullptr)
+	m_hToolTip(NULL)
 {
 	UT_DEBUGMSG(("AP_Win32Preview_Annotation: Preview annotation for Unix platform\n"));
 }
@@ -66,11 +66,11 @@ void AP_Win32Preview_Annotation::_createToolTip(HWND hwndParent)
 
 	// Create a tooltip.
     m_hToolTip = CreateWindowExW(WS_EX_TOPMOST,
-        TOOLTIPS_CLASSW, nullptr,
+        TOOLTIPS_CLASSW, NULL,
         WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP | TTS_BALLOON,		
         CW_USEDEFAULT, CW_USEDEFAULT,
         CW_USEDEFAULT, CW_USEDEFAULT,
-        hwndParent, nullptr, hinst, nullptr);
+        hwndParent, NULL, hinst, NULL);
 
     SetWindowPos(m_hToolTip, HWND_TOPMOST,
         0, 0, 0, 0,
@@ -155,6 +155,6 @@ void AP_Win32Preview_Annotation::destroy(void)
 	if (m_hToolTip)
 	{
 		DestroyWindow(m_hToolTip);
-		m_hToolTip = nullptr;
+		m_hToolTip = NULL;
 	}
 }

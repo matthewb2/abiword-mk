@@ -31,14 +31,14 @@ public:
   IE_Exp_PS_Sniffer ();
   virtual ~IE_Exp_PS_Sniffer ();
 
-  virtual UT_Confidence_t supportsMIME (const char * szMIME) override;
+  UT_Confidence_t supportsMIME (const char * szMIME);
 
-  virtual bool recognizeSuffix (const char * szSuffix) override;
+  virtual bool recognizeSuffix (const char * szSuffix);
   virtual bool getDlgLabels (const char ** szDesc,
 			     const char ** szSuffixList,
-			     IEFileType * ft) override;
+			     IEFileType * ft);
   virtual UT_Error constructExporter (PD_Document * pDocument,
-				      IE_Exp ** ppie) override;
+				      IE_Exp ** ppie);
 };
 
 class ABI_EXPORT IE_Exp_SVG_Sniffer : public IE_ExpSniffer
@@ -49,14 +49,14 @@ public:
   IE_Exp_SVG_Sniffer ();
   virtual ~IE_Exp_SVG_Sniffer ();
 
-  virtual UT_Confidence_t supportsMIME (const char * szMIME) override;
+  UT_Confidence_t supportsMIME (const char * szMIME);
 
-  virtual bool recognizeSuffix (const char * szSuffix) override;
+  virtual bool recognizeSuffix (const char * szSuffix);
   virtual bool getDlgLabels (const char ** szDesc,
 			     const char ** szSuffixList,
-			     IEFileType * ft) override;
+			     IEFileType * ft);
   virtual UT_Error constructExporter (PD_Document * pDocument,
-				      IE_Exp ** ppie) override;
+				      IE_Exp ** ppie);
 };
 
 class ABI_EXPORT IE_Exp_PDF_Sniffer : public IE_ExpSniffer
@@ -67,14 +67,14 @@ public:
   IE_Exp_PDF_Sniffer ();
   virtual ~IE_Exp_PDF_Sniffer ();
 
-  virtual UT_Confidence_t supportsMIME (const char * szMIME) override;
+  UT_Confidence_t supportsMIME (const char * szMIME);
 
-  virtual bool recognizeSuffix (const char * szSuffix) override;
+  virtual bool recognizeSuffix (const char * szSuffix);
   virtual bool getDlgLabels (const char ** szDesc,
 			     const char ** szSuffixList,
-			     IEFileType * ft) override;
+			     IEFileType * ft);
   virtual UT_Error constructExporter (PD_Document * pDocument,
-				      IE_Exp ** ppie) override;
+				      IE_Exp ** ppie);
 };
 
 #endif

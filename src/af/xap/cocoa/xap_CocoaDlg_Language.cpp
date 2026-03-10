@@ -93,9 +93,9 @@ void XAP_CocoaDialog_Language::runModal(XAP_Frame * /*pFrame*/)
 	if (![super initWithWindowNibName:@"xap_CocoaDlg_Language"]) {
 		return nil;
 	}
-	_xap = nullptr;
+	_xap = 0;
 
-	m_Selection = nil;
+	m_Selection = 0;
 	m_SelectionIndex = -1;
 
 	m_bApplyToDocument = NO;
@@ -132,7 +132,7 @@ if (m_Selection)
 	}
 	m_SelectionIndex = -1;
 
-	_xap = nullptr;
+	_xap = 0;
 }
 
 - (void)windowDidLoad
@@ -201,7 +201,7 @@ if (m_Selection)
 	if (m_Selection)
 	{
 		[m_Selection release];
-		m_Selection = nil;
+		m_Selection = 0;
 	}
 	m_SelectionIndex = -1;
 
@@ -211,7 +211,7 @@ if (m_Selection)
 - (IBAction)aOK:(id)sender
 {
 	UT_UNUSED(sender);
-	m_bApplyToDocument = ([_documentDefaultBtn state] == NSControlStateValueOn) ? YES : NO;
+	m_bApplyToDocument = ([_documentDefaultBtn state] == NSOnState) ? YES : NO;
 
 	[NSApp stopModal];
 }

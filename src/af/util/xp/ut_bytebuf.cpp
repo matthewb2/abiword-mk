@@ -27,12 +27,13 @@
 #include "ut_bytebuf.h"
 
 #include "ut_go_file.h"
+#include <gsf/gsf-output.h>
 
 #define DEFAULT_CHUNK		1024
 #define MIN_CHUNK			256
 
 UT_ByteBuf::UT_ByteBuf(UT_uint32 iChunk)
-  : m_pBuf(nullptr), m_iSize(0), m_iSpace(0)
+  : m_pBuf(0), m_iSize(0), m_iSpace(0)
 {
 	if (iChunk < MIN_CHUNK)
 		iChunk = DEFAULT_CHUNK;
@@ -153,7 +154,7 @@ const UT_Byte * UT_ByteBuf::getPointer(UT_uint32 position) const
 	// return a read-only pointer to the buffer
 	
 	if (!m_pBuf || !m_iSize)
-		return nullptr;
+		return 0;
 	UT_ASSERT(position < m_iSize);
 	return m_pBuf+position;
 }
@@ -193,7 +194,7 @@ void UT_ByteBuf::truncate(UT_uint32 position)
 
 bool UT_ByteBuf::insertFromURI(UT_uint32 iPosition, const char *szURI)
 {
-  GsfInput *fp = UT_go_file_open(szURI, nullptr);
+  GsfInput *fp = UT_go_file_open(szURI, NULL);
   if(!fp)
     return false;
 
@@ -205,7 +206,7 @@ bool UT_ByteBuf::insertFromURI(UT_uint32 iPosition, const char *szURI)
 
 bool UT_ByteBuf::insertFromInput(UT_uint32 iPosition, GsfInput * fp)
 {
-  UT_return_val_if_fail (fp != nullptr, false);
+  UT_return_val_if_fail (fp != NULL, false);
 
   UT_uint32 iLengthOfFile = gsf_input_size(fp);
 
@@ -294,7 +295,7 @@ bool UT_ByteBuf::writeToURI(const char* pszURI) const
 {
 	UT_ASSERT(pszURI && pszURI[0]);
 	
-	GsfOutput *fp = UT_go_file_create(pszURI, nullptr);
+	GsfOutput *fp = UT_go_file_create(pszURI, NULL);
 	if (!fp)
 	  return false;
 

@@ -64,15 +64,15 @@ public:
 	IE_Imp_XHTML_Sniffer();
 	virtual ~IE_Imp_XHTML_Sniffer() {}
 
-	virtual const IE_SuffixConfidence * getSuffixConfidence() override;
-	virtual const IE_MimeConfidence * getMimeConfidence() override;
+	virtual const IE_SuffixConfidence * getSuffixConfidence ();
+	virtual const IE_MimeConfidence * getMimeConfidence ();
 	virtual UT_Confidence_t recognizeContents (const char * szBuf,
-									UT_uint32 iNumbytes) override;
+									UT_uint32 iNumbytes);
 	virtual bool getDlgLabels (const char ** szDesc,
 							   const char ** szSuffixList,
-							   IEFileType * ft) override;
+							   IEFileType * ft);
 	virtual UT_Error constructImporter (PD_Document * pDocument,
-										IE_Imp ** ppie) override;
+										IE_Imp ** ppie);
 
 };
 
@@ -83,25 +83,25 @@ public:
 
 	virtual ~IE_Imp_XHTML ();
 
-	virtual void startElement (const gchar * name, const gchar ** atts) override;
-	virtual void endElement (const gchar * name) override;
+	void					startElement (const gchar * name, const gchar ** atts);
+	void					endElement (const gchar * name);
 
-	virtual void charData (const gchar * buffer, int length) override;
+	virtual void			charData (const gchar * buffer, int length);
 
-	virtual bool pasteFromBuffer(PD_DocumentRange * pDocRange,
+	virtual bool		pasteFromBuffer(PD_DocumentRange * pDocRange,
 										const unsigned char * pData,
 										UT_uint32 lenData,
-										const char * szEncoding = nullptr) override;
+										const char * szEncoding = 0);
 
-	virtual bool appendStrux(PTStruxType pts, const PP_PropertyVector & attributes) override;
-	virtual bool appendFmt(const PP_PropertyVector & vecAttributes) override;
-	virtual bool appendSpan(const UT_UCSChar * p, UT_uint32 length) override;
+	virtual bool  appendStrux(PTStruxType pts, const PP_PropertyVector & attributes);
+	virtual bool  appendFmt(const PP_PropertyVector & vecAttributes);
+	virtual bool  appendSpan(const UT_UCSChar * p, UT_uint32 length);
 	virtual bool  appendObject(PTObjectType pto, const PP_PropertyVector & attributes);
 
 
 protected:
-	virtual UT_Error _loadFile (GsfInput * input) override;
-	virtual FG_ConstGraphicPtr importImage(const gchar * szSrc);
+	virtual UT_Error        _loadFile (GsfInput * input);
+	virtual FG_ConstGraphicPtr	importImage(const gchar * szSrc);
 
 private:
 	FG_ConstGraphicPtr	importDataURLImage(const gchar * szData);

@@ -43,18 +43,16 @@ class TF_Test
     const char *descr, *idstr;
     MainFunc *main;
     TF_Test *next;
-    static TF_Test*& first();
-    static TF_Test*& last();
-    static int& fails();
-    static int& runs();
-    static time_t& start_time();
+    static TF_Test *first, *last;
+    static int fails, runs;
+    static time_t start_time;
 
     static void alarm_handler(int sig) ABI_NORETURN;
 public:
     TF_Test(const char *_suite, const char *_descr,
             const char *_idstr, MainFunc *_main);
     static int run(const char * const *prefixes, const char * suite);
-    static int run_all(const char * const *prefixes = nullptr);
+    static int run_all(const char * const *prefixes = NULL);
     static int run_suite(const char * suite);
     static void start(const char *file, int line, const char *condstr);
     static void check(bool cond);

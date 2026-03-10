@@ -56,7 +56,7 @@ class ABI_EXPORT AP_Dialog_Modeless : public XAP_Dialog_Modeless
     virtual void setStatus( const std::string& msg );
 
 public:
-	AP_Dialog_Modeless(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id, const char * helpUrl = nullptr );
+	AP_Dialog_Modeless(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id, const char * helpUrl = NULL );
 	virtual ~AP_Dialog_Modeless();
 
 	// these are kinda screwy now, but we never return anything but on
@@ -72,11 +72,11 @@ public:
 	// values.
   	bool						setView(FV_View * view);
   	FV_View * 					getView() const;
-	void setActiveFrame(XAP_Frame *pFrame) override;
+	void						setActiveFrame(XAP_Frame *pFrame);
 
-    virtual void maybeClosePopupPreviewBubbles() override;
+    virtual void                maybeClosePopupPreviewBubbles();
     void                        closePopupPreviewBubbles();
-    virtual void maybeReallowPopupPreviewBubbles() override;
+    virtual void                maybeReallowPopupPreviewBubbles();
 
 protected:
 	// These are the "current use" dialog data items,

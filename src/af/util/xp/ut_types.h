@@ -19,7 +19,8 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef UT_TYPES_H
+#define UT_TYPES_H
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -249,12 +250,12 @@ ABI_EXPORT void * UT_calloc ( UT_uint32 nmemb, UT_uint32 size );
 ** Some useful macros that we use throughout
 */
 
-#define FREEP(p)		do { if (p) { g_free((void *)p); (p)=nullptr; } } while (0)
-#define DELETEP(p)		do { if (p) { delete(p); (p)=nullptr; } } while (0)
-#define DELETEPV(pa)	do { if (pa) { delete [] (pa); (pa)=nullptr; } } while (0)
+#define FREEP(p)		do { if (p) { g_free((void *)p); (p)=NULL; } } while (0)
+#define DELETEP(p)		do { if (p) { delete(p); (p)=NULL; } } while (0)
+#define DELETEPV(pa)	do { if (pa) { delete [] (pa); (pa)=NULL; } } while (0)
 #define REPLACEP(p,q)		do { if (p) delete p; p = q; } while (0)
 #define REFP(p)			((p)->ref(), (p))
-#define UNREFP(p)		do { if (p) { (p)->unref(); (p)=nullptr; } } while (0)
+#define UNREFP(p)		do { if (p) { (p)->unref(); (p)=NULL; } } while (0)
 #define CLONEP(p,q)		do { FREEP(p); if (q && *q) p = g_strdup(q); } while (0)
 
 #define E2B(err)		((err) == UT_OK)
@@ -267,3 +268,5 @@ ABI_EXPORT void * UT_calloc ( UT_uint32 nmemb, UT_uint32 size );
 // 0xffffffff to avoid problems with bad 64-bit compilers
 
 #define PD_MAX_REVISION 0x0fffffff
+
+#endif /* UT_TYPES_H */

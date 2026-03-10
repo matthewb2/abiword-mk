@@ -1,5 +1,5 @@
 /* AbiSuite
- * Copyright (C) Jordi Mas i Hern√†ndez
+ * Copyright (C) Jordi Mas i Hern‡ndez
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,7 +29,7 @@
 
 BarbarismChecker::BarbarismChecker()
 {
-	m_pCurVector = nullptr;
+	m_pCurVector = NULL;
 }
 
 BarbarismChecker::~BarbarismChecker()
@@ -61,7 +61,7 @@ bool BarbarismChecker::load(const char * szLang)
 
 	m_sLang = szLang;
 
-	std::string fileName;
+	UT_String fileName;
 	std::string fullPath;
 
 	fileName  = szLang;
@@ -94,7 +94,7 @@ bool BarbarismChecker::checkWord(const UT_UCSChar * word32, size_t length)
 
 	// TODO: capitalization issues
 
-	bool bResult = (m_map.pick(stUTF8.utf8_str()) != nullptr);
+	bool bResult = (m_map.pick(stUTF8.utf8_str()) != NULL);
 
 	return bResult;
 }
@@ -103,7 +103,7 @@ bool BarbarismChecker::checkWord(const UT_UCSChar * word32, size_t length)
 	Looks for an exact case match of the suggestion
 	Returns true if word is a barbarism
 */
-bool BarbarismChecker::suggestExactWord(const UT_UCSChar *word32, size_t length, const std::unique_ptr<std::vector<UT_UCSChar*>>& pVecsugg)
+bool BarbarismChecker::suggestExactWord(const UT_UCSChar *word32, size_t length, UT_GenericVector<UT_UCSChar*>* pVecsugg)
 {
 	const char* pUTF8;
 	const UT_UCS4Char *pWord;
@@ -131,7 +131,7 @@ bool BarbarismChecker::suggestExactWord(const UT_UCSChar *word32, size_t length,
 		suggest32 = static_cast<UT_UCS4Char*>(g_try_malloc(nSize));
 		memcpy (suggest32, pWord, nSize);
 		
-		pVecsugg->insert(pVecsugg->begin(), suggest32);
+		pVecsugg->insertItemAt(suggest32, 0);
 	}
 
 	return true;
@@ -146,7 +146,7 @@ bool BarbarismChecker::suggestExactWord(const UT_UCSChar *word32, size_t length,
 
 	Returns true if word is a barbarism
 */
-bool BarbarismChecker::suggestWord(const UT_UCSChar *word32, size_t length, const std::unique_ptr<std::vector<UT_UCSChar*>>& pVecsugg)
+bool BarbarismChecker::suggestWord(const UT_UCSChar *word32, size_t length, UT_GenericVector<UT_UCSChar*>* pVecsugg)
 {
 	bool bIsBarbarism = false;
 	bool bIsLower = true;
@@ -204,13 +204,13 @@ bool BarbarismChecker::suggestWord(const UT_UCSChar *word32, size_t length, cons
 
 		if ((bIsBarbarism = suggestExactWord(wordsearch,  length, pVecsugg)))
 		{
-			const UT_uint32 nItems = pVecsugg->size();
+			const UT_uint32 nItems = pVecsugg->getItemCount();
 			UT_UCSChar* pSug;
 
 			/* Make the first letter of all the results uppercase */
 			for (UT_uint32 iItem = nItems; iItem; --iItem)
 			{
-				pSug = pVecsugg->at(iItem - 1);
+				pSug = pVecsugg->getNthItem(iItem - 1);
 				*pSug = UT_UCS4_toupper(*pSug);
 			}
 		}
@@ -237,13 +237,13 @@ void BarbarismChecker::startElement(const gchar *name, const gchar **atts)
 	{
 		
 		const char * word = UT_getAttribute ("word", atts);
-		if (word != nullptr)
+		if (word != NULL)
 		{
 			m_pCurVector = new UT_GenericVector<UT_UCS4Char *>();
 			m_map.insert (word, m_pCurVector);
 		}
 		else
-			m_pCurVector = nullptr;
+			m_pCurVector = NULL;
 			
 	}
 	else if (strcmp(name, "suggestion")==0)
@@ -251,7 +251,7 @@ void BarbarismChecker::startElement(const gchar *name, const gchar **atts)
 		if (m_pCurVector)
 		{
 			const char* pUTF8 = UT_getAttribute ("word", atts);
-			if (pUTF8 == nullptr)
+			if (pUTF8 == NULL)
 				return;
 
 			size_t			length = strlen (pUTF8);

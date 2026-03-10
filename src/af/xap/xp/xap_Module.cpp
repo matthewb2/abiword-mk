@@ -30,14 +30,14 @@
  * Protected constructor
  */
 XAP_Module::XAP_Module () :
-	m_fnRegister(nullptr),
-	m_fnDeregister(nullptr),
-	m_fnSupportsVersion(nullptr),
-	m_creator(nullptr),
+	m_fnRegister(0),
+	m_fnDeregister(0),
+	m_fnSupportsVersion(0),
+	m_creator (0),
 	m_bLoaded(false),
 	m_bRegistered(false),
 	m_iStatus(0),
-	m_szSPI(nullptr)
+	m_szSPI(0)
 {
 	// zero this out
 	memset (&m_info, 0, sizeof (m_info));
@@ -159,7 +159,7 @@ bool XAP_Module::unregisterThySelf ()
 
 	m_bRegistered = false;
 	m_iStatus = 0;
-	m_szSPI = nullptr;
+	m_szSPI = 0;
 
 	return result;
 }

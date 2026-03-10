@@ -37,7 +37,7 @@ static UT_iconv_t iconv_handle_U2Latin1 = UT_ICONV_INVALID;
 static UT_iconv_t iconv_handle_U2Win    = UT_ICONV_INVALID;
 static UT_iconv_t iconv_handle_Win2U    = UT_ICONV_INVALID;
 
-XAP_EncodingManager*	XAP_EncodingManager::_instance = nullptr;
+XAP_EncodingManager*	XAP_EncodingManager::_instance = NULL;
 
 /*!
  * Returns the native encoding, no matter what
@@ -95,10 +95,10 @@ const char* XAP_EncodingManager::getNativeUnicodeEncodingName() const
     return "UTF-8"; /* this will definitely work*/
 }
 
-static const char * UCS2BEName = nullptr;
-static const char * UCS2LEName = nullptr;
-static const char * UCS4BEName = nullptr;
-static const char * UCS4LEName = nullptr;
+static const char * UCS2BEName = 0;
+static const char * UCS2LEName = 0;
+static const char * UCS4BEName = 0;
+static const char * UCS4LEName = 0;
 
 /*!
  * Returns the name this system uses for UCS-2, big endian
@@ -154,7 +154,7 @@ XAP_EncodingManager::XAP_EncodingManager() { }
 void XAP_EncodingManager::Delete_instance()
 {
 	delete _instance;
-	_instance = nullptr;
+	_instance = NULL;
 }
 
 const char* XAP_EncodingManager::getLanguageISOName() const 
@@ -164,7 +164,7 @@ const char* XAP_EncodingManager::getLanguageISOName() const
 
 const char* XAP_EncodingManager::getLanguageISOTerritory() const
 {
-    return nullptr;
+    return NULL;
 }
 
 // TODO Do we need an equivalent function which can return
@@ -303,8 +303,8 @@ int XAP_EncodingManager::XAP_XML_UnknownEncodingHandler(void* /*encodingHandlerD
 	UT_iconv_t iconv_handle = UT_iconv_open("UCS-2",name);
 	if (!UT_iconv_isValid(iconv_handle))
 		return 0;
-	info->convert = nullptr;
-	info->release = nullptr;
+	info->convert = NULL;
+	info->release = NULL;
 	{
 		char ibuf[1],obuf[2];		
 		for(int i=0;i<256;++i)
@@ -479,11 +479,11 @@ UT_UCSChar XAP_EncodingManager::try_UToWindows(UT_UCSChar c) const
 /*reverse map*/
 struct _rmap
 {
-	const char* value;//it can't be nullptr for non-special entries like last or first
-	const char** keys;//nullptr-teminated array of strings
+	const char* value;//it can't be NULL for non-special entries like last or first
+	const char** keys;//NULL-teminated array of strings
 };
 
-static const char* search_rmap(const _rmap* m,const char* key,bool* is_default = nullptr)
+static const char* search_rmap(const _rmap* m,const char* key,bool* is_default = NULL)
 {
 	const _rmap* cur = m+1;	
 	if (is_default)
@@ -507,7 +507,7 @@ static const char* search_rmap(const _rmap* m,const char* key,bool* is_default =
 	return m->value;
 }
 
-static const char* search_rmap_with_opt_suffix(const _rmap* m,const char* key,const char* fallback_key=nullptr,const char* fallback_key_final=nullptr)
+static const char* search_rmap_with_opt_suffix(const _rmap* m,const char* key,const char* fallback_key=NULL,const char* fallback_key_final=NULL)
 {
 	bool is_default;
 	const char* value = search_rmap(m,key,&is_default);
@@ -522,7 +522,7 @@ struct _map
 	const char* key;
 	const char* value;
 };
-static const char* search_map(const _map* m,const char* key,bool* is_default = nullptr)
+static const char* search_map(const _map* m,const char* key,bool* is_default = NULL)
 {
 	const _map* cur = m+1;	
 	if (is_default)
@@ -535,7 +535,7 @@ static const char* search_map(const _map* m,const char* key,bool* is_default = n
 	return m->value;
 }
 
-static const char* search_map_with_opt_suffix(const _map* m,const char* key,const char* fallback_key=nullptr,const char* fallback_key_final=nullptr)
+static const char* search_map_with_opt_suffix(const _map* m,const char* key,const char* fallback_key=NULL,const char* fallback_key_final=NULL)
 {
 	bool is_default;
 	const char* value = search_map(m,key,&is_default);
@@ -548,23 +548,23 @@ static const char* search_map_with_opt_suffix(const _map* m,const char* key,cons
 
 /* this array describes mapping form current encoding to Tex's encoding name.
  The 1st entry is default value.
- If the 'keys' field is nullptr, then the 'value' of that entry should be used 
+ If the 'keys' field is NULL, then the 'value' of that entry should be used 
  (in the same case) if searched key matches the value.
 */
-static const char* texenc_iso88595[] = { "iso8859-5", nullptr };
+static const char* texenc_iso88595[] = { "iso8859-5", NULL };
 static const _rmap native_tex_enc_map[]=
 {
-	{ nullptr, nullptr }, /* the 1st item tells default value */
-	{ "koi8-r", nullptr }, { "koi8-ru", nullptr },
-	{ "koi8-u", nullptr }, { "cp1251", nullptr }, { "cp866", nullptr },
+	{ NULL, NULL }, /* the 1st item tells default value */
+	{ "koi8-r", NULL }, { "koi8-ru", NULL }, 
+	{ "koi8-u", NULL }, { "cp1251", NULL }, { "cp866", NULL },
 	{ "iso88595", texenc_iso88595},
-	{ nullptr, nullptr } /*last entry has nullptr as 'value'*/
+	{ NULL, NULL } /*last entry has NULL as 'value'*/
 };
 
 
 static const _map langcode_to_babelarg[]=
 {
-	{nullptr,nullptr},
+	{NULL,NULL},
 	{"ru","english,russian"},
 	
 	/* I'm not sure that this is correct, but my teTeX 0.9.17 works only 
@@ -574,7 +574,7 @@ static const _map langcode_to_babelarg[]=
 	/* I'm not sure again - my teTeX 0.9.17 doesn't know 'byelorussian' 
 	   language - hvv */
 	{"be","english,russian"},
-	{nullptr,nullptr}
+	{NULL,NULL}
 };
 
 
@@ -584,31 +584,31 @@ static const _map langcode_to_babelarg[]=
  RUSSIAN_CHARSET).
 */
 static const char* wincharsetcode_ru[]= /* russian charset */
-{ "ru", "be", "uk" , nullptr };
+{ "ru", "be", "uk" , NULL };
 static const char* wincharsetcode_el[]=  /* greek charset*/
-{ "el", nullptr };
+{ "el", NULL };
 
 static const char* wincharsetcode_tr[]=  /* turkish charset*/
-{ "tr", nullptr };
+{ "tr", NULL };
 
 static const char* wincharsetcode_vi[]=  /* vietnamese charset*/
-{ "vi", nullptr };
+{ "vi", NULL };
 
 static const char* wincharsetcode_th[]=  /* thai charset*/
-{ "th", nullptr };
+{ "th", NULL };
 
 /*I'm not sure that charset code is the same for Big5 and GB2312.
   Tested with GB2312 only.  
 */
 static const char* wincharsetcode_zh_GB2312[]= /* chinese*/
-{ "zh_CN.GB2312", "zh_CN.GBK", "zh_CN.GB18030", nullptr };
+{ "zh_CN.GB2312", "zh_CN.GBK", "zh_CN.GB18030", NULL };
 
 static const char* wincharsetcode_zh_BIG5[]= /* chinese*/
-{ "zh_TW.BIG5", "zh_HK.BIG5-HKSCS", nullptr };
+{ "zh_TW.BIG5", "zh_HK.BIG5-HKSCS", NULL };
 
 static const _rmap langcode_to_wincharsetcode[]=
 {
-	{"0", nullptr }, /* default value - ansi charset*/
+	{"0", NULL }, /* default value - ansi charset*/
 	{"204",wincharsetcode_ru},
 	{"161",wincharsetcode_el},
 	{"162",wincharsetcode_tr},
@@ -616,7 +616,7 @@ static const _rmap langcode_to_wincharsetcode[]=
 	{"222",wincharsetcode_th},	
 	{"134",wincharsetcode_zh_GB2312},
 	{"136",wincharsetcode_zh_BIG5},	
-	{nullptr, nullptr}
+	{NULL, NULL}
 };
 
 #if 0
@@ -630,30 +630,30 @@ static const UT_Bijection::pair_data zh_TW_big5[]=
     {"fangsong","\xe4\xbb\xbf\xe5\xae\x8b"},
     {"hei","\xe9\xbb\x91\xe4\xbd\x93"},
     {"kai","\xe6\xa5\xb7\xe4\xbd\x93"},
-    {nullptr,nullptr}
+    {NULL,NULL}
 };
 
 static const char* zh_TW_big5_keys[]=
-{  "zh_TW.BIG5", nullptr };
+{  "zh_TW.BIG5", NULL };
 
 static const _rmap cjk_word_fontname_mapping_data[]=
 {
-    {nullptr, nullptr},
+    {NULL, NULL},
     {reinterpret_cast<const char*>(zh_TW_big5),zh_TW_big5_keys},
-    {nullptr, nullptr}
+    {NULL, NULL}
 };
 #endif
 
 
 /*all CJK language codes should be listed here to be marked as CJK*/
 static const char* cjk_languages[]=
-{ "zh", "ja", "ko", nullptr };
+{ "zh", "ja", "ko", NULL }; 
 
 static const _rmap langcode_to_cjk[]=
 {
-	{"0", nullptr}, /* default value - non-CJK environment */
+	{"0", NULL}, /* default value - non-CJK environment */    
 	{"1",cjk_languages},
-	{nullptr, nullptr}
+	{NULL, NULL}
 };
 
 
@@ -665,7 +665,7 @@ static const _rmap langcode_to_cjk[]=
 static const _map MSCodepagename_to_charset_name_map[]=
 {
 	/*key,		value*/
-	{ nullptr,			nullptr },
+	{ NULL,			NULL },
 
 //	{ "CP0",		?? },					// ANSI code page
 //	{ "CP1",		?? },					// OEM code page
@@ -734,7 +734,7 @@ static const _map MSCodepagename_to_charset_name_map[]=
 	{ "CP65000",	"UTF-7" },				// Translate using UTF-7 (Win2k, NT 4.0)	// ??
 	{ "CP65001",	"UTF-8" },				// Translate using UTF-8 (Win2k, NT 4.0)	// ??
 
-    { nullptr,			nullptr }
+    { NULL,			NULL }
 };
 
 /*
@@ -745,7 +745,7 @@ static const _map MSCodepagename_to_charset_name_map[]=
 static const _map charset_name_to_MSCodepagename_map[]=
 {
 /*key,value*/
-    {nullptr,nullptr},
+    {NULL,NULL},
 	// libiconv also lists "SHIFT_JIS", "SHIFT-JIS", "MS_KANJI", "csShiftJIS"
 	{"SJIS","CP932"},
     {"GB2312","CP936"},
@@ -754,14 +754,14 @@ static const _map charset_name_to_MSCodepagename_map[]=
     {"BIG5","CP950"},
     {"BIG5-HKSCS","CP950"},
 	{"JOHAB","CP1361"},
-    {nullptr,nullptr}
+    {NULL,NULL}
 };
 
 /*warning: 0x400 won't be added to the values in this table. */
 static const _map langcode_to_winlangcode[]=
 {
 /*key, value*/
-    {nullptr, nullptr},
+    {NULL, NULL},
    {"zh_CN.GB2312",	"0x804"},     
    {"zh_CN.GBK",	"0x804"}, 
    {"zh_CN.GB18030",	"0x804"}, 
@@ -770,7 +770,7 @@ static const _map langcode_to_winlangcode[]=
    {"zh_HK.UTF-8",	"0x404"},  
    {"zh_TW.BIG5",	"0x404"},  
    {"zh_TW.UTF-8",	"0x404"},  
-	{nullptr, nullptr}
+	{NULL, NULL}
 };
 
 #undef v
@@ -779,14 +779,14 @@ static const char* non_cjk_fontsizes[]=
 {
     /* this is a list of sizes AW 0.7.11 had */
     v(8),v(9),v(10),v(11),v(12),v(14),v(16),v(18),v(20),v(22),v(24),v(26),
-    v(28),v(36),v(48),v(72),nullptr
+    v(28),v(36),v(48),v(72),NULL
 };
 
 static const char* cjk_fontsizes[]=
 {
     /* this list of font sizes was in HJ's Big5 patch to AW-0.7.10 */
     v(5),v(5.5),v(6.5),v(7.5),v(9),v(10.5),v(12),v(14),v(15),v(16),v(18),
-    v(22),v(24),v(26),v(36),v(42),nullptr
+    v(22),v(24),v(26),v(36),v(42),NULL
 };
 #undef v
 
@@ -990,7 +990,7 @@ const XAP_LangInfo XAP_EncodingManager::langinfo[] =
     {{   "Yiddish",           "yi",     "",     "",       "langYiddish",                       "41",   },  17,   1   },
     {{   "Yoruba",            "yo",     "",     "",       "",                                  "",     },   0,   1   },
     {{   "Zulu",              "zu",     "",     "",       "",                                  "",     },   0,   1   },
-    {{   nullptr,                "",       "",     "",       "",                                  "" ,    },   0,   1   },
+    {{   NULL,                "",       "",     "",       "",                                  "" ,    },   0,   1   },
 };
 
 /* 
@@ -1192,18 +1192,18 @@ static bool blineBreakRules[] = {
 const XAP_LangInfo* XAP_EncodingManager::findLangInfo(const char* key,XAP_LangInfo::fieldidx idx)
 {
 	if (idx > XAP_LangInfo::max_idx)
-		return nullptr;
+		return NULL;
 	const XAP_LangInfo* cur = langinfo;
 	for(; cur->fields[0]; ++cur)
 		if (!g_ascii_strcasecmp(cur->fields[idx],key))
 			return cur;
-	return nullptr;
+	return NULL;
 }
 
 const XAP_LangInfo* XAP_EncodingManager::findLangInfoByLocale(const char* locale)
 {
 	if (!locale)
-		return nullptr;
+		return NULL;
 		
 	std::string strISOName(locale, 2);
 	std::string strCountryCode;
@@ -1214,7 +1214,7 @@ const XAP_LangInfo* XAP_EncodingManager::findLangInfoByLocale(const char* locale
 	}
 	
 	const XAP_LangInfo* cur = langinfo;
-	const XAP_LangInfo* temp = nullptr;
+	const XAP_LangInfo* temp = NULL;
 	for(; cur->fields[0]; ++cur)
 	{
 		if (strISOName == cur->fields[XAP_LangInfo::isoshortname_idx])
@@ -1233,12 +1233,12 @@ const XAP_LangInfo* XAP_EncodingManager::findLangInfoByLocale(const char* locale
 		}
 	}
 	
-	if (temp != nullptr)
+	if (temp != NULL)
 	{
 		return temp;
 	}
 	
-	return nullptr;
+	return NULL;
 }
 
 bool XAP_EncodingManager::swap_utos = false;
@@ -1253,33 +1253,33 @@ void XAP_EncodingManager::initialize()
 	*enc = getNativeEncodingName();
 	
 	// UCS-2 Encoding Names
-	static const char * szUCS2BENames[] = {
+	static const char * (szUCS2BENames[]) = {
 		"UTF-16BE",			// superset
 		"UTF-16-BE",		// my guess		
 		"UCS-2BE",			// preferred
 		"UCS-2-BE",			// older libiconv
 		"UNICODEBIG",		// older glibc
 		"UNICODE-1-1",		// in libiconv source
-		nullptr };
-	static const char * szUCS2LENames[] = {
+		0 };
+	static const char * (szUCS2LENames[]) = {
 		"UTF-16LE",			// superset
 		"UTF-16-LE",		// my guess
 		"UCS-2LE",			// preferred
 		"UCS-2-LE",			// older libiconv
 		"UNICODELITTLE",	// older glibc
-		nullptr };
+		0 };
 
 	// UCS-4 Encoding Names
-	static const char * szUCS4BENames[] = {
+	static const char * (szUCS4BENames[]) = {
 		"UCS-4BE",			// preferred
 		"UCS-4-BE",			// older libiconv (??)
-		nullptr };
-	static const char * szUCS4LENames[] = {
+		0 };
+	static const char * (szUCS4LENames[]) = {
 		"UCS-4LE",			// preferred
 		"UCS-4-LE",			// older libiconv (??)
-		nullptr };
+		0 };
 
-	const char ** p = nullptr;
+	const char ** p = 0;
 	UT_iconv_t iconv_handle = UT_ICONV_INVALID;
 
 	for (p = szUCS2BENames; *p; ++p)
@@ -1501,7 +1501,7 @@ const char* XAP_EncodingManager::CodepageFromCharset(const char *charset) const
 {
     bool is_default;
     const char* ret = search_map(charset_name_to_MSCodepagename_map,charset,&is_default);
-    UT_DEBUGMSG(("Belcon:in XAP_EncodingManager::CodepageFromCharset,charset=%s,ret=%s,is_default=%d\n", charset, ret ? ret : "(null)", is_default));
+    UT_DEBUGMSG(("Belcon:in XAP_EncodingManager::CodepageFromCharset,charset=%s,ret=%s,is_default=%d\n",charset,ret,is_default));
     return is_default ? charset : ret;
 }
 
@@ -1552,8 +1552,8 @@ void 	XAP_EncodingManager::describe()
 
 
 /*
-    This one returns NUL-terminated vector of strings in static buffers (i.e.
-    don't try to free anything). On next call, filled data will be lost.
+    This one returns NULL-terminated vector of strings in static buffers (i.e.
+	don't try to g_free anything). On next call, filled data will be lost.
     returns the following strings surrounded by prefix and suffix:
     if (!skip_fallback)
 	"";
@@ -1618,7 +1618,7 @@ const char** localeinfo_combinations(const char* prefix,const char* suffix,const
 
 	for (size_t j = 0; j < 5; ++j)
 		ptrs[j] = buf[j].c_str();
-	ptrs[5] = nullptr;
+	ptrs[5] = 0;
 	
     return ptrs;
 }

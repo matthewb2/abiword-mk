@@ -136,16 +136,16 @@ public:
 	IE_Imp_MsWord_97_Sniffer();
 	virtual ~IE_Imp_MsWord_97_Sniffer() {}
 
-	virtual const IE_SuffixConfidence * getSuffixConfidence() override;
-	virtual const IE_MimeConfidence * getMimeConfidence() override;
-	virtual UT_Confidence_t recognizeContents(const char * szBuf,
-									UT_uint32 iNumbytes) override;
-	virtual UT_Confidence_t recognizeContents(GsfInput * input) override;
-	virtual bool getDlgLabels(const char ** szDesc,
+	virtual const IE_SuffixConfidence * getSuffixConfidence ();
+	virtual const IE_MimeConfidence * getMimeConfidence ();
+	virtual UT_Confidence_t recognizeContents (const char * szBuf,
+									UT_uint32 iNumbytes);
+	virtual UT_Confidence_t recognizeContents (GsfInput * input);
+	virtual bool getDlgLabels (const char ** szDesc,
 							   const char ** szSuffixList,
-							   IEFileType * ft) override;
-	virtual UT_Error constructImporter(PD_Document * pDocument,
-										IE_Imp ** ppie) override;
+							   IEFileType * ft);
+	virtual UT_Error constructImporter (PD_Document * pDocument,
+										IE_Imp ** ppie);
 };
 
 // how many chars to buffer in our fields implementation
@@ -160,7 +160,7 @@ public:
 	IE_Imp_MsWord_97 (PD_Document * pDocument);
 	~IE_Imp_MsWord_97 ();
 
-	virtual bool supportsLoadStylesOnly() override {return true;}
+	virtual bool        supportsLoadStylesOnly() {return true;}
 
 	// wv's callbacks need access to these, so they have to be public
 	int 			_specCharProc (wvParseStruct *ps, UT_uint16 eachchar,
@@ -173,7 +173,7 @@ public:
 
 protected:
 
-	UT_Error _loadFile (GsfInput * input) override;
+	UT_Error			_loadFile (GsfInput * input);
 
 private:
 

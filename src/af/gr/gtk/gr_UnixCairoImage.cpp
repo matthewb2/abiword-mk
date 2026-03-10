@@ -42,7 +42,7 @@ GR_UnixCairoImage::GR_UnixCairoImage(const char *name, GdkPixbuf *pixbuf)
 									 convertToPng,
 									 reinterpret_cast<gpointer>(pBB),
 									 "png",
-									 nullptr, nullptr, nullptr))
+									 NULL, NULL, NULL))
 		{
 			UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
 		}
@@ -74,13 +74,13 @@ GdkPixbuf* GR_UnixCairoImage::getPixbuf()
 
 			if (!gdk_pixbuf_loader_write(loader, 
 										 static_cast<const guchar *>(pBB->getPointer (0)),
-										 static_cast<gsize>(pBB->getLength ()), nullptr))
+										 static_cast<gsize>(pBB->getLength ()), NULL))
 				{
 					UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
 					goto error;
 				}
 
-			if (!gdk_pixbuf_loader_close(loader, nullptr))
+			if (!gdk_pixbuf_loader_close(loader, NULL))
 				{
 					UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
 					goto error;
@@ -101,5 +101,5 @@ GdkPixbuf* GR_UnixCairoImage::getPixbuf()
 		}
 	
 	UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
-	return nullptr;
+	return NULL;
 }

@@ -56,24 +56,25 @@ void XAP_CocoaDialog_MessageBox::runModal(XAP_Frame * /*pFrame*/)
 
 	const XAP_StringSet * pSS = pApp->getStringSet();
 	
-	NSString * title   = [NSString stringWithUTF8String:m_message.c_str()];
+	NSString * title   = [NSString stringWithUTF8String:m_szMessage];
+	const char* message = m_szSecondaryMessage ? m_szSecondaryMessage : "";
 
 	switch (m_buttons) {
 	case b_O:
 		NSRunAlertPanel(title, @"%s",
 						LocalizedString(pSS, XAP_STRING_ID_DLG_OK), nil, nil, 
-						m_secondaryMessage.c_str());
+						message);
 
 		m_answer = a_OK;
 		break;
 
 	case b_OC:
 		if (m_defaultAnswer == XAP_Dialog_MessageBox::a_OK)	{
-			NSInteger btn = NSRunAlertPanel(title, @"%s",
+			int btn = NSRunAlertPanel(title, @"%s",
 									  LocalizedString(pSS, XAP_STRING_ID_DLG_OK),
 									  LocalizedString(pSS, XAP_STRING_ID_DLG_Cancel),
 									  nil, 
-                                      m_secondaryMessage.c_str());
+									  message);
 
 			switch (btn) {
 			case NSAlertDefaultReturn:
@@ -87,11 +88,11 @@ void XAP_CocoaDialog_MessageBox::runModal(XAP_Frame * /*pFrame*/)
 				break;
 			}
 		} else {
-			NSInteger btn = NSRunAlertPanel(title, @"%s",
+			int btn = NSRunAlertPanel(title, @"%s",
 									  LocalizedString(pSS, XAP_STRING_ID_DLG_Cancel),
 									  LocalizedString(pSS, XAP_STRING_ID_DLG_OK),
 									  nil, 
-                                      m_secondaryMessage.c_str());
+									  message);
 
 			switch (btn) {
 			case NSAlertDefaultReturn:
@@ -109,11 +110,11 @@ void XAP_CocoaDialog_MessageBox::runModal(XAP_Frame * /*pFrame*/)
 
 	case b_YN:
 		if (m_defaultAnswer == XAP_Dialog_MessageBox::a_YES) {
-			NSInteger btn = NSRunAlertPanel(title, @"%s",
+			int btn = NSRunAlertPanel(title, @"%s",
 									  LocalizedString(pSS, XAP_STRING_ID_DLG_MB_Yes),
 									  LocalizedString(pSS, XAP_STRING_ID_DLG_MB_No), 
 									  nil, 
-									  m_secondaryMessage.c_str());
+									  message);
 			switch (btn) {
 			case NSAlertDefaultReturn:
 				m_answer = a_YES;
@@ -126,11 +127,11 @@ void XAP_CocoaDialog_MessageBox::runModal(XAP_Frame * /*pFrame*/)
 				break;
 			}
 		} else {
-			NSInteger btn = NSRunAlertPanel(title, @"%s",
+			int btn = NSRunAlertPanel(title, @"%s",
 									  LocalizedString(pSS, XAP_STRING_ID_DLG_MB_No), 
 									  LocalizedString(pSS, XAP_STRING_ID_DLG_MB_Yes),
 									  nil, 
-									  m_secondaryMessage.c_str());
+									  message);
 			switch (btn) {
 			case NSAlertDefaultReturn:
 				m_answer = a_NO;
@@ -147,11 +148,11 @@ void XAP_CocoaDialog_MessageBox::runModal(XAP_Frame * /*pFrame*/)
 
 	case b_YNC:
 		if (m_defaultAnswer == XAP_Dialog_MessageBox::a_YES) {
-			NSInteger btn = NSRunAlertPanel(title, @"%s",
+			int btn = NSRunAlertPanel(title, @"%s",
 									  LocalizedString(pSS, XAP_STRING_ID_DLG_MB_Yes),
 									  LocalizedString(pSS, XAP_STRING_ID_DLG_MB_No), 
 									  LocalizedString(pSS, XAP_STRING_ID_DLG_Cancel),
-									  m_secondaryMessage.c_str());
+									  message);
 
 			switch (btn) {
 			case NSAlertDefaultReturn:
@@ -168,11 +169,11 @@ void XAP_CocoaDialog_MessageBox::runModal(XAP_Frame * /*pFrame*/)
 				break;
 			}
 		} else {
-			NSInteger btn = NSRunAlertPanel(title, @"%s",
+			int btn = NSRunAlertPanel(title, @"%s",
 									  LocalizedString(pSS, XAP_STRING_ID_DLG_Cancel),
 									  LocalizedString(pSS, XAP_STRING_ID_DLG_MB_No), 
 									  LocalizedString(pSS, XAP_STRING_ID_DLG_MB_Yes), 
-									  m_secondaryMessage.c_str());
+									  message);
 			switch (btn) {
 			case NSAlertDefaultReturn:
 				m_answer = a_CANCEL;

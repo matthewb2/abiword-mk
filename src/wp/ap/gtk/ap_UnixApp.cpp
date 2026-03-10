@@ -1,21 +1,22 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
+
 /* AbiWord
  * Copyright (C) 1998-2000 AbiSource, Inc.
- * Copyright (C) 2009, 2019 Hubert Figuière
- *
+ * Copyright (C) 2009 Hubert Figuiere
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
 
@@ -44,15 +45,11 @@
 #include <signal.h>
 #include <X11/Xlib.h>
 #include <glib.h>
-
-#include "ut_compiler.h"
-
-#include <gsf/gsf.h>
+#include <gsf/gsf-output-memory.h>
 
 #include "ut_debugmsg.h"
 #include "ut_path.h"
 #include "ut_string.h"
-#include "ut_std_string.h"
 #include "ut_misc.h"
 #include "ut_locale.h"
 #include "ut_sleep.h"
@@ -154,14 +151,14 @@ extern XAP_Dialog_MessageBox::tAnswer s_CouldNotLoadFileMessage(XAP_Frame * pFra
 */
 AP_UnixApp::AP_UnixApp(const char * szAppName)
     : AP_App(szAppName),
-	  m_pStringSet(nullptr),
-	  m_pClipboard(nullptr),
+	  m_pStringSet(0),
+	  m_pClipboard(0),
 	  m_bHasSelection(false),
 	  m_bSelectionInFlux(false),
 	  m_cacheDeferClear(0),
-	  m_pViewSelection(nullptr),
-	  m_cacheSelectionView(nullptr),
-	  m_pFrameSelection(nullptr)
+	  m_pViewSelection(0),
+	  m_cacheSelectionView(0),
+	  m_pFrameSelection(0)
 {
 }
 
@@ -182,7 +179,7 @@ AP_UnixApp::~AP_UnixApp(void)
 * Try loading a string-set.
 * \param szStringSet Language id, e.g. de_AT
 * \param pDefaultStringSet String set to be used for untranslated strings.
-* \return AP_DiskStringSet * on success, nullptr if not found
+* \return AP_DiskStringSet * on success, NULL if not found
 */
 AP_DiskStringSet * 
 AP_UnixApp::loadStringsFromDisk(const char 			* szStringSet, 
@@ -190,13 +187,15 @@ AP_UnixApp::loadStringsFromDisk(const char 			* szStringSet,
 {
 	UT_ASSERT(pDefaultStringSet);
 
-	std::string directory;
-	getPrefsValueDirectory(true, AP_PREF_KEY_StringSetDirectory, directory);
-	UT_return_val_if_fail(!directory.empty(), nullptr);
+	const char * szDirectory = NULL;
+	getPrefsValueDirectory(true,
+			       static_cast<const gchar*>(AP_PREF_KEY_StringSetDirectory),
+			       static_cast<const gchar**>(&szDirectory));
+	UT_return_val_if_fail((szDirectory) && (*szDirectory), NULL);
 
 	UT_String szPathVariant[4];
 	char * p_strbuf = strdup("");
-	char * p_modifier = nullptr;
+	char * p_modifier = NULL;
 	int  cur_id = 0;
 	bool three_letters = false; // some have 3!
 
@@ -211,10 +210,9 @@ AP_UnixApp::loadStringsFromDisk(const char 			* szStringSet,
 
 	if (p_modifier) {
 		// fo_BA@xxx.strings
-		szPathVariant[cur_id] = directory;
-		if (directory[directory.size() - 1] != '/') {
+		szPathVariant[cur_id] = szDirectory;
+		if (szDirectory[strlen(szDirectory)-1]!='/')
 			szPathVariant[cur_id] += "/";
-		}
 		szPathVariant[cur_id] += p_strbuf;
 		szPathVariant[cur_id] += ".strings";
 
@@ -222,10 +220,9 @@ AP_UnixApp::loadStringsFromDisk(const char 			* szStringSet,
 
 		// fo@xxx.strings
 		if (szStringSet && strlen(szStringSet) > 2) {
-			szPathVariant[cur_id] = directory;
-			if (directory[directory.size() - 1] != '/') {
+			szPathVariant[cur_id] = szDirectory;
+			if (szDirectory[strlen(szDirectory)-1]!='/')
 				szPathVariant[cur_id] += "/";
-			}
 			szPathVariant[cur_id] += p_strbuf[0];
 			szPathVariant[cur_id] += p_strbuf[1];
 			if (three_letters)
@@ -239,22 +236,20 @@ AP_UnixApp::loadStringsFromDisk(const char 			* szStringSet,
 		// trim modifier part
 		*p_modifier = 0;
 	}
-
+	
 	// fo_BA.strings
-	UT_String szPath = directory;
-	if (directory[szPath.size() -1 ] != '/') {
+	UT_String szPath = szDirectory;
+	if (szDirectory[szPath.size()-1]!='/')
 		szPath += "/";
-	}
 	szPath += p_strbuf;
 	szPath += ".strings";
 
 	// fo.strings
 	UT_String szFallbackPath;
 	if (szStringSet && strlen(szStringSet) > 2) {
-		szFallbackPath = directory;
-		if (directory[szFallbackPath.size() - 1] != '/') {
+		szFallbackPath = szDirectory;
+		if (szDirectory[szFallbackPath.size()-1]!='/')
 			szFallbackPath += "/";
-		}
 		szFallbackPath += p_strbuf[0];
 		szFallbackPath += p_strbuf[1];
 		if (three_letters)
@@ -292,7 +287,7 @@ AP_UnixApp::loadStringsFromDisk(const char 			* szStringSet,
 	{
 		DELETEP(pDiskStringSet);
 		UT_DEBUGMSG(("Unable to load StringSet [%s] -- using builtin strings instead.\n",szPath.c_str()));
-		return nullptr;
+		return NULL;
 	}
 }
 
@@ -331,31 +326,36 @@ bool AP_UnixApp::initialize(bool has_display)
     // the initialization could be properly localized before being
     // reported to the user)
     //////////////////////////////////////////////////////////////////
-
-    {
+	
+    {	
 		// Loading default string set for untranslated messages
-		AP_BuiltinStringSet * pBuiltinStringSet = new AP_BuiltinStringSet(this,
-													AP_PREF_DEFAULT_StringSet);
+		AP_BuiltinStringSet * pBuiltinStringSet = new AP_BuiltinStringSet(this, 
+													static_cast<const gchar*>(AP_PREF_DEFAULT_StringSet));
 		UT_ASSERT(pBuiltinStringSet);
 
 		// try loading strings by preference
-		std::string stringSet;
-		if (getPrefsValue(AP_PREF_KEY_StringSet, stringSet)
-			&& !stringSet.empty()
-			&& stringSet == AP_PREF_DEFAULT_StringSet) {
-			m_pStringSet = loadStringsFromDisk(stringSet.c_str(), pBuiltinStringSet);
+		const char * szStringSet = NULL;
+		if (   (getPrefsValue(AP_PREF_KEY_StringSet,
+							  static_cast<const gchar**>(&szStringSet)))
+			   && (szStringSet)
+			   && (*szStringSet)
+			   && (strcmp(szStringSet,AP_PREF_DEFAULT_StringSet) != 0))
+		{
+			m_pStringSet = loadStringsFromDisk(szStringSet, pBuiltinStringSet);
 		}
 
 		// try loading fallback strings for the language, e.g. es-ES for es-AR
-		if (m_pStringSet == nullptr) {
-			const char *szFallbackStringSet = UT_getFallBackStringSetLocale(stringSet.c_str());
+		if (m_pStringSet == NULL) 
+		{
+			const char *szFallbackStringSet = UT_getFallBackStringSetLocale(szStringSet);
 			if (szFallbackStringSet)
 				m_pStringSet = loadStringsFromDisk(szFallbackStringSet, pBuiltinStringSet);
 		}
 
 		// load the builtin string set
 		// this is the default
-		if (m_pStringSet == nullptr) {
+		if (m_pStringSet == NULL) 
+		{
 			m_pStringSet = pBuiltinStringSet;
 		}
     }
@@ -394,26 +394,28 @@ bool AP_UnixApp::initialize(bool has_display)
     for (i = 0; fp_FieldTypes[i].m_Type != FPFIELDTYPE_END; i++)
       (&fp_FieldTypes[i])->m_Desc = m_pStringSet->getValue(fp_FieldTypes[i].m_DescId);
 
-    for (i = 0; fp_FieldFmts[i].m_Tag != nullptr; i++)
+    for (i = 0; fp_FieldFmts[i].m_Tag != NULL; i++)
       (&fp_FieldFmts[i])->m_Desc = m_pStringSet->getValue(fp_FieldFmts[i].m_DescId);
 
     ///////////////////////////////////////////////////////////////////////
     /// Build a labelset so the plugins can add themselves to something ///
     ///////////////////////////////////////////////////////////////////////
 
-	std::string menuLabelSetName;
-	if (getPrefsValue(AP_PREF_KEY_StringSet, menuLabelSetName) && !menuLabelSetName.empty()) {
+	const char * szMenuLabelSetName = NULL;
+	if (getPrefsValue( AP_PREF_KEY_StringSet, static_cast<const gchar**>(&szMenuLabelSetName))
+		&& (szMenuLabelSetName) && (*szMenuLabelSetName))
+	{
 		;
-	} else {
-		menuLabelSetName = AP_PREF_DEFAULT_StringSet;
 	}
+	else
+		szMenuLabelSetName = AP_PREF_DEFAULT_StringSet;
 
-	getMenuFactory()->buildMenuLabelSet(menuLabelSetName.c_str());
+	getMenuFactory()->buildMenuLabelSet(szMenuLabelSetName);
 
 	abi_register_builtin_plugins();
 
 	bool bLoadPlugins = true;
-	bool bFound = getPrefsValueBool(XAP_PREF_KEY_AutoLoadPlugins, bLoadPlugins);
+	bool bFound = getPrefsValueBool(XAP_PREF_KEY_AutoLoadPlugins,&bLoadPlugins);
 	if(bLoadPlugins || !bFound)
 		loadAllPlugins();
 	//
@@ -472,23 +474,29 @@ bool AP_UnixApp::shutdown(void)
   \todo support meaningful return values.
 */
 bool AP_UnixApp::getPrefsValueDirectory(bool bAppSpecific,
-										const std::string& key, std::string& value) const
+										const gchar * szKey, const gchar ** pszValue) const
 {
-	if (!m_prefs)
+    if (!m_prefs)
 		return false;
 
-	if (!m_prefs->getPrefsValue(key, value) || value.empty()) {
+    const gchar * psz = NULL;
+    if (!m_prefs->getPrefsValue(szKey,&psz))
 		return false;
-	}
 
-	if (value[0] == '/')  {
+    if (*psz == '/')
+    {
+		*pszValue = psz;
 		return true;
-	}
+    }
 
-	const gchar * dir = ((bAppSpecific) ? getAbiSuiteAppDir() : getAbiSuiteLibDir());
+    const gchar * dir = ((bAppSpecific) ? getAbiSuiteAppDir() : getAbiSuiteLibDir());
 
-	value = UT_std_string_sprintf("%s/%s", dir, value.c_str());
-	return true;
+    static gchar buf[1024];
+    UT_ASSERT((strlen(dir) + strlen(psz) + 2) < sizeof(buf));
+	
+    sprintf(buf,"%s/%s",dir,psz);
+    *pszValue = buf;
+    return true;
 }
 
 /*!
@@ -581,7 +589,7 @@ void AP_UnixApp::copyToClipboard(PD_DocumentRange * pDocRange, bool bUseClipboar
 	{
 		// ODT plugin is present construct an exporter
 		//
-		IE_Exp * pODT = nullptr;
+		IE_Exp * pODT = NULL;
 		IEFileType genIEFT = IEFT_Unknown;
 		GsfOutput * outBuf =  gsf_output_memory_new();
 		UT_Error err = IE_Exp::constructExporter(pDocRange->m_pDoc,outBuf,
@@ -600,9 +608,6 @@ void AP_UnixApp::copyToClipboard(PD_DocumentRange * pDocRange, bool bUseClipboar
             oss.write( (const char*)bufODT.getPointer (0), bufODT.getLength () );
             oss.close();
 #endif
-		}
-		if (pODT != nullptr) {
-			delete pODT;
 		}
 	}
 
@@ -640,7 +645,7 @@ void AP_UnixApp::copyToClipboard(PD_DocumentRange * pDocRange, bool bUseClipboar
 
 	{
 		// TODO: we have to make a good way to tell if the current selection is just an image
-		FV_View * pView = nullptr;
+		FV_View * pView = NULL;
 		if(getLastFocussedFrame())
 			pView = static_cast<FV_View*>(getLastFocussedFrame()->getCurrentView());
 
@@ -680,8 +685,8 @@ void AP_UnixApp::pasteFromClipboard(PD_DocumentRange * pDocRange, bool bUseClipb
 					   ? XAP_UnixClipboard::TAG_ClipboardOnly
 					   : XAP_UnixClipboard::TAG_PrimaryOnly);
 
-    const char * szFormatFound = nullptr;
-    const unsigned char * pData = nullptr;
+    const char * szFormatFound = NULL;
+    const unsigned char * pData = NULL;
     UT_uint32 iLen = 0;
 
     bool bFoundOne = false;
@@ -741,11 +746,11 @@ void AP_UnixApp::pasteFromClipboard(PD_DocumentRange * pDocRange, bool bUseClipb
 	else if (AP_UnixClipboard::isDynamicTag (szFormatFound))
 	{
 		UT_DEBUGMSG(("Format Found = %s \n",szFormatFound));
-		IE_Imp * pImp = nullptr;
+		IE_Imp * pImp = NULL;
 		IEFileType ieft = IE_Imp::fileTypeForMimetype(szFormatFound);
 		UT_DEBUGMSG(("found file type %d\n",ieft));
 		IE_Imp::constructImporter(pDocRange->m_pDoc,ieft,&pImp);
-		if(pImp == nullptr)
+		if(pImp == NULL)
 			 goto retry_text;
 		bSuccess = pImp->pasteFromBuffer(pDocRange,pData,iLen);
 		DELETEP(pImp);
@@ -755,10 +760,10 @@ void AP_UnixApp::pasteFromClipboard(PD_DocumentRange * pDocRange, bool bUseClipb
 		  UT_DEBUGMSG(("Format Found = %s \n",szFormatFound));
 		  if(strncmp(szFormatFound,"application",11) == 0) // embedded object
 		  {
-			  IE_Imp * pImp = nullptr;
+			  IE_Imp * pImp = NULL;
 			  IEGraphicFileType iegft = IE_Imp::fileTypeForMimetype(szFormatFound);
 			  IE_Imp::constructImporter(pDocRange->m_pDoc,iegft,&pImp);
-			  if(pImp == nullptr)
+			  if(pImp == NULL)
 			  {
 					  goto retry_text;
 			  }
@@ -808,7 +813,7 @@ void AP_UnixApp::pasteFromClipboard(PD_DocumentRange * pDocRange, bool bUseClipb
 	}
 }
 
-bool AP_UnixApp::canPasteFromClipboard(void) const
+bool AP_UnixApp::canPasteFromClipboard(void)
 {
     return m_pClipboard->canPaste(XAP_UnixClipboard::TAG_ClipboardOnly);
 }
@@ -849,16 +854,16 @@ void AP_UnixApp::loadAllPlugins ()
 	if (!g_file_test (path.c_str(), G_FILE_TEST_IS_DIR))
 		continue;
 
-	GError *err = nullptr;
+	GError *err = NULL;
 	GDir *dir = g_dir_open (path.c_str(), 0, &err);
 	if (err) {
 		g_warning ("%s", err->message);
-		g_error_free (err), err = nullptr;
+		g_error_free (err), err = NULL;
 		continue;
 	}
 
 	const char *name;
-	while (nullptr != (name = g_dir_read_name (dir))) {
+	while (NULL != (name = g_dir_read_name (dir))) {
 		if (is_so (name)) {
 			UT_String plugin (path + name);
 			UT_DEBUGMSG(("DOM: loading plugin %s\n", plugin.c_str()));
@@ -870,7 +875,7 @@ void AP_UnixApp::loadAllPlugins ()
 			}
 		}
 	}
-	g_dir_close (dir), dir = nullptr;
+	g_dir_close (dir), dir = NULL;
   }
 }
 
@@ -961,8 +966,8 @@ bool AP_UnixApp::forgetFrame(XAP_Frame * pFrame)
     if (m_pFrameSelection && (pFrame==m_pFrameSelection))
     {
 		m_pClipboard->clearData(false,true);
-		m_pFrameSelection = nullptr;
-		m_pViewSelection = nullptr;
+		m_pFrameSelection = NULL;
+		m_pViewSelection = NULL;
     }
 	
     return XAP_App::forgetFrame(pFrame);
@@ -1024,7 +1029,7 @@ void AP_UnixApp::cacheCurrentSelection(AV_View * pView)
 			m_cacheDeferClear = false;
 			m_bHasSelection = false;
 		}
-		m_cacheSelectionView = nullptr;
+		m_cacheSelectionView = NULL;
     }
 }
 
@@ -1045,9 +1050,9 @@ bool AP_UnixApp::getCurrentSelection(const char** formatList,
 {
     int j;
 	
-    *ppData = nullptr;				// assume failure
+    *ppData = NULL;				// assume failure
     *pLen = 0;
-    *pszFormatFound = nullptr;
+    *pszFormatFound = NULL;
 	
     if (!m_pViewSelection || !m_pFrameSelection || !m_bHasSelection)
 		return false;		// can't do it, give up.
@@ -1097,7 +1102,7 @@ bool AP_UnixApp::getCurrentSelection(const char** formatList,
 		if ( AP_UnixClipboard::isImageTag(formatList[j]) )
 		{
 			// TODO: we have to make a good way to tell if the current selection is just an image
-			FV_View * pView = nullptr;
+			FV_View * pView = NULL;
 			if(getLastFocussedFrame())
 				pView = static_cast<FV_View*>(getLastFocussedFrame()->getCurrentView());
 
@@ -1145,7 +1150,7 @@ bool AP_UnixApp::makePngPreview(const char * pszInFile, const char * pszPNGFile,
 	cairo_surface_t *surface = cairo_image_surface_create (CAIRO_FORMAT_RGB24, iWidth, iHeight);
 	cairo_t *cr = cairo_create (surface);
 
-	GR_UnixCairoAllocInfo ai(nullptr);
+	GR_UnixCairoAllocInfo ai(NULL, false);
 
 	GR_CairoGraphics * pG = static_cast<GR_CairoGraphics*>(GR_UnixCairoGraphics::graphicsAllocator(ai));
 	pG->setCairo(cr);
@@ -1153,19 +1158,19 @@ bool AP_UnixApp::makePngPreview(const char * pszInFile, const char * pszPNGFile,
 
 	UT_Error error = UT_OK;
 	PD_Document * pNewDoc = new PD_Document();
-	error = pNewDoc->readFromFile(pszInFile,IEFT_Unknown, nullptr);
+	error = pNewDoc->readFromFile(pszInFile,IEFT_Unknown, NULL);
 
 	if (error != UT_OK) 
 	{
 		return false;
 	}
-	AP_Preview_Abi * pPrevAbi = new AP_Preview_Abi(pG,iWidth,iHeight,nullptr, PREVIEW_ZOOMED,pNewDoc);
+	AP_Preview_Abi * pPrevAbi = new AP_Preview_Abi(pG,iWidth,iHeight,NULL, PREVIEW_ZOOMED,pNewDoc);
 	dg_DrawArgs da;
 	memset(&da, 0, sizeof(da));
 	da.pG = pG;
 	GR_Painter * pPaint = new GR_Painter(pG);
 	pPaint->clearArea(0,0,pG->tlu(iWidth),pG->tlu(iHeight));
-	pPrevAbi->getView()->drawPage(0, &da);
+	pPrevAbi->getView()->draw(0, &da);
 	pG->endPaint();
 	cairo_destroy(cr);
 	DELETEP(pPaint);
@@ -1181,62 +1186,22 @@ bool AP_UnixApp::makePngPreview(const char * pszInFile, const char * pszPNGFile,
 GR_Graphics * AP_UnixApp::newDefaultScreenGraphics() const
 {
 	XAP_Frame * pFrame = findValidFrame();
-	UT_return_val_if_fail( pFrame, nullptr );
+	UT_return_val_if_fail( pFrame, NULL );
 	UT_DEBUGMSG(("AP_UnixApp::newDefaultScreenGraphics() \n"));
 	AP_UnixFrameImpl * pFI = static_cast<AP_UnixFrameImpl *>(pFrame->getFrameImpl());
-	UT_return_val_if_fail( pFI, nullptr );
+	UT_return_val_if_fail( pFI, NULL );
 
 	GtkWidget * da = pFI->getDrawingArea();
-	UT_return_val_if_fail( da, nullptr );
+	UT_return_val_if_fail( da, NULL );
 	
 	GR_UnixCairoAllocInfo ai(da);
 	return XAP_App::getApp()->newGraphics(ai);
 }
 
 #ifdef WITH_CHAMPLAIN
-ABI_W_NO_DEPRECATED
 #include <champlain-gtk/champlain-gtk.h>
-ABI_W_POP
 #include <clutter-gtk/clutter-gtk.h>
 #endif
-
-/**
- * activate signale callback for the GApplication
- */
-static void s_activate(GApplication*, gpointer user_data)
-{
-	static_cast<AP_UnixApp*>(user_data)->_appActivate();
-}
-
-static void s_open(GApplication*, gpointer files, gint n_files, gchar* /*hint*/,
-				   gpointer user_data)
-{
-	static_cast<AP_UnixApp*>(user_data)->_appOpen(static_cast<GFile**>(files), n_files);
-}
-
-/**
- * Activate event handler called from signal.
- */
-void AP_UnixApp::_appActivate()
-{
-	openCmdLineFiles(m_args.get());
-}
-
-void AP_UnixApp::_appOpen(GFile* files[], gint n_files)
-{
-	if (!files) {
-		return;
-	}
-	for (gint i = 0; i < n_files; i++) {
-		char* uri = g_file_get_uri(files[i]);
-		if (uri) {
-			openFile(uri);
-			g_free(uri);
-		} else {
-			UT_DEBUGMSG(("can't get uri for file to open"));
-		}
-	}
-}
 
 /*****************************************************************/
 
@@ -1246,7 +1211,7 @@ int AP_UnixApp::main(const char * szAppName, int argc, char ** argv)
 
 #if !GLIB_CHECK_VERSION(2,32,0)
 	if (!g_thread_supported ())
-		g_thread_init (nullptr);
+		g_thread_init (NULL);
 #endif
 
     // initialize our application.
@@ -1281,15 +1246,15 @@ int AP_UnixApp::main(const char * szAppName, int argc, char ** argv)
 #endif
 		// gtk_init_check() modifies argv/argc if --display is specified
 		XAP_Args XArgs = XAP_Args(argc, argv);
-		std::unique_ptr<AP_Args> Args(new AP_Args(&XArgs, szAppName, pMyUnixApp));
+		AP_Args Args = AP_Args(&XArgs, szAppName, pMyUnixApp);
 		if (have_display > 0) {
-			Args->addOptions(gtk_get_option_group(TRUE));
-			Args->parseOptions();
+			Args.addOptions(gtk_get_option_group(TRUE));
+			Args.parseOptions();
 		}
 		else {
 			// no display, but we still need to at least parse our own arguments, damnit, for --to, --to-png, and --print
-			Args->addOptions(gtk_get_option_group(FALSE));
-			Args->parseOptions();
+			Args.addOptions(gtk_get_option_group(FALSE));
+			Args.parseOptions();
 		}
 
 		// if the initialize fails, we don't have icons, fonts, etc.
@@ -1312,34 +1277,39 @@ int AP_UnixApp::main(const char * szAppName, int argc, char ** argv)
 		sa.sa_flags = 0;
 #endif
     
-		sigaction(SIGSEGV, &sa, nullptr);
-		sigaction(SIGBUS, &sa, nullptr);
-		sigaction(SIGILL, &sa, nullptr);
-		sigaction(SIGQUIT, &sa, nullptr);
-		sigaction(SIGFPE, &sa, nullptr);
+		sigaction(SIGSEGV, &sa, NULL);
+		sigaction(SIGBUS, &sa, NULL);
+		sigaction(SIGILL, &sa, NULL);
+		sigaction(SIGQUIT, &sa, NULL);
+		sigaction(SIGFPE, &sa, NULL);
 
 		// TODO: handle SIGABRT
 	
 		// Step 2: Handle all non-window args.
     
 		bool windowlessArgsWereSuccessful = true;
-		if (!Args->doWindowlessArgs(windowlessArgsWereSuccessful)) {
+		if (!Args.doWindowlessArgs(windowlessArgsWereSuccessful )) {
 			delete pMyUnixApp;
 			return (windowlessArgsWereSuccessful ? 0 : -1);
 		}
 
 		if (have_display) {
 
-			// Step 3: This will be the Gtk GUI starting.
-			// All the work is done in the activate signal of the GApplication
-			// after it starts running.
-			pMyUnixApp->setArgs(std::move(Args));
-			g_signal_connect(pMyUnixApp->getGtkApp(), "activate",
-							 G_CALLBACK(s_activate), pMyUnixApp);
-			g_signal_connect(pMyUnixApp->getGtkApp(), "open",
-							 G_CALLBACK(s_open), pMyUnixApp);
+			// Step 3: Create windows as appropriate.
+			// if some args are botched, it returns false and we should
+			// continue out the door.
+			// We used to check for bShowApp here.  It shouldn't be needed
+			// anymore, because doWindowlessArgs was supposed to bail already. -PL
 
-			g_application_run(G_APPLICATION(pMyUnixApp->getGtkApp()), argc, argv);
+			if (pMyUnixApp->openCmdLineFiles(&Args))
+			{
+				// turn over control to gtk
+				gtk_main();
+			}
+			else
+			{
+				UT_DEBUGMSG(("DOM: not parsing command line or showing app\n"));
+			}
 		}
 		else {
 			fprintf(stderr, "No DISPLAY: this may not be what you want.\n");
@@ -1356,8 +1326,14 @@ int AP_UnixApp::main(const char * szAppName, int argc, char ** argv)
 	
 	return exit_status;
 }
+	
+void AP_UnixApp::errorMsgBadArg(const char *msg)
+{
+  fprintf (stderr, "%s.\nRun '%s --help' to see a full list of available command line options.\n",
+	  msg, g_get_prgname());
+}
 
-void AP_UnixApp::errorMsgBadFile(XAP_Frame * pFrame, const char * file,
+void AP_UnixApp::errorMsgBadFile(XAP_Frame * pFrame, const char * file, 
 				 UT_Error error)
 {
   s_CouldNotLoadFileMessage (pFrame, file, error);

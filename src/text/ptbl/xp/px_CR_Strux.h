@@ -48,7 +48,7 @@ public:
 						  PTStruxType struxType);
 	~PX_ChangeRecord_Strux();
 
-	virtual PX_ChangeRecord * reverse(void) const override;
+	virtual PX_ChangeRecord * reverse(void) const;
 
 	PTStruxType				getStruxType(void) const;
 

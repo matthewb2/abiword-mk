@@ -2,7 +2,7 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* major.minor */
-#define ABIWORD_SERIES "3.0" 
+#define ABIWORD_SERIES "3.0"
 
 /* Define to enable debugging functionality */
 /* #undef DEBUG */
@@ -46,9 +46,6 @@
 /* define if the Boost library is available */
 #define HAVE_BOOST /**/
 
-/* define if the compiler supports basic C++11 syntax */
-#define HAVE_CXX11 1
-
 /* Define to 1 if you have the <dlfcn.h> header file. */
 /* #undef HAVE_DLFCN_H */
 
@@ -59,7 +56,7 @@
 #define HAVE_GCRYPT 1
 
 /* GSF has GIO support */
-/* #undef HAVE_GSF_GIO */
+#define HAVE_GSF_GIO 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
@@ -70,11 +67,11 @@
 /* "have link-grammar 5.1.0 or later" */
 /* #undef HAVE_LINK_GRAMMAR_51 */
 
+/* Define to 1 if you have the <memory.h> header file. */
+#define HAVE_MEMORY_H 1
+
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1
-
-/* Define to 1 if you have the <stdio.h> header file. */
-#define HAVE_STDIO_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
@@ -89,7 +86,7 @@
 #define HAVE_SYS_STAT_H 1
 
 /* Define to 1 if you have the <sys/time.h> header file. */
-#define HAVE_SYS_TIME_H 1
+/* #undef HAVE_SYS_TIME_H */
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #define HAVE_SYS_TYPES_H 1
@@ -119,7 +116,7 @@
 #define PACKAGE_NAME "abiword"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "abiword 3.0.5"
+#define PACKAGE_STRING "abiword 3.0.2"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "abiword"
@@ -128,18 +125,15 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "3.0.5"
+#define PACKAGE_VERSION "3.0.2"
 
 /* The platform that is compiled for */
 #define PLATFORM "win"
 
-/* Define to 1 if all of the C90 standard headers exist (not just the ones
-   required in a freestanding environment). This macro is provided for
-   backward compatibility; new code need not use it. */
+/* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
-/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. This
-   macro is obsolete. */
+/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 /* #undef TIME_WITH_SYS_TIME */
 
 /* The toolkit that is used */
@@ -164,7 +158,7 @@
 #define UNICODE 1
 
 /* Version number of package */
-#define VERSION "3.0.5"
+#define VERSION "3.0.2"
 
 /* Using Cairo */
 /* #undef WITH_CAIRO */
@@ -179,7 +173,7 @@
 /* #undef WITH_EVOLUTION_DATA_SERVER */
 
 /* Define if using GIO */
-/* #undef WITH_GIO */
+#define WITH_GIO 1
 
 /* Define if using gnome-vfs */
 /* #undef WITH_GNOMEVFS */
@@ -195,20 +189,14 @@
 
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */
-#define YYTEXT_POINTER 1
+/* #undef YYTEXT_POINTER */
 
 /* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
    <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
    #define below would cause a syntax error. */
 /* #undef _UINT32_T */
 
-/* minimal comctl.dll v4.70 for toolbars */
-#define _WIN32_IE 0x0501
-
-/* support collaboration plugin in Windows 2000 or higher */
-#define _WIN32_WINNT 0x0500
-
-/* Define as a signed integer type capable of holding a process identifier. */
+/* Define to `int' if <sys/types.h> does not define. */
 /* #undef pid_t */
 
 /* Define to the type of an unsigned integer type of width exactly 32 bits if

@@ -1,9 +1,6 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
  * Copyright (C) 2003 Marc Maurer
- * Copyright (C) 2019-2021 Hubert Figuière
- *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -20,9 +17,9 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef AP_UNIXDIALOG_FORMATFRAME_H
+#define AP_UNIXDIALOG_FORMATFRAME_H
 
-#include "xap_UnixDialog.h"
 #include "ap_Dialog_FormatFrame.h"
 
 class XAP_UnixFrame;
@@ -31,29 +28,26 @@ class XAP_UnixFrame;
 
 class GR_UnixCairoGraphics;
 
-class AP_UnixDialog_FormatFrame
-  : public AP_Dialog_FormatFrame
-  , public XAP_UnixDialog
+class AP_UnixDialog_FormatFrame: public AP_Dialog_FormatFrame
 {
 public:
 	AP_UnixDialog_FormatFrame(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_UnixDialog_FormatFrame(void);
 
-	virtual void runModeless(XAP_Frame * pFrame) override;
+	virtual void			runModeless(XAP_Frame * pFrame);
 
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 
 	// callbacks can fire these events
 	virtual void			event_Close(void);
-	void event_previewInvalidate(void);
-	void event_previewDraw(void);
+	void					event_previewExposed(void);
 	void					event_ApplyToChanged(void);
 	void                    event_BorderThicknessChanged(void);
-	virtual void setBorderThicknessInGUI(UT_UTF8String & sThick) override;
-	virtual void setSensitivity(bool bsens) override;
-	virtual void destroy(void) override;
-	virtual void activate(void) override;
-	virtual void notifyActiveFrame(XAP_Frame * pFrame) override;
+	virtual void            setBorderThicknessInGUI(UT_UTF8String & sThick);
+	virtual void            setSensitivity(bool bsens);
+	virtual void            destroy(void);
+	virtual void            activate(void);
+	virtual void            notifyActiveFrame(XAP_Frame * pFrame);
 	const GtkWidget 	  * getWindow (void) const { return m_windowMain; }
 protected:
 	typedef enum
@@ -70,6 +64,7 @@ protected:
 	GR_UnixCairoGraphics	* 		m_pPreviewWidget;
 
 	// pointers to widgets we need to query/set
+	GtkWidget * m_windowMain;
 	GtkWidget * m_wApplyButton;
 	GtkWidget * m_wCloseButton;
 
@@ -92,4 +87,7 @@ protected:
 	GtkWidget * m_wPosParagraph;
 	GtkWidget * m_wPosColumn;
 	GtkWidget * m_wPosPage;
+
 };
+
+#endif /* AP_UNIXDIALOG_FORMATFRAME_H */

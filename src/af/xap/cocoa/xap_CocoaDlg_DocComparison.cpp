@@ -91,7 +91,7 @@ void XAP_CocoaDialog_DocComparison::_populateWindowData(void)
 
 -(void)discardXAP
 {
-	_xap = nullptr;
+	_xap = NULL; 
 }
 
 -(void)dealloc

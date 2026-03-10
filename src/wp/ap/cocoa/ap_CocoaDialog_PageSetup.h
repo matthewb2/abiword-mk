@@ -1,7 +1,8 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:nil; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
+
 /* AbiWord
  * Copyright (C) 2001 AbiSource, Inc.
- * Copyright (C) 2001, 2003-2021 Hubert Figuière
+ * Copyright (C) 2001, 2003 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,7 +20,8 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef AP_CocoaDialog_PageSetup_H
+#define AP_CocoaDialog_PageSetup_H
 
 #import <Cocoa/Cocoa.h>
 #include "ap_Dialog_PageSetup.h"
@@ -28,7 +30,7 @@ class XAP_Frame;
 class AP_CocoaDialog_PageSetup;
 
 
-@interface AP_CocoaDialog_PageSetup_Controller : NSViewController
+@interface AP_CocoaDialog_PageSetup_Controller : NSObject
 {
     IBOutlet NSTextField *_adjustData;
     IBOutlet NSTextField *_adjustLabel;
@@ -45,10 +47,12 @@ class AP_CocoaDialog_PageSetup;
     IBOutlet NSTextField *_topMargin;
     IBOutlet NSTextField *_unitLabel;
     IBOutlet NSPopUpButton *_unitPopup;
+    IBOutlet NSView *_view;
 	AP_CocoaDialog_PageSetup*	_xap;
 	UT_Dimension _last_margin_unit;
 }
-- (id)initWithXAP:(AP_CocoaDialog_PageSetup*)owner;
+- (void)setXAPOwner:(AP_CocoaDialog_PageSetup*)owner;
+- (NSView*)view;
 - (void)fetchData;
 
 - (IBAction)adjustAction:(id)sender;
@@ -69,8 +73,10 @@ public:
 	virtual void runModal(XAP_Frame *pFrame);
 
 private:
-	bool _validate(AP_CocoaDialog_PageSetup_Controller* ctrl, NSPrintInfo * printInfo);
+	bool					_validate(AP_CocoaDialog_PageSetup_Controller* ctrl, NSPrintInfo * printInfo);
 
 	AP_CocoaDialog_PageSetup_Controller *	m_ctrl;
 	XAP_Frame *								m_pFrame;
 };
+
+#endif // AP_CocoaDialog_PageSetup_H

@@ -52,19 +52,19 @@ UT_Script::~UT_Script()
 
 /************************************************************************/
 /************************************************************************/
-UT_ScriptLibrary * UT_ScriptLibrary::m_pInstance = nullptr;
+UT_ScriptLibrary * UT_ScriptLibrary::m_pInstance = NULL;
 
 UT_ScriptLibrary::UT_ScriptLibrary ()
   :     mSniffers (new UT_GenericVector<UT_ScriptSniffer *>(5)),
     m_stErrMsg("")
 {
   m_pInstance = this;
-  UT_DEBUGMSG(("Construct a scriptlibrary %p \n", (void*)this));
+  UT_DEBUGMSG(("Construct a scriptlibrary %p \n",this));
 }
 
 UT_ScriptLibrary::~UT_ScriptLibrary ()
 {
-  UT_DEBUGMSG(("Delete the scriptlibrary %p \n", (void*)this));
+  UT_DEBUGMSG(("Delete the scriptlibrary %p \n",this));
 	DELETEP(mSniffers);
 }
 
@@ -76,7 +76,7 @@ UT_ScriptLibrary * UT_ScriptLibrary::instance ()
 UT_Error UT_ScriptLibrary::execute (const char * script,
 									UT_ScriptIdType type )
 {
-	UT_Script* pScript = nullptr;
+	UT_Script* pScript = NULL;
 	UT_ScriptIdType scriptId = -1;
 
 	UT_Error err = UT_OK;
@@ -118,7 +118,7 @@ void UT_ScriptLibrary::unregisterScript ( UT_ScriptSniffer * s )
 	mSniffers->deleteNthItem (ndx-1);
   
 	// Refactor the indexes
-	UT_ScriptSniffer * pSniffer = nullptr;
+	UT_ScriptSniffer * pSniffer = 0;
 	UT_sint32 size  = mSniffers->size();
 	UT_sint32 i     = 0;
 	for( i = ndx-1; i < size; i++)
@@ -131,7 +131,7 @@ void UT_ScriptLibrary::unregisterScript ( UT_ScriptSniffer * s )
 
 void UT_ScriptLibrary::unregisterAllScripts ()
 {
-	UT_ScriptSniffer * pSniffer = nullptr;
+	UT_ScriptSniffer * pSniffer = 0;
 	UT_sint32 size = mSniffers->size();
   
 	for (UT_sint32 i = 0; i < size; i++)
@@ -209,7 +209,7 @@ UT_ScriptIdType	UT_ScriptLibrary::typeForSuffix(const char * szSuffix)
 
 const char * UT_ScriptLibrary::suffixesForType(UT_ScriptIdType ieft)
 {
-	const char * szSuffixes = nullptr;
+	const char * szSuffixes = 0;
   
 	// we have to construct the loop this way because a
 	// given filter could support more than one file type,
@@ -235,7 +235,7 @@ const char * UT_ScriptLibrary::suffixesForType(UT_ScriptIdType ieft)
     }
   
 	// The passed in filetype is invalid.
-	return nullptr;
+	return 0;
 }
 	
 UT_Error UT_ScriptLibrary::constructScript(const char * szFilename,
@@ -271,9 +271,8 @@ UT_Error UT_ScriptLibrary::constructScript(const char * szFilename,
 	UT_return_val_if_fail(ieft != -1, UT_ERROR);
 	
 	// tell the caller the type of importer they got
-	if (pieft != nullptr) {
+	if (pieft != NULL) 
 		*pieft = ieft;
-	}
   
 	// use the importer for the specified file type
 	UT_uint32 nrElements = getNumScripts();

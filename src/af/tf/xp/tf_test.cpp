@@ -75,35 +75,9 @@ static int memleaks()
 }
 
 
-TF_Test*& TF_Test::first()
-{
-    static TF_Test* _first = nullptr;
-    return _first;
-}
-
-TF_Test*& TF_Test::last()
-{
-    static TF_Test* _last = nullptr;
-    return _last;
-}
-
-int& TF_Test::fails()
-{
-    static int _fails = 0;
-    return _fails;
-}
-
-int& TF_Test::runs()
-{
-    static int _runs = 0;
-    return _runs;
-}
-
-time_t& TF_Test::start_time()
-{
-    static time_t start_time_ = 0;
-    return start_time_;
-}
+TF_Test *TF_Test::first, *TF_Test::last;
+int TF_Test::fails, TF_Test::runs;
+time_t TF_Test::start_time;
 
 
 void TF_Test::alarm_handler(int)
@@ -123,20 +97,18 @@ TF_Test::TF_Test(const char *_suite, const char *_descr,
     : m_suite(_suite)
     , descr(_descr)
     , main(_main)
-    , next(nullptr)
+    , next(NULL)
 {
     const char *cptr = strrchr(_idstr, '/');
-    if (cptr) {
+    if (cptr)
         idstr = cptr+1;
-    } else {
+    else
         idstr = _idstr;
-    }
-    if (first()) {
-        last()->next = this;
-    } else {
-        first() = this;
-    }
-    last() = this;
+    if (first)
+        last->next = this;
+    else
+        first = this;
+    last = this;
 }
 
 
@@ -159,11 +131,11 @@ int TF_Test::run(const char * const *prefixes, const char *suite)
     signal(SIGALRM, alarm_handler);
     // signal(SIGALRM, SIG_IGN);
     alarm(MAX_TEST_TIME);
-    TF_Test::start_time() = time(nullptr);
+    start_time = time(NULL);
 
-    fails() = 0;
-    runs() = 0;
-    for (TF_Test *cur = first(); cur; cur = cur->next) {
+    fails = runs = 0;
+    for (TF_Test *cur = first; cur; cur = cur->next)
+    {
         if ((!prefixes
             || prefix_match(cur->idstr, prefixes)
             || prefix_match(cur->descr, prefixes))
@@ -193,20 +165,20 @@ int TF_Test::run(const char * const *prefixes, const char *suite)
     else
         printf("TF_Test: ran all tests.\n");
     printf("TF_Test: %d test%s, %d failure%s.\n",
-           runs(), runs() == 1 ? "" : "s",
-           fails(), fails() == 1 ? "": "s");
+           runs, runs==1 ? "" : "s",
+           fails, fails==1 ? "": "s");
 
-    return fails() != 0;
+    return fails != 0;
 }
 
 int TF_Test::run_all(const char * const *prefixes)
 {
-    return run(prefixes, nullptr);
+    return run(prefixes, NULL);
 }
 
 int TF_Test::run_suite(const char *suite)
 {
-    return run(nullptr, suite);
+    return run(NULL, suite);
 }
 
 void TF_Test::start(const char *file, int line, const char *condstr)
@@ -235,23 +207,24 @@ void TF_Test::start(const char *file, int line, const char *condstr)
 void TF_Test::check(bool cond)
 {
     alarm(MAX_TEST_TIME); // restart per-test timeout
-    if (!TF_Test::start_time()) {
-        TF_Test::start_time() = time(nullptr);
-    }
+    if (!start_time)
+        start_time = time(NULL);
 
-    if (time(nullptr) - TF_Test::start_time() > MAX_TOTAL_TIME) {
+    if (time(NULL) - start_time > MAX_TOTAL_TIME)
+    {
         printf("\n! TF_Test   Total run time exceeded %d seconds!  FAILED\n",
                MAX_TOTAL_TIME);
         abort();
     }
 
-    runs()++;
+    runs++;
 
-    if (cond) {
+    if (cond)
         printf("ok\n");
-    } else {
+    else
+    {
         printf("FAILED\n");
-        fails()++;
+        fails++;
     }
     fflush(stdout);
 }
@@ -317,12 +290,11 @@ bool TF_Test::ensure_test_data(const char* file, std::string & path)
 {
     path = "file://";
     path += TF_Test::get_test_src_dir();
-    path += "/";
     path += file;
 
     bool exists = false;
     GFile *f = g_file_new_for_uri(path.c_str());
-    exists = g_file_query_exists(f, nullptr);
+    exists = g_file_query_exists(f, NULL);
     g_object_unref(f);
 
     return exists;

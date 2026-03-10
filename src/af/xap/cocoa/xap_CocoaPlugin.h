@@ -19,11 +19,14 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef XAP_COCOAPLUGIN_H
+#define XAP_COCOAPLUGIN_H
 
 #define XAP_COCOAPLUGIN_INTERFACE 20050925 /** The current version of the CocoaPlugin API. */
 
 #import <Cocoa/Cocoa.h>
+
+#import "xap_CocoaCompat.h"
 
 @class XAP_CocoaPlugin;
 
@@ -703,3 +706,5 @@
 - (NSString *)parseFile:(NSString *)path simpleXML:(id <XAP_CocoaPlugin_SimpleXML>)callback;
 
 @end
+
+#endif /* XAP_COCOAPLUGIN_H */

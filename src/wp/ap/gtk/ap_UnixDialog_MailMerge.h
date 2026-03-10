@@ -1,7 +1,5 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 2003 Dom Lachowicz
- * Copyright (C) 2019 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,24 +20,21 @@
 #ifndef AP_UNIXDIALOG_MAILMERGE_H
 #define AP_UNIXDIALOG_MAILMERGE_H
 
-#include "xap_UnixDialog.h"
 #include "ap_Dialog_MailMerge.h"
 
 class XAP_UnixFrame;
 
 /*****************************************************************/
 
-class AP_UnixDialog_MailMerge
-  : public AP_Dialog_MailMerge
-  , public XAP_UnixDialog
+class AP_UnixDialog_MailMerge: public AP_Dialog_MailMerge
 {
 public:
 	AP_UnixDialog_MailMerge(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_UnixDialog_MailMerge(void);
 
-	virtual void runModeless(XAP_Frame * pFrame) override;
-	virtual void activate(void) override {XAP_gtk_window_raise(m_windowMain);}
-	virtual void destroy(void) override {modeless_cleanup();}
+	virtual void			runModeless(XAP_Frame * pFrame);
+	virtual void activate(void) {gdk_window_raise (gtk_widget_get_window(m_windowMain));}
+	virtual void destroy(void) {modeless_cleanup();}
 
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 
@@ -49,13 +44,14 @@ public:
 	void event_Close();
 
 protected:
-	virtual void setFieldList() override;
+	virtual void setFieldList();
 
 private:
 
 	// private construction functions
 	GtkWidget *  _constructWindow(void);
 
+	GtkWidget * m_windowMain;
 	GtkWidget * m_entry;
 	GtkWidget * m_treeview;
 };

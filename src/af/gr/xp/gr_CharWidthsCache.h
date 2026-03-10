@@ -1,5 +1,5 @@
 /* AbiSource Application Framework
- * Copyright (C) 2003, 2013-2021 Hubert Figuière
+ * Copyright (C) 2003, 2013 Hubert Figuiere
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,7 +17,8 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef _GR_CHAR_WIDTHS_CACHE_H__
+#define _GR_CHAR_WIDTHS_CACHE_H__
 
 #include <map>
 #include <string>
@@ -40,14 +41,16 @@ public:
 		return s_pInstance;
 	}
 
-	constexpr static const double CACHE_FONT_SIZE = 120.;
+	enum {
+		CACHE_FONT_SIZE = 120
+	};
 
 	static void destroyCharWidthsCache()
 	{
 		if(s_pInstance)
 		{
 			delete s_pInstance;
-			s_pInstance = nullptr;
+			s_pInstance = NULL;
 		}
 	}
 
@@ -78,3 +81,6 @@ private:
 	 */
 	FontCache m_fontHash;
 };
+
+
+#endif

@@ -1,4 +1,3 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
  *
@@ -21,31 +20,28 @@
 #ifndef AP_UNIXDIALOG_SPLITCELLS_H
 #define AP_UNIXDIALOG_SPLITCELLS_H
 
-#include "xap_UnixDialog.h"
 #include "ap_Dialog_SplitCells.h"
 
 class XAP_UnixFrame;
 
 /*****************************************************************/
 
-class AP_UnixDialog_SplitCells
-  : public AP_Dialog_SplitCells
-  , public XAP_UnixDialog
+class AP_UnixDialog_SplitCells: public AP_Dialog_SplitCells
 {
 public:
 	AP_UnixDialog_SplitCells(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_UnixDialog_SplitCells(void);
 
-	virtual void runModeless(XAP_Frame * pFrame) override;
+	virtual void			runModeless(XAP_Frame * pFrame);
 
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 
 	// callbacks can fire these events
 	virtual void			event_Close(void);
-	virtual void setSensitivity(AP_CellSplitType splitThis, bool bsens) override;
-	virtual void destroy(void) override;
-	virtual void activate(void) override;
-	virtual void notifyActiveFrame(XAP_Frame * pFrame) override;
+	virtual void            setSensitivity(AP_CellSplitType splitThis, bool bsens);
+	virtual void            destroy(void);
+	virtual void            activate(void);
+	virtual void            notifyActiveFrame(XAP_Frame * pFrame);
 protected:
 	typedef enum
 	{
@@ -59,6 +55,7 @@ protected:
 	void					_storeWindowData(void);
 	void                     _connectSignals(void);
 	// pointers to widgets we need to query/set
+	GtkWidget * m_windowMain;
 	GtkWidget * m_wContents;
 
 	GtkWidget * m_wSplitLeft;

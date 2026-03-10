@@ -68,7 +68,7 @@ public:
 	void                  mouseRelease(UT_sint32 x, UT_sint32 y);
 	FV_DragWhat           mouseMotion(UT_sint32 x, UT_sint32 y);
 	void                  drawFrame(bool bWithHandles);
-	void                  deleteFrame(fl_FrameLayout * pFL = nullptr);
+	void                  deleteFrame(fl_FrameLayout * pFL = NULL);
 	void                  setDragType(UT_sint32 x,UT_sint32 y, bool bDrawFrame);
 	bool                  getFrameStrings(UT_sint32 x, UT_sint32 y,
 					      fv_FrameStrings &FS,
@@ -84,7 +84,7 @@ public:
     bool                  isImageWrapper(void) const;
 
 protected:
-	virtual void          _mouseDrag(UT_sint32 x, UT_sint32 y) override;
+	virtual void          _mouseDrag(UT_sint32 x, UT_sint32 y);
 
 private:
 	FV_FrameEditMode      m_iFrameEditMode;

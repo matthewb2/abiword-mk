@@ -1,4 +1,3 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
  * Copyright (c) 2010 Maleesh Prasan
@@ -18,9 +17,9 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef AP_UNIXDIALOG_BORDER_SHADING_H
+#define AP_UNIXDIALOG_BORDER_SHADING_H
 
-#include "xap_UnixDialog.h"
 #include "ap_Dialog_Border_Shading.h"
 
 
@@ -29,38 +28,35 @@ class GR_UnixCairoGraphics;
 
 /*****************************************************************/
 
-class AP_UnixDialog_Border_Shading
-	: public AP_Dialog_Border_Shading
-	, public XAP_UnixDialog
+class AP_UnixDialog_Border_Shading: public AP_Dialog_Border_Shading
 {
 public:
 	AP_UnixDialog_Border_Shading(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_UnixDialog_Border_Shading(void);
 
-	virtual void			runModeless(XAP_Frame * pFrame) override;
+	virtual void			runModeless(XAP_Frame * pFrame);
 
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 
 	// callbacks can fire these events
 	virtual void			event_Close(void);
-	void event_previewInvalidate(void);
-	void event_previewDraw(void);
+	void					event_previewExposed(void);
 	void                    event_BorderThicknessChanged(void);
 	void                    event_BorderStyleChanged(void);
 	void                    event_ShadingOffsetChanged(void);
 	void					event_shadingPatternChange(void);
 
-	virtual void           	setBorderThicknessInGUI(const std::string & sThick) override;
-	virtual void            setBorderColorInGUI(const UT_RGBColor & clr) override;
-	virtual void            setBorderStyleInGUI(const std::string & sStyle) override;
-	virtual void		setShadingColorInGUI(const UT_RGBColor & clr) override;
-	virtual void		setShadingPatternInGUI(const std::string & sPattern) override;
-	virtual void		setShadingOffsetInGUI(const std::string & sOffset) override;
+	virtual void           	setBorderThicknessInGUI(const std::string & sThick);
+	virtual void            setBorderColorInGUI(const UT_RGBColor & clr);
+	virtual void            setBorderStyleInGUI(const std::string & sStyle);
+	virtual void			setShadingColorInGUI(const UT_RGBColor & clr);
+	virtual void			setShadingPatternInGUI(const std::string & sPattern);
+	virtual void			setShadingOffsetInGUI(const std::string & sOffset);
 
-	virtual void           	setSensitivity(bool bsens) override;
-	virtual void           	destroy(void) override;
-	virtual void            activate(void) override;
-	virtual void            notifyActiveFrame(XAP_Frame * pFrame) override;
+	virtual void           	setSensitivity(bool bsens);
+	virtual void           	destroy(void);
+	virtual void            activate(void);
+	virtual void            notifyActiveFrame(XAP_Frame * pFrame);
 	const GtkWidget 	  * getWindow (void) const { return m_windowMain; }
 
 protected:
@@ -77,6 +73,7 @@ protected:
 	GR_UnixCairoGraphics	* 		m_pPreviewWidget;
 
 	// pointers to widgets we need to query/set
+	GtkWidget * m_windowMain;
 	GtkWidget * m_wApplyButton;
 	GtkWidget * m_wCloseButton;
 
@@ -104,3 +101,5 @@ protected:
 	guint		m_iLineTopConnect;
 	guint		m_iLineBotConnect;
 };
+
+#endif /* AP_UNIXDIALOG_BORDER_SHADING_H */

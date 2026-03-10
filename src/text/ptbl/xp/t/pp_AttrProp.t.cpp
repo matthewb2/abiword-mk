@@ -173,7 +173,7 @@ TFTEST_MAIN("PP_cloneAndDecodeAttributes")
     const char *attrs[] = {
         "inline", "&amp; &lt; &gt; &quot;",
         "props", "abc: d; efg: hij",
-        nullptr, nullptr
+        NULL, NULL
     };
     PP_PropertyVector props = PP_cloneAndDecodeAttributes(attrs);
 
@@ -183,7 +183,7 @@ TFTEST_MAIN("PP_cloneAndDecodeAttributes")
 
     const char *attrs2[] = {
         "inline", "&amp; &lt; &gt; &quot;",
-        "props", nullptr
+        "props", NULL
     };
     props = PP_cloneAndDecodeAttributes(attrs2);
     TFPASSEQ(props.size(), 4);
@@ -217,7 +217,7 @@ TFTEST_MAIN("PP_std_copyProps")
     const char *cprops[] = {
         "style", "Normal",
         "lang", "fr",
-        nullptr, nullptr
+        NULL, NULL
     };
     PP_PropertyVector attr = PP_std_copyProps(cprops);
     TFPASSEQ(attr.size(), 4);
@@ -229,8 +229,8 @@ TFTEST_MAIN("PP_std_copyProps")
 
     const char *cprops2[] = {
         "style", "Normal",
-        "lang", nullptr,
-        nullptr, nullptr
+        "lang", NULL,
+        NULL, NULL
     };
 
 
@@ -308,7 +308,7 @@ TFTEST_MAIN("PP_AttrProp checksum")
     attrProps.setAttributes(true_attr);
     attrProps.markReadOnly();
     UT_uint32 cs = attrProps.getCheckSum();
-    TFPASSEQ(cs, 0x12301177);
+    TFPASSEQ(cs, 0x1984e55b);
 
     PP_AttrProp attrProps2;
 

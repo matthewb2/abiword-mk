@@ -1,4 +1,3 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t -*- */
 /* AbiSource Program Utilities
  * Copyright (C) 2002 Dom Lachowicz
  *
@@ -43,15 +42,16 @@
  * SEE ALSO: man setlocale
  */
 UT_LocaleTransactor::UT_LocaleTransactor (int category, const char * locale)
-  : mCategory(category)
+  : mCategory (category), mOldLocale (0)
 {
-	mOldLocale = setlocale(category, nullptr);
-	setlocale(category, locale);
+	mOldLocale = g_strdup(setlocale(category, NULL));
+	setlocale (category, locale);
 }
 
 UT_LocaleTransactor::~UT_LocaleTransactor ()
 {
-	setlocale(mCategory, mOldLocale.c_str());
+	setlocale (mCategory, mOldLocale);
+	FREEP(mOldLocale);
 }
 
 /********************************************/
@@ -62,17 +62,17 @@ UT_LocaleTransactor::~UT_LocaleTransactor ()
  */
 UT_LocaleInfo::UT_LocaleInfo ()
 {
-	// should work on any platform, as opposed to init(getenv("LANG"))
-	XAP_EncodingManager * instance = XAP_EncodingManager::get_instance ();
+  // should work on any platform, as opposed to init(getenv("LANG"))
+  XAP_EncodingManager * instance = XAP_EncodingManager::get_instance ();
 
-	if (instance->getLanguageISOName() != nullptr)
-		mLanguage = instance->getLanguageISOName();
+  if (instance->getLanguageISOName () != NULL)
+    mLanguage = instance->getLanguageISOName ();
 
-	if (instance->getLanguageISOTerritory() != nullptr)
-		mTerritory = instance->getLanguageISOTerritory();
+  if (instance->getLanguageISOTerritory () != NULL)
+    mTerritory = instance->getLanguageISOTerritory ();
 
-	if (instance->getNative8BitEncodingName() != nullptr)
-		mEncoding = instance->getNative8BitEncodingName();
+  if (instance->getNative8BitEncodingName () != NULL)
+    mEncoding = instance->getNative8BitEncodingName ();
 }
 
 /**
@@ -82,36 +82,36 @@ UT_LocaleInfo::UT_LocaleInfo ()
  */
 UT_LocaleInfo::UT_LocaleInfo (const char * locale)
 {
-	init(locale);
+  init (locale);
 }
 
 /* static */const UT_LocaleInfo UT_LocaleInfo::system()
 {
-	return UT_LocaleInfo();
+  return UT_LocaleInfo();
 }
 
 /**
  * True if language field is non-null/non-empty, false if not
  */
-bool UT_LocaleInfo::hasLanguage() const
+bool UT_LocaleInfo::hasLanguage () const
 {
-	return mLanguage.size() != 0;
+  return mLanguage.size () != 0;
 }
 
 /**
  * True if territory field is non-null/non-empty, false if not
  */
-bool UT_LocaleInfo::hasTerritory() const
+bool UT_LocaleInfo::hasTerritory () const
 {
-	return mTerritory.size() != 0;
+  return mTerritory.size () != 0;
 }
 
 /**
  * True if encoding field is non-null/non-empty, false if not
  */
-bool UT_LocaleInfo::hasEncoding() const
+bool UT_LocaleInfo::hasEncoding () const
 {
-	return mEncoding.size() != 0;
+  return mEncoding.size () != 0;
 }
 
 /**
@@ -120,106 +120,104 @@ bool UT_LocaleInfo::hasEncoding() const
  */
 const std::string& UT_LocaleInfo::getLanguage () const
 {
-	return mLanguage;
+  return mLanguage;
 }
 
 /**
  * Returns empty string or territory. Example territories are:
  * "US", "GB", "FR", ...
  */
-const std::string& UT_LocaleInfo::getTerritory() const
+const std::string& UT_LocaleInfo::getTerritory () const
 {
-	return mTerritory;
+  return mTerritory;
 }
 
 /**
  * Returns empty string or encoding. Encoding is like "UTF-8" or
  * "ISO-8859-1"
  */
-const std::string& UT_LocaleInfo::getEncoding() const
+const std::string& UT_LocaleInfo::getEncoding () const
 {
-	return mEncoding;
+  return mEncoding;
 }
 
-void UT_LocaleInfo::init(const std::string & locale)
+void UT_LocaleInfo::init (const std::string & locale)
 {
-	if (locale.empty())
-	{
-		return;
-	}
+  if (locale.size () == 0)
+    return;
 
-	std::string::size_type dot = 0;
-	std::string::size_type hyphen = 0;
+  size_t dot    = 0;
+  size_t hyphen = 0;
 
-	// take both hyphen types into account
-	hyphen = locale.find('_');
-	if (hyphen == std::string::npos)
-	{
-		hyphen = locale.find('-');
-	}
+  // take both hyphen types into account
+  hyphen = UT_String_findCh (locale, '_');
+  if (hyphen == (size_t)-1)
+    hyphen = UT_String_findCh (locale, '-');
 
-	dot = locale.find('.');
+  dot = UT_String_findCh (locale, '.');
 
-	if (hyphen == std::string::npos && dot == std::string::npos)
-	{
-		mLanguage = locale;
-		return;
-	}
+  if (hyphen == (size_t)-1 && dot == (size_t)-1)
+    {
+      mLanguage = locale.c_str();
+      return;
+    }
 
-	if (hyphen != std::string::npos && dot != std::string::npos)
+  if (hyphen != (size_t)-1 && dot != (size_t)-1)
+    {
+      if (hyphen < dot)
 	{
-		if (hyphen < dot)
-		{
-			mLanguage  = locale.substr(0, hyphen);
-			mTerritory = locale.substr(hyphen + 1, dot - (hyphen + 1));
-			mEncoding  = locale.substr(dot + 1, locale.size() - (dot + 1));
-		}
-		else
-		{
-			mLanguage = locale.substr(0, dot);
-			mEncoding = locale.substr(dot + 1, locale.size() - (dot + 1));
-		}
+	  mLanguage  = locale.substr (0, hyphen).c_str();
+	  mTerritory = locale.substr (hyphen+1, dot-(hyphen+1)).c_str();
+	  mEncoding  = locale.substr (dot+1, locale.size ()-(dot+1)).c_str();
 	}
-	else if (dot != std::string::npos)
+      else
 	{
-		mLanguage = locale.substr(0, dot);
-		mEncoding = locale.substr(dot + 1, locale.size() - (dot + 1));
+	  mLanguage = locale.substr (0, dot).c_str();
+	  mEncoding = locale.substr (dot+1, locale.size ()-(dot+1)).c_str();
 	}
-	else if (hyphen != std::string::npos)
-	{
-		mLanguage = locale.substr(0, hyphen);
-		mEncoding = locale.substr(hyphen +1, locale.size() - (hyphen + 1));
-	}
+    }
+  else if (dot != (size_t)-1)
+    {
+      mLanguage = locale.substr (0, dot).c_str();
+      mEncoding = locale.substr (dot+1, locale.size ()-(dot+1)).c_str();
+    }
+  else if (hyphen != (size_t)-1)
+    {
+      mLanguage = locale.substr (0, hyphen).c_str();
+      mEncoding = locale.substr (hyphen+1, locale.size ()-(hyphen+1)).c_str();
+    }
 }
 
 /**
  * Turns object back into a string of the form language_TERRITORY.ENCODING
  * (eg): en_US.UTF-8
  */
-std::string UT_LocaleInfo::toString() const
+std::string UT_LocaleInfo::toString () const
 {
-	std::string ret(mLanguage);
+  std::string ret (mLanguage);
 
-	if (hasTerritory())
-	{
-		ret += "_";
-		ret += mTerritory;
-	}
-
-	if (hasEncoding())
+  if (hasTerritory ())
     {
-		ret += ".";
-		ret += mEncoding;
+      ret += "_";
+      ret += mTerritory;
     }
 
-	return ret;
+  if (hasEncoding ())
+    {
+      ret += ".";
+      ret += mEncoding;
+    }
+
+  return ret;
 }
 
 bool UT_LocaleInfo::operator==(const UT_LocaleInfo & rhs) const
 {
-	return ((mLanguage == rhs.mLanguage) &&
-			(mTerritory == rhs.mTerritory) &&
-			(mEncoding == rhs.mEncoding));
+  if ((this->mLanguage  == rhs.mLanguage) && 
+      (this->mTerritory == rhs.mTerritory) &&
+      (this->mEncoding  == rhs.mEncoding))
+    return true;
+  return false;
 }
 
 bool UT_LocaleInfo::operator!=(const UT_LocaleInfo & rhs) const
@@ -227,57 +225,45 @@ bool UT_LocaleInfo::operator!=(const UT_LocaleInfo & rhs) const
   return (!(*this == rhs));
 }
 
-/*
+/*	
 	We build the default Abiword user's locale in the form ISO3166-ISO639 pair
-	(e.g. es-MX) from Windows locale information. For example, If the user's selected
-	country and language are Argentina and Spanish we will build AR-ES. Unfortunally,
+	(e.g. es-MX) from Windows locale information. For example, If the user's selected 
+	country and language are Argentina and Spanish we will build AR-ES. Unfortunally, 
 	it's likely that we do not have a string set for this variant of Spanish (there are
 	more than 19). What we do is we provide a fallback locale for this situation.
-	26/01/2003 Jordi
-
+	26/01/2003 Jordi 
+		
 	See bug 4174 for additional details
 */
 const char* UT_getFallBackStringSetLocale(const char* pLocale)
-{
-	char szLanguage[3];
-	strncpy(szLanguage, pLocale, 2);
-	szLanguage[2] = '\0';
-
+{	
+	char	szLanguage[3];	
+	strncpy (szLanguage, pLocale,2);
+	szLanguage[2]='\0';
+	
 	// please keep these in alphabetical order
-	if (g_ascii_strcasecmp(szLanguage, "ca") == 0)
-	{
+	
+	if (g_ascii_strcasecmp(szLanguage,"ca")==0)
 		return "ca-ES";
-	}
 
-	if (g_ascii_strcasecmp(szLanguage, "de") == 0)
-	{
+	if (g_ascii_strcasecmp(szLanguage,"de")==0)
 		return "de-DE";
-	}
-
-	if (g_ascii_strcasecmp(szLanguage, "en") == 0)
-	{
-		return "en-US";
-	}
-
-	if (g_ascii_strcasecmp(szLanguage, "es") == 0)
-	{
+	
+	if (g_ascii_strcasecmp(szLanguage,"en")==0)
+		return "en-US";		 	
+	
+	if (g_ascii_strcasecmp(szLanguage,"es")==0)
 		return "es-ES";
-	}
-
-	if (g_ascii_strcasecmp(szLanguage, "fr") == 0)
-	{
-		return "fr-FR";
-	}
-
-	if (g_ascii_strcasecmp(szLanguage, "nl") == 0)
-	{
+	
+	if (g_ascii_strcasecmp(szLanguage,"fr")==0)
+		return "fr-FR";		 
+	
+	if (g_ascii_strcasecmp(szLanguage,"nl")==0) 	
 		return "nl-NL";
-	}
 
-	if (g_ascii_strcasecmp(szLanguage, "ru") == 0)
-	{
+	if (g_ascii_strcasecmp(szLanguage,"ru")==0) 
 		return "ru-RU";
-	}
 
-	return nullptr;
+
+	return NULL;
 }

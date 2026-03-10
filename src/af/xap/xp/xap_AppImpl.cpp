@@ -20,6 +20,7 @@
 #include "xap_AppImpl.h"
 #include "ut_assert.h"
 #include "ut_path.h"
+#include "ut_string_class.h"
 #include "xap_App.h"
 #include "xap_Prefs.h"
 
@@ -40,9 +41,9 @@ bool XAP_AppImpl::openHelpURL(const char * url)
 }
 
 
-inline static void _catPath(std::string& st, const std::string& st2)
+inline static void _catPath(UT_String& st, const char* st2)
 {
-	if (!st.empty())
+	if (st.size() > 0)
 	{
 		if (st[st.size() - 1] != '/')
 			st += '/';
@@ -62,9 +63,9 @@ inline static void _catPath(std::string& st, const std::string& st2)
 	
 	Override in subclasses if platform needs specific work
  */
-std::string XAP_AppImpl::localizeHelpUrl (const char * pathBeforeLang,
-					  const char * pathAfterLang,
-					  const char * remoteURLbase)
+UT_String XAP_AppImpl::localizeHelpUrl (const char * pathBeforeLang, 
+										   const char * pathAfterLang,
+										   const char * remoteURLbase)
 {
 	XAP_App* pApp = XAP_App::getApp();
 
@@ -73,17 +74,17 @@ std::string XAP_AppImpl::localizeHelpUrl (const char * pathBeforeLang,
 	UT_return_val_if_fail(pPrefs, "");
 
 	const char* abiSuiteLibDir = pApp->getAbiSuiteLibDir();
-	std::string abiSuiteLocString;
-	std::string url;
+	const gchar* abiSuiteLocString = NULL;
+	UT_String url;
 
 	// evil...
-	pPrefs->getPrefsValue("StringSet", abiSuiteLocString);
+	pPrefs->getPrefsValue((gchar*)"StringSet", &abiSuiteLocString);
 
 	// 1st try file on user's computer (local file), if not exist try remote help
-	std::string path(abiSuiteLibDir);
+	UT_String path(abiSuiteLibDir);
 	_catPath(path, pathBeforeLang);
 
-	std::string localized_path(path);
+	UT_String localized_path(path);
 	_catPath(localized_path, abiSuiteLocString);
 
 	if (UT_directoryExists(localized_path.c_str()))
@@ -110,9 +111,9 @@ std::string XAP_AppImpl::localizeHelpUrl (const char * pathBeforeLang,
 		// HACK: Not all help files are localized. 
 		// HACK: Hard code the available translations here instead of 404-ing.
 		if (!(
-			abiSuiteLocString == "en-US" ||
-			abiSuiteLocString == "fr-FR" ||
-			abiSuiteLocString == "pl-PL"
+			!strcmp(abiSuiteLocString, "en-US") ||
+			!strcmp(abiSuiteLocString, "fr-FR") ||
+			!strcmp(abiSuiteLocString, "pl-PL")
 			))
 			_catPath(url, "en-US");
 		else

@@ -91,7 +91,7 @@ static char *s_escapeMenuString(char *p_str)
 Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_Toolbar)
 {
 	XAP_App * pApp = XAP_App::getApp();
-	UT_return_val_if_fail (pApp && pLabel, nullptr);
+	UT_return_val_if_fail (pApp && pLabel, NULL);
 
 	UT_ASSERT_HARMLESS(id >= AP_MENU_ID_VIEW_TB_1);
 	UT_ASSERT_HARMLESS(id <= AP_MENU_ID_VIEW_TB_4);
@@ -111,7 +111,7 @@ Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_Toolbar)
 		return buf;
 	}
 
-	return nullptr;
+	return NULL;
 }
 
 
@@ -122,22 +122,22 @@ Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_Recent)
 	// on the next call).
 
 	XAP_App * pApp = XAP_App::getApp();
-	UT_return_val_if_fail (pApp && pLabel, nullptr);
+	UT_return_val_if_fail (pApp && pLabel, NULL);
 
 	UT_ASSERT_HARMLESS(id >= AP_MENU_ID_FILE_RECENT_1);
 
-	UT_uint32 ndx = (id - AP_MENU_ID_FILE_RECENT_1 + 1);
+	UT_sint32 ndx = (id - AP_MENU_ID_FILE_RECENT_1 + 1);
 
 	XAP_Prefs * pPrefs = pApp->getPrefs();
-	UT_return_val_if_fail (pPrefs, nullptr);
+	UT_return_val_if_fail (pPrefs, NULL);
 
-    static char *buf = nullptr;
+    static char *buf = NULL;
     if (ndx <= pPrefs->getRecentCount())
     {
         const char * szFormat = pLabel->getMenuLabel();
         const char * szURI = pPrefs->getRecent(ndx);
-        char *szFname = g_filename_from_uri(szURI, nullptr, nullptr);
-        char *szRecent = g_filename_to_utf8(szFname, -1, nullptr, nullptr, nullptr);
+        char *szFname = g_filename_from_uri(szURI, NULL, NULL);
+        char *szRecent = g_filename_to_utf8(szFname, -1, NULL, NULL, NULL);
         char *szBasename = szRecent ? g_path_get_basename(szRecent) : g_strdup ("");
 		char *szMenuname = s_escapeMenuString(szBasename);
         g_free(szFname);
@@ -153,7 +153,7 @@ Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_Recent)
 	// for the other slots, return a null string to tell
 	// the menu code to remove this item from the menu.
 
-	return nullptr;
+	return NULL;
 }
 
 Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_About)
@@ -162,7 +162,7 @@ Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_About)
 	// Compute the menu label for the _help_about item.
 
 	XAP_App * pApp = XAP_App::getApp();
-	UT_return_val_if_fail (pApp && pLabel, nullptr);
+	UT_return_val_if_fail (pApp && pLabel, NULL);
 
 	UT_ASSERT_HARMLESS(id == AP_MENU_ID_HELP_ABOUT);
 
@@ -171,7 +171,8 @@ Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_About)
 
 	const char * szAppName = pApp->getApplicationName();
 
-	snprintf(buf, 128, szFormat, szAppName);
+	//snprintf(buf, 128, szFormat, szAppName);   //pascal
+  snprintf(buf, 128, szFormat, "AbiWord Personal");
 	return buf;
 }
 
@@ -181,7 +182,7 @@ Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_Contents)
 	// Compute the menu label for the _help_contents item.
 
 	XAP_App * pApp = XAP_App::getApp();
-	UT_return_val_if_fail (pApp && pLabel, nullptr);
+	UT_return_val_if_fail (pApp && pLabel, NULL);
 
 	UT_ASSERT_HARMLESS(id == AP_MENU_ID_HELP_CONTENTS);
 
@@ -200,7 +201,7 @@ Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_Intro)
 	// Compute the menu label for the _help_intro item.
 
 	XAP_App * pApp = XAP_App::getApp();
-	UT_return_val_if_fail (pApp && pLabel, nullptr);
+	UT_return_val_if_fail (pApp && pLabel, NULL);
 
 	UT_ASSERT_HARMLESS(id == AP_MENU_ID_HELP_INTRO);
 
@@ -220,7 +221,7 @@ Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_Search)
 	// Compute the menu label for the _help_search item.
 
 	XAP_App * pApp = XAP_App::getApp();
-	UT_return_val_if_fail (pApp && pLabel, nullptr);
+	UT_return_val_if_fail (pApp && pLabel, NULL);
 
 	UT_ASSERT_HARMLESS(id == AP_MENU_ID_HELP_SEARCH);
 
@@ -239,7 +240,7 @@ Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_Checkver)
 	// Compute the menu label for the about the check version item.
 
 	XAP_App * pApp = XAP_App::getApp();
-	UT_return_val_if_fail (pApp && pLabel, nullptr);
+	UT_return_val_if_fail (pApp && pLabel, NULL);
 
 	UT_ASSERT_HARMLESS(id == AP_MENU_ID_HELP_CHECKVER);
 
@@ -283,7 +284,7 @@ Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_Window)
 	// on the next call).
 
 	XAP_App * pApp = XAP_App::getApp();
-	UT_return_val_if_fail (pApp && pLabel, nullptr);
+	UT_return_val_if_fail (pApp && pLabel, NULL);
 
 	UT_ASSERT_HARMLESS(id >= AP_MENU_ID_WINDOW_1);
 	UT_ASSERT_HARMLESS(id <= AP_MENU_ID_WINDOW_9);
@@ -300,10 +301,10 @@ Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_Window)
 		static char buf[128];
 
 		XAP_Frame * pFrame = pApp->getFrame(ndx);
-		UT_return_val_if_fail (pFrame, nullptr);
+		UT_return_val_if_fail (pFrame, NULL);
 
 		memset(buf, 0, sizeof(buf));
-		snprintf(buf, sizeof(buf), szFormat, pFrame->getTitle().c_str());
+		snprintf(buf, sizeof(buf), szFormat, pFrame->getTitle().utf8_str());
 		buf[sizeof(buf) - 1] = '\0';
 		return buf;
 	}
@@ -311,7 +312,7 @@ Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_Window)
 	// for the other slots, return a null string to tell
 	// the menu code to remove this item from the menu.
 
-	return nullptr;
+	return NULL;
 }
 
 Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_WindowMore)
@@ -321,7 +322,7 @@ Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_WindowMore)
 	// Compute the menu label for the _window_more ("More Windows...") item.
 
 	XAP_App * pApp = XAP_App::getApp();
-	UT_return_val_if_fail (pApp && pLabel, nullptr);
+	UT_return_val_if_fail (pApp && pLabel, NULL);
 	UT_ASSERT_HARMLESS(id == AP_MENU_ID_WINDOW_MORE);
 
 	// if we have more than 9 windows in our window list,
@@ -331,7 +332,7 @@ Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_WindowMore)
 	if (8 < pApp->getFrameCount())
 		return pLabel->getMenuLabel();
 
-	return nullptr;
+	return NULL;
 }
 
 /*****************************************************************/
@@ -348,7 +349,7 @@ Defun_EV_GetMenuItemState_Fn(ap_GetState_Spelling)
   UT_return_val_if_fail (pPrefs, EV_MIS_Gray);
 
   bool b = true ;
-  pPrefs->getPrefsValueBool(AP_PREF_KEY_AutoSpellCheck, b);
+  pPrefs->getPrefsValueBool(static_cast<const gchar *>(AP_PREF_KEY_AutoSpellCheck),&b) ;
 
   // if there are no loaded dictionaries and we are spell checking
   // as we type
@@ -392,7 +393,7 @@ Defun_EV_GetMenuItemState_Fn(ap_GetState_BookmarkOK)
 	PT_DocPosition posEnd = pView->getSelectionAnchor();
 	fl_BlockLayout * pBL1 = pView->getBlockAtPosition(posStart);
 	fl_BlockLayout * pBL2 = pView->getBlockAtPosition(posEnd);
-	if((pBL1 == nullptr) || (pBL2 == nullptr)) // make sure we get valid blocks from selection beginning and end
+	if((pBL1 == NULL) || (pBL2 == NULL)) // make sure we get valid blocks from selection beginning and end
 	{
 		s = EV_MIS_Gray;
 		return s;
@@ -424,7 +425,7 @@ Defun_EV_GetMenuItemState_Fn(ap_GetState_xmlidOK)
 	PT_DocPosition posEnd = pView->getSelectionAnchor();
 	fl_BlockLayout * pBL1 = pView->getBlockAtPosition(posStart);
 	fl_BlockLayout * pBL2 = pView->getBlockAtPosition(posEnd);
-	if((pBL1 == nullptr) || (pBL2 == nullptr)) // make sure we get valid blocks from selection beginning and end
+	if((pBL1 == NULL) || (pBL2 == NULL)) // make sure we get valid blocks from selection beginning and end
 	{
 		s = EV_MIS_Gray;
 		return s;
@@ -516,7 +517,7 @@ Defun_EV_GetMenuItemState_Fn(ap_GetState_TOCOK)
   {
 	  return EV_MIS_Gray;
   }
-  else if(pView->getHyperLinkRun(pView->getPoint()) != nullptr)
+  else if(pView->getHyperLinkRun(pView->getPoint()) != NULL)
   {
 	  return EV_MIS_Gray;
   }
@@ -563,7 +564,7 @@ static EV_Menu_ItemState HyperLinkOK(FV_View * pView)
 
 	if ( pView->isSelectionEmpty())
 	  {
-		  if(pView->getHyperLinkRun(pView->getPoint()) == nullptr)
+		  if(pView->getHyperLinkRun(pView->getPoint()) == NULL)
 		  {
 			  s = EV_MIS_Gray ;
 			  return s;
@@ -580,7 +581,7 @@ static EV_Menu_ItemState HyperLinkOK(FV_View * pView)
 	PT_DocPosition posEnd = pView->getSelectionAnchor();
 	fl_BlockLayout * pBL1 = pView->getBlockAtPosition(posStart);
 	fl_BlockLayout * pBL2 = pView->getBlockAtPosition(posEnd);
-	if((pBL1 == nullptr) || (pBL2 == nullptr)) // make sure we get valid blocks from selection beginning and end
+	if((pBL1 == NULL) || (pBL2 == NULL)) // make sure we get valid blocks from selection beginning and end
 	{
 		s = EV_MIS_Gray;
 		return s;
@@ -729,7 +730,7 @@ Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_Suggest)
 	// on the next call).
 
 	XAP_App * pApp = XAP_App::getApp();
-	UT_return_val_if_fail (pApp && pLabel, nullptr);
+	UT_return_val_if_fail (pApp && pLabel, NULL);
 	XAP_Frame * frame = pApp->getLastFocussedFrame();
 
 	AV_View * pAV_View = frame->getCurrentView();
@@ -738,13 +739,13 @@ Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_Suggest)
 	UT_ASSERT_HARMLESS(id >= AP_MENU_ID_SPELL_SUGGEST_1);
 	UT_ASSERT_HARMLESS(id <= AP_MENU_ID_SPELL_SUGGEST_9);
 
-	UT_return_val_if_fail(pView != nullptr, nullptr);
+	UT_return_val_if_fail(pView != NULL, NULL);
 
 	UT_uint32 ndx = (id - AP_MENU_ID_SPELL_SUGGEST_1 + 1);
 	UT_UCSChar *p = pView->getContextSuggest(ndx);
-	gchar * c = nullptr;
+	gchar * c = NULL;
 	if (p && *p) {
-		c = g_ucs4_to_utf8(p, -1, nullptr, nullptr, nullptr);
+		c = g_ucs4_to_utf8(p, -1, NULL, NULL, NULL);
 	}
 	else if (ndx == 1)
 	{
@@ -763,14 +764,14 @@ Defun_EV_GetMenuItemComputedLabel_Fn(ap_GetLabel_Suggest)
 		static char buf[128];	// BUGBUG: possible buffer overflow
 
 		snprintf(buf, 128, szFormat, c);
-		g_free (c); c = nullptr;
+		g_free (c); c = NULL;
 		return buf;
 	}
 
 	// for the other slots, return a null string to tell
 	// the menu code to remove this item from the menu.
 
-	return nullptr;
+	return NULL;
 }
 #endif
 /****************************************************************/
@@ -947,7 +948,7 @@ Defun_EV_GetMenuItemState_Fn(ap_GetState_Prefs)
 	switch (id)
 	  {
 	  case AP_MENU_ID_TOOLS_AUTOSPELL:
-	    pPrefs->getPrefsValueBool(AP_PREF_KEY_AutoSpellCheck, b);
+	    pPrefs->getPrefsValueBool(static_cast<const gchar *>(AP_PREF_KEY_AutoSpellCheck), &b);
 	    s = (b ? EV_MIS_Toggled : EV_MIS_ZERO);
 	    break;
 
@@ -970,17 +971,17 @@ Defun_EV_GetMenuItemState_Fn(ap_GetState_FmtHdrFtr)
 		return EV_MIS_Gray;
 	}
 	fp_Page * pPage = pView->getCurrentPage();
-	if(pPage == nullptr)
+	if(pPage == NULL)
 	{
 		return EV_MIS_Gray;
 	}
 	fl_DocSectionLayout * pDSLP = pPage->getOwningSection();
-	if(pDSLP == nullptr)
+	if(pDSLP == NULL)
 	{
 		return EV_MIS_Gray;
 	}
 	fl_BlockLayout * pBL = pView->getCurrentBlock();
-	if(pBL == nullptr)
+	if(pBL == NULL)
 	{
 		return EV_MIS_Gray;
 	}
@@ -1000,8 +1001,8 @@ Defun_EV_GetMenuItemState_Fn(ap_GetState_CharFmt)
 
 	EV_Menu_ItemState s = EV_MIS_ZERO;
 
-	const gchar * prop = nullptr;
-	const gchar * val  = nullptr;
+	const gchar * prop = NULL;
+	const gchar * val  = NULL;
 
 	if(pView->getDocument()->areStylesLocked() && !(AP_MENU_ID_FMT_SUPERSCRIPT == id || AP_MENU_ID_FMT_SUBSCRIPT == id)) {
           return EV_MIS_Gray;
@@ -1110,7 +1111,7 @@ Defun_EV_GetMenuItemState_Fn(ap_GetState_BlockFmt)
 	EV_Menu_ItemState s = EV_MIS_ZERO;
 
 	const gchar * prop = "text-align";
-	const gchar * val  = nullptr;
+	const gchar * val  = NULL;
 
 	if(pView->getDocument()->areStylesLocked()) {
 	    return EV_MIS_Gray;
@@ -1173,8 +1174,8 @@ Defun_EV_GetMenuItemState_Fn(ap_GetState_DocFmt)
 	const PP_AttrProp * pAP = pDoc->getAttrProp();
 	UT_return_val_if_fail( pAP, EV_MIS_Gray );
 	
-	const gchar * prop = nullptr;
-	const gchar * val  = nullptr;
+	const gchar * prop = NULL;
+	const gchar * val  = NULL;
 
 	if(pDoc->areStylesLocked()) {
 	    return EV_MIS_Gray;
@@ -1213,8 +1214,8 @@ Defun_EV_GetMenuItemState_Fn(ap_GetState_SectFmt)
 
 	EV_Menu_ItemState s = EV_MIS_ZERO;
 
-	const gchar * prop = nullptr;
-	const gchar * val  = nullptr;
+	const gchar * prop = NULL;
+	const gchar * val  = NULL;
 
 	if(pView->getDocument()->areStylesLocked()) {
 	    return EV_MIS_Gray;
@@ -1722,7 +1723,7 @@ Defun_EV_GetMenuItemState_Fn(ap_GetState_TableOK)
 	{
 		return EV_MIS_Gray;
 	}
-	else if(pView->getHyperLinkRun(pView->getPoint()) != nullptr)
+	else if(pView->getHyperLinkRun(pView->getPoint()) != NULL)
 	{
 		return EV_MIS_Gray;
 	}
@@ -1769,7 +1770,7 @@ Defun_EV_GetMenuItemState_Fn(ap_GetState_InFootnote)
 	UT_UNUSED(id);
 	ABIWORD_VIEW;
 	UT_return_val_if_fail (pView, EV_MIS_Gray);
-	if(pView->getHyperLinkRun(pView->getPoint()) != nullptr)
+	if(pView->getHyperLinkRun(pView->getPoint()) != NULL)
 	{
 		return EV_MIS_Gray;
 	}
@@ -1802,7 +1803,7 @@ Defun_EV_GetMenuItemState_Fn(ap_GetState_InAnnotation)
 	}
 	PT_DocPosition point = pView->getPoint();
 	PT_DocPosition anchor = pView->getSelectionAnchor();
-	if((pView->getHyperLinkRun(point) != nullptr) || (pView->getHyperLinkRun(anchor) != nullptr))
+	if((pView->getHyperLinkRun(point) != NULL) || (pView->getHyperLinkRun(anchor) != NULL))
 	{
 		return EV_MIS_Gray;
 	}
@@ -1836,7 +1837,7 @@ Defun_EV_GetMenuItemState_Fn(ap_GetState_ToggleAnnotations)
 	XAP_PrefsScheme * pScheme = pPrefs->getCurrentScheme(true);
 	UT_return_val_if_fail(pScheme, EV_MIS_Gray);
 	bool b = false;
-	pScheme->getValueBool(AP_PREF_KEY_DisplayAnnotations, b);
+	pScheme->getValueBool(static_cast<const gchar *>(AP_PREF_KEY_DisplayAnnotations), &b );
 	return (b ? EV_MIS_Toggled : EV_MIS_ZERO);
 }
 
@@ -1852,7 +1853,7 @@ Defun_EV_GetMenuItemState_Fn(ap_GetState_ToggleRDFAnchorHighlight)
 	XAP_PrefsScheme * pScheme = pPrefs->getCurrentScheme(true);
 	UT_return_val_if_fail(pScheme, EV_MIS_Gray);
 	bool b = false;
-	pScheme->getValueBool(AP_PREF_KEY_DisplayRDFAnchors, b);
+	pScheme->getValueBool(static_cast<const gchar *>(AP_PREF_KEY_DisplayRDFAnchors), &b );
 	return (b ? EV_MIS_Toggled : EV_MIS_ZERO);
 }
 
@@ -1978,7 +1979,7 @@ Defun_EV_GetMenuItemState_Fn(ap_GetState_BreakOK)
 	{
 		return EV_MIS_Gray;
 	}
-	else if(pView->getHyperLinkRun(pView->getPoint()) != nullptr)
+	else if(pView->getHyperLinkRun(pView->getPoint()) != NULL)
 	{
 		return EV_MIS_Gray;
 	}

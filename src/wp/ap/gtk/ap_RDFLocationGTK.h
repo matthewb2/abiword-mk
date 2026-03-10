@@ -17,7 +17,8 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef AP_RDFLOCATIONGTK_H
+#define AP_RDFLOCATIONGTK_H
 
 #include "config.h"
 #include "GTKCommon.h"
@@ -25,11 +26,8 @@
 #include "ap_RDFSemanticItemGTKInjected.h"
 
 #ifdef WITH_CHAMPLAIN
-#include "ut_compiler.h"
-ABI_W_NO_DEPRECATED
 #include <champlain/champlain.h>
 #include <champlain-gtk/champlain-gtk.h>
-ABI_W_POP
 #include <clutter-gtk/clutter-gtk.h>
 #endif
 
@@ -48,9 +46,11 @@ class ABI_EXPORT AP_RDFLocationGTK
     AP_RDFLocationGTK( PD_DocumentRDFHandle rdf, PD_ResultBindings_t::iterator& it, bool isGeo84 = false );
     virtual ~AP_RDFLocationGTK();
 
-    virtual void* createEditor() override;
-    virtual void updateFromEditorData(PD_DocumentRDFMutationHandle m) override;
+    virtual void* createEditor();
+    virtual void updateFromEditorData( PD_DocumentRDFMutationHandle m );
 #ifdef WITH_CHAMPLAIN
     void OnMouseClick( ClutterActor *actor, ClutterButtonEvent *event );
 #endif
 };
+
+#endif

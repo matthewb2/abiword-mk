@@ -138,7 +138,7 @@ void AP_CocoaDialog_InsertHyperlink::event_Cancel(void)
 
 -(void)discardXAP
 {
-	_xap = nullptr;
+	_xap = NULL; 
 }
 
 -(void)dealloc

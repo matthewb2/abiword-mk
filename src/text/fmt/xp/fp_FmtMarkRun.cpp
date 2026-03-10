@@ -21,7 +21,7 @@
 #include <string.h>
 #include <time.h>
 
-#include "fp_FmtMarkRun.h"
+#include "fp_Run.h"
 #include "fl_DocLayout.h"
 #include "fl_BlockLayout.h"
 #include "fp_Line.h"
@@ -58,7 +58,7 @@ void fp_FmtMarkRun::_lookupProperties(const PP_AttrProp * pSpanAP,
 									  const PP_AttrProp * pSectionAP,
 									  GR_Graphics * pG)
 {
-	if(pG == nullptr)
+	if(pG == NULL)
 	{
 		pG = getGraphics();
 	}
@@ -198,7 +198,7 @@ void fp_DummyRun::_lookupProperties(const PP_AttrProp * pSpanAP,
 									  const PP_AttrProp * pSectionAP,
 									  GR_Graphics * pG)
 {
-	if(pG == nullptr)
+	if(pG == NULL)
 	{
 		pG = getGraphics();
 	}

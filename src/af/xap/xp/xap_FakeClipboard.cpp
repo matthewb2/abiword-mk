@@ -114,13 +114,13 @@ _ClipboardItem* XAP_FakeClipboard::_findFormatItem(const char* format)
 			return pItem;
 	}
 
-	return nullptr;
+	return NULL;
 }
 
 bool XAP_FakeClipboard::hasFormat(const char* format)
 {
 	_ClipboardItem* pItem = _findFormatItem(format);
-	return (pItem != nullptr);
+	return (pItem != NULL);
 }
 
 bool XAP_FakeClipboard::getClipboardData(const char * format, void ** ppData, UT_uint32 * pLen)
@@ -136,7 +136,7 @@ bool XAP_FakeClipboard::getClipboardData(const char * format, void ** ppData, UT
 	}
 	else
 	{
-		*ppData = nullptr;
+		*ppData = NULL;
 		*pLen = 0;
 		return false;
 	}

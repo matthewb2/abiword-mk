@@ -70,7 +70,7 @@ public:
 		bool			m_tabbed;
 	};
 
-	XAP_DialogFactory(XAP_App * pApp, int nrElem, const struct _dlg_table * pDlgTable, XAP_Frame * pFrame = nullptr);
+	XAP_DialogFactory(XAP_App * pApp, int nrElem, const struct _dlg_table * pDlgTable, XAP_Frame * pFrame = NULL);
 	virtual ~XAP_DialogFactory(void);
 
 	inline XAP_App *	getApp(void) const	{ return m_pApp; };
@@ -78,7 +78,7 @@ public:
 	XAP_Dialog *		requestDialog(XAP_Dialog_Id id);
 	XAP_Dialog *		justMakeTheDialog(XAP_Dialog_Id id);
 	void				releaseDialog(XAP_Dialog * pDialog);
-	XAP_Dialog_Id getNextId(void) const;
+	XAP_Dialog_Id		getNextId(void);
 	XAP_Dialog_Id		registerDialog(XAP_Dialog *(*pStaticConstructor)(XAP_DialogFactory *, XAP_Dialog_Id id),XAP_Dialog_Type iDialogType);
 	void				unregisterDialog(XAP_Dialog_Id id);
 
@@ -99,7 +99,7 @@ protected:
 	UT_GenericVector<_dlg_table *>	m_vecDynamicTable;			/* a Vector of elements */
 
 private:
-	static void addPages(XAP_NotebookDialog* pDialog, XAP_Dialog_Id id);
+	void addPages(XAP_NotebookDialog * pDialog, XAP_Dialog_Id id);
 };
 
 #endif /* XAP_DIALOGFACTORY_H */

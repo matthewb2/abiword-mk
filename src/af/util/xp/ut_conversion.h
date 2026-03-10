@@ -61,7 +61,7 @@ T UT_getAttributeTyped( const PP_AttrProp *pAP,
                         const gchar* name,
                         T def )
 {
-    const gchar * pAttrValue = nullptr;
+    const gchar * pAttrValue = NULL;
     if( pAP->getAttribute( name, pAttrValue ))
     {
         return toType<T>( pAttrValue );

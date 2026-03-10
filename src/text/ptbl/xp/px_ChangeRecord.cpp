@@ -59,7 +59,7 @@ PX_ChangeRecord::PX_ChangeRecord(PXType type,
 	m_persistant(true),
 	m_iXID(iXID),
 	m_iCRNumber(0),
-	m_pDoc(nullptr),
+	m_pDoc(NULL),
 	m_iAdjust(0)
 {
 	// bulletproofing
@@ -73,9 +73,9 @@ PX_ChangeRecord::~PX_ChangeRecord()
 {
 }
 
-bool PX_ChangeRecord::setCRNumber(void)
+bool PX_ChangeRecord::setCRNumber(void) const
 {
-  if(m_pDoc == nullptr)
+  if(m_pDoc == NULL)
   {
       UT_ASSERT(0);
       return false;
@@ -84,14 +84,14 @@ bool PX_ChangeRecord::setCRNumber(void)
   return true;
 }
 
-const PD_Document* PX_ChangeRecord::getDocument(void) const
+PD_Document * PX_ChangeRecord::getDocument(void) const
 {
   return m_pDoc;
 }
 
-void PX_ChangeRecord::setDocument(const PD_Document* pDoc)
+void PX_ChangeRecord::setDocument(const PD_Document * pDoc) const
 {
-  m_pDoc = pDoc;
+  m_pDoc = const_cast<PD_Document *>(pDoc);
   m_pDoc->getMyUUID()->toBinary(m_MyDocUUID);
 }
 
@@ -100,7 +100,7 @@ const char * PX_ChangeRecord::getDocUUID() const
 	static char s[37];
 
 	if(!UT_UUID::toStringFromBinary(s, sizeof(s), m_MyDocUUID))
-		return nullptr;
+		return NULL;
 	
 	return s;
 }
@@ -125,7 +125,7 @@ bool PX_ChangeRecord::isFromThisDoc(void) const
   return b;
 }
 
-void PX_ChangeRecord::setAdjustment(UT_sint32 iAdj)
+void PX_ChangeRecord::setAdjustment(UT_sint32 iAdj) const
 {
   m_iAdjust = iAdj;
 }

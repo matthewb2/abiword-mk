@@ -70,7 +70,7 @@ const char *InsertDateTimeFmts[] = {
 	"%#I:%M:%S %p",
 	"%H:%M",
 	"%H:%M:%S",
-	nullptr
+	NULL
 };
 #else
 const char *InsertDateTimeFmts[] = {
@@ -98,7 +98,7 @@ const char *InsertDateTimeFmts[] = {
 	"%m/%d/%y %I:%M:%S %p",
 	"%d.%m.%Y %H:%M",
 	"%d.%m.%Y %H:%M:%S",
-	nullptr
+	NULL
 };
 #endif
 

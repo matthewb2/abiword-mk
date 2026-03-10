@@ -53,88 +53,88 @@ public:
 
     virtual ~IE_Exp_HTML_DocumentWriter();
 
-    virtual void openSpan(const gchar *szStyleNames, const UT_UTF8String& style) override;
-    virtual void closeSpan() override;
+    void openSpan(const gchar *szStyleNames, const UT_UTF8String& style);
+    void closeSpan();
 
-    virtual void openBlock(const gchar* szStyleName, const UT_UTF8String& style,
-        const PP_AttrProp *pAP) override;
-    virtual void closeBlock() override;
+    void openBlock(const gchar* szStyleName, const UT_UTF8String& style,
+        const PP_AttrProp *pAP);
+    void closeBlock();
 
-    virtual void openHeading(size_t level, const gchar* szStyleName,
-        const gchar *szId, const PP_AttrProp *pAP) override;
-    virtual void closeHeading() override;
+    void openHeading(size_t level, const gchar* szStyleName,
+        const gchar *szId, const PP_AttrProp *pAP);
+    void closeHeading();
 
-    virtual void openSection(const gchar* szStyleName) override;
-    virtual void closeSection() override;
+    void openSection(const gchar* szStyleName);
+    void closeSection();
 
-    virtual void openHyperlink(const gchar *szUri, const gchar *szStyleName,
-        const gchar *szId) override;
-    virtual void closeHyperlink() override;
+    void openHyperlink(const gchar *szUri, const gchar *szStyleName,
+        const gchar *szId);
+    void closeHyperlink();
 
-    virtual void openDocument() override;
-    virtual void closeDocument() override;
+    void openDocument();
+    void closeDocument();
 
-    virtual void openHead() override;
-    virtual void closeHead() override;
+    void openHead();
+    void closeHead();
 
-    virtual void openBody() override;
-    virtual void closeBody() override;
+    void openBody();
+    void closeBody();
 
-    virtual void openTable(const UT_UTF8String &style,
-        const UT_UTF8String &cellPadding, const UT_UTF8String &border) override;
-    virtual void closeTable() override;
+    void openTable(const UT_UTF8String &style,
+        const UT_UTF8String &cellPadding, const UT_UTF8String &border);
+    void closeTable();
 
-    virtual void openRow() override;
-    virtual void closeRow() override;
+    void openRow();
+    void closeRow();
 
-    virtual void openCell(const UT_UTF8String &style,
-        const UT_UTF8String &rowspan, const UT_UTF8String &colspan) override;
-    virtual void closeCell() override;
+    void openCell(const UT_UTF8String &style,
+        const UT_UTF8String &rowspan, const UT_UTF8String &colspan);
+    void closeCell();
 
-    virtual void openBookmark(const gchar* szBookmarkName) override;
-    virtual void closeBookmark() override;
+    void openBookmark(const gchar* szBookmarkName);
+    void closeBookmark();
 
-    virtual void openList(bool ordered, const gchar *szStyleName,
-        const PP_AttrProp *pAP) override;
-    virtual void closeList() override;
+    void openList(bool ordered, const gchar *szStyleName,
+        const PP_AttrProp *pAP);
+    void closeList();
 
-    virtual void openListItem() override;
-    virtual void closeListItem() override;
+    void openListItem();
+    void closeListItem();
 
-    virtual void openField(const UT_UTF8String &fieldType, const UT_UTF8String &value) override;
-    virtual void closeField(const UT_UTF8String& fieldType) override;
+    void openField(const UT_UTF8String &fieldType, const UT_UTF8String &value);
+    void closeField(const UT_UTF8String& fieldType);
 
-    virtual void openAnnotation() override;
-    virtual void closeAnnotation() override;
+    void openAnnotation();
+    void closeAnnotation();
 
-    virtual void openTextbox(const UT_UTF8String &style) override;
-    virtual void closeTextbox() override;
+    void openTextbox(const UT_UTF8String &style);
+    void closeTextbox();
 
-    virtual void insertDTD() override;
-    virtual void insertMeta(const std::string& name, const std::string& content,
-            const std::string& httpEquiv) override;
-    virtual void insertText(const UT_UTF8String &text) override;
-    virtual void insertImage(const UT_UTF8String &url, const UT_UTF8String &width,
+    void insertDTD();
+    void insertMeta(const std::string& name, const std::string& content,
+            const std::string& httpEquiv);
+    void insertText(const UT_UTF8String &text);
+    void insertImage(const UT_UTF8String &url, const UT_UTF8String &width,
         const UT_UTF8String &align, const UT_UTF8String &style,
-        const UT_UTF8String &alt) override;
-    virtual void insertTOC(const gchar *title, const std::vector<UT_UTF8String> &items,
-        const std::vector<UT_UTF8String> &itemUriList) override;
-    virtual void insertEndnotes(const std::vector<UT_UTF8String> &endnotes) override;
-    virtual void insertFootnotes(const std::vector<UT_UTF8String> &footnotes) override;
-    virtual void insertAnnotations(const std::vector<UT_UTF8String> &titles,
+        const UT_UTF8String &alt);
+    void insertTOC(const gchar *title, const std::vector<UT_UTF8String> &items,
+        const std::vector<UT_UTF8String> &itemUriList);
+    void insertEndnotes(const std::vector<UT_UTF8String> &endnotes);
+    void insertFootnotes(const std::vector<UT_UTF8String> &footnotes);
+    void insertAnnotations(const std::vector<UT_UTF8String> &titles,
        const std::vector<UT_UTF8String> &authors,
-       const std::vector<UT_UTF8String> &annotations) override;
-    virtual void insertStyle(const UT_UTF8String &style) override;
+       const std::vector<UT_UTF8String> &annotations);
+    void insertStyle(const UT_UTF8String &style);
     virtual void insertJavaScript(const gchar * /*src*/,
-								  const gchar* /*script*/) override {}
-    virtual void insertTitle(const std::string& title) override;
-    virtual void insertLink(const UT_UTF8String &rel,
-            const UT_UTF8String &type, const UT_UTF8String &uri) override;
-    virtual void insertMath(const UT_UTF8String &mathml,
-            const UT_UTF8String &width, const UT_UTF8String &height) override;
+								  const gchar* /*script*/) {}
+    void insertTitle(const std::string& title);
+    void insertLink(const UT_UTF8String &rel,
+            const UT_UTF8String &type, const UT_UTF8String &uri);
+    void insertMath(const UT_UTF8String &mathml,
+    const UT_UTF8String &width, const UT_UTF8String &height);
     inline void enablePHP (bool bEnable = true) { m_bInsertPhp = bEnable; }
     inline void enableSVGScript (bool bEnable = true) { m_bInsertSvgScript = bEnable; }
-    virtual void insertLineFeed(void) override;
+    void insertLineFeed(void);
 protected:
     IE_Exp_HTML_DocumentWriter(){}
     void inline _handleStyleAndId(const gchar *szStyleName, const gchar *szId,
@@ -158,14 +158,14 @@ class ABI_EXPORT IE_Exp_HTML_XHTMLWriter : public IE_Exp_HTML_DocumentWriter
 {
 public:
     IE_Exp_HTML_XHTMLWriter(IE_Exp_HTML_OutputWriter* pOutputWriter);
-    virtual void insertDTD() override;
-    virtual void openDocument() override;
-    virtual void openHead() override;
-    virtual void openList(bool ordered, const gchar *szStyleName, const PP_AttrProp *pAP) override;
-    virtual void openHeading(size_t level, const gchar* szStyleName, const gchar *szId,
-        const PP_AttrProp *pAP) override;
-    virtual void openBlock(const gchar* szStyleName, const UT_UTF8String& style,
-        const PP_AttrProp *pAP) override;
+    void insertDTD();
+    void openDocument();
+    void openHead();
+    void openList(bool ordered, const gchar *szStyleName, const PP_AttrProp *pAP);
+    void openHeading(size_t level, const gchar* szStyleName, const gchar *szId,
+        const PP_AttrProp *pAP);
+    void openBlock(const gchar* szStyleName, const UT_UTF8String& style,
+        const PP_AttrProp *pAP);
     inline void enableXmlDeclaration(bool bEnable) { m_bEnableXmlDeclaration = bEnable; }
     inline void enableAwmlNamespace(bool bEnable) { m_bUseAwml = bEnable; }
 private:
@@ -179,8 +179,8 @@ class ABI_EXPORT IE_Exp_HTML_HTML4Writer : public IE_Exp_HTML_DocumentWriter
 {
 public:
     IE_Exp_HTML_HTML4Writer(IE_Exp_HTML_OutputWriter* pOutputWriter);
-    virtual void insertDTD() override;
-    virtual void openHead() override;
+    void insertDTD();
+    void openHead();
 };
 
 /*
@@ -201,12 +201,12 @@ class ABI_EXPORT IE_Exp_HTML_DefaultWriterFactory : public IE_Exp_HTML_WriterFac
 {
 public:
     virtual ~IE_Exp_HTML_DefaultWriterFactory() {}
-    IE_Exp_HTML_DefaultWriterFactory(const PD_Document *pDocument,
-                                     const XAP_Exp_HTMLOptions &exp_opt);
-    virtual IE_Exp_HTML_DocumentWriter *constructDocumentWriter(
-        IE_Exp_HTML_OutputWriter *pOutputWriter) override;
+    IE_Exp_HTML_DefaultWriterFactory(PD_Document *pDocument,
+            XAP_Exp_HTMLOptions &exp_opt);
+    IE_Exp_HTML_DocumentWriter *constructDocumentWriter(
+    IE_Exp_HTML_OutputWriter *pOutputWriter);
 private:
-    const XAP_Exp_HTMLOptions &m_exp_opt;
-    const PD_Document *m_pDocument;
+    XAP_Exp_HTMLOptions &m_exp_opt;
+    PD_Document *m_pDocument;
 };
 #endif

@@ -2,7 +2,7 @@
 /* AbiWord
  * Copyright (C) 1998-2000 AbiSource, Inc.
  * Copyright (C) 2001 Tomas Frydrych
- * Copyright (C) 2004-2021 Hubert FiguiÃ¨re
+ * Copyright (C) 2004-2016 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -52,8 +52,6 @@
 #include "fv_View.h"
 #include "fl_DocLayout.h"
 #include "fl_AutoLists.h"
-#include "fp_AnnotationRun.h"
-#include "fp_RDFAnchorRun.h"
 #include "fp_Page.h"
 #include "fp_Line.h"
 #include "fg_Graphic.h"
@@ -111,7 +109,7 @@
 #include "ap_Dialog_MergeCells.h"
 #include "ap_Dialog_SplitCells.h"
 #include "ap_Dialog_FormatTable.h"
-//	Maleesh 6/8/2010 - 
+//	Maleesh 6/8/2010 -
 #include "ap_Dialog_Border_Shading.h"
 #include "ap_Dialog_FormatFrame.h"
 #include "ap_Dialog_FormatFootnotes.h"
@@ -270,7 +268,7 @@ public:
 	static EV_EditMethod_Fn spellIgnoreAll;
 	static EV_EditMethod_Fn spellAdd;
 #endif
-	
+
 	static EV_EditMethod_Fn dragToXY;
 	static EV_EditMethod_Fn dragToXYword;
 	static EV_EditMethod_Fn endDrag;
@@ -515,7 +513,7 @@ public:
 	static EV_EditMethod_Fn dlgSpell;
 	static EV_EditMethod_Fn dlgSpellPrefs;
 #endif
-	
+
 	static EV_EditMethod_Fn dlgWordCount;
 	static EV_EditMethod_Fn dlgOptions;
     static EV_EditMethod_Fn dlgMetaData;
@@ -622,6 +620,7 @@ public:
 	static EV_EditMethod_Fn helpIntro;
 	static EV_EditMethod_Fn helpSearch;
 	static EV_EditMethod_Fn helpCheckVer;
+	static EV_EditMethod_Fn helpAboutGnomeOffice;
 	static EV_EditMethod_Fn helpCredits;
 	static EV_EditMethod_Fn helpReportBug;
 
@@ -680,7 +679,7 @@ public:
 #ifdef ENABLE_SPELL
 	static EV_EditMethod_Fn toggleAutoSpell;
 #endif
-	
+
 	static EV_EditMethod_Fn scriptPlay;
 	static EV_EditMethod_Fn executeScript;
 
@@ -733,11 +732,11 @@ public:
 	static EV_EditMethod_Fn revisionCompareDocuments;
 	static EV_EditMethod_Fn purgeAllRevisions;
 	static EV_EditMethod_Fn startNewRevision;
-	
+
     static EV_EditMethod_Fn insAnnotation;
     static EV_EditMethod_Fn insAnnotationFromSel;
     static EV_EditMethod_Fn editAnnotation;
-	
+
 	static EV_EditMethod_Fn sortColsAscend;
 	static EV_EditMethod_Fn sortColsDescend;
 	static EV_EditMethod_Fn sortRowsAscend;
@@ -745,7 +744,7 @@ public:
 
 	static EV_EditMethod_Fn history;
 
-	
+
 	static EV_EditMethod_Fn insertTable;
 
 #ifdef DEBUG
@@ -760,7 +759,7 @@ public:
  	static EV_EditMethod_Fn rdfInsertRef;
 	static EV_EditMethod_Fn rdfInsertNewContact;
 	static EV_EditMethod_Fn rdfInsertNewContactFromFile;
-	
+
 	static EV_EditMethod_Fn noop;
 
 	// Test routines
@@ -933,7 +932,7 @@ static EV_EditMethod s_arrayEditMethods[] =
 	EV_EditMethod(NF(dumpRDFObjects),		0,	""),
 #endif
 
-	
+
 	// e
 
 	EV_EditMethod(NF(editAnnotation),		0,	""),
@@ -998,6 +997,7 @@ static EV_EditMethod s_arrayEditMethods[] =
 	EV_EditMethod(NF(go),					0,	""),
 
 	// h
+	EV_EditMethod(NF(helpAboutGnomeOffice), _A_, ""),
 	EV_EditMethod(NF(helpCheckVer), 		_A_,		""),
 	EV_EditMethod(NF(helpContents), 		_A_,		""),
 	EV_EditMethod(NF(helpCredits), _A_, ""),
@@ -1278,7 +1278,7 @@ static EV_EditMethod s_arrayEditMethods[] =
 	EV_EditMethod(NF(undo), 				0,	""),
 
 	// v
-	EV_EditMethod(NF(viCmd_5e),		0,	""), //^ 
+	EV_EditMethod(NF(viCmd_5e),		0,	""), //^
 	EV_EditMethod(NF(viCmd_A),		0,	""),
 	EV_EditMethod(NF(viCmd_C),		0,	""),
 	EV_EditMethod(NF(viCmd_I),		0,	""),
@@ -1334,7 +1334,7 @@ static EV_EditMethod s_arrayEditMethods[] =
 	EV_EditMethod(NF(viewTB3),			0,		""),
 	EV_EditMethod(NF(viewTB4),			0,		""),
 #if !XAP_SIMPLE_TOOLBAR
-	EV_EditMethod(NF(viewTable),			0,		""),	
+	EV_EditMethod(NF(viewTable),			0,		""),
 #endif
 	EV_EditMethod(NF(viewWebLayout), 0, ""),
 
@@ -1405,10 +1405,10 @@ EV_EditMethodContainer * AP_GetEditMethods(void)
 // forward declaration
 static bool _openURL(const char* url);
 
-static UT_Timer * s_pToUpdateCursor = nullptr;
-static UT_Worker * s_pFrequentRepeat = nullptr;
-static XAP_Frame * s_pLoadingFrame = nullptr;
-static AD_Document * s_pLoadingDoc = nullptr;
+static UT_Timer * s_pToUpdateCursor = NULL;
+static UT_Worker * s_pFrequentRepeat = NULL;
+static XAP_Frame * s_pLoadingFrame = NULL;
+static AD_Document * s_pLoadingDoc = NULL;
 static bool s_LockOutGUI = false;
 
 class ABI_EXPORT _Freq
@@ -1428,7 +1428,7 @@ public:
 This little macro locks out loading frames from any activity thus preventing
 segfaults.
 *
-* Also used to lock out operations during a frequently repeated event 
+* Also used to lock out operations during a frequently repeated event
 * (like holding down an arrow key)
 *
 */
@@ -1440,13 +1440,13 @@ static bool s_EditMethods_check_frame(void)
 	{
 		return true;
 	}
-	if(s_pFrequentRepeat != nullptr)
+	if(s_pFrequentRepeat != NULL)
 	{
 		xxx_UT_DEBUGMSG(("Dropping frequent event!!!! \n"));
 		return true;
 	}
 	XAP_Frame * pFrame = XAP_App::getApp()->getLastFocussedFrame();
-	AV_View * pView = nullptr;
+	AV_View * pView = NULL;
 	if(pFrame)
 	{
 		pView = pFrame->getCurrentView();
@@ -1455,7 +1455,7 @@ static bool s_EditMethods_check_frame(void)
 	{
 		result = true;
 	}
-	else if(pFrame && (s_pLoadingDoc != nullptr) && (pFrame->getCurrentDoc() == s_pLoadingDoc))
+	else if(pFrame && (s_pLoadingDoc != NULL) && (pFrame->getCurrentDoc() == s_pLoadingDoc))
 	{
 	        result = true;
 	}
@@ -1499,33 +1499,33 @@ static void _sFrequentRepeat(UT_Worker * pWorker)
 	// (the problem was caused by an endless loop elsewhere, but the recursive firing made
 	// it hard to diagnose; in any case when we use a timer rather than idle, this could
 	// happen if m_pExe is taking longer to execute than the timer interval)
-	
+
 	static bool bRunning = false;
 
 	if(bRunning)
 		return;
-	
+
 	bRunning = true;
 //
-// Once run then delete, stop and set to nullptr
+// Once run then delete, stop and set to NULL
 //
-	
+
 	_Freq * pFreq = static_cast<_Freq *>(pWorker->getInstanceData());
 	xxx_UT_DEBUGMSG((" _sFrequentRepeat: pWorker %x pFeq %x \n",pWorker,pFreq));
 	s_pFrequentRepeat->stop();
 	UT_Worker * pTmp =  s_pFrequentRepeat;
 	//
-	// Set s_pFrequentRepeat to nullptr before we execute the method
+	// Set s_pFrequentRepeat to NULL before we execute the method
 	// so that the call itself doesn't generate a new event to process
 	//
-	s_pFrequentRepeat = nullptr;
+	s_pFrequentRepeat = NULL;
 
 	pFreq->m_pExe(pFreq->m_pView,pFreq->m_pData);
 	DELETEP(pFreq->m_pData);
 	delete pFreq;
 	delete pTmp;
 
-	
+
 	bRunning = false;
 }
 
@@ -1547,9 +1547,8 @@ Defun1(toggleAutoSpell)
 
 	bool b = false;
 
-	pPrefs->getPrefsValueBool(AP_PREF_KEY_AutoSpellCheck, b);
-	pPrefsScheme->setValueBool(AP_PREF_KEY_AutoSpellCheck, !b);
-	return true;
+	pPrefs->getPrefsValueBool(static_cast<const gchar *>(AP_PREF_KEY_AutoSpellCheck), &b);
+	return pPrefsScheme->setValueBool(static_cast<const gchar *>(AP_PREF_KEY_AutoSpellCheck), !b);
 }
 #endif
 
@@ -1668,19 +1667,19 @@ Defun0(fileNew)
 	CHECK_FRAME;
 	XAP_App * pApp = XAP_App::getApp();
 	UT_return_val_if_fail (pApp, false);
-	
-#if 0 //def HAVE_HILDON	
-	
+
+#if 0 //def HAVE_HILDON
+
 	XAP_Frame * pNewFrame;
 	if (pApp->getFrameCount() == 0)
 		pNewFrame = pApp->newFrame();
 	else
 	{
-		//fileSave(nullptr, nullptr);
+		//fileSave(NULL, NULL);
 		pNewFrame = pApp->getFrame(0);
 		if (pNewFrame->isDirty())
 		{
-			if(!fileSave(pAV_View, nullptr))
+			if(!fileSave(pAV_View, NULL))
 			{
 				// we cannot just close the dirty file when the user clicked cancel -- if
 				// she really want to loose unsaved changes, let her close it manually
@@ -1692,8 +1691,8 @@ Defun0(fileNew)
 	XAP_Frame * pNewFrame = pApp->newFrame();
 #endif
 
-	// the IEFileType here doesn't really matter, since the name is nullptr
-	UT_Error error = pNewFrame->loadDocument((const char *)nullptr, IEFT_Unknown);
+	// the IEFileType here doesn't really matter, since the name is NULL
+	UT_Error error = pNewFrame->loadDocument((const char *)NULL, IEFT_Unknown);
 
 	if (pNewFrame)
 	{
@@ -1728,8 +1727,8 @@ static void s_LoadingCursorCallback(UT_Worker * pTimer )
 	xxx_UT_DEBUGMSG(("Update Screen on load Frame %x \n",s_pLoadingFrame));
 	XAP_Frame * pFrame = s_pLoadingFrame;
 	UT_uint32 iPageCount = 0;
-	
-	if(pFrame == nullptr)
+
+	if(pFrame == NULL)
 	{
 		s_bFirstDrawDone = false;
 		return;
@@ -1751,7 +1750,7 @@ static void s_LoadingCursorCallback(UT_Worker * pTimer )
 
 			if(!s_bFirstDrawDone && (iPageCount > 1))
 			{
-				pView->queueDraw();
+				pView->draw();
 				s_bFirstDrawDone = true;
 			}
 			else
@@ -1812,15 +1811,15 @@ static void s_StartStopLoadingCursor( bool bStartStop, XAP_Frame * pFrame)
 // Can't have multiple loading document yet. Need Vectors of loading frames
 // and auto-updaters. Do this later.
 //
-		if(s_pLoadingFrame != nullptr)
+		if(s_pLoadingFrame != NULL)
 		{
 			return;
 		}
 		s_pLoadingFrame = pFrame;
 		s_pLoadingDoc = pFrame->getCurrentDoc();
-		if(s_pToUpdateCursor == nullptr)
+		if(s_pToUpdateCursor == NULL)
 		{
-			s_pToUpdateCursor = UT_Timer::static_constructor(s_LoadingCursorCallback,nullptr);
+			s_pToUpdateCursor = UT_Timer::static_constructor(s_LoadingCursorCallback,NULL);
 		}
 		s_bFirstDrawDone = false;
 		const XAP_StringSet * pSS = XAP_App::getApp()->getStringSet();
@@ -1832,12 +1831,12 @@ static void s_StartStopLoadingCursor( bool bStartStop, XAP_Frame * pFrame)
 	}
 	else
 	{
-		if(s_pToUpdateCursor != nullptr)
+		if(s_pToUpdateCursor != NULL)
 		{
 			s_pToUpdateCursor->stop();
 			DELETEP(s_pToUpdateCursor);
-			s_pToUpdateCursor = nullptr;
-			if(s_pLoadingFrame != nullptr)
+			s_pToUpdateCursor = NULL;
+			if(s_pLoadingFrame != NULL)
 			{
 				s_pLoadingFrame->setCursor(GR_Graphics::GR_CURSOR_DEFAULT);
 				FV_View * pView = static_cast<FV_View *>(s_pLoadingFrame->getCurrentView());
@@ -1847,9 +1846,9 @@ static void s_StartStopLoadingCursor( bool bStartStop, XAP_Frame * pFrame)
 					pView->focusChange(AV_FOCUS_HERE);
 				}
 			}
-			s_pLoadingFrame = nullptr;
+			s_pLoadingFrame = NULL;
 		}
-		s_pLoadingDoc = nullptr;
+		s_pLoadingDoc = NULL;
 	}
 }
 
@@ -1895,7 +1894,7 @@ static void s_TellSpellDone(XAP_Frame * pFrame, bool bIsSelection)
 
 static void s_TellNotImplemented(XAP_Frame * pFrame, const char * szWhat, int iLine)
 {
-	XAP_Dialog_MessageBox * message = 
+	XAP_Dialog_MessageBox * message =
 		pFrame->createMessageBox(AP_STRING_ID_MSG_DlgNotImp,
 					 XAP_Dialog_MessageBox::b_O,
 					 XAP_Dialog_MessageBox::a_OK,
@@ -1935,7 +1934,7 @@ static bool s_AskCloseAllAndExit(XAP_Frame * pFrame)
 
 static XAP_Dialog_MessageBox::tAnswer s_AskSaveFile(XAP_Frame * pFrame)
 {
-	XAP_Dialog_MessageBox * message = 
+	XAP_Dialog_MessageBox * message =
 		pFrame->createMessageBox(AP_STRING_ID_MSG_ConfirmSave,
 					 XAP_Dialog_MessageBox::b_YNC,
 					 XAP_Dialog_MessageBox::a_YES,
@@ -1959,15 +1958,15 @@ static bool s_AskForPathname(XAP_Frame * pFrame,
 	// to the caller (so g_free it when you're done with it).
 
 	UT_DEBUGMSG(("s_AskForPathname: frame %p, bSaveAs %d, suggest=[%s]\n",
-				 (void*)pFrame, bSaveAs, ((pSuggestedName) ? pSuggestedName : "")));
+				 pFrame,bSaveAs,((pSuggestedName) ? pSuggestedName : "")));
 
 	UT_return_val_if_fail (ppPathname, false);
-	*ppPathname = nullptr;
+	*ppPathname = NULL;
 
 	if (pFrame) {
 		pFrame->raise();
 	}
-	
+
 	XAP_DialogFactory * pDialogFactory
 		= static_cast<XAP_DialogFactory *>(XAP_App::getApp()->getDialogFactory());
 
@@ -1997,7 +1996,7 @@ static bool s_AskForPathname(XAP_Frame * pFrame,
 			// the c-lib library uses
 			const char * encoding;
 			bool bSet = false;
-			
+
 			if(g_ascii_strcasecmp(l.getEncoding(), "UTF-8") != 0)
 			{
 				UT_iconv_t  cd = UT_iconv_open(l.getEncoding(), "UTF-8");
@@ -2085,7 +2084,7 @@ static bool s_AskForPathname(XAP_Frame * pFrame,
 	static IEFileType dflFileType = IEFT_Bogus;
 
 	// if a file format was given to us, then use that
-	if (ieft != nullptr && *ieft != IEFT_Bogus)
+	if (ieft != NULL && *ieft != IEFT_Bogus)
 	  {
 		// have a pre-existing file format, try to default to that
 		UT_DEBUGMSG(("DOM: using given filetype %d\n", *ieft));
@@ -2113,15 +2112,18 @@ static bool s_AskForPathname(XAP_Frame * pFrame,
 			return false;
 		}
 
-		std::string ftype;
+		const gchar * ftype = 0;
 
 		// fetch the default save format
-		pPrefs->getPrefsValue(AP_PREF_KEY_DefaultSaveFormat, ftype, true);
-		if (!ftype.empty()) {
+		pPrefs->getPrefsValue (static_cast<const gchar *>(AP_PREF_KEY_DefaultSaveFormat), &ftype, true);
+		if (ftype)
+		{
 			// load the default file format
-			dflFileType = IE_Exp::fileTypeForSuffix(ftype.c_str());
-			UT_DEBUGMSG(("DOM: reverting to default file type: %s (%d)\n", ftype.c_str(), dflFileType));
-		} else {
+			dflFileType = IE_Exp::fileTypeForSuffix (ftype);
+			UT_DEBUGMSG(("DOM: reverting to default file type: %s (%d)\n", ftype, dflFileType));
+		}
+		else
+		{
 			UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
 		}
 	  }
@@ -2187,10 +2189,10 @@ static bool s_AskForGraphicPathname(XAP_Frame * pFrame,
 	// to the caller (so g_free it when you're done with it).
 
 	UT_DEBUGMSG(("s_AskForGraphicPathname: frame %p\n",
-				 (void*)pFrame));
+				 pFrame));
 
 	UT_return_val_if_fail (ppPathname, false);
-	*ppPathname = nullptr;
+	*ppPathname = NULL;
 
 	pFrame->raise();
 
@@ -2236,7 +2238,7 @@ static bool s_AskForGraphicPathname(XAP_Frame * pFrame,
 		k++;
 
 	pDialog->setFileTypeList(szDescList, szSuffixList, static_cast<const UT_sint32 *>(nTypeList));
-	if (iegft != nullptr)
+	if (iegft != NULL)
 	  pDialog->setDefaultFileType(*iegft);
 	pDialog->runModal(pFrame);
 
@@ -2324,7 +2326,7 @@ XAP_Dialog_MessageBox::tAnswer s_CouldNotLoadFileMessage(XAP_Frame * pFrame, con
 
       case UT_IE_TRY_RECOVER:
 		String_id = AP_STRING_ID_MSG_OpenRecovered;
-		break;        
+		break;
 
 	  default:
 		String_id = AP_STRING_ID_MSG_ImportError;
@@ -2342,7 +2344,7 @@ UT_Error fileOpen(XAP_Frame * pFrame, const char * pNewFile, IEFileType ieft)
 	XAP_App * pApp = XAP_App::getApp();
 	UT_return_val_if_fail (pApp, UT_ERROR);
 
-	XAP_Frame * pNewFrame = nullptr;
+	XAP_Frame * pNewFrame = NULL;
 	// not needed bool bRes = false;
 	UT_Error errorCode = UT_IE_IMPORTERROR;
 
@@ -2374,22 +2376,22 @@ UT_Error fileOpen(XAP_Frame * pFrame, const char * pNewFile, IEFileType ieft)
 			// cancel the FileOpen.
 			errorCode = UT_OK;		// don't remove from recent list
 		}
-		s_StartStopLoadingCursor( false,nullptr);
+		s_StartStopLoadingCursor( false,NULL);
 		return errorCode;
 	}
 
-	// For widgetized AbiWord, if there is a prexisting document in the 
+	// For widgetized AbiWord, if there is a prexisting document in the
 	// Frame, we save it then open a the new document in the same frame
 
 	if(pFrame)
 	{
-		AP_FrameData *pFrameData = static_cast<AP_FrameData *>(pFrame->getFrameData());		
+		AP_FrameData *pFrameData = static_cast<AP_FrameData *>(pFrame->getFrameData());
 		if(pFrameData && pFrameData->m_bIsWidget)
 		 {
 			 if(pFrame->isDirty())
 			 {
 				 AV_View * pAV_View = pFrame->getCurrentView();
-				 EV_EditMethodCallData * pCallData = nullptr;
+				 EV_EditMethodCallData * pCallData = NULL;
 				 EX(saveImmediate);
 			 }
 
@@ -2405,9 +2407,9 @@ UT_Error fileOpen(XAP_Frame * pFrame, const char * pNewFile, IEFileType ieft)
 			 {
 				 s_CouldNotLoadFileMessage(pFrame,pNewFile, errorCode);
 			 }
-			 s_StartStopLoadingCursor( false,nullptr);
+			 s_StartStopLoadingCursor( false,NULL);
 			 return errorCode;
-		 } 
+		 }
 	}
 
 	// We generally open documents in a new frame, which keeps the
@@ -2416,7 +2418,9 @@ UT_Error fileOpen(XAP_Frame * pFrame, const char * pNewFile, IEFileType ieft)
 	// current frame if it's the only top-level view on an empty,
 	// untitled document.
 
-	if ((pFrame == nullptr) || pFrame->isDirty() || pFrame->getFilename() || (pFrame->getViewNumber() > 0))
+    //pascal pFrame->getFilename() devient strcmp(pFrame->getFilename(), "") != 0
+
+    if ((pFrame == NULL) || pFrame->isDirty() || strcmp(pFrame->getFilename(), "") != 0 || (pFrame->getViewNumber() > 0))
 	{
 		// open new document in a new frame.  if we fail,
 		// put up an error dialog on current frame (our
@@ -2426,13 +2430,13 @@ UT_Error fileOpen(XAP_Frame * pFrame, const char * pNewFile, IEFileType ieft)
 		pNewFrame = pApp->newFrame();
 		if (!pNewFrame)
 		{
-			s_StartStopLoadingCursor( false,nullptr);
+			s_StartStopLoadingCursor( false,NULL);
 			return false;
 		}
 
 // Open a complete but blank frame, then load the document into it
 
-		errorCode = pNewFrame->loadDocument((const char *)nullptr, IEFT_Unknown);
+		errorCode = pNewFrame->loadDocument((const char *)NULL, IEFT_Unknown);
 		if (UT_IS_IE_SUCCESS(errorCode))
 		{
 			pNewFrame->show();
@@ -2473,8 +2477,8 @@ UT_Error fileOpen(XAP_Frame * pFrame, const char * pNewFile, IEFileType ieft)
 			// TODO long term, we may want to modified pApp->newFrame()
 			// TODO to take an 'bool bShowWindow' argument....
 
-			// the IEFileType here doesn't really matter since the file name is nullptr
-			errorCode = pNewFrame->loadDocument((const char *)nullptr, IEFT_Unknown);
+			// the IEFileType here doesn't really matter since the file name is NULL
+			errorCode = pNewFrame->loadDocument((const char *)NULL, IEFT_Unknown);
 			if (UT_IS_IE_SUCCESS(errorCode)) {
 				pNewFrame->updateZoom();
 				pNewFrame->show();
@@ -2482,7 +2486,7 @@ UT_Error fileOpen(XAP_Frame * pFrame, const char * pNewFile, IEFileType ieft)
 			s_CouldNotLoadFileMessage(pNewFrame,pNewFile, errorCode);
 		}
 #endif
-		s_StartStopLoadingCursor( false,nullptr);
+		s_StartStopLoadingCursor( false,NULL);
 		return errorCode;
 	}
 
@@ -2501,7 +2505,7 @@ UT_Error fileOpen(XAP_Frame * pFrame, const char * pNewFile, IEFileType ieft)
 	{
 		s_CouldNotLoadFileMessage(pFrame,pNewFile, errorCode);
 	}
-	s_StartStopLoadingCursor( false,nullptr);
+	s_StartStopLoadingCursor( false,NULL);
 	return errorCode;
 }
 
@@ -2515,9 +2519,9 @@ Defun1(importStyles)
 	UT_return_val_if_fail(pFrame,false);
 
 	UT_Error error = UT_IE_IMPORTERROR;
-	char * pFile = nullptr;
+	char * pFile = NULL;
 	IEFileType ieft = IEFT_Unknown;
-	bool bOK = s_AskForPathname(pFrame,false, XAP_DIALOG_ID_FILE_OPEN, nullptr,&pFile,&ieft);
+	bool bOK = s_AskForPathname(pFrame,false, XAP_DIALOG_ID_FILE_OPEN, NULL,&pFile,&ieft);
 
 	if (!bOK || !pFile)
 	  return false;
@@ -2535,15 +2539,15 @@ Defun1(importStyles)
 Defun1(fileOpen)
 {
 	CHECK_FRAME;
-	XAP_Frame * pFrame = nullptr;
+	XAP_Frame * pFrame = NULL;
 	IEFileType ieft = IEFT_Unknown;
 	if (pAV_View) {
 		pFrame = static_cast<XAP_Frame *> (pAV_View->getParentData());
 		UT_return_val_if_fail (pFrame, false);
 		ieft = static_cast<PD_Document *>(pFrame->getCurrentDoc())->getLastOpenedType();
 	}
-	char * pNewFile = nullptr;
-	bool bOK = s_AskForPathname(pFrame,false, XAP_DIALOG_ID_FILE_OPEN, nullptr,&pNewFile,&ieft);
+	char * pNewFile = NULL;
+	bool bOK = s_AskForPathname(pFrame,false, XAP_DIALOG_ID_FILE_OPEN, NULL,&pNewFile,&ieft);
 
 	if (!bOK || !pNewFile)
 	  return false;
@@ -2562,7 +2566,7 @@ s_importFile (XAP_Frame * pFrame, const char * pNewFile, IEFileType ieft)
 	UT_DEBUGMSG(("fileOpen: loading [%s]\n",pNewFile));
 	XAP_App * pApp = XAP_App::getApp();
 	UT_return_val_if_fail (pApp, UT_ERROR);
-	XAP_Frame * pNewFrame = nullptr;
+	XAP_Frame * pNewFrame = NULL;
 	// not needed bool bRes = false;
 	UT_Error errorCode = UT_IE_IMPORTERROR;
 
@@ -2572,7 +2576,8 @@ s_importFile (XAP_Frame * pFrame, const char * pNewFile, IEFileType ieft)
 	// current frame if it's the only top-level view on an empty,
 	// untitled document.
 
-	if ((pFrame == nullptr) || pFrame->isDirty() || pFrame->getFilename() || (pFrame->getViewNumber() > 0))
+	//pascal
+	if ((pFrame == NULL) || pFrame->isDirty() || strcmp(pFrame->getFilename(), "") != 0 || (pFrame->getViewNumber() > 0))
 	{
 		// open new document in a new frame.  if we fail,
 		// put up an error dialog on current frame (our
@@ -2583,7 +2588,7 @@ s_importFile (XAP_Frame * pFrame, const char * pNewFile, IEFileType ieft)
 		pNewFrame = pApp->newFrame();
 		if (!pNewFrame)
 		{
-			s_StartStopLoadingCursor( false,nullptr);
+			s_StartStopLoadingCursor( false,NULL);
 			return false;
 		}
 
@@ -2598,12 +2603,12 @@ s_importFile (XAP_Frame * pFrame, const char * pNewFile, IEFileType ieft)
 		else
 		{
 			// see problem documented in ::fileOpen()
-			errorCode = pNewFrame->loadDocument((const char *)nullptr, IEFT_Unknown);
+			errorCode = pNewFrame->loadDocument((const char *)NULL, IEFT_Unknown);
 			if (!errorCode)
 				pNewFrame->show();
 			s_CouldNotLoadFileMessage(pNewFrame,pNewFile, errorCode);
 		}
-		s_StartStopLoadingCursor( false,nullptr);
+		s_StartStopLoadingCursor( false,NULL);
 		return errorCode;
 	}
 
@@ -2621,7 +2626,7 @@ s_importFile (XAP_Frame * pFrame, const char * pNewFile, IEFileType ieft)
 	{
 		s_CouldNotLoadFileMessage(pFrame,pNewFile, errorCode);
 	}
-	s_StartStopLoadingCursor( false,nullptr);
+	s_StartStopLoadingCursor( false,NULL);
 	return errorCode;
 }
 
@@ -2632,9 +2637,9 @@ Defun1(openTemplate)
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> ( pAV_View->getParentData());
 	UT_return_val_if_fail (pFrame, false);
 
-	char * pNewFile = nullptr;
+	char * pNewFile = NULL;
 	IEFileType ieft = static_cast<PD_Document *>(pFrame->getCurrentDoc())->getLastOpenedType();
-	bool bOK = s_AskForPathname(pFrame,false, XAP_DIALOG_ID_FILE_IMPORT, nullptr,&pNewFile,&ieft);
+	bool bOK = s_AskForPathname(pFrame,false, XAP_DIALOG_ID_FILE_IMPORT, NULL,&pNewFile,&ieft);
 
 	if (!bOK || !pNewFile)
 	  return false;
@@ -2677,12 +2682,13 @@ Defun(saveImmediate)
 	}
 	// can only save without prompting if filename already known
 
+    //pascal pFrame->getFilename() devient strcmp(pFrame->getFilename(), "") != 0
 	if (!pFrame->getFilename())
    		return EX(fileSaveAs);
 
 	UT_Error errSaved;
 	errSaved = pAV_View->cmdSave();
-	
+
 	// if it has a problematic extension save as instead
 	//	if (errSaved == UT_EXTENSIONERROR)
 	//  return EX(fileSaveAs);
@@ -2734,13 +2740,12 @@ Defun(fileSave)
 		}
 	}
 	// can only save without prompting if filename already known
-
-	if (!pFrame->getFilename())
+	if (!pFrame->getFilename() || strlen(pFrame->getFilename()) == 0) //pascal   if (!pFrame->getFilename())
    		return EX(fileSaveAs);
 
 	UT_Error errSaved;
 	errSaved = pAV_View->cmdSave();
-	
+
 	// if it has a problematic extension save as instead
 	if (errSaved == UT_EXTENSIONERROR)
 		return EX(fileSaveAs);
@@ -2774,7 +2779,7 @@ s_actuallySaveAs(AV_View * pAV_View, bool overwriteName)
 
 	//ieft = static_cast<PD_Document *>(pFrame->getCurrentDoc())->getLastSavedAsType();
 
-	char * pNewFile = nullptr;
+	char * pNewFile = NULL;
 	XAP_Dialog_Id id = XAP_DIALOG_ID_FILE_SAVEAS;
 
 	if ( !overwriteName )
@@ -2829,9 +2834,9 @@ Defun1(fileImport)
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> ( pAV_View->getParentData());
 	UT_return_val_if_fail (pFrame, false);
 
-	char * pNewFile = nullptr;
+	char * pNewFile = NULL;
 	IEFileType ieft = static_cast<PD_Document *>(pFrame->getCurrentDoc())->getLastOpenedType();
-	bool bOK = s_AskForPathname(pFrame,false, XAP_DIALOG_ID_FILE_IMPORT, nullptr,&pNewFile,&ieft);
+	bool bOK = s_AskForPathname(pFrame,false, XAP_DIALOG_ID_FILE_IMPORT, NULL,&pNewFile,&ieft);
 
 	if (!bOK || !pNewFile)
 	  return false;
@@ -2859,7 +2864,7 @@ Defun1(fileSaveTemplate)
   UT_return_val_if_fail (pFrame, false);
 
   IEFileType ieft = IE_Exp::fileTypeForSuffix ( ".awt" ) ;
-  char * pNewFile = nullptr;
+  char * pNewFile = NULL;
   XAP_Dialog_Id id = XAP_DIALOG_ID_FILE_SAVEAS;
 
   UT_String suggestedName (XAP_App::getApp()->getUserPrivateDirectory());
@@ -2891,7 +2896,7 @@ Defun1(fileSaveAsWeb)
 	UT_return_val_if_fail (pAV_View, false);
 	XAP_Frame * pFrame = static_cast<XAP_Frame *>(pAV_View->getParentData());
   IEFileType ieft = IE_Exp::fileTypeForSuffix (".xhtml");
-  char * pNewFile = nullptr;
+  char * pNewFile = NULL;
   bool bOK = s_AskForPathname(pFrame,true, XAP_DIALOG_ID_FILE_SAVEAS, pFrame->getFilename(),&pNewFile,&ieft);
 
   if (!bOK || !pNewFile)
@@ -3037,7 +3042,7 @@ Defun1(fileSaveEmbed)
 		const std::string & resultPathname = pDialog->getPathname();
 		if (!resultPathname.empty()) {
 			UT_ConstByteBufPtr Buf;
-			pView->getDocument()->getDataItemDataByName(pRun->getDataID(), Buf, nullptr, nullptr);
+			pView->getDocument()->getDataItemDataByName(pRun->getDataID(), Buf, NULL, NULL);
 			if (Buf)
 				Buf->writeToURI(resultPathname.c_str());
 		}
@@ -3057,14 +3062,14 @@ Defun1(filePreviewWeb)
 	CHECK_FRAME;
 	UT_return_val_if_fail (pAV_View, false);
 	XAP_Frame * pFrame = static_cast<XAP_Frame *>(pAV_View->getParentData());
-	
+
 	std::string file = UT_createTmpFile("web", ".html");
 
 	UT_Error errSaved = UT_OK;
 
 	// we do this because we don't want to change the default
 	// document extension or rename what we're working on
-	char *uri = UT_go_filename_to_uri(file.c_str());
+	char *uri = UT_go_filename_to_uri(file.c_str()); //pascal bug2
 	if(uri)
 	{
 		if(XAP_App::getApp()->getPrefs())
@@ -3121,9 +3126,9 @@ Defun1(newWindow)
 	return (pClone ? true : false);
 }
 
-static bool _openRecent(AV_View* pAV_View, UT_uint32 ndx)
+static bool _openRecent(AV_View* pAV_View, UT_sint32 ndx)
 {
-	XAP_Frame * pFrame = nullptr;
+	XAP_Frame * pFrame = NULL;
 	if (pAV_View) {
 		pFrame = static_cast<XAP_Frame *> ( pAV_View->getParentData());
 		UT_return_val_if_fail(pFrame, false);
@@ -3278,7 +3283,7 @@ static bool s_doMoreWindowsDlg(XAP_Frame* pFrame, XAP_Dialog_Id id)
 	// run the dialog
 	pDialog->runModal(pFrame);
 
-	XAP_Frame * pSelFrame = nullptr;
+	XAP_Frame * pSelFrame = NULL;
 	bool bOK = (pDialog->getAnswer() == XAP_Dialog_WindowMore::a_OK);
 
 	if (bOK)
@@ -3391,13 +3396,13 @@ Defun1(rotateCase)
 Defun1(dlgAbout)
 {
 	CHECK_FRAME;
-	XAP_Frame * pFrame = nullptr;
-	
+	XAP_Frame * pFrame = NULL;
+
 	if (pAV_View) {
 		pFrame = static_cast<XAP_Frame *> ( pAV_View->getParentData());
 		UT_return_val_if_fail(pFrame, false);
 	}
-	
+
 	s_doAboutDlg(pFrame, XAP_DIALOG_ID_ABOUT);
 
 	return true;
@@ -3482,7 +3487,7 @@ Defun1(dlgMetaData)
 	  for(UT_sint32 i = 0;i < pApp->getFrameCount();++i)
 	  {
 		  pApp->getFrame(i)->updateTitle ();
-	  }	  
+	  }
 
       pDocument->forceDirty();
     }
@@ -3497,14 +3502,14 @@ Defun1(dlgMetaData)
 Defun1(fileNewUsingTemplate)
 {
 	CHECK_FRAME;
-	XAP_Frame * pFrame = nullptr;
+	XAP_Frame * pFrame = NULL;
 	if (pAV_View) {
 		FV_View * pView = static_cast<FV_View *>(pAV_View);
-	
+
 		pFrame = static_cast<XAP_Frame *>(pView->getParentData());
 		UT_return_val_if_fail(pFrame, false);
-	
-	
+
+
 		pFrame->raise();
 	}
 	XAP_App * pApp = XAP_App::getApp();
@@ -3553,7 +3558,7 @@ Defun1(fileNewUsingTemplate)
 			if (pNewFrame)
 				pFrame = pNewFrame;
 
-			bOK = pFrame->loadDocument((const char *)nullptr, IEFT_Unknown) == UT_OK;
+			bOK = pFrame->loadDocument((const char *)NULL, IEFT_Unknown) == UT_OK;
 
 			if (pNewFrame)
 			{
@@ -3575,7 +3580,7 @@ static bool _openURL(const char* url)
 {
 	return XAP_App::getApp()->openURL(url);
 }
-	
+
 bool helpLocalizeAndOpenURL(const char* pathBeforeLang, const char* pathAfterLang, const char *remoteURLbase)
 {
 	UT_String url (XAP_App::getApp()->localizeHelpUrl (pathBeforeLang, pathAfterLang, remoteURLbase));
@@ -3620,6 +3625,11 @@ Defun0(helpSearch)
 Defun0(helpCredits)
 {
 	return helpLocalizeAndOpenURL("help", "credits", "http://www.abisource.com/help/");
+}
+
+Defun0(helpAboutGnomeOffice)
+{
+	return _openURL("http://live.gnome.org/GnomeOffice/");
 }
 
 Defun1(cycleWindows)
@@ -3703,7 +3713,7 @@ s_closeWindow (AV_View * pAV_View, EV_EditMethodCallData * pCallData,
 	if ((pFrame->getViewNumber() == 0) &&
 		(pFrame->isDirty()))
 	{
-		
+
 		XAP_Dialog_MessageBox::tAnswer ans;
 
 		ans = s_AskSaveFile(pFrame);
@@ -3736,14 +3746,14 @@ s_closeWindow (AV_View * pAV_View, EV_EditMethodCallData * pCallData,
 
 		case XAP_Dialog_MessageBox::a_NO:				// just close it
 			break;
-			
+
 		case XAP_Dialog_MessageBox::a_CANCEL:			// don't close it
 			return false;
-			
+
 		default:
 			UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
 			return false;
-			
+
 		}
 	}
 
@@ -3766,7 +3776,7 @@ s_closeWindow (AV_View * pAV_View, EV_EditMethodCallData * pCallData,
 		else
 		{
 			// keep the app open with an empty document (in this frame)
-			pFrame->loadDocument((const char *)nullptr, IEFT_Unknown);
+			pFrame->loadDocument((const char *)NULL, IEFT_Unknown);
 			pFrame->updateZoom();
 			pFrame->show();
 			return true;
@@ -3798,7 +3808,7 @@ Defun(closeWindow)
 
 	bool close = false;
 
-	pPrefs->getPrefsValueBool(AP_PREF_KEY_CloseOnLastDoc, close);
+	pPrefs->getPrefsValueBool(static_cast<const gchar *>(AP_PREF_KEY_CloseOnLastDoc), &close);
 	return s_closeWindow (pAV_View, pCallData, close);
 #else
 	// must, to comply with the HIG
@@ -3815,8 +3825,8 @@ Defun(closeWindowX)
 Defun(querySaveAndExit)
 {
 	CHECK_FRAME;
-		
-	XAP_Frame * pFrame = nullptr;
+
+	XAP_Frame * pFrame = NULL;
 	bool bRet = true;
 
 	if (pAV_View) {
@@ -3856,7 +3866,7 @@ Defun(querySaveAndExit)
 			ndx--;
 		}
 	}
-	
+
 	if (bRet)
 	{
 		//	delete all open modeless dialogs
@@ -3921,6 +3931,7 @@ Defun1(insertClipart)
 		= static_cast<XAP_Dialog_ClipArt *>(pDialogFactory->requestDialog(XAP_DIALOG_ID_CLIPART));
 UT_return_val_if_fail(pDialog, false);
 	// set the initial directory
+
 	UT_String dir(pApp->getAbiSuiteLibDir());
 	dir += "/clipart/";
 
@@ -3970,7 +3981,7 @@ Defun1(fileInsertGraphic)
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> ( pAV_View->getParentData());
 	UT_return_val_if_fail(pFrame, false);
 
-	char* pNewFile = nullptr;
+	char* pNewFile = NULL;
 
 
 	IEGraphicFileType iegft = IEGFT_Unknown;
@@ -4017,7 +4028,7 @@ Defun1(fileInsertPositionedGraphic)
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> ( pAV_View->getParentData());
 	UT_return_val_if_fail(pFrame, false);
 
-	char* pNewFile = nullptr;
+	char* pNewFile = NULL;
 
 
 	IEGraphicFileType iegft = IEGFT_Unknown;
@@ -4064,7 +4075,7 @@ Defun1(fileInsertPageBackgroundGraphic)
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> ( pAV_View->getParentData());
 	UT_return_val_if_fail(pFrame, false);
 
-	char* pNewFile = nullptr;
+	char* pNewFile = NULL;
 
 
 	IEGraphicFileType iegft = IEGFT_Unknown;
@@ -4113,7 +4124,7 @@ Defun(selectObject)
 {
 	CHECK_FRAME;
 	ABIWORD_VIEW;
-	
+
 	UT_return_val_if_fail (pView, false);
 	// check if the run to select is a fp_ImageRun. If, so, don't move the view
 	PT_DocPosition pos = pView->getDocPositionFromXY(pCallData->m_xPos, pCallData->m_yPos);
@@ -4123,9 +4134,9 @@ Defun(selectObject)
 		UT_sint32 x1,x2,y1,y2,iHeight;
 		bool bEOL = false;
 		bool bDir = false;
-		
-		fp_Run * pRun = nullptr;
-		
+
+		fp_Run * pRun = NULL;
+
 		pRun = pBlock->findPointCoords(pos,bEOL,x1,y1,x2,y2,iHeight,bDir);
 		while(pRun && ((pRun->getType() != FPRUN_IMAGE) && (pRun->getType() != FPRUN_EMBED)))
 		{
@@ -4144,11 +4155,11 @@ Defun(selectObject)
 			// do nothing...
 		}
 	}
-	
+
 	// no, the run is something else (ie. not a fp_ImageRun)
 	pView->warpInsPtToXY(pCallData->m_xPos, pCallData->m_yPos, true);
 	pView->extSelHorizontal(true, 1); // move point forward one
-	
+
 	return true;
 }
 
@@ -4170,8 +4181,15 @@ static void sActualMoveLeft(AV_View *  pAV_View, EV_EditMethodCallData * /*pCall
 	fl_BlockLayout * pBL = pView->getCurrentBlock();
 	if(pBL)
 		bRTL = pBL->getDominantDirection() == UT_BIDI_RTL;
-	
+
 	pView->cmdCharMotion(bRTL,1);
+	if(pView->getGraphics() && pView->getGraphics()->allCarets()->getBaseCaret())
+	{
+//
+// Draw fsking caret for sure!!!
+//
+		pView->getGraphics()->allCarets()->getBaseCaret()->forceDraw();
+	}
 }
 
 Defun1(warpInsPtLeft)
@@ -4187,7 +4205,7 @@ Defun1(warpInsPtLeft)
 	UT_return_val_if_fail (pView, false);
 	int inMode = UT_WorkerFactory::IDLE | UT_WorkerFactory::TIMER;
 	UT_WorkerFactory::ConstructMode outMode = UT_WorkerFactory::NONE;
-	_Freq * pFreq = new _Freq(pView,nullptr,sActualMoveLeft);
+	_Freq * pFreq = new _Freq(pView,NULL,sActualMoveLeft);
 	s_pFrequentRepeat = UT_WorkerFactory::static_constructor (_sFrequentRepeat,pFreq, inMode, outMode);
 
 	UT_ASSERT(s_pFrequentRepeat);
@@ -4212,8 +4230,16 @@ static void sActualMoveRight(AV_View *  pAV_View, EV_EditMethodCallData * /*pCal
 	fl_BlockLayout * pBL = pView->getCurrentBlock();
 	if(pBL)
 		bRTL = pBL->getDominantDirection() == UT_BIDI_RTL;
-	
+
 	pView->cmdCharMotion(!bRTL,1);
+	if(pView->getGraphics() && pView->getGraphics()->allCarets()->getBaseCaret())
+	{
+//
+// Draw the fsking caret for sure!!!
+//
+		pView->getGraphics()->allCarets()->getBaseCaret()->forceDraw();
+	}
+	return;
 }
 
 Defun1(warpInsPtRight)
@@ -4229,7 +4255,7 @@ Defun1(warpInsPtRight)
 	UT_return_val_if_fail (pView, false);
 	int inMode = UT_WorkerFactory::IDLE | UT_WorkerFactory::TIMER;
 	UT_WorkerFactory::ConstructMode outMode = UT_WorkerFactory::NONE;
-	_Freq * pFreq = new _Freq(pView,nullptr,sActualMoveRight);
+	_Freq * pFreq = new _Freq(pView,NULL,sActualMoveRight);
 	s_pFrequentRepeat = UT_WorkerFactory::static_constructor (_sFrequentRepeat,pFreq, inMode, outMode);
 
 	UT_ASSERT(s_pFrequentRepeat);
@@ -4291,7 +4317,7 @@ Defun1(warpInsPtBOW)
 	fl_BlockLayout * pBL = pView->getCurrentBlock();
 	if(pBL)
 		bRTL = pBL->getDominantDirection() == UT_BIDI_RTL;
-	
+
 
 	if(bRTL)
 		pView->moveInsPtTo(FV_DOCPOS_EOW_MOVE);
@@ -4310,7 +4336,7 @@ Defun1(warpInsPtEOW)
 	fl_BlockLayout * pBL = pView->getCurrentBlock();
 	if(pBL)
 		bRTL = pBL->getDominantDirection() == UT_BIDI_RTL;
-	
+
 
 	if(bRTL)
 		pView->moveInsPtTo(FV_DOCPOS_BOW);
@@ -4434,7 +4460,13 @@ Defun1(warpInsPtPrevLine)
 //
 	UT_return_val_if_fail (pView, false);
 	pView->warpInsPtNextPrevLine(false);
-
+	if(pView->getGraphics() && pView->getGraphics()->allCarets()->getBaseCaret())
+	{
+//
+// Draw fsking caret for sure!!!
+//
+		pView->getGraphics()->allCarets()->getBaseCaret()->forceDraw();
+	}
 	return true;
 }
 
@@ -4447,7 +4479,13 @@ Defun1(warpInsPtNextLine)
 //
 	UT_return_val_if_fail (pView, false);
 	pView->warpInsPtNextPrevLine(true);
-
+	if(pView->getGraphics() && pView->getGraphics()->allCarets()->getBaseCaret())
+	{
+//
+// Draw fsking caret for sure!!!
+//
+		pView->getGraphics()->allCarets()->getBaseCaret()->forceDraw();
+	}
 	return true;
 }
 
@@ -4461,7 +4499,7 @@ Defun1(cursorDefault)
 	// clear status bar of any lingering messages
 	UT_return_val_if_fail (pView, false);
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> (pView->getParentData());
-	pFrame->setStatusMessage(nullptr);
+	pFrame->setStatusMessage(NULL);
 
 	GR_Graphics * pG = pView->getGraphics();
 	if (pG)
@@ -4479,7 +4517,7 @@ Defun1(cursorIBeam)
 	// clear status bar of any lingering messages
 	UT_return_val_if_fail (pView, false);
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> (pView->getParentData());
-	pFrame->setStatusMessage(nullptr);
+	pFrame->setStatusMessage(NULL);
 
 	GR_Graphics * pG = pView->getGraphics();
 	if (pG)
@@ -4498,7 +4536,7 @@ Defun1(cursorTOC)
 	// clear status bar of any lingering messages
 	UT_return_val_if_fail (pView, false);
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> (pView->getParentData());
-	pFrame->setStatusMessage(nullptr);
+	pFrame->setStatusMessage(NULL);
 
 	GR_Graphics * pG = pView->getGraphics();
 	if (pG)
@@ -4516,7 +4554,7 @@ Defun1(cursorRightArrow)
 	// clear status bar of any lingering messages
 	UT_return_val_if_fail (pView, false);
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> (pView->getParentData());
-	pFrame->setStatusMessage(nullptr);
+	pFrame->setStatusMessage(NULL);
 
 	GR_Graphics * pG = pView->getGraphics();
 	if (pG)
@@ -4535,7 +4573,7 @@ Defun1(cursorVline)
 	// clear status bar of any lingering messages
 	UT_return_val_if_fail (pView, false);
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> (pView->getParentData());
-	pFrame->setStatusMessage(nullptr);
+	pFrame->setStatusMessage(NULL);
 
 	GR_Graphics * pG = pView->getGraphics();
 	if (pG)
@@ -4554,7 +4592,7 @@ Defun1(cursorTopCell)
 	// clear status bar of any lingering messages
 	UT_return_val_if_fail (pView, false);
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> (pView->getParentData());
-	pFrame->setStatusMessage(nullptr);
+	pFrame->setStatusMessage(NULL);
 
 	GR_Graphics * pG = pView->getGraphics();
 	if (pG)
@@ -4573,7 +4611,7 @@ Defun1(cursorHline)
 	// clear status bar of any lingering messages
 	UT_return_val_if_fail (pView, false);
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> (pView->getParentData());
-	pFrame->setStatusMessage(nullptr);
+	pFrame->setStatusMessage(NULL);
 
 	GR_Graphics * pG = pView->getGraphics();
 	if (pG)
@@ -4591,7 +4629,7 @@ Defun1(cursorLeftArrow)
 	// clear status bar of any lingering messages
 	UT_return_val_if_fail (pView, false);
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> (pView->getParentData());
-	pFrame->setStatusMessage(nullptr);
+	pFrame->setStatusMessage(NULL);
 
 	GR_Graphics * pG = pView->getGraphics();
 	if (pG)
@@ -4609,7 +4647,7 @@ Defun1(cursorImage)
 	// clear status bar of any lingering messages
 	UT_return_val_if_fail (pView, false);
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> (pView->getParentData());
-	pFrame->setStatusMessage(nullptr);
+	pFrame->setStatusMessage(NULL);
 
 	GR_Graphics * pG = pView->getGraphics();
 	if (pG)
@@ -4627,7 +4665,7 @@ Defun1(cursorImageSize)
 	// clear status bar of any lingering messages
 	UT_return_val_if_fail (pView, false);
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> (pView->getParentData());
-	pFrame->setStatusMessage(nullptr);
+	pFrame->setStatusMessage(NULL);
 
 	GR_Graphics * pG = pView->getGraphics();
 	if (pG)
@@ -4658,8 +4696,8 @@ static bool dlgEditLatexEquation(AV_View *pAV_View, EV_EditMethodCallData * /*pC
 	    pos = pView->getPoint()-1;
 	}
 	fl_BlockLayout * pBlock = pView->getCurrentBlock();
-	fp_Run * pRun = nullptr;
-	fp_MathRun * pMathRun = nullptr;
+	fp_Run * pRun = NULL;
+	fp_MathRun * pMathRun = NULL;
 	UT_sint32 x1,y1,x2,y2,height;
 	bool bEOL = false;
 	bool bDir = false;
@@ -4668,7 +4706,7 @@ static bool dlgEditLatexEquation(AV_View *pAV_View, EV_EditMethodCallData * /*pC
 	{
 		pRun = pRun->getNextRun();
 	}
-	if(pRun == nullptr)
+	if(pRun == NULL)
 	{
 		return false;
 	}
@@ -4678,19 +4716,19 @@ static bool dlgEditLatexEquation(AV_View *pAV_View, EV_EditMethodCallData * /*pC
 	}
 	pMathRun = static_cast<fp_MathRun *>(pRun);
 	const PP_AttrProp * pSpanAP = pMathRun->getSpanAP();
-	const gchar * pszLatexID = nullptr, *pszDisplayMode = nullptr;
+	const gchar * pszLatexID = NULL, *pszDisplayMode = NULL;
 	pSpanAP->getAttribute("latexid",pszLatexID);
 	pSpanAP->getProperty("display",pszDisplayMode);
-	if(pszLatexID == nullptr || *pszLatexID == 0)
+	if(pszLatexID == NULL || *pszLatexID == 0)
 	{
 		return false;
 	}
 	UT_ConstByteBufPtr pByteBuf;
 	UT_UTF8String sLatex;
 	PD_Document * pDoc= pView->getDocument();
-	bool bFoundLatexID = pDoc->getDataItemDataByName(pszLatexID, 
+	bool bFoundLatexID = pDoc->getDataItemDataByName(pszLatexID,
 													 pByteBuf,
-													 nullptr, nullptr);
+													 NULL, NULL);
 
 	if(!bFoundLatexID)
 	{
@@ -4813,7 +4851,7 @@ Defun(contextFrame)
 	// no frame context menu in normal view ...
 	if(pView->getViewMode() == VIEW_NORMAL)
 		return true;
-	
+
 	return s_doContextMenu(EV_EMC_FRAME,pCallData->m_xPos, pCallData->m_yPos,pView,pFrame);
 }
 
@@ -4878,7 +4916,7 @@ Defun(contextImage)
 	UT_return_val_if_fail (pView, false);
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> (pView->getParentData());
 	UT_return_val_if_fail(pFrame, false);
-	fp_Run *pRun = nullptr;
+	fp_Run *pRun = NULL;
 
 	if ( pView->isSelectionEmpty () )
 	  {
@@ -4895,7 +4933,7 @@ Defun(contextImage)
 		UT_sint32 x1,x2,y1,y2,iHeight;
 		bool bEOL = false;
 		bool bDir = false;
-		
+
 		pRun = pBlock->findPointCoords(pos,bEOL,x1,y1,x2,y2,iHeight,bDir);
 		while(pRun && ((pRun->getType() != FPRUN_IMAGE) && (pRun->getType() != FPRUN_EMBED)))
 		{
@@ -4942,7 +4980,7 @@ Defun(contextEmbedLayout)
 	UT_return_val_if_fail (pView, false);
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> (pView->getParentData());
 	UT_return_val_if_fail(pFrame, false);
-	fp_Run *pRun = nullptr;
+	fp_Run *pRun = NULL;
 
 	if ( pView->isSelectionEmpty () )
 	  {
@@ -4958,7 +4996,7 @@ Defun(contextEmbedLayout)
 		UT_sint32 x1,x2,y1,y2,iHeight;
 		bool bEOL = false;
 		bool bDir = false;
-		
+
 		pRun = pBlock->findPointCoords(pos,bEOL,x1,y1,x2,y2,iHeight,bDir);
 		while(pRun && ((pRun->getType() != FPRUN_IMAGE) && (pRun->getType() != FPRUN_EMBED)))
 		{
@@ -4981,11 +5019,11 @@ Defun(contextHyperlink)
 	// move the IP so actions have the right context
 	if (!pView->isXYSelected(pCallData->m_xPos, pCallData->m_yPos))
 		EX(warpInsPtToXY);
-	
+
 	fp_Run * pRun = pView->getHyperLinkRun(pView->getPoint());
 	UT_return_val_if_fail(pRun, false);
 	fp_HyperlinkRun * pHRun = pRun->getHyperlink();
-	
+
 	if(pHRun && pHRun->getHyperlinkType() == HYPERLINK_NORMAL) // normal hyperlinks
 	{
 #ifdef ENABLE_SPELL
@@ -5177,7 +5215,7 @@ Defun1(extSelLeft)
 	fl_BlockLayout * pBL = pView->getCurrentBlock();
 	if(pBL)
 		bRTL = pBL->getDominantDirection() == UT_BIDI_RTL;
-	
+
 
 	pView->extSelHorizontal(bRTL,1);
 
@@ -5193,7 +5231,7 @@ Defun1(extSelRight)
 	fl_BlockLayout * pBL = pView->getCurrentBlock();
 	if(pBL)
 		bRTL = pBL->getDominantDirection() == UT_BIDI_RTL;
-	
+
 
 	pView->extSelHorizontal(!bRTL,1);
 
@@ -5227,7 +5265,7 @@ Defun1(extSelBOW)
 	fl_BlockLayout * pBL = pView->getCurrentBlock();
 	if(pBL)
 		bRTL = pBL->getDominantDirection() == UT_BIDI_RTL;
-	
+
 
 	if(bRTL)
 		pView->extSelTo(FV_DOCPOS_EOW_MOVE);
@@ -5246,7 +5284,7 @@ Defun1(extSelEOW)
 	fl_BlockLayout * pBL = pView->getCurrentBlock();
 	if(pBL)
 		bRTL = pBL->getDominantDirection() == UT_BIDI_RTL;
-	
+
 
 	if(bRTL)
 		pView->extSelTo(FV_DOCPOS_BOW);
@@ -5418,7 +5456,7 @@ Defun1(selectTable)
 		return false;
 	}
 	posStartTab = pDoc->getStruxPosition(tableSDH); //was -1
-	UT_DEBUGMSG(("PosStart %d TableSDH %p \n", posStartTab, (void*)tableSDH));
+	UT_DEBUGMSG(("PosStart %d TableSDH %p \n",posStartTab,tableSDH));
 	bRes = pDoc->getNextStruxOfType(tableSDH,PTX_EndTable,&endTableSDH);
 	if(!bRes)
 	{
@@ -5426,7 +5464,7 @@ Defun1(selectTable)
 		return false;
 	}
 	posEndTab = pDoc->getStruxPosition(endTableSDH)+1; //was +1
-	UT_DEBUGMSG(("PosEndTab %d endTableSDH %p \n", posEndTab, (void*)endTableSDH));
+	UT_DEBUGMSG(("PosEndTab %d endTableSDH %p \n",posEndTab,endTableSDH));
 	pView->cmdSelect(posStartTab,posEndTab);
 	return true;
 }
@@ -5493,9 +5531,9 @@ Defun1(editEmbed)
 		UT_sint32 x1,x2,y1,y2,iHeight;
 		bool bEOL = false;
 		bool bDir = false;
-		
-		fp_Run * pRun = nullptr;
-		
+
+		fp_Run * pRun = NULL;
+
 		pRun = pBlock->findPointCoords(posL,bEOL,x1,y1,x2,y2,iHeight,bDir);
 		while(pRun && ((pRun->getType() != FPRUN_IMAGE) && (pRun->getType() != FPRUN_EMBED)))
 		{
@@ -5544,13 +5582,13 @@ Defun1(selectRow)
 
 	PD_Document * pDoc = pView->getDocument();
 	pView->getCellParams(pView->getPoint(), &iLeft, &iRight,&iTop,&iBot);
-	
+
 	bool bRes = pDoc->getStruxOfTypeFromPosition(pView->getPoint(),PTX_SectionTable,&tableSDH);
 	if(!bRes)
 	{
 		return false;
 	}
-  
+
 	//
 	// Now find the number of rows and columns inthis table.
     //
@@ -5652,7 +5690,7 @@ Defun1(delLeft)
 	UT_return_val_if_fail (pView, false);
 	int inMode = UT_WorkerFactory::IDLE | UT_WorkerFactory::TIMER;
 	UT_WorkerFactory::ConstructMode outMode = UT_WorkerFactory::NONE;
-	_Freq * pFreq = new _Freq(pView,nullptr,sActualDelLeft);
+	_Freq * pFreq = new _Freq(pView,NULL,sActualDelLeft);
 	s_pFrequentRepeat = UT_WorkerFactory::static_constructor (_sFrequentRepeat,pFreq, inMode, outMode);
 
 	UT_ASSERT(s_pFrequentRepeat);
@@ -5690,7 +5728,7 @@ Defun1(delRight)
 	UT_return_val_if_fail (pView, false);
 	int inMode = UT_WorkerFactory::IDLE | UT_WorkerFactory::TIMER;
 	UT_WorkerFactory::ConstructMode outMode = UT_WorkerFactory::NONE;
-	_Freq * pFreq = new _Freq(pView,nullptr,sActualDelRight);
+	_Freq * pFreq = new _Freq(pView,NULL,sActualDelRight);
 	s_pFrequentRepeat = UT_WorkerFactory::static_constructor (_sFrequentRepeat,pFreq, inMode, outMode);
 
 	UT_ASSERT(s_pFrequentRepeat);
@@ -5812,12 +5850,12 @@ static bool pView->cmdCharInsert(const UT_UCS4Char * pText, UT_uint32 iLen,
 
 		if (pLR)
 		{
-			const gchar * props_out[] = {"lang", nullptr, nullptr};
+			const gchar * props_out[] = {"lang", NULL, NULL};
 			props_out[1] = pLR->m_szLangCode;
 			pView->setCharFormat(props_out);
 		}
 	}
-	
+
 	pView->cmdCharInsert(pText, iLen, bForce);
 	return true;
 }
@@ -5883,15 +5921,16 @@ Defun(insertClosingParenthesis)
 
 	bool bLang = false, bMarker = false;
 
-	pPrefs->getPrefsValueBool(XAP_PREF_KEY_ChangeLanguageWithKeyboard, bLang);
+	pPrefs->getPrefsValueBool(static_cast<const gchar *>(XAP_PREF_KEY_ChangeLanguageWithKeyboard),
+							  &bLang);
 
-	const UT_LangRecord * pLR = nullptr;
-	
+	const UT_LangRecord * pLR = NULL;
+
 	if(bLang)
 	{
 		pLR = pApp->getKbdLanguage();
-		
-		pPrefs->getPrefsValueBool(XAP_PREF_KEY_DirMarkerAfterClosingParenthesis, bMarker);
+
+		pPrefs->getPrefsValueBool(static_cast<const gchar *>(XAP_PREF_KEY_DirMarkerAfterClosingParenthesis), &bMarker);
 	}
 
 	if(bMarker && pLR)
@@ -5899,7 +5938,7 @@ Defun(insertClosingParenthesis)
 		UT_return_val_if_fail(pCallData->m_dataLength == 1, false);
 		UT_UCS4Char data[2];
 		data[0] = (UT_UCS4Char) *(pCallData->m_pData);
-		
+
 		if(pLR->m_eDir == UTLANG_RTL)
 		{
 			data[1] = UCS_RLM;
@@ -5917,7 +5956,7 @@ Defun(insertClosingParenthesis)
 		return true;
 	}
 
- normal_insert:	
+ normal_insert:
 	pView->cmdCharInsert(pCallData->m_pData, pCallData->m_dataLength);
 	return true;
 }
@@ -5937,15 +5976,16 @@ Defun(insertOpeningParenthesis)
 
 	bool bLang = false, bMarker = false;
 
-	pPrefs->getPrefsValueBool(XAP_PREF_KEY_ChangeLanguageWithKeyboard, bLang);
+	pPrefs->getPrefsValueBool(static_cast<const gchar *>(XAP_PREF_KEY_ChangeLanguageWithKeyboard),
+							  &bLang);
 
-	const UT_LangRecord * pLR = nullptr;
+	const UT_LangRecord * pLR = NULL;
 
 	if(bLang)
 	{
 		pLR = pApp->getKbdLanguage();
 
-		pPrefs->getPrefsValueBool(XAP_PREF_KEY_DirMarkerAfterClosingParenthesis, bMarker);
+		pPrefs->getPrefsValueBool(static_cast<const gchar *>(XAP_PREF_KEY_DirMarkerAfterClosingParenthesis), &bMarker);
 	}
 
 	if(bMarker && pLR)
@@ -5971,7 +6011,7 @@ Defun(insertOpeningParenthesis)
 		return true;
 	}
 
- normal_insert:	
+ normal_insert:
 	pView->cmdCharInsert(pCallData->m_pData, pCallData->m_dataLength);
 	return true;
 }
@@ -5980,7 +6020,7 @@ Defun1(insertLRM)
 {
 	CHECK_FRAME;
 	ABIWORD_VIEW;
-	
+
 	UT_return_val_if_fail (pView, false);
 	UT_UCS4Char cM = UCS_LRM;
 	pView->cmdCharInsert(&cM, 1);
@@ -6136,20 +6176,20 @@ static bool s_doHyperlinkDlg(FV_View * pView)
 	{
 		const char *buf;
 		fp_HyperlinkRun * pHRun = static_cast<fp_HyperlinkRun *>(pView->getHyperLinkRun(pView->getPoint()));
-		if(pHRun == nullptr)
+		if(pHRun == NULL)
 		{
 			pDialogFactory->releaseDialog(pDialog);
 			return false;
 		}
 		bEdit = true;
 		buf = pHRun->getTarget();
-		if (buf != nullptr)
+		if (buf != NULL)
 			sTarget = buf;
 		buf = pHRun->getTitle();
-		if (buf != nullptr)
+		if (buf != NULL)
 			sTitle = buf;
 		fl_BlockLayout * pBL = pHRun->getBlock();
-		fp_Run * pRun = nullptr;
+		fp_Run * pRun = NULL;
 		if(pHRun->isStartOfHyperlink())
 		{
 			pos1 = pBL->getPosition(true) + pHRun->getBlockOffset()+1;
@@ -6241,7 +6281,7 @@ Defun1(insertHyperlink)
 			UT_return_val_if_fail (pFrame, false);
 
 
-			pFrame->showMessageBox(AP_STRING_ID_MSG_HyperlinkNoSelection, 
+			pFrame->showMessageBox(AP_STRING_ID_MSG_HyperlinkNoSelection,
 								   XAP_Dialog_MessageBox::b_O, XAP_Dialog_MessageBox::a_OK);
 			return false;
 		}
@@ -6764,7 +6804,7 @@ Defun1(insertNBSpace)
 	return true;
 }
 
-// non-breaking, zerrow width 
+// non-breaking, zerrow width
 Defun1(insertNBZWSpace)
 {
 	CHECK_FRAME;
@@ -7344,7 +7384,7 @@ Defun1(paste)
 	UT_return_val_if_fail(pView, false);
 	int inMode = UT_WorkerFactory::IDLE | UT_WorkerFactory::TIMER;
 	UT_WorkerFactory::ConstructMode outMode = UT_WorkerFactory::NONE;
-	_Freq * pFreq = new _Freq(pView,nullptr,sActualPaste);
+	_Freq * pFreq = new _Freq(pView,NULL,sActualPaste);
 	s_pFrequentRepeat = UT_WorkerFactory::static_constructor (_sFrequentRepeat,pFreq, inMode, outMode);
 
 	UT_ASSERT(s_pFrequentRepeat);
@@ -7403,12 +7443,22 @@ static bool checkViewModeIsPrint(FV_View * pView)
 			AP_FrameData *pFrameData = static_cast<AP_FrameData *>(pFrame->getFrameData());
 			UT_return_val_if_fail (pFrameData, false);
 
+            //pascal
+            /*
 			pFrameData->m_pViewMode = VIEW_PRINT;
 			pFrame->toggleLeftRuler (true && (pFrameData->m_bShowRuler) &&
 									 (!pFrameData->m_bIsFullScreen));
-
-
 			pView->setViewMode (VIEW_PRINT);
+			*/
+
+
+			pFrameData->m_pViewMode = VIEW_PRINT;
+			pView->setViewMode (VIEW_PRINT);
+			pFrame->toggleLeftRuler (true && (pFrameData->m_bShowRuler) &&
+									 (!pFrameData->m_bIsFullScreen));
+
+            //fin pascal
+
 
 			// POLICY: make this the default for new frames, too
 			XAP_App * pApp = XAP_App::getApp();
@@ -7581,7 +7631,7 @@ UT_return_val_if_fail(pDialog, false);
 	{
 		UT_UCSChar * buffer;
 		pView->getSelectionText(buffer);
-		if(buffer != nullptr)
+		if(buffer != NULL)
 		{
 			pDialog->setFindString(buffer);
 			FREEP(buffer);
@@ -7666,7 +7716,7 @@ static bool s_doLangDlg(FV_View * pView)
 	const PP_AttrProp *  pAP = pDoc->getAttrProp();
 	UT_return_val_if_fail( pAP, false );
 
-	const gchar * pLang = nullptr;
+	const gchar * pLang = NULL;
 	bool bRet = pAP->getProperty("lang", pLang);
 
 	if(bRet)
@@ -7677,7 +7727,7 @@ static bool s_doLangDlg(FV_View * pView)
 	{
 		UT_ASSERT_HARMLESS( UT_SHOULD_NOT_HAPPEN );
 	}
-	
+
 	// run the dialog
 
 	pDialog->runModal(pFrame);
@@ -7691,7 +7741,7 @@ static bool s_doLangDlg(FV_View * pView)
 		//UT_DEBUGMSG(("pressed OK\n"));
 		UT_uint32 k = 0;
 		PP_PropertyVector props_out;
-		const gchar * s = nullptr;
+		const gchar * s = NULL;
 
 		bool bChange = pDialog->getChangedLangProperty(&s);
 		if (s)
@@ -7707,13 +7757,13 @@ static bool s_doLangDlg(FV_View * pView)
 		{
 #ifdef ENABLE_SPELL
 			FL_DocLayout* pLayout = pView->getLayout();
-			
+
 			if(pLayout)
 				pLayout->queueAll(FL_DocLayout::bgcrSpelling | FL_DocLayout::bgcrGrammar);
 #endif
 			pDoc->setProperties(props_out);
 		}
-		
+
 	}
 
 	pDialogFactory->releaseDialog(pDialog);
@@ -7827,7 +7877,7 @@ UT_return_val_if_fail(pDialog, false);
 	{
 	    // set the drawable string to the selection text
 		// the pointer return by getSelectionText() must be freed
-		UT_UCS4Char* text = nullptr;
+		UT_UCS4Char* text = NULL;
 		pView->getSelectionText(text);
 		if(text)
 		{
@@ -8032,7 +8082,7 @@ bool s_doTabDlg(FV_View * pView)
 	if(pDialog)
 	{
 		// setup the callback function, no closure
-		pDialog->setSaveCallback(s_TabSaveCallBack, nullptr);
+		pDialog->setSaveCallback(s_TabSaveCallBack, NULL);
 
 		// run the dialog
 		pDialog->runModal(pFrame);
@@ -8262,7 +8312,7 @@ static bool _fontSizeChange(FV_View * pView, bool bIncrease)
 #define PT_INC_SMALL  1.0
 #define PT_INC_MEDIUM 2.0
 #define PT_INC_LARGE  4.0
-	
+
 	if(bIncrease)
 	{
 		if(dPoints >= 26.0)
@@ -8280,7 +8330,7 @@ static bool _fontSizeChange(FV_View * pView, bool bIncrease)
 			dPoints -= PT_INC_MEDIUM;
 		else
 			dPoints -= PT_INC_SMALL;
-		
+
 	}
 
 #undef PT_INC_SMALL
@@ -8290,7 +8340,7 @@ static bool _fontSizeChange(FV_View * pView, bool bIncrease)
 	// make sure that we do not decrease fonts too far ...
 	if(dPoints < 2.0)
 		return false;
-	
+
 	const gchar * sz = UT_formatDimensionString(DIM_PT, dPoints);
 
 	if(!sz || !*sz)
@@ -8308,7 +8358,7 @@ Defun1(fontSizeIncrease)
 {
 	CHECK_FRAME;
 	ABIWORD_VIEW;
-	
+
 	return _fontSizeChange(pView, true);
 }
 
@@ -8316,7 +8366,7 @@ Defun1(fontSizeDecrease)
 {
 	CHECK_FRAME;
 	ABIWORD_VIEW;
-	
+
 	return _fontSizeChange(pView, false);
 }
 
@@ -8342,7 +8392,7 @@ Defun1(cairoPrint)
 	GR_Graphics * pGraphics = pDialog->getPrinterGraphicsContext();
 	pDialog->releasePrinterGraphicsContext(pGraphics);
 	pView->clearCursorWait();
-	s_pLoadingFrame = nullptr;
+	s_pLoadingFrame = NULL;
 	pView->setPoint(pView->getPoint());
 	pView->updateScreen(false);
 	pDialogFactory->releaseDialog(pDialog);
@@ -8372,7 +8422,7 @@ Defun1(cairoPrintPreview)
 	GR_Graphics * pGraphics = pDialog->getPrinterGraphicsContext();
 	pDialog->releasePrinterGraphicsContext(pGraphics);
 	pView->clearCursorWait();
-	s_pLoadingFrame = nullptr;
+	s_pLoadingFrame = NULL;
 	pView->setPoint(pView->getPoint());
 	pView->updateScreen(false);
 	pDialogFactory->releaseDialog(pDialog);
@@ -8401,11 +8451,11 @@ Defun1(cairoPrintDirectly)
 	//
 	// DOM you can use this for your command line printing
 	//
-	pDialog->PrintDirectly(pFrame,/*filename*/ nullptr, /*printer name */nullptr);
+	pDialog->PrintDirectly(pFrame,/*filename*/ NULL, /*printer name */NULL);
 	GR_Graphics * pGraphics = pDialog->getPrinterGraphicsContext();
 	pDialog->releasePrinterGraphicsContext(pGraphics);
 	pView->clearCursorWait();
-	s_pLoadingFrame = nullptr;
+	s_pLoadingFrame = NULL;
 	pView->updateScreen(false);
 	pDialogFactory->releaseDialog(pDialog);
 	return true;
@@ -8433,7 +8483,7 @@ Defun1(formatPainter)
   pNewDoc->newDocument();
 
   FL_DocLayout *pDocLayout = new FL_DocLayout(pNewDoc, pView->getGraphics());
-  FV_View pPasteView(XAP_App::getApp(), nullptr, pDocLayout);
+  FV_View pPasteView (XAP_App::getApp(), 0, pDocLayout);
   pDocLayout->setView (&pPasteView);
   pDocLayout->fillLayouts();
   pDocLayout->formatAll();
@@ -8580,7 +8630,7 @@ bool s_actuallyPrint(PD_Document *doc,  GR_Graphics *pGraphics,
 			pages.insert(i);
 		}
 
-	return s_actuallyPrint(doc, pGraphics, pPrintView, pDocName, 
+	return s_actuallyPrint(doc, pGraphics, pPrintView, pDocName,
 						   nCopies, bCollate, iWidth, iHeight, pages);
 }
 
@@ -8609,6 +8659,7 @@ bool s_actuallyPrint(PD_Document *doc,  GR_Graphics *pGraphics,
 	  gchar msgBuf [1024];
 
 	  dg_DrawArgs da;
+	  memset(&da, 0, sizeof(da));
 	  da.pG = pGraphics;
 
 	  XAP_Frame * pFrame = XAP_App::getApp()->getLastFocussedFrame ();
@@ -8636,7 +8687,7 @@ bool s_actuallyPrint(PD_Document *doc,  GR_Graphics *pGraphics,
 							// iHeight is allowed to vary page to page
 							pGraphics->m_iRasterPosition = (k-1)*iHeight;
 							pGraphics->startPage(pDocName, k, orient, iWidth, iHeight);
-							pPrintView->drawPage(k-1, &da);
+							pPrintView->draw(k-1, &da);
 						}
 				}
 		}
@@ -8664,7 +8715,7 @@ bool s_actuallyPrint(PD_Document *doc,  GR_Graphics *pGraphics,
 							// iHeight is allowed to vary page to page
 							pGraphics->m_iRasterPosition = (k-1)*iHeight;
 							pGraphics->startPage(pDocName, k, orient, iWidth, iHeight);
-							pPrintView->drawPage(k-1, &da);
+							pPrintView->draw(k-1, &da);
 						}
 				}
 		}
@@ -8673,7 +8724,7 @@ bool s_actuallyPrint(PD_Document *doc,  GR_Graphics *pGraphics,
 		if(pFrame)
 		  pFrame->setStatusMessage (""); // reset/0 out status bar
 	}
-	s_pLoadingDoc = nullptr;
+	s_pLoadingDoc = NULL;
 
 	return true;
 }
@@ -8704,7 +8755,7 @@ static bool s_doPrint(FV_View * pView, bool bTryToSuppressDialog,bool bPrintDire
 		pView->setViewMode (VIEW_PRINT);
 		pView->updateScreen (false);
 	}
-	
+
 	pFrame->raise();
 
 	XAP_DialogFactory * pDialogFactory
@@ -8763,13 +8814,13 @@ UT_return_val_if_fail(pDialog, false);
 		font list, we can remove the 4 lines below. - MARCM
 		*/
 		//
-		FL_DocLayout * pDocLayout = nullptr;
-		FV_View * pPrintView = nullptr;
+		FL_DocLayout * pDocLayout = NULL;
+		FV_View * pPrintView = NULL;
 		bool canQuickPrint = pGraphics->canQuickPrint();
 		if(!canQuickPrint)
 		{
 				pDocLayout = new FL_DocLayout(doc,pGraphics);
-				pPrintView = new FV_View(XAP_App::getApp(), nullptr, pDocLayout);
+				pPrintView = new FV_View(XAP_App::getApp(),0,pDocLayout);
 				pPrintView->getLayout()->fillLayouts();
 				pPrintView->getLayout()->formatAll();
 				pPrintView->getLayout()->recalculateTOCFields();
@@ -8819,7 +8870,7 @@ UT_return_val_if_fail(pDialog, false);
 			if(bHideFmtMarks)
 				pPrintView->setShowPara(true);
 
-			pDocLayout->setQuickPrint(nullptr);
+			pDocLayout->setQuickPrint(NULL);
 		}
 		pDialog->releasePrinterGraphicsContext(pGraphics);
 
@@ -8827,7 +8878,7 @@ UT_return_val_if_fail(pDialog, false);
 // Turn off wait cursor
 //
 		pView->clearCursorWait();
-		s_pLoadingFrame = nullptr;
+		s_pLoadingFrame = NULL;
 		pView->updateScreen(false);
 	}
 
@@ -8876,9 +8927,9 @@ static bool s_doPrintPreview(FV_View * pView)
 		{
 			UT_ASSERT_HARMLESS(pGraphics);
 			UT_ASSERT_HARMLESS(pGraphics->queryProperties(GR_Graphics::DGP_PAPER));
-			
+
 			pDialogFactory->releaseDialog(pDialog);
-			
+
 			// Turn off wait cursor
 			pView->clearCursorWait();
 
@@ -8890,14 +8941,14 @@ static bool s_doPrintPreview(FV_View * pView)
 	get it's font list filled. When we find a better way to fill the UnixPSGraphics
 	font list, we can remove the 4 lines below. - MARCM
 	*/
-	FL_DocLayout * pDocLayout = nullptr;
-	FV_View * pPrintView = nullptr;
+	FL_DocLayout * pDocLayout = NULL;
+	FV_View * pPrintView = NULL;
 	bool bHideFmtMarks = false;
 	bool bDidQuickPrint = false;
 	if(!pGraphics->canQuickPrint() || (pView->getViewMode() != VIEW_PRINT))
 	{
 			pDocLayout = new FL_DocLayout(doc,pGraphics);
-			pPrintView = new FV_View(XAP_App::getApp(), nullptr, pDocLayout);
+			pPrintView = new FV_View(XAP_App::getApp(),0,pDocLayout);
 			pPrintView->setViewMode(VIEW_PRINT);
 			pPrintView->getLayout()->fillLayouts();
 			pPrintView->getLayout()->formatAll();
@@ -8915,7 +8966,7 @@ static bool s_doPrintPreview(FV_View * pView)
 				bHideFmtMarks = true;
 			}
 	}
-	
+
 	UT_uint32 nFromPage = 1, nToPage = pLayout->countPages(), nCopies = 1;
 	bool bCollate  = false;
 
@@ -8939,7 +8990,7 @@ static bool s_doPrintPreview(FV_View * pView)
 		if(bHideFmtMarks)
 			pPrintView->setShowPara(true);
 
-		pDocLayout->setQuickPrint(nullptr);
+		pDocLayout->setQuickPrint(NULL);
 	}
 	pDialog->releasePrinterGraphicsContext(pGraphics);
 
@@ -8947,7 +8998,7 @@ static bool s_doPrintPreview(FV_View * pView)
 
     // Turn off wait cursor
 	pView->clearCursorWait();
-	
+
 	return true;
 }
 #endif
@@ -9163,7 +9214,7 @@ Defun1(zoomIn)
 	UT_return_val_if_fail(pView, false);
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> ( pView->getParentData());
 	UT_return_val_if_fail(pFrame, false);
-	
+
 	pFrame->raise();
 	UT_uint32 newZoom = UT_MIN(pFrame->getZoomPercentage() + 10, XAP_DLG_ZOOM_MAXIMUM_ZOOM);
 	UT_String tmp (UT_String_sprintf("%d",newZoom));
@@ -9174,7 +9225,7 @@ Defun1(zoomIn)
 	XAP_PrefsScheme *pPrefsScheme = pPrefs->getCurrentScheme();
 UT_return_val_if_fail(pPrefsScheme, false);	pPrefsScheme->setValue(static_cast<const gchar*>(XAP_PREF_KEY_ZoomType),
 						 static_cast<const gchar*>(tmp.c_str()));
-	
+
 	pFrame->setZoomType( XAP_Frame::z_PERCENT );
 	pFrame->quickZoom(newZoom);
 
@@ -9188,9 +9239,9 @@ Defun1(zoomOut)
 	UT_return_val_if_fail(pView, false);
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> ( pView->getParentData());
 	UT_return_val_if_fail(pFrame, false);
-	
+
 	pFrame->raise();
-	
+
 	UT_uint32 newZoom = UT_MAX(pFrame->getZoomPercentage() - 10, XAP_DLG_ZOOM_MINIMUM_ZOOM);
 	UT_String tmp (UT_String_sprintf("%d",newZoom));
 	XAP_App * pApp = XAP_App::getApp();
@@ -9203,7 +9254,7 @@ UT_return_val_if_fail(pPrefsScheme, false);	pPrefsScheme->setValue(static_cast<c
 	pFrame->setZoomType( XAP_Frame::z_PERCENT );
 	pFrame->quickZoom(newZoom);
 
-	
+
 	return true;
 }
 
@@ -9323,10 +9374,11 @@ static bool s_doPageSetupDlg (FV_View * pView)
 
 	// respect units set in the dialogue constructer from prefs
 	UT_Dimension orig_uprefs = DIM_IN;
-	std::string rulerUnits;
-	if (pApp->getPrefsValue(AP_PREF_KEY_RulerUnits, rulerUnits)) {
+	const gchar * szRulerUnits;
+	if (pApp->getPrefsValue(AP_PREF_KEY_RulerUnits,&szRulerUnits))
+	{
 		// we only allow in, cm, mm in the dlg
-		UT_Dimension units = UT_determineDimension(rulerUnits.c_str());
+		UT_Dimension units = UT_determineDimension(szRulerUnits);
 		if(units == DIM_CM || units == DIM_MM || units == DIM_IN)
 		{
 			orig_uprefs = units;
@@ -9336,7 +9388,7 @@ static bool s_doPageSetupDlg (FV_View * pView)
 	// make sure that the units in the dlg are the same as in the prefs
 	pDialog->setPageUnits(orig_uprefs);
 	pDialog->setMarginUnits(orig_uprefs);
-	
+
 	pDialog->setPageScale(static_cast<int>(100.0*orig_scale));
 
 	//
@@ -9583,13 +9635,13 @@ class ABI_EXPORT FV_View_Insert_symbol_listener : public XAP_Insert_symbol_liste
 	{
 	public:
 
-		virtual void setView( AV_View * pJustFocussedView) override
+		void setView( AV_View * pJustFocussedView)
 			{
 			p_view = static_cast<FV_View *>(pJustFocussedView) ;
 			}
-		virtual bool insertSymbol(UT_UCSChar Char, const char *p_font_name) override
+		bool insertSymbol(UT_UCSChar Char, const char *p_font_name)
 		{
-			UT_return_val_if_fail (p_view != nullptr, false);
+			UT_return_val_if_fail (p_view != NULL, false);
 
 			p_view->insertSymbol(Char, p_font_name);
 
@@ -9599,6 +9651,7 @@ class ABI_EXPORT FV_View_Insert_symbol_listener : public XAP_Insert_symbol_liste
 	private:
 		FV_View *p_view;
 	};
+
 
 
 static	FV_View_Insert_symbol_listener symbol_Listener;
@@ -9722,7 +9775,7 @@ Defun1(dlgSpellPrefs)
 {
 	CHECK_FRAME;
 	ABIWORD_VIEW;
-	
+
 #ifdef TOOLKIT_COCOA
     return s_doOptionsDlg(pView, 4); // spelling tab
 #endif
@@ -9746,16 +9799,16 @@ Defun1(dlgSpellPrefs)
 static const gchar* s_TBPrefsKeys [] = {
 #if XAP_SIMPLE_TOOLBAR
 	AP_PREF_KEY_SimpleBarVisible,
-#else	
+#else
 	AP_PREF_KEY_StandardBarVisible,
 	AP_PREF_KEY_FormatBarVisible,
 	AP_PREF_KEY_TableBarVisible,
 	AP_PREF_KEY_ExtraBarVisible
-#endif		
+#endif
 };
 
 static bool
-_viewTBx(AV_View* pAV_View, int num) 
+_viewTBx(AV_View* pAV_View, int num)
 {
 	CHECK_FRAME;
 	UT_return_val_if_fail(pAV_View, false);
@@ -9786,7 +9839,7 @@ _viewTBx(AV_View* pAV_View, int num)
 	pScheme->setValueBool(s_TBPrefsKeys[num], pFrameData->m_bShowBar[num]);
 
 	//	FV_View * pView = static_cast<FV_View *>(pAV_View);
-	//	pView->draw(nullptr);
+	//	pView->draw(NULL);
 	return true;
 }
 
@@ -9949,7 +10002,7 @@ UT_return_val_if_fail(pFrameData, false);
 UT_return_val_if_fail(pScheme, false);
 
 	pScheme->setValueBool(static_cast<const gchar *>(AP_PREF_KEY_ExtraBarVisible), pFrameData->m_bShowBar[3]);
-	
+
 	return true;
 }
 #endif
@@ -10013,12 +10066,27 @@ Defun1(viewNormalLayout)
 
 	AP_FrameData *pFrameData = static_cast<AP_FrameData *>(pFrame->getFrameData());
 UT_return_val_if_fail(pFrameData, false);
+
+
+	//pascal bug mauvaise longueur de page après un changement de view mode
+	/*
 	pFrameData->m_pViewMode = VIEW_NORMAL;
 	pFrame->toggleLeftRuler (false);
 	if(!pFrameData->m_bIsFullScreen)
 		pFrame->toggleTopRuler (true);
 
 	pView->setViewMode (VIEW_NORMAL);
+    */
+
+	pFrameData->m_pViewMode = VIEW_NORMAL;
+    pView->setViewMode (VIEW_NORMAL);
+
+	pFrame->toggleLeftRuler (false);
+	if(!pFrameData->m_bIsFullScreen)
+		pFrame->toggleTopRuler (true);
+
+    //fin pascal
+
 
 	// POLICY: make this the default for new frames, too
 	XAP_App * pApp = XAP_App::getApp();
@@ -10048,6 +10116,10 @@ Defun1(viewWebLayout)
 
 	AP_FrameData *pFrameData = static_cast<AP_FrameData *>(pFrame->getFrameData());
 UT_return_val_if_fail(pFrameData, false);
+
+
+	//pascal bug mauvaise longueur de page après un changement de view mode
+	/*
 	pFrameData->m_pViewMode = VIEW_WEB;
 	pFrame->toggleLeftRuler (false);
 	pFrame->toggleTopRuler (false);
@@ -10058,6 +10130,24 @@ UT_return_val_if_fail(pFrameData, false);
 
 	FV_View * pView = static_cast<FV_View *>(pAV_View);
 	pView->setViewMode (VIEW_WEB);
+    */
+
+    pFrameData->m_pViewMode = VIEW_WEB;
+
+    // This about this. we need to work out a page width for 100% zoom
+	//pFrame->setZoomType(XAP_Frame::z_PAGEWIDTH);
+
+	FV_View * pView = static_cast<FV_View *>(pAV_View);
+	pView->setViewMode (VIEW_WEB);
+
+	pFrame->toggleLeftRuler (false);
+	pFrame->toggleTopRuler (false);
+
+
+	//fin pascal
+
+
+
 
 	// POLICY: make this the default for new frames, too
 	XAP_App * pApp = XAP_App::getApp();
@@ -10085,7 +10175,12 @@ Defun1(viewPrintLayout)
 	UT_return_val_if_fail(pFrame, false);
 
 	AP_FrameData *pFrameData = static_cast<AP_FrameData *>(pFrame->getFrameData());
-UT_return_val_if_fail(pFrameData, false);
+    UT_return_val_if_fail(pFrameData, false);
+
+
+
+	//pascal bug mauvaise longueur de page après un changement de view mode
+	/*
 	pFrameData->m_pViewMode = VIEW_PRINT;
 	pFrame->toggleLeftRuler (true && (pFrameData->m_bShowRuler) &&
 				 (!pFrameData->m_bIsFullScreen));
@@ -10095,6 +10190,23 @@ UT_return_val_if_fail(pFrameData, false);
 	FV_View * pView = static_cast<FV_View *>(pAV_View);
 	UT_DEBUGMSG(("Set mode VIEW PRINT \n"));
 	pView->setViewMode (VIEW_PRINT);
+    */
+
+
+   	pFrameData->m_pViewMode = VIEW_PRINT;
+
+    FV_View * pView = static_cast<FV_View *>(pAV_View);
+	UT_DEBUGMSG(("Set mode VIEW PRINT \n"));
+	pView->setViewMode (VIEW_PRINT);
+
+	pFrame->toggleLeftRuler (true && (pFrameData->m_bShowRuler) &&
+				 (!pFrameData->m_bIsFullScreen));
+	if(!pFrameData->m_bIsFullScreen)
+		pFrame->toggleTopRuler (true);
+
+    //fin pascal
+
+
 
 	// POLICY: make this the default for new frames, too
 	XAP_App * pApp = XAP_App::getApp();
@@ -10288,7 +10400,7 @@ Defun(zoom)
 	XAP_PrefsScheme *pPrefsScheme = pPrefs->getCurrentScheme();
 UT_return_val_if_fail(pPrefsScheme, false);
 	UT_uint32 iZoom = 0;
-	
+
 	UT_UTF8String utf8(pCallData->m_pData, pCallData->m_dataLength);
 	const gchar *p_zoom = reinterpret_cast<const gchar *>(utf8.utf8_str());
 
@@ -10296,13 +10408,13 @@ UT_return_val_if_fail(pPrefsScheme, false);
 
 	std::string sPageWidth;
 	pSS->getValueUTF8(XAP_STRING_ID_TB_Zoom_PageWidth,sPageWidth);
-	
+
 	std::string sWholePage;
 	pSS->getValueUTF8(XAP_STRING_ID_TB_Zoom_WholePage,sWholePage);
-	
+
 	std::string sPercent;
 	pSS->getValueUTF8(XAP_STRING_ID_TB_Zoom_Percent,sPercent);
-	
+
 	if(strcmp(p_zoom, sPageWidth.c_str()) == 0)
 	{
 		pPrefsScheme->setValue(static_cast<const gchar*>(XAP_PREF_KEY_ZoomType),
@@ -10327,11 +10439,11 @@ UT_return_val_if_fail(pPrefsScheme, false);
 		// we've gotten back a number - turn it into a zoom percentage
 		//UT_UTF8String tmp (UT_UTF8String_sprintf("%d",p_zoom))
 		pPrefsScheme->setValue(static_cast<const gchar*>(XAP_PREF_KEY_ZoomType),
-						 static_cast<const gchar*>(utf8.utf8_str()));		
+						 static_cast<const gchar*>(utf8.utf8_str()));
 		pFrame->setZoomType(XAP_Frame::z_PERCENT);
 		iZoom = atoi(p_zoom);
 	}
-	  
+
 	UT_return_val_if_fail (iZoom > 0, false);
 	pFrame->quickZoom(iZoom);
 
@@ -10369,9 +10481,9 @@ UT_return_val_if_fail(pDialog, false);
 
 	if (pDialog->getAnswer() == AP_Dialog_Insert_DateTime::a_OK)
 	{
-		time_t	tim = time(nullptr);
+		time_t	tim = time(NULL);
 		struct tm *pTime = localtime(&tim);
-		UT_UCSChar *CurrentDateTime = nullptr;
+		UT_UCSChar *CurrentDateTime = NULL;
 		char szCurrentDateTime[CURRENT_DATE_TIME_SIZE];
 
 		strftime(szCurrentDateTime,CURRENT_DATE_TIME_SIZE,pDialog->GetDateTimeFormat(),pTime);
@@ -10545,49 +10657,49 @@ Defun1(insFile)
 	XAP_Frame * pFrame = static_cast<XAP_Frame *>(pAV_View->getParentData());
 	UT_return_val_if_fail(pFrame, false);
 	XAP_App * pApp = XAP_App::getApp();
-	
+
 	IEFileType fType = IEFT_Unknown;
-	char *pathName = nullptr;
-	
+	char *pathName = NULL;
+
 	// we'll share the same graphics context, which won't matter because
 	// we only use it to get font metrics and stuff and not actually draw
 	GR_Graphics *pGraphics = pView->getGraphics();
-	
+
 	if (s_AskForPathname (pFrame, false, XAP_DIALOG_ID_INSERT_FILE,
-			      nullptr, &pathName, &fType))
+			      NULL, &pathName, &fType))
 	{
 	    UT_DEBUGMSG(("DOM: insertFile %s\n", pathName));
-	    
+
 	    PD_Document * newDoc = new PD_Document();
 	    UT_Error err = newDoc->readFromFile(pathName, IEFT_Unknown);
-	    
+
 		if (!UT_IS_IE_SUCCESS(err))
 		{
 			UNREFP(newDoc);
 			s_CouldNotLoadFileMessage(pFrame, pathName, err);
 			return false;
 		}
-        if ( err == UT_IE_TRY_RECOVER ) 
+        if ( err == UT_IE_TRY_RECOVER )
         {
             s_CouldNotLoadFileMessage(pFrame, pathName, err);
         }
 
 	    // create a new layout and view object for the doc
 	    FL_DocLayout *pDocLayout = new FL_DocLayout(newDoc,pGraphics);
-	    FV_View copyView(pApp, nullptr, pDocLayout);
+	    FV_View copyView(pApp,0,pDocLayout);
 
 	    pDocLayout->setView (&copyView);
 	    pDocLayout->fillLayouts();
-	    
+
 	    copyView.cmdSelect(0, 0, FV_DOCPOS_BOD, FV_DOCPOS_EOD); // select all the contents of the new doc
 	    copyView.cmdCopy(); // copy the contents of the new document
 	    pView->cmdPaste ( true ); // paste the contents into the existing document honoring the formatting
-	    
+
 	    DELETEP(pDocLayout);
 	    UNREFP(newDoc);
 	    return true;
 	}
-	
+
 	return false;
 }
 
@@ -10621,70 +10733,70 @@ Defun1(insFootnote)
 }
 
 
-static 
+static
 void insertAnnotation(FV_View * pView, bool bDescr)
 {
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> (pView->getParentData());
 	UT_return_if_fail(pFrame);
-	
+
 	pFrame->raise();
-	
+
 	XAP_DialogFactory * pDialogFactory
 		= static_cast<XAP_DialogFactory *>(pFrame->getDialogFactory());
-	
+
 	AP_Dialog_Annotation * pDialog
 		= static_cast<AP_Dialog_Annotation *>(pDialogFactory->requestDialog(AP_DIALOG_ID_ANNOTATION));
 	UT_return_if_fail(pDialog);
-	
+
 	pDialog->setAuthor(pView->getDocument()->getUserName());
-	
+
 	if (bDescr)
 	{
-		UT_UCS4Char* text = nullptr;
+		UT_UCS4Char* text = NULL;
 		pView->getSelectionText(text);
 		UT_UCS4String sUCS4(static_cast<const UT_UCS4Char *>(text));
 		pDialog->setDescription(sUCS4.utf8_str());
 	}
-	
-	// run the dialog	
-	
+
+	// run the dialog
+
 	UT_DEBUGMSG(("insertAnnotation: Drawing annotation dialog...\n"));
 	pDialog->runModal(pFrame);
-	
-	bool bOK = (pDialog->getAnswer() == AP_Dialog_Annotation::a_OK);  
-	bool bApply = (pDialog->getAnswer() == AP_Dialog_Annotation::a_APPLY);	
-	
+
+	bool bOK = (pDialog->getAnswer() == AP_Dialog_Annotation::a_OK);
+	bool bApply = (pDialog->getAnswer() == AP_Dialog_Annotation::a_APPLY);
+
 	if (bOK || bApply)
 	{
 		const std::string &sTitle = pDialog->getTitle();
 		const std::string &sAuthor = pDialog->getAuthor();
 		const std::string &sText = pDialog->getDescription();
-		
+
 		UT_sint32 iAnnotation = pView->getDocument()->getUID(UT_UniqueId::Annotation);
-		
-		fl_AnnotationLayout * pAL = nullptr;
 
-		pView->insertAnnotation(iAnnotation,  
-								sText,  
-								sAuthor,  
-								sTitle,  
-								bApply);  
+		fl_AnnotationLayout * pAL = NULL;
 
-		if (bApply)  
-		{  
-			pView->setAnnotationText(iAnnotation, pDialog->getDescription());  
+		pView->insertAnnotation(iAnnotation,
+								sText,
+								sAuthor,
+								sTitle,
+								bApply);
+
+		if (bApply)
+		{
+			pView->setAnnotationText(iAnnotation, pDialog->getDescription());
 			pAL = pView->insertAnnotationDescription(iAnnotation, pDialog);
-			UT_return_if_fail(pAL);        
+			UT_return_if_fail(pAL);
 		}
-		
+
 		pAL = pView->getAnnotationLayout(iAnnotation);
-		if (pAL) 
+		if (pAL)
 			pView->selectAnnotation(pAL);
-	}      
-	
+	}
+
 	// release the dialog
 	pDialogFactory->releaseDialog(pDialog);
-	
+
 	// TODO: set the document as dirty when something changed
 }
 
@@ -10693,7 +10805,7 @@ Defun1(insAnnotation)
 	CHECK_FRAME;
 	ABIWORD_VIEW;
 	UT_return_val_if_fail(pView, false);
-	
+
 	UT_DEBUGMSG(("insAnnotation: inserting\n"));
 	insertAnnotation(pView, false);
 	return true;
@@ -10705,7 +10817,7 @@ Defun1(insAnnotationFromSel)
 	CHECK_FRAME;
 	ABIWORD_VIEW;
 	UT_return_val_if_fail(pView, false);
-	
+
 	UT_DEBUGMSG(("insAnnotationFromSel: inserting\n"));
 	insertAnnotation(pView, true);
 	return true;
@@ -10716,7 +10828,7 @@ Defun1(toggleDisplayAnnotations)
 	CHECK_FRAME;
 	ABIWORD_VIEW;
 	UT_return_val_if_fail(pView, false);
-	
+
 	//
 	// Set the preference to enable annotations display
 	//
@@ -10725,12 +10837,12 @@ Defun1(toggleDisplayAnnotations)
 	XAP_PrefsScheme * pScheme = pPrefs->getCurrentScheme(true);
 	UT_return_val_if_fail(pScheme, false);
 	bool b = false;
-	pScheme->getValueBool(AP_PREF_KEY_DisplayAnnotations, b);
+	pScheme->getValueBool(static_cast<const gchar *>(AP_PREF_KEY_DisplayAnnotations), &b );
 	b = !b;
 	UT_DEBUGMSG(("toggleDisplayAnnotations: Changing annotation display to %s\n",(b ? "true" : "false")));
 	gchar szBuffer[2] = {0,0};
 	szBuffer[0] = ((b)==true ? '1' : '0');
-	pScheme->setValue(AP_PREF_KEY_DisplayAnnotations, szBuffer);
+	pScheme->setValue(static_cast<const gchar *>(AP_PREF_KEY_DisplayAnnotations),szBuffer);
 	return true ;
 }
 
@@ -10743,7 +10855,7 @@ Defun1(editAnnotation)
 
 	fp_AnnotationRun * pA = static_cast<fp_AnnotationRun *>(pView->getHyperLinkRun(pView->getPoint()));
 	UT_ASSERT(pA);
-	
+
 	pView->cmdEditAnnotationWithDialog(pA->getPID());
 	return true;
 }
@@ -10772,7 +10884,7 @@ Defun1(toggleRDFAnchorHighlight)
 	CHECK_FRAME;
 	ABIWORD_VIEW;
 	UT_return_val_if_fail(pView, false);
-	
+
 	//
 	// Set the preference to enable annotations display
 	//
@@ -10781,12 +10893,12 @@ Defun1(toggleRDFAnchorHighlight)
 	XAP_PrefsScheme * pScheme = pPrefs->getCurrentScheme(true);
 	UT_return_val_if_fail(pScheme, false);
 	bool b = false;
-	pScheme->getValueBool(AP_PREF_KEY_DisplayRDFAnchors, b);
+	pScheme->getValueBool(static_cast<const gchar *>(AP_PREF_KEY_DisplayRDFAnchors), &b );
 	b = !b;
 	UT_DEBUGMSG(("toggleRDFAnchorHighlight: Changing annotation display to %s\n",(b ? "true" : "false")));
 	gchar szBuffer[2] = {0,0};
 	szBuffer[0] = ((b)==true ? '1' : '0');
-	pScheme->setValue(AP_PREF_KEY_DisplayRDFAnchors, szBuffer);
+	pScheme->setValue(static_cast<const gchar *>(AP_PREF_KEY_DisplayRDFAnchors),szBuffer);
 	return true ;
 }
 
@@ -10800,7 +10912,7 @@ static bool s_doRDFQueryDlg( FV_View * pView, XAP_Dialog_Id id, AP_Dialog_RDFQue
 	// kill the annotation preview popup if needed
 	if(pView->isAnnotationPreviewActive())
 		pView->killAnnotationPreview();
-	
+
 	pFrame->raise();
 
 	XAP_DialogFactory * pDialogFactory
@@ -10828,7 +10940,7 @@ Defun1(rdfQuery)
 	CHECK_FRAME;
 	ABIWORD_VIEW;
 	XAP_Dialog_Id id = AP_DIALOG_ID_RDF_QUERY;
-	AP_Dialog_RDFQuery* dialog = nullptr;
+	AP_Dialog_RDFQuery* dialog = 0;
 	return s_doRDFQueryDlg( pView, id, dialog );
 }
 
@@ -10842,7 +10954,7 @@ static bool s_doRDFEditorDlg( FV_View * pView, XAP_Dialog_Id id, AP_Dialog_RDFEd
 	// kill the annotation preview popup if needed
 	if(pView->isAnnotationPreviewActive())
 		pView->killAnnotationPreview();
-	
+
 	pFrame->raise();
 
 	XAP_DialogFactory * pDialogFactory
@@ -10854,8 +10966,8 @@ static bool s_doRDFEditorDlg( FV_View * pView, XAP_Dialog_Id id, AP_Dialog_RDFEd
 	dialogret = pDialog;
 
 	pDialog->hideRestrictionXMLID( !rstrct );
-	
-	
+
+
 	if(pDialog->isRunning() == true)
 	{
 		pDialog->activate();
@@ -10874,7 +10986,7 @@ Defun1(rdfEditor)
 	CHECK_FRAME;
 	ABIWORD_VIEW;
 	XAP_Dialog_Id id = AP_DIALOG_ID_RDF_EDITOR;
-	AP_Dialog_RDFEditor* dialog = nullptr;
+	AP_Dialog_RDFEditor* dialog = 0;
 	return s_doRDFEditorDlg( pView, id, dialog, false );
 }
 
@@ -10940,7 +11052,7 @@ Defun1(rdfQueryXMLIDs)
 {
 	CHECK_FRAME;
 	ABIWORD_VIEW;
-	AP_Dialog_RDFQuery* dialog = nullptr;
+	AP_Dialog_RDFQuery* dialog = 0;
 	XAP_Dialog_Id id = AP_DIALOG_ID_RDF_QUERY;
 
 	bool rc = s_doRDFQueryDlg( pView, id, dialog );
@@ -10961,7 +11073,7 @@ Defun1(rdfQueryXMLIDs)
 				sparql = PD_DocumentRDF::getSPARQL_LimitedToXMLIDList( xmlids );
 			}
 		}
-		
+
 		dialog->executeQuery( sparql );
 	}
 	return rc;
@@ -11076,8 +11188,8 @@ Defun1(setPosImage)
 	PT_DocPosition pos = pView->getDocPositionFromLastXY();
 
 	fl_BlockLayout * pBlock = pView->getBlockAtPosition(pos);
-	fp_Run *  pRun = nullptr;
-	fp_Line * pLine = nullptr;
+	fp_Run *  pRun = NULL;
+	fp_Line * pLine = NULL;
 	UT_sint32 x1,x2,y1,y2,iHeight;
 	bool bEOL = false;
 	bool bDir = false;
@@ -11099,7 +11211,7 @@ Defun1(setPosImage)
 		}
 	}
 	pLine = pRun->getLine();
-	if(pLine == nullptr)
+	if(pLine == NULL)
 	{
 	        return false;
 	}
@@ -11108,9 +11220,9 @@ Defun1(setPosImage)
 	std::string sWidth;
 	std::string sHeight;
 	double d = static_cast<double>(pRun->getWidth())/static_cast<double>(UT_LAYOUT_RESOLUTION);
-	sWidth =  UT_formatDimensionedValue(d,"in", nullptr);
+	sWidth =  UT_formatDimensionedValue(d,"in", NULL);
 	d = static_cast<double>(pRun->getHeight())/static_cast<double>(UT_LAYOUT_RESOLUTION);
-	sHeight =  UT_formatDimensionedValue(d,"in", nullptr);
+	sHeight =  UT_formatDimensionedValue(d,"in", NULL);
 //
 // Get the dataID of the image.
 
@@ -11162,12 +11274,12 @@ Defun1(setPosImage)
 	UT_sint32 yLine = pLine->getY() + pLine->getColumn()->getY();
 	ypos = static_cast<double>(yLine)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 	sProp = "frame-page-ypos";
-	sVal = UT_formatDimensionedValue(ypos,"in", nullptr);
+	sVal = UT_formatDimensionedValue(ypos,"in", NULL);
 	UT_std_string_setProperty(sFrameProps, sProp, sVal);
 	UT_sint32 ix = pRun->getX() + pLine->getColumn()->getX() + pLine->getX();
 	xpos =  static_cast<double>(ix)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 	sProp = "frame-page-xpos";
-	sVal = UT_formatDimensionedValue(xpos,"in", nullptr);
+	sVal = UT_formatDimensionedValue(xpos,"in", NULL);
 	UT_std_string_setProperty(sFrameProps, sProp, sVal);
 	sVal = UT_std_string_sprintf("%d", pLine->getPage()->getPageNumber());
 	sProp = "frame-pref-page";
@@ -11181,8 +11293,8 @@ Defun1(setPosImage)
 	//
 	// Now the alt and title
 	//
-	const char * szTitle = nullptr;
-	const char * szDescription = nullptr;
+	const char * szTitle = NULL;
+	const char * szDescription = NULL;
 	bool bFound = pImageAP->getAttribute("title",szTitle);
 	if(!bFound)
 	{
@@ -11231,12 +11343,12 @@ Defun1(dlgFmtPosImage)
 		= static_cast<XAP_Dialog_Image *>(pDialogFactory->requestDialog(XAP_DIALOG_ID_IMAGE));
 	UT_return_val_if_fail(pDialog, false);
 	fl_FrameLayout * pPosObj = pView->getFrameLayout();
-	if(pPosObj == nullptr)
+	if(pPosObj == NULL)
 	{
 		// try to select frame
 		pView->activateFrame();
 		pPosObj = pView->getFrameLayout();
-		if (pPosObj == nullptr)
+		if (pPosObj == NULL)
 		{
 			return true;
 		}
@@ -11246,15 +11358,16 @@ Defun1(dlgFmtPosImage)
 	  return true;
 	}
 
-	const PP_AttrProp* pAP = nullptr;
+	const PP_AttrProp* pAP = NULL;
 	pPosObj->getAP(pAP);
-	const gchar* szTitle = nullptr;
-	const gchar* szDescription = nullptr;
+	const gchar* szTitle = 0;
+	const gchar* szDescription = 0;
 	pDialog->setInHdrFtr(false);
-	std::string rulerUnits;
+	const char * pszRulerUnits = NULL;
 	UT_Dimension dim = DIM_IN;
-	if (XAP_App::getApp()->getPrefsValue(AP_PREF_KEY_RulerUnits, rulerUnits)) {
-		dim = UT_determineDimension(rulerUnits.c_str());
+	if (XAP_App::getApp()->getPrefsValue(AP_PREF_KEY_RulerUnits, &pszRulerUnits))
+	{
+		dim = UT_determineDimension(pszRulerUnits);
 	}
 	pDialog->setPreferedUnits(dim);
 
@@ -11269,22 +11382,22 @@ Defun1(dlgFmtPosImage)
 	pDialog->setMaxWidth (max_width);
 	pDialog->setMaxHeight (max_height);
 
-	if (pAP) 
+	if (pAP)
 	{
 	  pAP->getAttribute ("title", szTitle);
 	  pAP->getAttribute ("alt", szDescription);
 	}
 
-	if (szTitle) 
+	if (szTitle)
 	{
 	  pDialog->setTitle (szTitle);
 	}
-	if (szDescription) 
+	if (szDescription)
 	{
 	  pDialog->setDescription (szDescription);
 	}
-	const gchar * pszWidth = nullptr;
-	const gchar * pszHeight = nullptr;
+	const gchar * pszWidth = NULL;
+	const gchar * pszHeight = NULL;
 	if(!pAP || !pAP->getProperty("frame-width",pszWidth))
 	{
 	  pszWidth = "1.0in";
@@ -11309,7 +11422,7 @@ Defun1(dlgFmtPosImage)
 	else if(pPosObj->getFrameWrapMode() == FL_FRAME_WRAPPED_BOTH_SIDES)
 	{
 	  iWrap = WRAP_TEXTBOTH;
-	} 
+	}
 	else if(pPosObj->getFrameWrapMode() == FL_FRAME_ABOVE_TEXT)
 	{
 	  iWrap = WRAP_NONE;
@@ -11366,12 +11479,12 @@ Defun1(dlgFmtPosImage)
 
 		pView->convertPositionedToInLine(pPosObj);
 		pView->setCharFormat(properties, attribs);
-		pView->updateScreen(true);
+		pView->updateScreen();
 		return true;
 	}
 	else
 	{
-	  POSITION_TO newFormatMode = pDialog->getPositionTo(); 
+	  POSITION_TO newFormatMode = pDialog->getPositionTo();
 	  WRAPPING_TYPE newWrapMode = pDialog->getWrapping();
 	  PP_PropertyVector properties = {
 		  "frame-width", sWidth.c_str(),
@@ -11413,8 +11526,8 @@ Defun1(dlgFmtPosImage)
 
 	  fp_FrameContainer * pFrameC = static_cast<fp_FrameContainer *>(pPosObj->getFirstContainer());
 	  fv_FrameStrings FrameStrings;
-	  fl_BlockLayout * pCloseBL = nullptr;
-	  fp_Page * pPage = nullptr;
+	  fl_BlockLayout * pCloseBL = NULL;
+	  fp_Page * pPage = NULL;
 
 	  if (pFrameC && (newFormatMode != iPos))
 	  {
@@ -11465,7 +11578,7 @@ Defun1(dlgFmtPosImage)
 static bool s_doFormatImageDlg(FV_View * pView, EV_EditMethodCallData * pCallData, bool bCtxtMenu)
 {
 	UT_DEBUG_ONLY_ARG(pCallData);
-	
+
 	UT_return_val_if_fail(pView, false);
 	XAP_Frame * pFrame = static_cast<XAP_Frame *>(pView->getParentData());
 	UT_return_val_if_fail(pFrame, false);
@@ -11482,10 +11595,11 @@ static bool s_doFormatImageDlg(FV_View * pView, EV_EditMethodCallData * pCallDat
 	UT_sint32 iHeight,iWidth;
 
 	// set units in the dialog.
-	std::string rulerUnits;
+	const char * pszRulerUnits = NULL;
 	UT_Dimension dim = DIM_IN;
-	if (XAP_App::getApp()->getPrefsValue(AP_PREF_KEY_RulerUnits, rulerUnits)) {
-		dim = UT_determineDimension(rulerUnits.c_str());
+	if (XAP_App::getApp()->getPrefsValue(AP_PREF_KEY_RulerUnits, &pszRulerUnits))
+	{
+		dim = UT_determineDimension(pszRulerUnits);
 	}
 	pDialog->setPreferedUnits(dim);
 
@@ -11502,9 +11616,9 @@ static bool s_doFormatImageDlg(FV_View * pView, EV_EditMethodCallData * pCallDat
 	pDialog->setMaxWidth (max_width);
 	pDialog->setMaxHeight (max_height); // units are 1/72 of an inch
 	UT_DEBUGMSG(("formatting  image: %d\n", pCallData->m_xPos));
-	const fp_Run * pRun = nullptr;
-	const char * dataID = nullptr;
-	fl_BlockLayout * pBlock = nullptr;
+	const fp_Run * pRun = NULL;
+	const char * dataID = NULL;
+	fl_BlockLayout * pBlock = NULL;
 	PT_DocPosition pos = 0;
 
 	if (bCtxtMenu)
@@ -11544,10 +11658,10 @@ static bool s_doFormatImageDlg(FV_View * pView, EV_EditMethodCallData * pCallDat
     pView->cmdSelect(pos,pos+1);
 	PP_PropertyVector props_in;
 
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = 0;
 	pView->getAttributes (&pAP);
 	pDialog->setInHdrFtr(bInHdrFtr);
-	  
+
 	if (pView->getCharFormat(props_in))
 	{
 	  // stuff properties into the dialog.
@@ -11555,8 +11669,8 @@ static bool s_doFormatImageDlg(FV_View * pView, EV_EditMethodCallData * pCallDat
 	  const std::string & szWidth = PP_getAttribute("width", props_in);
 	  const std::string & szHeight = PP_getAttribute("height", props_in);
 
-	  const gchar* szTitle = nullptr;
-	  const gchar* szDescription = nullptr;
+	  const gchar* szTitle = 0;
+	  const gchar* szDescription = 0;
 	  pDialog->setInHdrFtr(bInHdrFtr);
 	  if (pAP) {
 		  pAP->getAttribute ("title", szTitle);
@@ -11648,7 +11762,7 @@ static bool s_doFormatImageDlg(FV_View * pView, EV_EditMethodCallData * pCallDat
 			  };
 
 			  pView->setCharFormat(properties, attribs);
-			  pView->updateScreen(true);
+			  pView->updateScreen();
 		  }
 
 //
@@ -11709,7 +11823,7 @@ static bool s_doFormatImageDlg(FV_View * pView, EV_EditMethodCallData * pCallDat
 				  UT_ASSERT(bValid);
 				  ypos = static_cast<double>(yBlockOff)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 				  sProp = "ypos";
-				  sVal = UT_formatDimensionedValue(ypos,"in", nullptr);
+				  sVal = UT_formatDimensionedValue(ypos,"in", NULL);
 				  UT_std_string_setProperty(sFrameProps, sProp, sVal);
 			  }
 			  else if(pDialog->getPositionTo() == POSITION_TO_COLUMN)
@@ -11722,7 +11836,7 @@ static bool s_doFormatImageDlg(FV_View * pView, EV_EditMethodCallData * pCallDat
 				  UT_sint32 yLine = pLine->getY();
 				  ypos = static_cast<double>(yLine)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 				  sProp = "frame-col-ypos";
-				  sVal = UT_formatDimensionedValue(ypos,"in", nullptr);
+				  sVal = UT_formatDimensionedValue(ypos,"in", NULL);
 				  UT_std_string_setProperty(sFrameProps, sProp, sVal);
 			  }
 			  else if(pDialog->getPositionTo() == POSITION_TO_PAGE)
@@ -11740,7 +11854,7 @@ static bool s_doFormatImageDlg(FV_View * pView, EV_EditMethodCallData * pCallDat
 				  UT_sint32 yLine = pLine->getY() + pCol->getY();
 				  ypos = static_cast<double>(yLine)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 				  sProp = "frame-page-ypos";
-				  sVal = UT_formatDimensionedValue(ypos,"in", nullptr);
+				  sVal = UT_formatDimensionedValue(ypos,"in", NULL);
 				  UT_std_string_setProperty(sFrameProps, sProp, sVal);
 			  }
 //
@@ -11759,7 +11873,7 @@ static bool s_doFormatImageDlg(FV_View * pView, EV_EditMethodCallData * pCallDat
 					  ix = pCol->getWidth() - pBlock->getRightMargin() - iWidth;
 					  xpos =  static_cast<double>(ix)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 					  sProp = "xpos";
-					  sVal = UT_formatDimensionedValue(xpos,"in", nullptr);
+					  sVal = UT_formatDimensionedValue(xpos,"in", NULL);
 					  UT_std_string_setProperty(sFrameProps, sProp, sVal);
 				  }
 				  else if(pDialog->getPositionTo() == POSITION_TO_COLUMN)
@@ -11768,7 +11882,7 @@ static bool s_doFormatImageDlg(FV_View * pView, EV_EditMethodCallData * pCallDat
 					  ix = pCol->getWidth() -iWidth;
 					  xpos =  static_cast<double>(ix)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 					  sProp = "frame-col-xpos";
-					  sVal = UT_formatDimensionedValue(xpos,"in", nullptr);
+					  sVal = UT_formatDimensionedValue(xpos,"in", NULL);
 					  UT_std_string_setProperty(sFrameProps, sProp, sVal);
 				  }
 				  else if(pDialog->getPositionTo() == POSITION_TO_PAGE)
@@ -11777,7 +11891,7 @@ static bool s_doFormatImageDlg(FV_View * pView, EV_EditMethodCallData * pCallDat
 					  ix = pPage->getWidth() - iWidth;
 					  xpos =  static_cast<double>(ix)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 					  sProp = "frame-page-xpos";
-					  sVal = UT_formatDimensionedValue(xpos,"in", nullptr);
+					  sVal = UT_formatDimensionedValue(xpos,"in", NULL);
 					  UT_std_string_setProperty(sFrameProps, sProp, sVal);
 				  }
 			  }
@@ -11791,21 +11905,21 @@ static bool s_doFormatImageDlg(FV_View * pView, EV_EditMethodCallData * pCallDat
 				  {
 					  xpos =  static_cast<double>(ix)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 					  sProp = "xpos";
-					  sVal = UT_formatDimensionedValue(xpos,"in", nullptr);
+					  sVal = UT_formatDimensionedValue(xpos,"in", NULL);
 					  UT_std_string_setProperty(sFrameProps, sProp, sVal);
 				  }
 				  else if(pDialog->getPositionTo() == POSITION_TO_COLUMN)
 				  {
 					  xpos =  static_cast<double>(ix)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 					  sProp = "frame-col-xpos";
-					  sVal = UT_formatDimensionedValue(xpos,"in", nullptr);
+					  sVal = UT_formatDimensionedValue(xpos,"in", NULL);
 					  UT_std_string_setProperty(sFrameProps, sProp, sVal);
 				  }
 				  else if(pDialog->getPositionTo() == POSITION_TO_PAGE)
 				  {
 					  xpos =  static_cast<double>(ix)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 					  sProp = "frame-page-xpos";
-					  sVal = UT_formatDimensionedValue(xpos,"in", nullptr);
+					  sVal = UT_formatDimensionedValue(xpos,"in", NULL);
 					  UT_std_string_setProperty(sFrameProps, sProp, sVal);
 				  }
 
@@ -11820,21 +11934,21 @@ static bool s_doFormatImageDlg(FV_View * pView, EV_EditMethodCallData * pCallDat
 				  {
 					  xpos =  static_cast<double>(ix)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 					  sProp = "xpos";
-					  sVal = UT_formatDimensionedValue(xpos,"in", nullptr);
+					  sVal = UT_formatDimensionedValue(xpos,"in", NULL);
 					  UT_std_string_setProperty(sFrameProps, sProp, sVal);
 				  }
 				  else if(pDialog->getPositionTo() == POSITION_TO_COLUMN)
 				  {
 					  xpos =  static_cast<double>(ix)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 					  sProp = "frame-col-xpos";
-					  sVal = UT_formatDimensionedValue(xpos,"in", nullptr);
+					  sVal = UT_formatDimensionedValue(xpos,"in", NULL);
 					  UT_std_string_setProperty(sFrameProps, sProp, sVal);
 				  }
 				  else if(pDialog->getPositionTo() == POSITION_TO_PAGE)
 				  {
 					  xpos =  static_cast<double>(ix)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 					  sProp = "frame-page-xpos";
-					  sVal = UT_formatDimensionedValue(xpos,"in", nullptr);
+					  sVal = UT_formatDimensionedValue(xpos,"in", NULL);
 					  UT_std_string_setProperty(sFrameProps, sProp, sVal);
 				  }
 			  }
@@ -11849,7 +11963,7 @@ static bool s_doFormatImageDlg(FV_View * pView, EV_EditMethodCallData * pCallDat
 					  ix += pLine->getX();
 					  xpos =  static_cast<double>(ix)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 					  sProp = "xpos";
-					  sVal = UT_formatDimensionedValue(xpos,"in", nullptr);
+					  sVal = UT_formatDimensionedValue(xpos,"in", NULL);
 					  UT_std_string_setProperty(sFrameProps, sProp, sVal);
 				  }
 				  else if(pDialog->getPositionTo() == POSITION_TO_COLUMN)
@@ -11857,7 +11971,7 @@ static bool s_doFormatImageDlg(FV_View * pView, EV_EditMethodCallData * pCallDat
 					  ix += pLine->getX();
 					  xpos =  static_cast<double>(ix)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 					  sProp = "frame-col-xpos";
-					  sVal = UT_formatDimensionedValue(xpos,"in", nullptr);
+					  sVal = UT_formatDimensionedValue(xpos,"in", NULL);
 					  UT_std_string_setProperty(sFrameProps, sProp, sVal);
 				  }
 				  else if(pDialog->getPositionTo() == POSITION_TO_PAGE)
@@ -11866,7 +11980,7 @@ static bool s_doFormatImageDlg(FV_View * pView, EV_EditMethodCallData * pCallDat
 					  ix += pLine->getX() + pCol->getX();
 					  xpos =  static_cast<double>(ix)/static_cast<double>(UT_LAYOUT_RESOLUTION);
 					  sProp = "frame-page-xpos";
-					  sVal = UT_formatDimensionedValue(xpos,"in", nullptr);
+					  sVal = UT_formatDimensionedValue(xpos,"in", NULL);
 					  UT_std_string_setProperty(sFrameProps, sProp, sVal);
 				  }
 			  }
@@ -11940,7 +12054,7 @@ Defun(dlgFmtImage)
 	{
 	  fl_FrameLayout * pFL = pView->getFrameLayout();
 
-	  if(pFL == nullptr)
+	  if(pFL == NULL)
 	  {
 	    return false;
 	  }
@@ -11990,7 +12104,7 @@ UT_return_val_if_fail(pDialog, false);
 	const std::string & sz = PP_getAttribute("columns", props_in);
 	if (!sz.empty())
 	{
-		iColumns = atoi(sz.c_str());
+		iColumns = stoi(sz);
 	}
 
 	if ( iColumns > 1 )
@@ -12063,13 +12177,13 @@ Defun(style)
 {
 	CHECK_FRAME;
 	ABIWORD_VIEW;
-	
+
 	UT_return_val_if_fail(pView, false);
 	UT_UTF8String utf8(pCallData->m_pData, pCallData->m_dataLength);
 	const gchar * style = reinterpret_cast<const gchar *>(utf8.utf8_str());
 	pView->setStyle(style,false);
 	pView->notifyListeners(AV_CHG_MOTION  | AV_CHG_HDRFTR);
-	
+
 	return true;
 }
 
@@ -12144,7 +12258,7 @@ Defun1(formatFootnotes)
 
 	AP_Dialog_FormatFootnotes * pDialog
 		= static_cast<AP_Dialog_FormatFootnotes *>(pDialogFactory->requestDialog(AP_DIALOG_ID_FORMAT_FOOTNOTES));
-	UT_return_val_if_fail(pDialog, false);	
+	UT_return_val_if_fail(pDialog, false);
 	pDialog->runModal(pFrame);
 	AP_Dialog_FormatFootnotes::tAnswer ans = pDialog->getAnswer();
 	if(ans == AP_Dialog_FormatFootnotes::a_OK)
@@ -12477,7 +12591,7 @@ void s_getPageMargins(FV_View * pView,
 {
 	UT_return_if_fail(pView);
 	// get current char properties from pView
-	const gchar * prop = nullptr;
+	const gchar * prop = NULL;
 	std::string sz;
 
 	PP_PropertyVector props_in;
@@ -12561,7 +12675,7 @@ Defun1(toggleUnIndent)
 
   if(pBL)
 	  iBlockDir = pBL->getDominantDirection();
-  
+
   allowed = iBlockDir == UT_BIDI_LTR ? margin_left : margin_right;
   if ( allowed <= 0. )
 	  return true ;
@@ -12751,7 +12865,7 @@ Defun1(togglePlain)
 		return true;
 
 	pView->resetCharFormat(false);
-		
+
 	return true;
 }
 
@@ -12992,7 +13106,7 @@ Defun1(Test_Ftr)
 	CHECK_FRAME;
 	ABIWORD_VIEW;
 	UT_return_val_if_fail(pView,false);
-	pView->insertPageNum(nullptr, FL_HDRFTR_FOOTER);
+	pView->insertPageNum(NULL, FL_HDRFTR_FOOTER);
 	return true;
 }
 #endif
@@ -13039,9 +13153,8 @@ Defun1(cycleInputMode)
 
 	// this edit method may get ignored entirely
 	bool b;
-	if (pPrefs->getPrefsValueBool(AP_PREF_KEY_KeyBindingsCycle, b) && !b) {
+	if (pPrefs->getPrefsValueBool(static_cast<const gchar *>(AP_PREF_KEY_KeyBindingsCycle), &b) && !b)
 		return false;
-	}
 
 	const char * szCurrentInputMode = pApp->getInputMode();
 	UT_return_val_if_fail (szCurrentInputMode, false);
@@ -13077,7 +13190,7 @@ Defun1(toggleInsertMode)
 
 	// this edit method may get ignored entirely
 	bool b;
-	if (pPrefs->getPrefsValueBool(AP_PREF_KEY_InsertModeToggle, b) && !b) {
+	if (pPrefs->getPrefsValueBool(AP_PREF_KEY_InsertModeToggle, &b) && !b) {
         // if we are in insert mode, just return, otherwise give a chance
         // to toggle it, or one might get stick to overwrite.
         if(pFrameData->m_bInsertMode) {
@@ -13113,8 +13226,8 @@ UT_return_val_if_fail(pScheme, false);
 Defun(viCmd_5e)
 {
 	CHECK_FRAME;
-	//Move to first non space char on current line 
-	//TODO: BOL seems to count as a BOW, how to move to first non space? 
+	//Move to first non space char on current line
+	//TODO: BOL seems to count as a BOW, how to move to first non space?
 	return ( EX(warpInsPtBOL));
 }
 
@@ -13487,18 +13600,18 @@ public:
 	virtual ~OneShot_MailMerge_Listener ()
 		{
 		}
-		
-	virtual PD_Document* getMergeDocument() const  override
+
+	virtual PD_Document* getMergeDocument () const
 		{
 			return m_doc;
 		}
-	
-	virtual bool fireUpdate() override
+
+	virtual bool fireUpdate ()
 		{
 			// don't process any more data
 			return false;
 		}
-	
+
 private:
 	PD_Document *m_doc;
 };
@@ -13515,16 +13628,16 @@ Defun1(mailMerge)
 
   pFrame->raise();
   XAP_Dialog_Id id = XAP_DIALOG_ID_FILE_OPEN;
-  
+
   XAP_DialogFactory * pDialogFactory
     = static_cast<XAP_DialogFactory *>(pFrame->getDialogFactory());
-  
+
   XAP_Dialog_FileOpenSaveAs * pDialog
     = static_cast<XAP_Dialog_FileOpenSaveAs *>(pDialogFactory->requestDialog(id));
   UT_return_val_if_fail (pDialog, false);
 
   UT_uint32 filterCount = 0;
-  
+
   filterCount = IE_MailMerge::getMergerCount();
 
   const char ** szDescList = static_cast<const char **>(UT_calloc(filterCount + 1, sizeof(char *)));
@@ -13548,7 +13661,7 @@ Defun1(mailMerge)
   }
 
   UT_uint32 k = 0;
-  
+
   while (IE_MailMerge::enumerateDlgLabels(k, &szDescList[k], &szSuffixList[k], &nTypeList[k]))
 	  k++;
 
@@ -13565,7 +13678,7 @@ Defun1(mailMerge)
     {
 		UT_String filename (pDialog->getPathname());
 		UT_sint32 type = pDialog->getFileType();
-		
+
 		IE_MailMergePtr pie;
 		UT_Error errorCode = IE_MailMerge::constructMerger(filename.c_str(), static_cast<IEMergeType>(type), pie);
 		if (!errorCode)
@@ -13608,11 +13721,11 @@ Defun1(scriptPlay)
 
 	// we have no expectations of executing a remote program
 	char * scriptName = UT_go_filename_from_uri(pNewFile.c_str());
-	UT_return_val_if_fail (scriptName != nullptr, false);
+	UT_return_val_if_fail (scriptName != NULL, false);
 
 #ifdef _WIN32
 	// we need to add quotes to the script name _after_ the UT_go_filename_from_uri() call above;
-	// if not, it will return nullptr and the script won't play.
+	// if not, it will return NULL and the script won't play.
 
 	UT_UTF8String script = "\"";
 	script += scriptName;
@@ -13655,11 +13768,11 @@ Defun(executeScript)
 
 	// we have no expectations of executing a remote program
 	char * scriptName = UT_go_filename_from_uri (pCallData->getScriptName().c_str());
-	UT_return_val_if_fail (scriptName != nullptr, false);
+	UT_return_val_if_fail (scriptName != NULL, false);
 
 #ifdef _WIN32
 	// we need to add quotes to the script name _after_ the UT_go_filename_from_uri() call above;
-	// if not, it will return nullptr and the script won't execute.
+	// if not, it will return NULL and the script won't execute.
 
 	UT_UTF8String script = "\"";
 	script += scriptName;
@@ -13841,7 +13954,7 @@ UT_return_val_if_fail(pDialog, false);//
 // Get stuff we need from the view
 //
 	if(pView->isHdrFtrEdit())
-	{	
+	{
 		pView->clearHdrFtrEdit();
 		pView->warpInsPtToXY(0,0,false);
 	}
@@ -13864,40 +13977,40 @@ UT_return_val_if_fail(pDialog, false);//
 	{
 		bOldBools[i] = false;
 	}
-	if(nullptr != pDSL->getHeader())
+	if(NULL != pDSL->getHeader())
 	{
 		bOldHdr = true;
 	}
-	if(nullptr != pDSL->getHeaderEven())
+	if(NULL != pDSL->getHeaderEven())
 	{
 		bOldHdrEven = true;
 		bOldBools[AP_Dialog_HdrFtr::HdrEven] = true;
 	}
-	if(nullptr != pDSL->getHeaderFirst())
+	if(NULL != pDSL->getHeaderFirst())
 	{
 		bOldHdrFirst = true;
 		bOldBools[AP_Dialog_HdrFtr::HdrFirst] = true;
 	}
-	if(nullptr != pDSL->getHeaderLast())
+	if(NULL != pDSL->getHeaderLast())
 	{
 		bOldHdrLast = true;
 		bOldBools[AP_Dialog_HdrFtr::HdrLast] = true;
 	}
-	if(nullptr != pDSL->getFooter())
+	if(NULL != pDSL->getFooter())
 	{
 		bOldFtr = true;
 	}
-	if(nullptr != pDSL->getFooterEven())
+	if(NULL != pDSL->getFooterEven())
 	{
 		bOldFtrEven = true;
 		bOldBools[AP_Dialog_HdrFtr::FtrEven] = true;
 	}
-	if(nullptr != pDSL->getFooterFirst())
+	if(NULL != pDSL->getFooterFirst())
 	{
 		bOldFtrFirst = true;
 		bOldBools[AP_Dialog_HdrFtr::FtrFirst] = true;
 	}
-	if(nullptr != pDSL->getFooterLast())
+	if(NULL != pDSL->getFooterLast())
 	{
 		bOldFtrLast = true;
 		bOldBools[AP_Dialog_HdrFtr::FtrLast] = true;
@@ -14032,7 +14145,7 @@ UT_return_val_if_fail(pDialog, false);//
 			else
 			{
 				props_out[1] = "0";
-				props_out[3] = "";
+				props_out[2] = "";
 			}
 			pView->setSectionFormat(props_out);
 		}
@@ -14057,18 +14170,18 @@ Defun(hyperlinkJump)
 	CHECK_FRAME;
 	ABIWORD_VIEW;
 	UT_return_val_if_fail(pView,false);
-	
+
 	fp_Run * pRun = pView->getHyperLinkRun(pView->getPoint());
-	fp_HyperlinkRun * pHRun = nullptr;
+	fp_HyperlinkRun * pHRun = NULL;
 	if(pRun)
 		pHRun = pRun->getHyperlink();
-	
+
 	if(pHRun && pHRun->getHyperlinkType() == HYPERLINK_NORMAL)
 	{
 		UT_DEBUGMSG(("hyperlinkJump: Normal hyperlink jump\n"));
 		pView->cmdHyperlinkJump(pCallData->m_xPos, pCallData->m_yPos);
 	}
-	
+
 	if(pHRun && pHRun->getHyperlinkType() == HYPERLINK_ANNOTATION)
 	{
 		// This is the behaveour when double clicking an annotation hypermark
@@ -14076,7 +14189,7 @@ Defun(hyperlinkJump)
 		fp_AnnotationRun * pARun = static_cast<fp_AnnotationRun *>(pHRun);
 		pView->cmdEditAnnotationWithDialog(pARun->getPID());
 	}
-	
+
 	return true;
 }
 
@@ -14096,7 +14209,7 @@ Defun1(rdfAnchorEditTriples)
 	CHECK_FRAME;
 	ABIWORD_VIEW;
 	XAP_Dialog_Id id = AP_DIALOG_ID_RDF_EDITOR;
-	AP_Dialog_RDFEditor* dialog = nullptr;
+	AP_Dialog_RDFEditor* dialog = 0;
 	return s_doRDFEditorDlg( pView, id, dialog, true );
 }
 Defun1(rdfAnchorQuery)
@@ -14104,7 +14217,7 @@ Defun1(rdfAnchorQuery)
 	CHECK_FRAME;
 	ABIWORD_VIEW;
 	UT_return_val_if_fail(pView,false);
-	return rdfQueryXMLIDs(pView, nullptr);
+	return rdfQueryXMLIDs( pView, 0 );
 }
 
 Defun1(rdfAnchorEditSemanticItem)
@@ -14121,8 +14234,8 @@ Defun1(rdfAnchorEditSemanticItem)
 
 			PD_RDFSemanticItems sl = rdf->getSemanticObjects( xmlids );
 			rdf->showEditorWindow( sl );
-			
-			
+
+
 			// PD_RDFContacts contacts = rdf->getContacts();
 			// for( PD_RDFContacts::iterator ci = contacts.begin();
 			// 	 ci != contacts.end(); ++ci )
@@ -14203,10 +14316,10 @@ Defun1(rdfAnchorExportSemanticItem)
 				{
 					h->exportToFile();
 				}
-				
+
 			}
-			
-			
+
+
 			// rdf->addRelevantIDsForPosition( xmlids, pView->getPoint() );
 			// PD_RDFContacts contacts = rdf->getContacts();
 			// for( PD_RDFContacts::iterator ci = contacts.begin();
@@ -14285,7 +14398,7 @@ static void setSemanticItemRing( PD_DocumentRDFHandle rdf,
 		if( !range.first || range.second <= range.first )
 			ring.xmlids.erase( t );
 	}
-	ring.iter   = ring.xmlids.find( xmlid );	
+	ring.iter   = ring.xmlids.find( xmlid );
 }
 
 
@@ -14312,7 +14425,7 @@ static void rdfAnchorSelectPos( FV_View* pView,
 		{
 			std::string xmlid = *clistiter;
 			UT_DEBUGMSG(("rdfAnchorSelectPos() xmlid:%s\n", xmlid.c_str() ));
-						
+
 			std::pair< PT_DocPosition, PT_DocPosition > range = rdf->getIDRange( xmlid );
 			if( range.first && range.second > range.first )
 			{
@@ -14321,7 +14434,7 @@ static void rdfAnchorSelectPos( FV_View* pView,
 				{
 					UT_DEBUGMSG(("rdfAnchorSelectPos() contains point...\n" ));
 					setSemanticItemRing( rdf, c, clist, xmlid );
-					
+
 					// ring.h = c;
 					// ring.xmlids = clist;
 					// for( std::set< std::string >::iterator ri = ring.xmlids.begin();
@@ -14375,14 +14488,14 @@ static bool rdfAnchorContainsPoint( FV_View* pView,
 	return true;
 }
 
-	
+
 Defun1(rdfAnchorSelectThisReferenceToSemanticItem)
 {
 	selectReferenceToSemanticItemRing& ring = getSelectReferenceToSemanticItemRing();
 	ring.h.reset();
 	ring.xmlids.clear();
 	ring.iter = ring.xmlids.end();
-	
+
 	CHECK_FRAME;
 	ABIWORD_VIEW;
 	UT_return_val_if_fail(pView,false);
@@ -14431,7 +14544,7 @@ Defun1(rdfAnchorSelectNextReferenceToSemanticItem)
 			}
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -14446,7 +14559,7 @@ Defun1(rdfAnchorSelectPrevReferenceToSemanticItem)
 		if( PD_DocumentRDFHandle rdf = pDoc->getDocumentRDF() )
 		{
 			bool wasContained = rdfAnchorContainsPoint( pView, rdf, pView->getPoint()-1 );
-	
+
 			if( ring.iter == ring.xmlids.begin() )
 			{
 				UT_DEBUGMSG((" selectPrev() resetting iter to end()\n" ));
@@ -14457,24 +14570,24 @@ Defun1(rdfAnchorSelectPrevReferenceToSemanticItem)
 				UT_DEBUGMSG((" selectPrev() iter IS end()\n" ));
 				if( wasContained )
 					return 0;
-				
+
 				// if we resynced, and there is no prev, then select the first one.
 				UT_DEBUGMSG((" selectPrev() set iter to the first item due to resync...\n" ));
 				ring.iter = ring.xmlids.begin();
 				ring.iter++;
 			}
-	
+
 			ring.iter--;
-	
+
 			std::string xmlid = *ring.iter;
 			UT_DEBUGMSG((" selectPrev() xmlid:%s\n", xmlid.c_str() ));
-			
+
 			std::pair< PT_DocPosition, PT_DocPosition > range = rdf->getIDRange( xmlid );
 			if( range.first && range.second > range.first )
 				pView->selectRange( range );
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -14497,7 +14610,7 @@ Defun1(rdfSemitemSetAsSource)
     PD_RDFSemanticItems sl = rdf->getSemanticObjects( xmlids );
 	if( sl.empty() )
 		return false;
-	
+
 	PD_RDFSemanticItemHandle si = *(sl.begin());
 	getrdfSemitemSource() = si;
 	return true;
@@ -14516,7 +14629,7 @@ Defun1(rdfSemitemFindRelatedFoafKnows)
 	UT_DEBUGMSG(("rdfSemitemFindRelatedFoafKnows(a) point->xmlids.sz:%ld\n", (long)xmlids.size() ));
 	if( xmlids.empty() )
 		rdf->addRelevantIDsForPosition( xmlids, pView->getPoint()-1 );
-		
+
     PD_RDFSemanticItems sl = rdf->getSemanticObjects( xmlids );
 	if( sl.empty() )
 		return false;
@@ -14528,7 +14641,7 @@ Defun1(rdfSemitemFindRelatedFoafKnows)
 		PD_RDFSemanticItemHandle si = *iter;
 		UT_DEBUGMSG(("rdfSemitemFindRelatedFoafKnows() point->si:%s\n", si->name().c_str() ));
 	}
-	
+
 	PD_RDFSemanticItems related = src->relationFind( PD_RDFSemanticItem::RELATION_FOAF_KNOWS );
 	for( PD_RDFSemanticItems::iterator iter = related.begin(); iter != related.end(); ++iter )
 	{
@@ -14547,7 +14660,7 @@ Defun1(rdfSemitemFindRelatedFoafKnows)
 			}
 		}
 	}
-	
+
 	return true;
 }
 
@@ -14570,7 +14683,7 @@ Defun1(rdfSemitemRelatedToSourceFoafKnows)
 		PD_RDFSemanticItemHandle si = *iter;
 		src->relationAdd( si, PD_RDFSemanticItem::RELATION_FOAF_KNOWS );
 	}
-	
+
 	return true;
 }
 
@@ -14590,7 +14703,7 @@ Defun1(rdfApplyCurrentStyleSheet)
 		PD_RDFSemanticItemHandle si = *iter;
 		PD_RDFSemanticItemViewSite vs( si, pView->getPoint() );
 		vs.reflowUsingCurrentStylesheet( pView );
-	}	
+	}
 	return true;
 }
 
@@ -14603,7 +14716,7 @@ Defun1(rdfStylesheetSettings)
 	PD_DocumentRDFHandle rdf = pDoc->getDocumentRDF();
 
 	runSemanticStylesheetsDialog( pView );
-	
+
 	return true;
 }
 
@@ -14624,7 +14737,7 @@ Defun1(rdfDisassocateCurrentStyleSheet)
 		PD_RDFSemanticItemViewSite vs( si, pView->getPoint() );
 		vs.disassociateStylesheet();
 		vs.reflowUsingCurrentStylesheet( pView );
-	}	
+	}
 	return true;
 }
 
@@ -14647,11 +14760,11 @@ static void _rdfApplyStylesheet( FV_View* pView, std::string stylesheetName, PT_
 									  stylesheetName );
 		if( !ss )
 			continue;
-		
+
 		PD_RDFSemanticItemViewSite vs( si, pos );
 		vs.applyStylesheet( pView, ss );
 		return;
-	}	
+	}
 }
 
 
@@ -14782,9 +14895,9 @@ Defun(hyperlinkStatusBar)
 	if( pView->bubblesAreBlocked() )
 	{
 		UT_DEBUGMSG(("hyperlinkStatusBar() bubbles are blocked, not opening one right now\n" ));
-		return true;	
+		return true;
 	}
-	
+
 	GR_Graphics * pG = pView->getGraphics();
 	if (pG)
 		pG->setCursor(GR_Graphics::GR_CURSOR_LINK);
@@ -14795,8 +14908,8 @@ Defun(hyperlinkStatusBar)
 	fp_HyperlinkRun * pHRun = static_cast<fp_HyperlinkRun *>(pView->getHyperLinkRun(pos));
 	if(!pHRun)
 		return false;
-	UT_DEBUGMSG(("hyperlinkStatusBar() pHRun:%p\n", (void*)pHRun));
-	UT_DEBUGMSG(("hyperlinkStatusBar()  type:%d\n", (int)pHRun->getHyperlinkType()));
+	UT_DEBUGMSG(("hyperlinkStatusBar() pHRun:%p\n", pHRun ));
+	UT_DEBUGMSG(("hyperlinkStatusBar()  type:%d\n", (int)pHRun->getHyperlinkType() ));
 	if(pHRun->getHyperlinkType() == HYPERLINK_NORMAL)
 	{
 			pView->cmdHyperlinkStatusBar(xpos, ypos);
@@ -14834,7 +14947,7 @@ Defun(hyperlinkStatusBar)
 		ss << " ";
 		sText = ss.str();
 	}
-	
+
 	// avoid unneeded redrawings
 	// check BOTH if we are already previewing an annotation, and that it is indeed the annotation we want
 	if((pView->isAnnotationPreviewActive()) &&
@@ -14843,14 +14956,14 @@ Defun(hyperlinkStatusBar)
 		xxx_UT_DEBUGMSG(("hyperlinkStatusBar: nothing to draw, annotation already previewed\n"));
 		return true; // should be false? think not
 	}
-	
+
 	// kill previous preview if needed (it is not the same annotation as it would have been detected above)
 	if (pView->isAnnotationPreviewActive())
 	{
 		UT_DEBUGMSG(("hyperlinkStatusBar: Deleting previous annotation preview...\n"));
 		pView->killAnnotationPreview();
 	}
-	
+
 	std::string sTitle;
 	std::string sAuthor;
 	if(pHRun->getHyperlinkType() == HYPERLINK_ANNOTATION && sText.empty() )
@@ -14858,16 +14971,16 @@ Defun(hyperlinkStatusBar)
 		UT_DEBUGMSG(("hyperlinkStatusBar: exiting because we have no annotation text for pid:%d\n", pid));
 		return false;
 	}
-	
+
 	// Optional fields
 	pView->getAnnotationTitle( pid, sTitle );
 	pView->getAnnotationAuthor( pid, sAuthor );
-	
+
 	// preview annotation
 
 	XAP_Frame * pFrame = static_cast<XAP_Frame *>(pView->getParentData());
 	UT_return_val_if_fail(pFrame, false);
-	
+
 	// PLEASE DOOOON'T UNCOMMENT THIS EVIL LINE (unexpectedly will hide the pop-up)
 	//pFrame->raise();
 
@@ -14881,22 +14994,22 @@ Defun(hyperlinkStatusBar)
 
 	if(!pAnnPview)
 		return false;
-		
+
 	UT_DEBUGMSG(("hyperlinkStatusBar: Previewing annotation text %s \n",sText.c_str()));
-	
+
 	// flags
 	pView->setAnnotationPreviewActive(true);
 	// this call is also needed to decide when to redraw the preview
-	pView->setActivePreviewAnnotationID( pid ); 
-	
+	pView->setActivePreviewAnnotationID( pid );
+
 	// Fields
 	pAnnPview->setDescription(sText);
-	
+
 	// Optional fields
 	// if those fields are to be hidden it should be at the GUI level (inside AP_Preview_Annotation)
-	pAnnPview->setTitle(sTitle);	
+	pAnnPview->setTitle(sTitle);
 	pAnnPview->setAuthor(sAuthor);
-	
+
 	fp_Line * pLine = pHRun->getLine();
 	if(pLine)
 	{
@@ -14906,7 +15019,7 @@ Defun(hyperlinkStatusBar)
 	}
 	pAnnPview->setXY(pG->tdu(xpos),pG->tdu(ypos));
 	pAnnPview->runModeless(pFrame);
-	
+
 	//UT_sint32 xoff = 0, yoff = 0;
 	//fp_Run * pRun = pView->getHyperLinkRun(pos);
 	//pHRun->getLine()->getOffsets(pHRun, xoff, yoff); //TODO try getting container's screen offset... ->getContainer()
@@ -14916,10 +15029,10 @@ Defun(hyperlinkStatusBar)
 	UT_DEBUGMSG(("hyperlinkStatusBar: setXY %d %d\n",pG->tdu(xpos),pG->tdu(ypos)));
 	//UT_DEBUGMSG(("hyperlinkStatusBar: pRungetxy %d %d\n",pHRun->getX(),pHRun->getY()));
 	//UT_DEBUGMSG(("hyperlinkStatusBar: getScreenOffsets %d %d\n",xoff,yoff));
-	
-	pAnnPview->queueDraw();
-	
-	return true;	
+
+	pAnnPview->draw();
+
+	return true;
 }
 
 static bool s_doMarkRevisions(XAP_Frame * pFrame, PD_Document * pDoc, FV_View * pView,
@@ -14939,7 +15052,7 @@ UT_return_val_if_fail(pDialog, false);
 
 	if(bForceNew)
 		pDialog->forceNew();
-	
+
 	pDialog->runModal(pFrame);
 	bool bOK = (pDialog->getAnswer() == AP_Dialog_MarkRevisions::a_OK);
 
@@ -14954,7 +15067,7 @@ UT_return_val_if_fail(pDialog, false);
 #if 0
 		// cannot remember at all why I thought this was needed and it has been marked as
 		// bug 7700, so I am going to disable this. Tomas, May 10, 2005
-		
+
 		// we also want to have paragraph marks and etc visible
 		AP_FrameData *pFrameData = static_cast<AP_FrameData *>(pFrame->getFrameData());
 		UT_return_val_if_fail(pFrameData, false);
@@ -14994,7 +15107,7 @@ Defun1(toggleAutoRevision)
 	UT_return_val_if_fail(pView,false);
 	PD_Document * pDoc = pView->getDocument();
 	UT_return_val_if_fail(pDoc,false);
-	
+
 	bool bAuto = !pDoc->isAutoRevisioning();
 	bool bDoIT = true;
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> ( pAV_View->getParentData());
@@ -15005,12 +15118,12 @@ Defun1(toggleAutoRevision)
 		// the record of changes, making it impossible to revert
 		// reliably to any earlier versions of document history
 		// we issue worning
-		
+
 		bDoIT = (XAP_Dialog_MessageBox::a_YES ==
-				        pFrame->showMessageBox(AP_STRING_ID_MSG_AutoRevisionOffWarning, 
-											   XAP_Dialog_MessageBox::b_YN, 
+				        pFrame->showMessageBox(AP_STRING_ID_MSG_AutoRevisionOffWarning,
+											   XAP_Dialog_MessageBox::b_YN,
 											   XAP_Dialog_MessageBox::a_NO));
-	
+
 	}
 	if(bDoIT)
 	{
@@ -15040,13 +15153,13 @@ Defun1(toggleMarkRevisions)
 		// set view level to all
 		pView->setRevisionLevel(0);
 	}
-	
+
 	if(!pView->isMarkRevisions())
 	{
 		PD_Document * pDoc = pView->getDocument();
 		XAP_Frame * pFrame = static_cast<XAP_Frame *> ( pAV_View->getParentData());
 		UT_return_val_if_fail( pFrame && pDoc, false );
-		
+
 		if(s_doMarkRevisions(pFrame, pDoc, pView, false, false))
 			pView->toggleMarkRevisions();
 	}
@@ -15054,10 +15167,10 @@ Defun1(toggleMarkRevisions)
 	{
 		pView->toggleMarkRevisions();
 	}
-	
 
 
-	
+
+
 	return true;
 }
 
@@ -15077,7 +15190,7 @@ Defun1(startNewRevision)
 	PD_Document * pDoc = pView->getDocument();
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> ( pAV_View->getParentData());
 	UT_return_val_if_fail( pDoc && pFrame, false );
-	
+
 	s_doMarkRevisions(pFrame, pDoc, pView, false, true);
 	return true;
 }
@@ -15100,7 +15213,7 @@ Defun1(toggleShowRevisionsBefore)
 	UT_return_val_if_fail(pView,false);
 	bool bShow = pView->isShowRevisions();
 	UT_uint32 iLevel = pView->getRevisionLevel();
-	
+
 	if(bShow)
 	{
 		//we are asked to hide revisions, first set view level to 0
@@ -15112,7 +15225,7 @@ Defun1(toggleShowRevisionsBefore)
 		// we are asked to change view level
 		pView->cmdSetRevisionLevel(0);
 	}
-	
+
 	return true;
 }
 
@@ -15148,7 +15261,7 @@ Defun1(toggleShowRevisionsAfter)
 		// we are asked to change view level
 		pView->cmdSetRevisionLevel(PD_MAX_REVISION);
 	}
-	
+
 	return true;
 }
 
@@ -15163,7 +15276,7 @@ Defun1(toggleShowRevisionsAfterPrevious)
 
 	if(iDocLevel == 0)
 		return false;
-	
+
 	if(iLevel != iDocLevel - 1)
 	{
 		// we are in Mark mode and are asked to treat all revisions
@@ -15269,7 +15382,7 @@ Defun(revisionNew)
 
 	s_doMarkRevisions(pFrame, pDoc, pView, false, true);
 	pDoc->setMarkRevisions( true );
-	
+
 	return true;
 }
 
@@ -15285,7 +15398,7 @@ Defun(revisionSelect)
 
 	pDoc->setMarkRevisions( false );
 	pView->setShowRevisions( true );
-	
+
 	XAP_Frame * pFrame = static_cast<XAP_Frame *> ( pAV_View->getParentData());
 	UT_return_val_if_fail(pFrame,false);
 
@@ -15316,11 +15429,11 @@ Defun1(history)
     \param iId: the dialogue iId determining which of the
                 ListDocuments variants to raise
 
-    \return: returns pointer to the document user selected or nullptr
+    \return: returns pointer to the document user selected or NULL
 */
 static PD_Document * s_doListDocuments(XAP_Frame * pFrame, bool bExcludeCurrent, UT_uint32 iId)
 {
-	UT_return_val_if_fail(pFrame, nullptr);
+	UT_return_val_if_fail(pFrame, NULL);
 
 	pFrame->raise();
 
@@ -15329,19 +15442,19 @@ static PD_Document * s_doListDocuments(XAP_Frame * pFrame, bool bExcludeCurrent,
 
 	XAP_Dialog_ListDocuments * pDialog
 		= static_cast<XAP_Dialog_ListDocuments *>(pDialogFactory->requestDialog(iId));
-	
-	UT_return_val_if_fail(pDialog, nullptr);
+
+	UT_return_val_if_fail(pDialog, NULL);
 
 	// the dialgue excludes current document by default, if we are to
 	// include it, we need to tell it ...
 	if(!bExcludeCurrent)
 		pDialog->setIncludeActiveDoc(true);
-	
+
 	pDialog->runModal(pFrame);
 	bool bOK = (pDialog->getAnswer() == XAP_Dialog_ListDocuments::a_OK);
 
-	PD_Document *pD = nullptr;
-	
+	PD_Document *pD = NULL;
+
 	if (bOK)
 	{
 		pD = (PD_Document *)pDialog->getDocument();
@@ -15381,7 +15494,7 @@ Defun1(revisionCompareDocuments)
 
 		XAP_Dialog_DocComparison * pDialog
 			= static_cast<XAP_Dialog_DocComparison *>(pDialogFactory->requestDialog(XAP_DIALOG_ID_DOCCOMPARISON));
-	
+
 		UT_return_val_if_fail(pDialog, false);
 
 		pDialog->calculate(pDoc, pDoc2);
@@ -15403,18 +15516,18 @@ Defun(beginVDrag)
 	UT_return_val_if_fail(pView, false);
 	AP_TopRuler * pTopRuler = pView->getTopRuler();
 
-	if(pTopRuler == nullptr)
+	if(pTopRuler == NULL)
 	{
 		XAP_Frame * pFrame = static_cast<XAP_Frame *> (pView->getParentData());
 		UT_return_val_if_fail( pFrame, true );
-		
+
 		pTopRuler = new AP_TopRuler(pFrame);
 		AP_FrameData *pFrameData = static_cast<AP_FrameData *>(pFrame->getFrameData());
 		pFrameData->m_pTopRuler = pTopRuler;
 		pView->setTopRuler(pTopRuler);
 		pTopRuler->setViewHidden(pView);
 	}
-	if(pTopRuler->getView() == nullptr)
+	if(pTopRuler->getView() == NULL)
 	{
 		return true;
 	}
@@ -15424,7 +15537,7 @@ Defun(beginVDrag)
 	UT_sint32 y = pCallData->m_yPos;
 	PT_DocPosition pos = pView->getDocPositionFromXY(x, y);
 	xxx_UT_DEBUGMSG(("ap_EditMethods.cpp:: VDrag begin \n"));
-	
+
 	sTopRulerHeight = pTopRuler ? pTopRuler->setTableLineDrag(pos,x,siFixed) : 0;
 	pView->getGraphics()->setCursor(GR_Graphics::GR_CURSOR_GRAB);
 	return true;
@@ -15437,7 +15550,7 @@ Defun(beginHDrag)
 	UT_return_val_if_fail(pView, false);
 	AP_LeftRuler * pLeftRuler = pView->getLeftRuler();
 
-	if(pLeftRuler == nullptr)
+	if(pLeftRuler == NULL)
 	{
 		XAP_Frame * pFrame = static_cast<XAP_Frame *> (pView->getParentData());
 
@@ -15496,17 +15609,17 @@ Defun(dragVline)
 
 	UT_return_val_if_fail(pView, false);
 	AP_TopRuler * pTopRuler = pView->getTopRuler();
-	if(pTopRuler == nullptr)
+	if(pTopRuler == NULL)
 	{
 		return true;
 	}
-	if(pTopRuler->getView() == nullptr)
+	if(pTopRuler->getView() == NULL)
 	{
 		pTopRuler->setViewHidden(pView);
 	}
 	UT_sint32 x = pCallData->m_xPos + siFixed;
 	pView->getGraphics()->setCursor(GR_Graphics::GR_CURSOR_GRAB);
-	EV_EditModifierState ems = 0; 
+	EV_EditModifierState ems = 0;
 	xxx_UT_DEBUGMSG(("ap_EditMethods.cpp:: DRagging VLine \n"));
 	pTopRuler->mouseMotion(ems, x, sTopRulerHeight);
 	return true;
@@ -15523,13 +15636,13 @@ Defun(dragHline)
 	{
 		return true;
 	}
-	if(pLeftRuler->getView() == nullptr)
+	if(pLeftRuler->getView() == NULL)
 	{
 		pLeftRuler->setViewHidden(pView);
 	}
 	UT_sint32 y = pCallData->m_yPos;
 	pView->getGraphics()->setCursor(GR_Graphics::GR_CURSOR_GRAB);
-	EV_EditModifierState ems = 0; 
+	EV_EditModifierState ems = 0;
 	pLeftRuler->mouseMotion(ems, sLeftRulerPos,y);
 	return true;
 }
@@ -15545,12 +15658,12 @@ Defun(endDragVline)
 	{
 		return true;
 	}
-	if(pTopRuler->getView() == nullptr)
+	if(pTopRuler->getView() == NULL)
 	{
 		pTopRuler->setView(pView);
 	}
 	UT_sint32 x = pCallData->m_xPos;
-	EV_EditModifierState ems = 0; 
+	EV_EditModifierState ems = 0;
 	EV_EditMouseButton emb = EV_EMB_BUTTON1;
 	pTopRuler->mouseRelease(ems,emb, x, sTopRulerHeight);
 	pView->setDragTableLine(false);
@@ -15569,7 +15682,7 @@ Defun(endDragHline)
 		return true;
 	}
 	UT_sint32 y = pCallData->m_yPos;
-	EV_EditModifierState ems = 0; 
+	EV_EditModifierState ems = 0;
 	EV_EditMouseButton emb = EV_EMB_BUTTON1;
 	pLeftRuler->mouseRelease(ems,emb,sLeftRulerPos,y);
 	pView->setDragTableLine(false);
@@ -15609,9 +15722,9 @@ Defun(btn1InlineImage)
 		  UT_sint32 x1,x2,y1,y2,iHeight;
 		  bool bEOL = false;
 		  bool bDir = false;
-		
-		  fp_Run * pRun = nullptr;
-		
+
+		  fp_Run * pRun = NULL;
+
 		  pRun = pBlock->findPointCoords(pos,bEOL,x1,y1,x2,y2,iHeight,bDir);
 		  while(pRun && ((pRun->getType() != FPRUN_IMAGE) && (pRun->getType() != FPRUN_EMBED)))
 		  {
@@ -15894,7 +16007,7 @@ Defun(cutVisualText)
 	CHECK_FRAME;
 	ABIWORD_VIEW;
 	UT_return_val_if_fail(pView, false);
-	XAP_Frame * pFrame = static_cast<XAP_Frame *>(pView->getParentData()); 
+	XAP_Frame * pFrame = static_cast<XAP_Frame *>(pView->getParentData());
 	UT_DEBUGMSG(("Cut on Selection \n"));
 	UT_sint32 y = pCallData->m_yPos;
 	UT_sint32 x = pCallData->m_xPos;
@@ -15922,7 +16035,7 @@ Defun(copyVisualText)
 	CHECK_FRAME;
 	ABIWORD_VIEW;
 	UT_return_val_if_fail(pView, false);
-	XAP_Frame * pFrame = static_cast<XAP_Frame *>(pView->getParentData()); 
+	XAP_Frame * pFrame = static_cast<XAP_Frame *>(pView->getParentData());
 	xxx_UT_DEBUGMSG(("Copy on Selection \n"));
 	UT_sint32 y = pCallData->m_yPos;
 	UT_sint32 x = pCallData->m_xPos;
@@ -15950,7 +16063,7 @@ static void sActualVisualDrag(AV_View *  pAV_View, EV_EditMethodCallData * pCall
 {
 	ABIWORD_VIEW;
 	UT_return_if_fail(pView);
-	XAP_Frame * pFrame = static_cast<XAP_Frame *>(pView->getParentData()); 
+	XAP_Frame * pFrame = static_cast<XAP_Frame *>(pView->getParentData());
 	UT_sint32 y = pCallData->m_yPos;
 	UT_sint32 x = pCallData->m_xPos;
 	if(sEndVisualDrag)
@@ -16136,9 +16249,9 @@ Defun1(dumpRDFForPoint)
         PT_DocPosition curr = pView->getPoint();
         UT_DEBUGMSG(("dumpRDFForPoint...current position:%d\n", curr));
         PD_RDFModelHandle h = pDoc->getDocumentRDF()->getRDFAtPosition( curr );
-		
+
     }
-    
+
     return true;
 }
 

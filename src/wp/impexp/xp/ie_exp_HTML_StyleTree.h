@@ -95,7 +95,7 @@ public:
     void print(StyleListener * listener) const;
 
     const IE_Exp_HTML_StyleTree * operator[] (UT_uint32 i) const {
-        return (i < m_count) ? m_list[i] : nullptr;
+        return (i < m_count) ? m_list[i] : 0;
     }
 
     UT_uint32 count() const {
@@ -126,25 +126,25 @@ class ABI_EXPORT IE_Exp_HTML_StyleListener : public PL_Listener {
 public:
     IE_Exp_HTML_StyleListener(IE_Exp_HTML_StyleTree *styleTree);
 
-    virtual bool populate(fl_ContainerLayout* sfh,
-            const PX_ChangeRecord * pcr) override;
+    bool populate(fl_ContainerLayout* sfh,
+            const PX_ChangeRecord * pcr);
 
-    virtual bool populateStrux(pf_Frag_Strux* sdh,
+    bool populateStrux(pf_Frag_Strux* sdh,
             const PX_ChangeRecord * pcr,
-            fl_ContainerLayout* * psfh) override;
+            fl_ContainerLayout* * psfh);
 
-    virtual bool change(fl_ContainerLayout* sfh,
-            const PX_ChangeRecord * pcr) override;
+    bool change(fl_ContainerLayout* sfh,
+            const PX_ChangeRecord * pcr);
 
-    virtual bool insertStrux(fl_ContainerLayout* sfh,
+    bool insertStrux(fl_ContainerLayout* sfh,
             const PX_ChangeRecord * pcr,
             pf_Frag_Strux* sdh,
             PL_ListenerId lid,
             void (*pfnBindHandles) (pf_Frag_Strux* sdhNew,
             PL_ListenerId lid,
-            fl_ContainerLayout* sfhNew)) override;
+            fl_ContainerLayout* sfhNew));
 
-    virtual bool signal(UT_uint32 iSignal) override;
+    bool signal(UT_uint32 iSignal);
 private:
     void styleCheck(PT_AttrPropIndex api);
 

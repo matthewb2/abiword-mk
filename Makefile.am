@@ -1,28 +1,24 @@
 
-ACLOCAL_AMFLAGS = -I m4
+ACLOCAL_AMFLAGS = -I .
 
 DIST_SUBDIRS = src plugins po user icons tools
 
-SUBDIRS = src plugins po user
+SUBDIRS = src plugins po user icons
 
 if TOOLKIT_GTK_ALL
 
-SUBDIRS += icons
-
+if !EMBEDDED_HILDON
 desktopdir = $(datadir)/applications
-desktop_DATA = com.abisource.AbiWord.desktop
+desktop_DATA = abiword.desktop
+endif
 
 mimedir = @ABIWORD_DATADIR@/mime-info
 mime_DATA = abiword.keys
-
-appdatadir = $(datarootdir)/metainfo
-appdata_DATA = com.abisource.AbiWord.appdata.xml
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = abiword-$(ABIWORD_SERIES).pc
 
 dist_man1_MANS = abiword.1
-
 endif
 
 if TOOLKIT_GTK

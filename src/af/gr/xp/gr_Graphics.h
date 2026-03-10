@@ -2,7 +2,6 @@
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
  * Copyright (C) 2002 Tomas Frydrych, <tomas@frydrych.uklinux.net>
- * Coprygiht (C) 2021 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,7 +19,8 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef GR_GRAPHICS_H
+#define GR_GRAPHICS_H
 
 #include <memory>
 
@@ -30,7 +30,6 @@
 #include "ut_units.h"
 #include "ut_bytebuf.h"
 #include "ut_growbuf.h"
-#include "ut_option.h"
 #include "ut_misc.h"
 #include "gr_Image.h"
 #include "gr_Caret.h"
@@ -103,7 +102,7 @@ class ABI_EXPORT GR_Font
 										   FontPitchEnum * pfp,
 										   bool * pbTrueType);
 
-	virtual const char* getFamily() const { return nullptr; }
+	virtual const char* getFamily() const { return NULL; }
 	UT_uint32           getAllocNumber() const {return m_iAllocNo;}
 	/*!
 		Measure the unremapped char to be put into the cache.
@@ -366,7 +365,7 @@ class ABI_EXPORT AllCarets
 	void		setCoords(UT_sint32 x, UT_sint32 y, UT_uint32 h,
 						  UT_sint32 x2 = 0, UT_sint32 y2 = 0, UT_uint32 h2 = 0,
 						  bool bPointDirection = false,
-						  const UT_RGBColor * pClr = nullptr);
+						  const UT_RGBColor * pClr = NULL);
 	void		setInsertMode (bool mode);
 	void		forceDraw(void);
 	bool        doBlinkIfNeeded(void);
@@ -398,7 +397,7 @@ class ABI_EXPORT GR_Graphics
 	// the following two static functions have to be implemented by all
 	// derrived classes and registered with GR_GraphicsFactory
 	static const char *    graphicsDescriptor(void){UT_ASSERT_HARMLESS(UT_NOT_IMPLEMENTED); return "???";}
-	static GR_Graphics *   graphicsAllocator(GR_AllocInfo&){UT_ASSERT_HARMLESS(UT_NOT_IMPLEMENTED); return nullptr;}
+	static GR_Graphics *   graphicsAllocator(GR_AllocInfo&){UT_ASSERT_HARMLESS(UT_NOT_IMPLEMENTED); return NULL;}
 #endif
 
 	AllCarets *	allCarets();
@@ -431,9 +430,9 @@ class ABI_EXPORT GR_Graphics
 	virtual UT_uint32 measureString(const UT_UCSChar*s,
 									int iOffset,
 									int num,
-									UT_GrowBufElement* pWidths, UT_uint32 *height = nullptr);
+									UT_GrowBufElement* pWidths, UT_uint32 *height = 0);
 
-	virtual UT_sint32 measureUnRemappedChar(const UT_UCSChar c, UT_uint32 * height = nullptr) = 0;
+	virtual UT_sint32 measureUnRemappedChar(const UT_UCSChar c, UT_uint32 * height = 0) = 0;
 	virtual void getCoverage(UT_NumberVector& coverage) = 0;
 
 	/* GR_Font versions of the above -- TODO: should I add drawChar* methods too? */
@@ -496,11 +495,8 @@ class ABI_EXPORT GR_Graphics
 
 	virtual void      setLineWidth(UT_sint32) = 0;
 
-	/// Invalidate the rect of the whole view
-	virtual void queueDraw(const UT_Rect* pRect) = 0;
 	virtual void      setClipRect(const UT_Rect* pRect) = 0;
 	const UT_Rect *   getClipRect(void) const { return m_pRect.get();}
-	UT_Option<UT_Rect> getClipRectOptional(void) const;
 	virtual void      scroll(UT_sint32, UT_sint32) = 0;
 	virtual void      scroll(UT_sint32 x_dest,
 							 UT_sint32 y_dest,
@@ -653,7 +649,6 @@ class ABI_EXPORT GR_Graphics
 	void              setPrevXOffset(UT_sint32 x) { m_iPrevXOffset = x;}
 
 	UT_sint32         _tduX(UT_sint32 layoutUnits) const;
-	double _tduXD(double layoutUnits) const;
 
 
 	///////////////////////////////////////////////////////////////////
@@ -674,6 +669,7 @@ class ABI_EXPORT GR_Graphics
 
 	virtual void appendRenderedCharsToBuff(GR_RenderInfo & ri, UT_GrowBuf & buf) const VIRTUAL_SFX;
 	virtual void measureRenderedCharWidths(GR_RenderInfo & ri) VIRTUAL_SFX;
+
 
 	// expects ri.m_iOffset set to the run offset condsidered for break
 	//         ri.m_pText set positioned at start of the run
@@ -757,7 +753,6 @@ class ABI_EXPORT GR_Graphics
 	virtual void _endPaint () {}
 
 	UT_sint32         _tduY(UT_sint32 layoutUnits) const;
-	double _tduYD(double layoutUnits) const;
 	UT_sint32         _tduR(UT_sint32 layoutUnits) const;
 
 	void _destroyFonts ();
@@ -802,14 +797,14 @@ class ABI_EXPORT GR_Graphics
 						   int iLength,
 						   UT_sint32 xoff,
 						   UT_sint32 yoff,
-						   int* pCharWidths = nullptr) = 0;
+						   int* pCharWidths = NULL) = 0;
 
 	virtual void drawCharsRelativeToBaseline(const UT_UCSChar* pChars,
 											 int iCharOffset,
 											 int iLength,
 											 UT_sint32 xoff,
 											 UT_sint32 yoff,
-											 int* pCharWidths = nullptr);
+											 int* pCharWidths = NULL);
 
 	virtual GR_Image *	  genImageFromRectangle(const UT_Rect & r) = 0;
 
@@ -840,8 +835,9 @@ class ABI_EXPORT GR_Graphics
 	static XAP_PrefsScheme *m_pPrefsScheme;
 	static UT_uint32 m_uTick;
 
-	std::unique_ptr<const UT_Rect> m_pRect;
-
+	//pascal std::unique_ptr<const UT_Rect> m_pRect;
+  std::shared_ptr<const UT_Rect> m_pRect;
+  
 	bool m_bHave3DColors;
 
 	UT_uint32 m_paintCount;
@@ -912,3 +908,5 @@ class ABI_EXPORT GR_Graphics
 	AllCarets               m_AllCarets;
 	bool                    m_bAntiAliasAlways;
 };
+
+#endif /* GR_GRAPHICS_H */

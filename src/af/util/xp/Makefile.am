@@ -57,7 +57,6 @@ libxp_la_SOURCES = \
 	ut_misc.h \
 	ut_mutex.cpp \
 	ut_mutex.h \
-	ut_null.h \
 	ut_option.h \
 	ut_OverstrikingChars.cpp \
 	ut_OverstrikingChars.h \
@@ -98,6 +97,7 @@ libxp_la_SOURCES = \
 	ut_units.h \
 	ut_uuid.cpp \
 	ut_uuid.h \
+	ut_vector.cpp \
 	ut_vector.h \
 	ut_warning.h \
 	ut_wctomb.cpp \

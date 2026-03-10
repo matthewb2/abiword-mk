@@ -169,7 +169,7 @@ UT_UTF8String fp_PageSize::getDefaultPageMargin(UT_Dimension dim)
 }
 
 fp_PageSize::fp_PageSize(Predefined preDef)
-	: m_predefined(nullptr)
+	: m_predefined(NULL)
 	, m_iWidth(0)
 	, m_iHeight(0)
 	, m_unit(DIM_MM)
@@ -184,7 +184,7 @@ fp_PageSize::fp_PageSize(Predefined preDef)
 }
 
 fp_PageSize::fp_PageSize(const char *name)
-	: m_predefined(nullptr)
+	: m_predefined(NULL)
 	, m_iWidth(0)
 	, m_iHeight(0)
 	, m_unit(DIM_MM)
@@ -199,7 +199,7 @@ fp_PageSize::fp_PageSize(const char *name)
 }
 
 fp_PageSize::fp_PageSize(double w, double h, UT_Dimension u)
-	: m_predefined(nullptr)
+	: m_predefined(NULL)
 	, m_iWidth(w)
 	, m_iHeight(w)
 	, m_unit(u)
@@ -210,6 +210,18 @@ fp_PageSize::fp_PageSize(double w, double h, UT_Dimension u)
 	m_scale = 1.0;
 	Set(w, h, u);
 }
+
+fp_PageSize& fp_PageSize::operator=(fp_PageSize& rhs)
+{
+  m_predefined = rhs.m_predefined;
+  m_iWidth = rhs.m_iWidth;
+  m_iHeight = rhs.m_iHeight;
+  m_bisPortrait = rhs.m_bisPortrait;
+  m_scale = rhs.m_scale;
+  m_unit = rhs.m_unit;
+  return *this;
+}
+
 
 fp_PageSize& fp_PageSize::operator=(const fp_PageSize& rhs)
 {

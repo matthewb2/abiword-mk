@@ -53,14 +53,14 @@ public:
 	IE_Exp_RTF_Sniffer ();
 	virtual ~IE_Exp_RTF_Sniffer () {}
 
-	virtual UT_Confidence_t supportsMIME (const char * szMIME) override;
+	UT_Confidence_t supportsMIME (const char * szMIME);
 
-	virtual bool recognizeSuffix (const char * szSuffix) override;
+	virtual bool recognizeSuffix (const char * szSuffix);
 	virtual bool getDlgLabels (const char ** szDesc,
 							   const char ** szSuffixList,
-							   IEFileType * ft) override;
+							   IEFileType * ft);
 	virtual UT_Error constructExporter (PD_Document * pDocument,
-										IE_Exp ** ppie) override;
+										IE_Exp ** ppie);
 };
 
 /*
@@ -75,12 +75,12 @@ public:
 	IE_Exp_RTF_attic_Sniffer ();
 	virtual ~IE_Exp_RTF_attic_Sniffer () {}
 
-	virtual bool recognizeSuffix (const char * szSuffix) override;
+	virtual bool recognizeSuffix (const char * szSuffix);
 	virtual bool getDlgLabels (const char ** szDesc,
 							   const char ** szSuffixList,
-							   IEFileType * ft) override;
+							   IEFileType * ft);
 	virtual UT_Error constructExporter (PD_Document * pDocument,
-										IE_Exp ** ppie) override;
+										IE_Exp ** ppie);
 };
 
 // hack for "msword" export
@@ -93,12 +93,12 @@ public:
 	IE_Exp_MsWord_Hack_Sniffer ();
 	virtual ~IE_Exp_MsWord_Hack_Sniffer () {}
 
-	virtual bool recognizeSuffix (const char * szSuffix) override;
+	virtual bool recognizeSuffix (const char * szSuffix);
 	virtual bool getDlgLabels (const char ** szDesc,
 				   const char ** szSuffixList,
-				   IEFileType * ft) override;
+				   IEFileType * ft);
 	virtual UT_Error constructExporter (PD_Document * pDocument,
-					    IE_Exp ** ppie) override;
+					    IE_Exp ** ppie);
 };
 
 struct NumberedStyle;
@@ -112,13 +112,13 @@ public:
 	IE_Exp_RTF(PD_Document * pDocument);
 	IE_Exp_RTF(PD_Document * pDocument,bool atticFormat);
 	virtual ~IE_Exp_RTF();
-	const ie_exp_RTF_MsWord97ListMulti& getNthMultiLevel(UT_uint32 i) const;
-	const ie_exp_RTF_MsWord97ListSimple& getNthSimple(UT_uint32 i) const;
-	const ie_exp_RTF_ListOveride& getNthOveride(UT_uint32 i) const;
+	ie_exp_RTF_MsWord97ListMulti * getNthMultiLevel(UT_uint32 i) const;
+	ie_exp_RTF_MsWord97ListSimple * getNthSimple(UT_uint32 i) const;
+	ie_exp_RTF_ListOveride * getNthOveride(UT_uint32 i) const;
 	UT_uint32 getMultiLevelCount(void) const;
 	UT_uint32 getSimpleListCount(void) const;
 	UT_uint32 getOverideCount(void)  const;
-	UT_uint32 getMatchingOverideNum(UT_uint32 ID) const;
+	UT_uint32 getMatchingOverideNum(UT_uint32 ID);
 	void exportHdrFtr(const char * pszHdrFtr , const char * pszHdrFtrID,const char * pszKeyword);
 	UT_BidiCharType isCharRTL() {return m_CharRTL;}
 	void setCharRTL(UT_BidiCharType t) {m_CharRTL = t;}
@@ -127,7 +127,7 @@ public:
 	UT_ByteBuf * getByteBuf(void)
 	{ return _getByteBuf();}
 protected:
-	virtual UT_Error	_writeDocument(void) override;
+	virtual UT_Error	_writeDocument(void);
 	UT_Error	        _writeDocumentLocal(bool bSkipHeader);
 	UT_sint32			_findColor(const char * szColor) const;
 	UT_sint32           _findOrAddColor (const char * szColor);
@@ -140,7 +140,7 @@ protected:
 	void				_rtf_keyword_space(const char * szKey, UT_sint32 d);
 	void                _rtf_keyword(const char * szKey, const char * szValue);
 	void				_rtf_nonascii_hex2(UT_sint32 d);
-	void				_rtf_nonascii_hex2(UT_sint32 d, UT_String & pStr) const;
+	void				_rtf_nonascii_hex2(UT_sint32 d, UT_String & pStr);
 	void				_rtf_keyword_hex2(const char * szKey, UT_sint32 d);
 	void				_rtf_keyword_ifnotdefault(const char * szKey, const char * szValue, UT_sint32 defaultValue);
 	void				_rtf_keyword_ifnotdefault_twips(const char * szKey, const char * szValue, UT_sint32 defaultValue);
@@ -178,9 +178,9 @@ protected:
 	void                            _write_style_fmt(const PD_Style *);
 	void                            _write_stylesheets(void);
 	void                            _write_listtable(void);
-    void                            _output_MultiLevelRTF(const ie_exp_RTF_MsWord97ListMulti& pMulti);
-    void                            _output_SimpleListRTF(const ie_exp_RTF_MsWord97ListSimple& pSimple);
-    void                            _output_OveridesRTF(const ie_exp_RTF_ListOveride& pOver, UT_uint32 i);
+    void                            _output_MultiLevelRTF(ie_exp_RTF_MsWord97ListMulti * pMulti);
+    void                            _output_SimpleListRTF(ie_exp_RTF_MsWord97ListSimple * pSimple);
+    void                            _output_OveridesRTF(ie_exp_RTF_ListOveride * pOver, UT_uint32 i);
 	void                            _output_ListRTF(const fl_AutoNumConstPtr & pAuto, UT_uint32 iLevel);
 	void                            _output_LevelText(const fl_AutoNumConstPtr & pAuto, UT_uint32 iLevel,UT_UCSChar bulletsym);
 	void                            _get_LeftRight_Side(UT_String & LeftSide, UT_String & RightSide);
@@ -215,9 +215,9 @@ protected:
 	/* Hash containing styles to be exported. The key is the
 	   AbiWord style name. The value is a NumberedStyle object
 	   (see the cpp file). */
-	std::vector<ie_exp_RTF_MsWord97ListMulti> m_vecMultiLevel;
-	std::vector<ie_exp_RTF_MsWord97ListSimple> m_vecSimpleList;
-	std::vector<ie_exp_RTF_ListOveride> m_vecOverides;
+	UT_Vector                   m_vecMultiLevel;
+	UT_Vector                   m_vecSimpleList;
+	UT_Vector                   m_vecOverides;
 
 	UT_BidiCharType             m_CharRTL;
 	UT_iconv_t                  m_conv;
@@ -279,8 +279,8 @@ class ABI_EXPORT ie_exp_RTF_MsWord97ListMulti : public ie_exp_RTF_MsWord97List
 	bool isSimple(void) const { return false;}
 	bool isMulti(void) const { return true;}
 	void addLevel(UT_uint32 iLevel, ie_exp_RTF_MsWord97List * pMsWord97List);
-	ie_exp_RTF_MsWord97List * getListAtLevel(UT_uint32 iLevel, UT_uint32 nthList) const;
-	UT_uint32 getMatchingID(UT_uint32 listID) const;
+	ie_exp_RTF_MsWord97List * getListAtLevel(UT_uint32 iLevel, UT_uint32 nthList);
+	UT_uint32 getMatchingID(UT_uint32 listID);
  private:
 	UT_Vector * m_vLevels[9];
 };

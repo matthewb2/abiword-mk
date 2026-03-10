@@ -67,14 +67,14 @@ UT_uint32 AP_TopRuler::s_iFixedWidth = 32;
 
 AP_TopRuler::AP_TopRuler(XAP_Frame * pFrame)
 #if XAP_DONTUSE_XOR
-	: m_guideCache(nullptr),
-	m_otherGuideCache(nullptr)
+	: m_guideCache(NULL),
+	m_otherGuideCache(NULL)
 #endif
 {
 	m_pFrame = pFrame;
-	m_pView = nullptr;
-	m_pScrollObj = nullptr;
-	m_pG = nullptr;
+	m_pView = NULL;
+	m_pScrollObj = NULL;
+	m_pG = NULL;
 	//m_iHeight = 0;
 	m_iWidth = 0;
 	m_iLeftRulerWidth = 0;
@@ -83,17 +83,16 @@ AP_TopRuler::AP_TopRuler(XAP_Frame * pFrame)
 	m_bValidMouseClick = false;
 	m_draggingWhat = DW_NOTHING;
 	m_iDefaultTabType = FL_TAB_LEFT;
-	m_pAutoScrollTimer = nullptr;
+	m_pAutoScrollTimer = NULL;
 
 	m_bGuide = false;
 	m_xGuide = 0;
 
-	std::string rulerUnits;
-	if (XAP_App::getApp()->getPrefsValue(AP_PREF_KEY_RulerUnits, rulerUnits)) {
-		m_dim = UT_determineDimension(rulerUnits.c_str());
-	} else {
+	const gchar * szRulerUnits;
+	if (XAP_App::getApp()->getPrefsValue(AP_PREF_KEY_RulerUnits,&szRulerUnits))
+		m_dim = UT_determineDimension(szRulerUnits);
+	else
 		m_dim = DIM_IN;
-	}
 
 	// set the default to be the fixed size
 	m_iHeight = s_iFixedHeight;
@@ -104,7 +103,7 @@ AP_TopRuler::AP_TopRuler(XAP_Frame * pFrame)
 	m_draggingCell = 0;
 	m_lidTopRuler = 0;
 	m_bIsHidden = false;
-	UT_DEBUGMSG(("Created TopRuler %p \n", (void*)this));
+	UT_DEBUGMSG(("Created TopRuler %p \n",this));
 }
 
 AP_TopRuler::~AP_TopRuler(void)
@@ -122,7 +121,7 @@ AP_TopRuler::~AP_TopRuler(void)
 	if(!m_bIsHidden)
 	{
 
-	  UT_DEBUGMSG(("AP_TopRuler::~AP_TopRuler (this=%p scroll=%p)\n", (void*)this, (void*)m_pScrollObj));
+	  UT_DEBUGMSG(("AP_TopRuler::~AP_TopRuler (this=%p scroll=%p)\n", this, m_pScrollObj));
 
 		DELETEP(m_pScrollObj);
 		DELETEP(m_pAutoScrollTimer);
@@ -130,11 +129,11 @@ AP_TopRuler::~AP_TopRuler(void)
 	if(m_pView)
 	{
 		FV_View * pView = static_cast<FV_View *>(m_pView);
-		pView->setTopRuler(nullptr);
+		pView->setTopRuler(NULL);
 	}
-	m_pView = nullptr;
-	m_pG = nullptr;
-	UT_DEBUGMSG(("Deleting TopRuler %p \n", (void*)this));
+	m_pView = NULL;
+	m_pG = NULL;
+	UT_DEBUGMSG(("Deleting TopRuler %p \n",this));
 }
 
 /*****************************************************************/
@@ -163,12 +162,12 @@ void AP_TopRuler::setZoom(UT_uint32 iZoom)
 }
 void AP_TopRuler::setViewHidden(AV_View *pView)
 {
-	if(m_pView != nullptr)
+	if(m_pView != NULL)
 	{
 		UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
 		return;
 	}
-	UT_DEBUGMSG(("setViewHidden View is set to %p \n", (void*)pView));
+	UT_DEBUGMSG(("setViewHidden View is set to %p \n",pView));
 	m_pView = pView;
 	m_bIsHidden = true;
 }
@@ -186,20 +185,20 @@ void AP_TopRuler::setView(AV_View * pView)
 		DELETEP(m_pScrollObj);
 		bNewView = true;
 	}
-	if(m_pView == nullptr)
+	if(m_pView == NULL)
 	  bNewView = true;
-	xxx_UT_DEBUGMSG(("setView is set to %p \n",pView));
+	UT_DEBUGMSG(("setView is set to %p \n",pView));
 
 	m_pView = pView;
 
 	// create an AV_ScrollObj to receive send*ScrollEvents()
-	if (m_pScrollObj == nullptr)
+	if (m_pScrollObj == NULL) 
 	{
 		m_pScrollObj = new AV_ScrollObj(this,_scrollFuncX,_scrollFuncY);
 	}
 	UT_return_if_fail (m_pScrollObj);
 
-	if (m_pView && bNewView)
+	if (m_pView && bNewView) 
 	{
 	     static_cast<FV_View *>(pView)->setTopRuler(this);
 	     m_pView->addScrollListener(m_pScrollObj);
@@ -211,7 +210,7 @@ void AP_TopRuler::setView(AV_View * pView)
 	  // from column to column.
 	  
 	     m_pView->addListener(static_cast<AV_Listener *>(this),&m_lidTopRuler);
-	     UT_DEBUGMSG(("Ruler attached as view listener %p \n", (void*)&m_lidTopRuler));
+	     UT_DEBUGMSG(("Ruler attached as view listener %p \n",&m_lidTopRuler));
 	}
 }
 
@@ -248,7 +247,7 @@ void AP_TopRuler::setHeight(UT_uint32 iHeight)
 
 UT_uint32 AP_TopRuler::getHeight(void) const
 {
-	if (m_pG == nullptr) {
+	if (m_pG == NULL) {
 		return 0;
 	}
 	return m_pG->tlu(m_iHeight);
@@ -262,12 +261,12 @@ void AP_TopRuler::setWidth(UT_uint32 iWidth)
 UT_uint32 AP_TopRuler::getWidth(void) const
 {
 	FV_View * pView = static_cast<FV_View *>(m_pView);
-	if(pView == nullptr)
+	if(pView == NULL)
 	{
 		return 0;
 	}
 	GR_Graphics * pG = pView->getGraphics();
-	if ((m_pG == nullptr) && (pG == nullptr))
+	if ((m_pG == NULL) && (pG== NULL)) 
 	{
 		return 0;
 	}
@@ -397,7 +396,7 @@ void AP_TopRuler::scrollRuler(UT_sint32 xoff, UT_sint32 xlimit)
 
 /*****************************************************************/
 
-void AP_TopRuler::drawImmediateLU(const UT_Rect *clip)
+void AP_TopRuler::drawLU(const UT_Rect *clip)
 {
 	if (!m_pG)
 		return;
@@ -416,10 +415,10 @@ void AP_TopRuler::drawImmediateLU(const UT_Rect *clip)
 
 	// draw the foreground
 
-	_draw(clip, nullptr);
+	_draw(clip, NULL);
 
 	if (clip)
-		m_pG->setClipRect(nullptr);
+		m_pG->setClipRect(NULL);
 }
 
 void AP_TopRuler::_drawBar(const UT_Rect * pClipRect, AP_TopRulerInfo * pInfo,
@@ -438,7 +437,7 @@ void AP_TopRuler::_drawBar(const UT_Rect * pClipRect, AP_TopRulerInfo * pInfo,
 	// convert page-relative coordinates into absolute coordinates.
 	UT_sint32 ixMargin = pInfo->m_xPageViewMargin;
 	FV_View * pView = static_cast<FV_View *>(m_pView);
-	if(pView == nullptr)
+	if(pView == NULL)
 		return;
 
 	if(pView->getPoint() == 0)
@@ -522,7 +521,7 @@ void AP_TopRuler::_drawTickMark(const UT_Rect * pClipRect,
 		UT_UCS4_strcpy_char(span, buf);
 		UT_uint32 len = strlen(buf);
 
-		UT_sint32 w = m_pG->measureString(span, 0, len, nullptr) *
+		UT_sint32 w = m_pG->measureString(span, 0, len, NULL) *
 		    100 / m_pG->getZoomPercentage();
 
 //                UT_sint32 yDU = s_iFixedHeight/4 + 
@@ -665,7 +664,7 @@ void AP_TopRuler::_getParagraphMarkerXCenters(AP_TopRulerInfo * pInfo,
 		xAbsRight = xAbsLeft + pInfo->u.c.m_xColumnWidth;
 	}
 
-	AP_TopRulerTableInfo *pTInfo = nullptr;
+	AP_TopRulerTableInfo *pTInfo = NULL;
 	if(pInfo->m_mode == AP_TopRulerInfo::TRI_MODE_TABLE)
 	{
 		if(pInfo->m_vecTableColInfo && pInfo->m_vecTableColInfo->getItemCount() > 0 && 
@@ -675,13 +674,13 @@ void AP_TopRuler::_getParagraphMarkerXCenters(AP_TopRulerInfo * pInfo,
 		}
 		else
 		{
-			pTInfo = nullptr;
+			pTInfo = NULL;
 		}
 	}
 	m_iCellContainerLeftPos = xAbsLeft;
 	if (pLeft)
 	{
-		if(pTInfo == nullptr)
+		if(pTInfo == NULL)
 		{
 			*pLeft = xAbsLeft + pInfo->m_xrLeftIndent;
 		}
@@ -710,7 +709,7 @@ void AP_TopRuler::_getParagraphMarkerXCenters(AP_TopRulerInfo * pInfo,
 
 	if (pRight)
 	{
-		if(pTInfo == nullptr)
+		if(pTInfo == NULL)
 		{
 			*pRight = xAbsRight - pInfo->m_xrRightIndent;
 		}
@@ -721,7 +720,7 @@ void AP_TopRuler::_getParagraphMarkerXCenters(AP_TopRulerInfo * pInfo,
 	}
 	if (pFirstLine)
 	{
-		if(pTInfo == nullptr)
+		if(pTInfo == NULL)
 		{
 			if(bRTL)
 				*pFirstLine = xAbsRight - pInfo->m_xrRightIndent - pInfo->m_xrFirstLineIndent;
@@ -1125,7 +1124,7 @@ const char * AP_TopRuler::_getTabStopString(AP_TopRulerInfo * pInfo, UT_sint32 k
 
 	bool bRes = pInfo->m_pfnEnumTabStops(pInfo->m_pVoidEnumTabStopsData,
 											k, &TabInfo);
-	UT_return_val_if_fail (bRes, nullptr);
+	UT_return_val_if_fail (bRes, NULL);
 
 	const char* pStart = &pInfo->m_pszTabStops[TabInfo.getOffset()];
 	const char* pEnd = pStart;
@@ -1135,7 +1134,7 @@ const char * AP_TopRuler::_getTabStopString(AP_TopRulerInfo * pInfo, UT_sint32 k
 	}
 
 	UT_uint32 iLen = pEnd - pStart;
-	UT_return_val_if_fail (iLen<20, nullptr);
+	UT_return_val_if_fail (iLen<20, NULL);
 
 	static char buf[20];
 
@@ -1210,7 +1209,7 @@ void AP_TopRuler::_getMarginMarkerRects(AP_TopRulerInfo * pInfo, UT_Rect &rLeft,
 	UT_sint32 widthPrevPagesInRow = pView->getWidthPrevPagesInRow(pView->getCurrentPageNumber()-1);
 
 	bool bRTL;
-	XAP_App::getApp()->getPrefsValueBool(AP_PREF_KEY_DefaultDirectionRtl, bRTL);
+	XAP_App::getApp()->getPrefsValueBool(static_cast<const gchar *>(AP_PREF_KEY_DefaultDirectionRtl), &bRTL);
 
 	if(bRTL)
 	{
@@ -1291,7 +1290,7 @@ void AP_TopRuler::_draw(const UT_Rect * pClipRect, AP_TopRulerInfo * pUseInfo)
 
 	AP_TopRulerInfo infoLocal;
 	AP_TopRulerInfo * pInfo;
-	if(pView== nullptr)
+	if(pView== NULL)
 		return;
 
 	if(pView->getPoint() == 0)
@@ -1308,7 +1307,7 @@ void AP_TopRuler::_draw(const UT_Rect * pClipRect, AP_TopRulerInfo * pUseInfo)
 			return;
 		}
 		pInfo = &infoLocal;
-		if(pView->getDocument() == nullptr)
+		if(pView->getDocument() == NULL)
 		{
 			return;
 		}
@@ -1333,7 +1332,7 @@ void AP_TopRuler::_draw(const UT_Rect * pClipRect, AP_TopRulerInfo * pUseInfo)
 	// draw a dark-gray bar over the left margin
 
 	bool bRTL;
-	XAP_App::getApp()->getPrefsValueBool(AP_PREF_KEY_DefaultDirectionRtl, bRTL);
+	XAP_App::getApp()->getPrefsValueBool(static_cast<const gchar *>(AP_PREF_KEY_DefaultDirectionRtl), &bRTL);
 
 	UT_sint32 xAbsRight = pInfo->u.c.m_xaLeftMargin + (pInfo->u.c.m_xColumnWidth + pInfo->u.c.m_xColumnGap) * pInfo->m_iNumColumns - pInfo->u.c.m_xColumnGap;
 
@@ -1638,7 +1637,7 @@ bool AP_TopRuler::isMouseOverTab(UT_uint32 x, UT_uint32 y)
 		return false;
 	}
 	FV_View * pView = static_cast<FV_View *>(m_pView);
-	if(pView == nullptr)
+	if(pView == NULL)
 	{
 		return false;
 	}
@@ -1679,7 +1678,7 @@ bool AP_TopRuler::isMouseOverTab(UT_uint32 x, UT_uint32 y)
 
 	UT_sint32 xAbsRight = xAbsLeft + m_infoCache.u.c.m_xColumnWidth;
 	bool bRTLglobal;
-	XAP_App::getApp()->getPrefsValueBool(AP_PREF_KEY_DefaultDirectionRtl, bRTLglobal);
+	XAP_App::getApp()->getPrefsValueBool(static_cast<const gchar *>(AP_PREF_KEY_DefaultDirectionRtl), &bRTLglobal);
 
 	fl_BlockLayout * pBL = (static_cast<FV_View *>(m_pView))->getCurrentBlock();
 	UT_return_val_if_fail(pBL,false);
@@ -1856,7 +1855,7 @@ void AP_TopRuler::_drawCellMark(UT_Rect * prDrag, bool bUp)
 //
 // Draw square inside
 //
-	if(m_pG == nullptr)
+	if(m_pG == NULL)
 		return;
 
 	GR_Painter painter(m_pG);
@@ -1903,7 +1902,7 @@ void AP_TopRuler::_drawCellProperties(const UT_Rect * pClipRect,
 									  AP_TopRulerInfo * pInfo,
 									  UT_uint32 /*kCell*/, bool bDrawAll)
 {
-	if(m_pG == nullptr)
+	if(m_pG == NULL)
 		return;
 	FV_View * pView1 = (static_cast<FV_View *>(m_pView));
 	UT_sint32 widthPrevPagesInRow = pView1->getWidthPrevPagesInRow(pView1->getCurrentPageNumber()-1);
@@ -1955,7 +1954,7 @@ void AP_TopRuler::_drawCellProperties(const UT_Rect * pClipRect,
 void AP_TopRuler::_drawCellProperties(const UT_Rect * pClipRect,
 									  AP_TopRulerInfo * pInfo, bool bDrawAll)
 {
-	if(m_pG == nullptr)
+	if(m_pG == NULL)
 	{
 		return;
 	}
@@ -2016,7 +2015,7 @@ void AP_TopRuler::_drawCellProperties(const UT_Rect * pClipRect,
  */
 void AP_TopRuler::_drawCellGap(AP_TopRulerInfo * pInfo, UT_sint32 iCell)
 {
-	if(m_pG == nullptr)
+	if(m_pG == NULL)
 		return;
 
 	UT_Rect lCell, cCell, rCell;
@@ -2586,7 +2585,7 @@ void AP_TopRuler::mouseRelease(EV_EditModifierState ems, EV_EditMouseButton /* e
 
 	//UT_DEBUGMSG(("mouseRelease: [ems 0x%08lx][emb 0x%08lx][x %ld][y %ld]\n",ems,emb,x,y));
 	FV_View * pView1 = static_cast<FV_View *>(m_pView);
-	if(pView1 == nullptr)
+	if(pView1 == NULL)
 	{
 		return;
 	}
@@ -2600,7 +2599,7 @@ void AP_TopRuler::mouseRelease(EV_EditModifierState ems, EV_EditMouseButton /* e
 
 
 	bool bRTLglobal;
-	XAP_App::getApp()->getPrefsValueBool(AP_PREF_KEY_DefaultDirectionRtl, bRTLglobal);
+	XAP_App::getApp()->getPrefsValueBool(static_cast<const gchar *>(AP_PREF_KEY_DefaultDirectionRtl), &bRTLglobal);
 
 	fl_BlockLayout *pBlock1 = (static_cast<FV_View *>(m_pView))->getCurrentBlock();
 	
@@ -2626,7 +2625,7 @@ void AP_TopRuler::mouseRelease(EV_EditModifierState ems, EV_EditMouseButton /* e
 		return;
 	}
 
-	AP_TopRulerTableInfo *pTInfo1 = nullptr;
+	AP_TopRulerTableInfo *pTInfo1 = NULL;
 	if(m_infoCache.m_mode == AP_TopRulerInfo::TRI_MODE_TABLE)
 	{
 		pTInfo1 = static_cast<AP_TopRulerTableInfo *>(m_infoCache.m_vecTableColInfo->getNthItem(m_infoCache.m_iCurCell));
@@ -2683,10 +2682,10 @@ void AP_TopRuler::mouseRelease(EV_EditModifierState ems, EV_EditMouseButton /* e
 				fl_FrameLayout * pFrame = pView->getFrameLayout();
 				if(pFrame)
 				{
-					const PP_AttrProp* pSectionAP = nullptr;
+					const PP_AttrProp* pSectionAP = NULL;
 					pFrame->getAP(pSectionAP);
-					const gchar * pszXpos = nullptr;
-					const gchar * pszWidth = nullptr;
+					const gchar * pszXpos = NULL;
+					const gchar * pszWidth = NULL;
 					UT_sint32 iX;
 					UT_sint32 iWidth;
 					if(!pSectionAP || !pSectionAP->getProperty("xpos",pszXpos))
@@ -2719,9 +2718,9 @@ void AP_TopRuler::mouseRelease(EV_EditModifierState ems, EV_EditMouseButton /* e
 					UT_String sXpos("");
 					UT_String sWidth("");
 					double dX = static_cast<double>(iX)/static_cast<double>(UT_LAYOUT_RESOLUTION);
-					sXpos = UT_formatDimensionedValue(dX,"in", nullptr);
+					sXpos = UT_formatDimensionedValue(dX,"in", NULL);
 					double dWidth = static_cast<double>(iWidth)/static_cast<double>(UT_LAYOUT_RESOLUTION);
-					sWidth = UT_formatDimensionedValue(dWidth,"in", nullptr);
+					sWidth = UT_formatDimensionedValue(dWidth,"in", NULL);
 					const PP_PropertyVector props = {
 						"frame-width", sWidth.c_str(),
 						"xpos", sXpos.c_str()
@@ -2766,7 +2765,7 @@ void AP_TopRuler::mouseRelease(EV_EditModifierState ems, EV_EditMouseButton /* e
 			}
 			else
 			{
-				if(m_pView == nullptr)
+				if(m_pView == NULL)
 				{
 					return;
 				}
@@ -2774,9 +2773,9 @@ void AP_TopRuler::mouseRelease(EV_EditModifierState ems, EV_EditMouseButton /* e
 				fl_FrameLayout * pFrame = pView->getFrameLayout();
 				if(pFrame)
 				{
-					const PP_AttrProp* pSectionAP = nullptr;
+					const PP_AttrProp* pSectionAP = NULL;
 					pFrame->getAP(pSectionAP);
-					const gchar * pszWidth = nullptr;
+					const gchar * pszWidth = NULL;
 					UT_sint32 iWidth;
 					if(!pSectionAP || !pSectionAP->getProperty("frame-width",pszWidth))
 					{
@@ -2796,7 +2795,7 @@ void AP_TopRuler::mouseRelease(EV_EditModifierState ems, EV_EditMouseButton /* e
 					}
 					UT_String sWidth("");
 					double dWidth = static_cast<double>(iWidth)/static_cast<double>(UT_LAYOUT_RESOLUTION);
-					sWidth = UT_formatDimensionedValue(dWidth,"in", nullptr);
+					sWidth = UT_formatDimensionedValue(dWidth,"in", NULL);
 					PP_PropertyVector props = {
 						"frame-width", sWidth.c_str()
 					};
@@ -3042,7 +3041,7 @@ void AP_TopRuler::mouseRelease(EV_EditModifierState ems, EV_EditMouseButton /* e
             //UT_sint32 xdelta;
 			UT_sint32 iCell;
 			//UT_sint32 nCells;
-			AP_TopRulerTableInfo *pTInfo = nullptr;
+			AP_TopRulerTableInfo *pTInfo = NULL;
 			if(m_infoCache.m_mode == AP_TopRulerInfo::TRI_MODE_TABLE)
 			{
 				iCell =  m_infoCache.m_iCurCell;
@@ -3209,7 +3208,7 @@ void AP_TopRuler::mouseRelease(EV_EditModifierState ems, EV_EditMouseButton /* e
 			m_draggingWhat = DW_NOTHING;
 			FV_View * pView = static_cast<FV_View *>(m_pView);
 			// table-width,table-rel-width,table-rel-column-props
-			if(pTInfo == nullptr)
+			if(pTInfo == NULL)
 			{
 				pTInfo = static_cast<AP_TopRulerTableInfo *>(m_infoCache.m_vecFullTable->getNthItem(0));
 			}
@@ -3282,7 +3281,7 @@ void AP_TopRuler::mouseRelease(EV_EditModifierState ems, EV_EditMouseButton /* e
 			}
 			else
 			{
-				if(m_pG == nullptr)
+				if(m_pG == NULL)
 				{
 					m_iCellContainerLeftPos = _getFirstPixelInColumn(&m_infoCache,m_infoCache.m_iCurrentColumn);
 				}
@@ -3298,7 +3297,7 @@ void AP_TopRuler::mouseRelease(EV_EditModifierState ems, EV_EditMouseButton /* e
 // Now do manipulations to find the position of the table we're about to 
 // change.
 //
-			if(pTInfo == nullptr)
+			if(pTInfo == NULL)
 			{
 				pTInfo = static_cast<AP_TopRulerTableInfo *>(m_infoCache.m_vecFullTable->getNthItem(0));
 			}
@@ -3327,7 +3326,7 @@ void AP_TopRuler::mouseRelease(EV_EditModifierState ems, EV_EditMouseButton /* e
 void AP_TopRuler::_setTabStops(ap_RulerTicks tick, UT_sint32 iTab, eTabLeader iLeader, bool bDelete)
 {
 	FV_View * pView = static_cast<FV_View *>(m_pView);
-	if(pView == nullptr)
+	if(pView == NULL)
 	{
 		return;
 	}
@@ -3358,7 +3357,7 @@ void AP_TopRuler::_setTabStops(ap_RulerTicks tick, UT_sint32 iTab, eTabLeader iL
 
 	if (!bDelete)
 	{
-		const char * sz = nullptr;
+		const char * sz = NULL; 
 		char sz1[2];
 		sz1[0] = static_cast<char>(iLeader) + '0'; sz1[1] = 0;
 
@@ -3405,7 +3404,7 @@ void AP_TopRuler::_setTabStops(ap_RulerTicks tick, UT_sint32 iTab, eTabLeader iL
 void AP_TopRuler::mouseMotion(EV_EditModifierState /*ems*/, UT_sint32 x, UT_sint32 y)
 {
 	// The X and Y that are passed to this function are x and y on the screen, not on the ruler.
-//	if(m_pG == nullptr)
+//	if(m_pG == NULL)
 //	{
 //		return;
 //	}
@@ -3415,11 +3414,11 @@ void AP_TopRuler::mouseMotion(EV_EditModifierState /*ems*/, UT_sint32 x, UT_sint
 		m_pG->setCursor(GR_Graphics::GR_CURSOR_WAIT);
 		return;
 	}
-	if(pView == nullptr)
+	if(pView == NULL)
 	{
 		return;
 	}
-	if (!m_bValidMouseClick && (m_pG != nullptr))
+	if (!m_bValidMouseClick && (m_pG != NULL))
 	{
 		m_pG->setCursor(GR_Graphics::GR_CURSOR_DEFAULT);
 		return;
@@ -3461,7 +3460,7 @@ void AP_TopRuler::mouseMotion(EV_EditModifierState /*ems*/, UT_sint32 x, UT_sint
 							// a right edge of the rightmost column.
 
 	bool bRTLglobal;
-	XAP_App::getApp()->getPrefsValueBool(AP_PREF_KEY_DefaultDirectionRtl, bRTLglobal);
+	XAP_App::getApp()->getPrefsValueBool(static_cast<const gchar *>(AP_PREF_KEY_DefaultDirectionRtl), &bRTLglobal);
 
 	fl_BlockLayout *pBlock = (static_cast<FV_View *>(m_pView))->getCurrentBlock();
 	
@@ -3520,7 +3519,7 @@ void AP_TopRuler::mouseMotion(EV_EditModifierState /*ems*/, UT_sint32 x, UT_sint
 	{
 		m_pAutoScrollTimer->stop();
 		DELETEP(m_pAutoScrollTimer);
-		m_pAutoScrollTimer = nullptr;
+		m_pAutoScrollTimer = NULL;
 		if(m_pG)
 			queueDraw();
 		_xorGuide(true);
@@ -3823,7 +3822,7 @@ void AP_TopRuler::mouseMotion(EV_EditModifierState /*ems*/, UT_sint32 x, UT_sint
 
 			xxx_UT_DEBUGMSG(("DW_LEFTINDENT (motion) (3): m_draggingCenter %d, iRightPos %d, m_minColumnWidth %d\n",m_draggingCenter,iRightPos,m_minColumnWidth));
 
-			_getParagraphMarkerRects(&m_infoCache,m_draggingCenter,0,0,&m_draggingRect,nullptr,nullptr);
+			_getParagraphMarkerRects(&m_infoCache,m_draggingCenter,0,0,&m_draggingRect,NULL,NULL);
 			if (!m_bBeforeFirstMotion && (m_draggingCenter != oldDraggingCenter))
 				queueDraw();
 			_xorGuide();
@@ -3948,7 +3947,7 @@ void AP_TopRuler::mouseMotion(EV_EditModifierState /*ems*/, UT_sint32 x, UT_sint
 
 			_getParagraphMarkerRects(&m_infoCache,
 									 m_draggingCenter,0,m_dragging2Center,
-									 &m_draggingRect,nullptr,&m_dragging2Rect);
+									 &m_draggingRect,NULL,&m_dragging2Rect);
 			if (!m_bBeforeFirstMotion && (m_draggingCenter != oldDraggingCenter))
 				queueDraw();
 			_xorGuide();
@@ -4018,7 +4017,7 @@ void AP_TopRuler::mouseMotion(EV_EditModifierState /*ems*/, UT_sint32 x, UT_sint
 
 			UT_DEBUGMSG(("DW_RIGHTINDENT (motion) (2) m_draggingCenter %d, iLeftIndentPos %d, m_minColumnWidth %d\n",m_draggingCenter,iLeftIndentPos,m_minColumnWidth));
 
-			_getParagraphMarkerRects(&m_infoCache,0,m_draggingCenter,0,nullptr,&m_draggingRect,nullptr);
+			_getParagraphMarkerRects(&m_infoCache,0,m_draggingCenter,0,NULL,&m_draggingRect,NULL);
 			if (!m_bBeforeFirstMotion && (m_draggingCenter != oldDraggingCenter))
 				queueDraw();
 			_xorGuide();
@@ -4093,7 +4092,7 @@ void AP_TopRuler::mouseMotion(EV_EditModifierState /*ems*/, UT_sint32 x, UT_sint
                 	m_draggingCenter = iRightIndentPos - m_minColumnWidth;
 			}
 
-			_getParagraphMarkerRects(&m_infoCache,0,0,m_draggingCenter,nullptr,nullptr,&m_draggingRect);
+			_getParagraphMarkerRects(&m_infoCache,0,0,m_draggingCenter,NULL,NULL,&m_draggingRect);
 			if (!m_bBeforeFirstMotion && (m_draggingCenter != oldDraggingCenter))
 				queueDraw();
 			xxx_UT_DEBUGMSG(("FirstLineIndent: r [%ld %ld %ld %ld]]n",
@@ -4185,7 +4184,7 @@ void AP_TopRuler::mouseMotion(EV_EditModifierState /*ems*/, UT_sint32 x, UT_sint
 double AP_TopRuler::_getUnitsFromRulerLeft(UT_sint32 xColRel, ap_RulerTicks & tick)
 {
 	FV_View * pView = static_cast<FV_View *>(m_pView);
-	if(pView == nullptr)
+	if(pView == NULL)
 	{
 		return 0;
 	}
@@ -4203,7 +4202,7 @@ UT_sint32 AP_TopRuler::_getFirstPixelInColumn(AP_TopRulerInfo * pInfo, UT_uint32
 {
 	// return absolute pixel value for the first pixel in this column.
 	FV_View * pView = static_cast<FV_View *>(m_pView);
-	if(pView == nullptr)
+	if(pView == NULL)
 		return 0;
 
 	UT_sint32 xFixed = static_cast<UT_sint32>(pView->getGraphics()->tlu(UT_MAX(m_iLeftRulerWidth,s_iFixedWidth)));
@@ -4225,7 +4224,7 @@ UT_sint32 AP_TopRuler::_getFirstPixelInColumn(AP_TopRulerInfo * pInfo, UT_uint32
 	UT_sint32 xAbsLeft = xFixed + ixMargin + xOrigin - m_xScrollOffset;
 
 	bool bRTL;
-	XAP_App::getApp()->getPrefsValueBool(AP_PREF_KEY_DefaultDirectionRtl, bRTL);
+	XAP_App::getApp()->getPrefsValueBool(static_cast<const gchar *>(AP_PREF_KEY_DefaultDirectionRtl), &bRTL);
 
 	if(bRTL)
 	{
@@ -4851,16 +4850,16 @@ void AP_TopRuler::_drawColumnGapMarker(UT_Rect & rect)
 
 }
 
-void AP_TopRuler::_prefsListener( XAP_Prefs *pPrefs, const XAP_PrefsChangeSet* /*phChanges*/, void *data )
+void AP_TopRuler::_prefsListener( XAP_Prefs *pPrefs, UT_StringPtrMap * /*phChanges*/, void *data )
 {
 	AP_TopRuler *pTopRuler = static_cast<AP_TopRuler *>(data);
 	UT_return_if_fail ( data && pPrefs );
 
-	std::string buffer;
-	pPrefs->getPrefsValue(AP_PREF_KEY_RulerUnits, buffer);
+	const gchar *pszBuffer;
+	pPrefs->getPrefsValue(static_cast<const gchar *>(AP_PREF_KEY_RulerUnits), &pszBuffer );
 
 	// or should I just default to inches or something?
-	UT_Dimension dim = UT_determineDimension(buffer.c_str(), DIM_none);
+	UT_Dimension dim = UT_determineDimension( pszBuffer, DIM_none );
 	UT_ASSERT_HARMLESS( dim != DIM_none );
 
 	if ( dim != pTopRuler->getDimension() )
@@ -4870,7 +4869,7 @@ void AP_TopRuler::_prefsListener( XAP_Prefs *pPrefs, const XAP_PrefsChangeSet* /
 void AP_TopRuler::setDimension( UT_Dimension newdim )
 {
 	m_dim = newdim;
-	queueDraw(nullptr);
+	draw( static_cast<const UT_Rect *>(0) );
 }
 
 void AP_TopRuler::_displayStatusMessage(XAP_String_Id messageID, const ap_RulerTicks &tick, double dValue)

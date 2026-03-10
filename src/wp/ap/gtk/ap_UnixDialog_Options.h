@@ -39,22 +39,22 @@ public:
 	AP_UnixDialog_Options(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_UnixDialog_Options(void);
 
-	virtual void runModal(XAP_Frame * pFrame) override;
+	virtual void			runModal(XAP_Frame * pFrame);
 
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 	void event_ChooseTransparentColor(void);
 
 	// tabbed dialog interface
-	virtual void addPage (const XAP_NotebookDialog::Page *page) override;
+	virtual void addPage (const XAP_NotebookDialog::Page *page);
 
  protected:
 
 	GtkWidget *_lookupWidget( tControl id );
-	virtual void _controlEnable( tControl id, bool value ) override;
+	virtual void _controlEnable( tControl id, bool value );
 
 	// we implement these so the XP dialog can set/grab our data
-#define SET_GATHER(a,t) virtual t _gather##a(void) override;  \
-					    virtual void _set##a(t) override
+#define SET_GATHER(a,t) virtual t _gather##a(void);  \
+ 					    virtual void _set##a(t)
 
 
  	SET_GATHER			(NotebookPageNum,		int);
@@ -70,8 +70,8 @@ public:
 		SET_GATHER (ViewRulerUnits,	 UT_Dimension);
 
 	// not implemented
-	virtual bool _gatherViewCursorBlink(void) override { return true; }
-	virtual void _setViewCursorBlink(const bool) override {}
+	virtual bool _gatherViewCursorBlink(void) { return true; }
+	virtual void _setViewCursorBlink(const bool) {}
 
 		// Application Startup
 
@@ -82,10 +82,10 @@ public:
 		// AutoSave
 
 		SET_GATHER (AutoSaveFile,	      bool);
-			virtual void _gatherAutoSaveFilePeriod (      UT_String &stRetVal) override;
-			virtual void _setAutoSaveFilePeriod    (const UT_String &stPeriod) override;
-			virtual void _gatherAutoSaveFileExt    (      UT_String &stRetVal) override;
-			virtual void _setAutoSaveFileExt       (const UT_String &stExt) override;
+			virtual void _gatherAutoSaveFilePeriod (      UT_String &stRetVal);
+			virtual void _setAutoSaveFilePeriod    (const UT_String &stPeriod);
+			virtual void _gatherAutoSaveFileExt    (      UT_String &stRetVal);
+			virtual void _setAutoSaveFileExt       (const UT_String &stExt);
 
 		// RTL Text Layout
 
@@ -230,7 +230,7 @@ private:
 	void	    _setupSmartQuotesCombos( GtkWidget *optionmenu );
 
 	// callbacks can fire these events
-	virtual void _storeWindowData(void) override;
+	virtual void _storeWindowData(void);
 
 	GSList	*m_extraPages;
 };

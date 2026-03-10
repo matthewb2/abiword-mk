@@ -50,7 +50,7 @@ GR_Image* CairoNull_Graphics::createNewImage(const char* /*pszName*/,
 					     UT_sint32 /*iDisplayHeight*/,
 					     GR_Image::GRType /*iType*/)
 {
-	return nullptr;
+	return NULL;
 }
 
 
@@ -77,7 +77,7 @@ void CairoNull_Graphics::getColor(UT_RGBColor& )
 
 GR_Font* CairoNull_Graphics::getGUIFont()
 {
-	return nullptr;
+	return NULL;
 }
 
 void CairoNull_Graphics::drawChars(const UT_UCSChar* /*pChars*/, int /*iCharOffset*/,
@@ -109,10 +109,6 @@ void CairoNull_Graphics::fillRect(const UT_RGBColor&, UT_sint32, UT_sint32, UT_s
 }
 
 void CairoNull_Graphics::invertRect(const UT_Rect* /*pRect*/)
-{
-}
-
-void CairoNull_Graphics::queueDraw(const UT_Rect*)
 {
 }
 

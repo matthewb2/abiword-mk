@@ -56,20 +56,20 @@ AP_Dialog_Paragraph::AP_Dialog_Paragraph(XAP_DialogFactory* pDlgFactory, XAP_Dia
 	: XAP_Dialog_NonPersistent(pDlgFactory,id, "interface/dialogparagraph")
 {
 	m_answer = a_OK;
-	m_paragraphPreview = nullptr;
-	m_pFrame = nullptr;
+	m_paragraphPreview = NULL;
+	m_pFrame = NULL;
 
 	// determine unit system to use in this dialog
-	std::string rulerUnits;
+	const gchar * szRulerUnits;
 	UT_return_if_fail (m_pApp);
 
 	XAP_Prefs* pPrefs = m_pApp->getPrefs();
 	UT_return_if_fail (pPrefs);
 
 	const bool bHasRulerUnits =
-		pPrefs->getPrefsValue(AP_PREF_KEY_RulerUnits, rulerUnits);
+		pPrefs->getPrefsValue((gchar*)AP_PREF_KEY_RulerUnits, &szRulerUnits);
 
-	m_dim = bHasRulerUnits ? UT_determineDimension(rulerUnits.c_str()) : DIM_IN;
+	m_dim = bHasRulerUnits ? UT_determineDimension(szRulerUnits) : DIM_IN;
 
 
 	_addPropertyItem (id_MENU_ALIGNMENT,		sControlData(align_UNDEF));
@@ -572,7 +572,7 @@ void AP_Dialog_Paragraph::_createPreviewFromGC(GR_Graphics * gc,
 	fl_BlockLayout * bl = dl->findBlockAtPosition((PT_DocPosition) view->getPoint());
 	UT_return_if_fail (bl);
 
-	const char *pfont = nullptr;
+	const char *pfont = NULL;
 
 	fp_Run * run = bl->findRunAtOffset(view->getPoint()-bl->getPosition());
 	if (run) {
@@ -587,7 +587,7 @@ void AP_Dialog_Paragraph::_createPreviewFromGC(GR_Graphics * gc,
 	UT_GrowBuf gb;
 	bool hadMem = bl->getBlockBuf(&gb);
 
-	UT_UCSChar * tmp = nullptr;
+	UT_UCSChar * tmp = NULL;
 	if (hadMem && gb.getLength() > 0)
 	{
 		gb.truncate(NUM_CHARS_FOR_SAMPLE);
@@ -753,12 +753,12 @@ void AP_Dialog_Paragraph::_setSpinItemValue(tControl item, const gchar * value,
 
 const gchar * AP_Dialog_Paragraph::_getSpinItemValue(tControl item)
 {
-	UT_return_val_if_fail (item <= m_vecProperties.getItemCount(), nullptr);
+	UT_return_val_if_fail (item <= m_vecProperties.getItemCount(), NULL);
 
 	sControlData * pItem = _getPropertyItem (item);
-	UT_return_val_if_fail (pItem, nullptr);
+	UT_return_val_if_fail (pItem, NULL);
 
-	const gchar * value = nullptr;
+	const gchar * value = NULL;
 	pItem->getData (value);
 	UT_ASSERT_HARMLESS(value);
 	return value;
@@ -1152,7 +1152,7 @@ bool AP_Dialog_Paragraph::_wasChanged(tControl item)
 
 void AP_Dialog_Paragraph::_addPropertyItem (tControl index, const sControlData & control_data)
 {
-	sControlData * pDataCopy = nullptr;
+	sControlData * pDataCopy = 0;
 
 	try
 		{
@@ -1160,17 +1160,17 @@ void AP_Dialog_Paragraph::_addPropertyItem (tControl index, const sControlData &
 		}
 	catch(...)
 		{
-			pDataCopy = nullptr;
+			pDataCopy = 0;
 		}
 	UT_return_if_fail (pDataCopy);
 
-	m_vecProperties.setNthItem (static_cast<UT_uint32>(index), pDataCopy, nullptr);
+	m_vecProperties.setNthItem (static_cast<UT_uint32>(index), pDataCopy, 0);
 }
 
 AP_Dialog_Paragraph::sControlData::sControlData (UT_sint32 data) :
 	m_siData(data),
 	m_csData(check_INDETERMINATE),
-	m_szData(nullptr),
+	m_szData(0),
 	m_bChanged(false)
 {
 	// 
@@ -1179,7 +1179,7 @@ AP_Dialog_Paragraph::sControlData::sControlData (UT_sint32 data) :
 AP_Dialog_Paragraph::sControlData::sControlData (tCheckState data) :
 	m_siData(0),
 	m_csData(data),
-	m_szData(nullptr),
+	m_szData(0),
 	m_bChanged(false)
 {
 	// 
@@ -1200,7 +1200,7 @@ AP_Dialog_Paragraph::sControlData::sControlData (gchar * data) :
 AP_Dialog_Paragraph::sControlData::sControlData (const sControlData & rhs) :
 	m_siData(rhs.m_siData),
 	m_csData(rhs.m_csData),
-	m_szData(rhs.m_szData ? new gchar[SPIN_BUF_TEXT_SIZE] : nullptr),
+	m_szData(rhs.m_szData ? new gchar[SPIN_BUF_TEXT_SIZE] : 0),
 	m_bChanged(false)
 {
 	if (m_szData)
@@ -1227,7 +1227,7 @@ AP_Dialog_Paragraph::sControlData & AP_Dialog_Paragraph::sControlData::operator=
 						}
 					catch(...)
 						{
-							m_szData = nullptr;
+							m_szData = 0;
 						}
 				}
 			UT_return_val_if_fail (m_szData, *this);
@@ -1252,7 +1252,7 @@ bool AP_Dialog_Paragraph::sControlData::setData (const gchar * data)
 				}
 			catch(...)
 				{
-					m_szData = nullptr;
+					m_szData = 0;
 				}
 			UT_return_val_if_fail (m_szData, false);
 

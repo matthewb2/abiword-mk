@@ -23,8 +23,10 @@
 
 #include <stdlib.h>
 #include <string.h>
-
+#include "ut_compiler.h"
+ABI_W_NO_CONST_QUAL
 #include <gtk/gtk.h>
+ABI_W_POP
 
 #include "ut_string.h"
 #include "ut_assert.h"
@@ -68,10 +70,8 @@ AP_UnixDialog_Goto__onFocusPage (GtkWidget 		  * /*widget*/,
 								 GdkEventFocus    *event,
 								 gpointer 		  data) 
 {
-	gboolean ev_in = event->in;
-	GdkEventType ev_type = gdk_event_get_event_type((GdkEvent*)event);
-	UT_DEBUGMSG (("ROB: _onFocusPage () '%d', '%d'\n", ev_type, ev_in));
-	if (ev_type == GDK_FOCUS_CHANGE && ev_in) {
+	UT_DEBUGMSG (("ROB: _onFocusPage () '%d', '%d'\n", event->type, event->in));
+	if (event->type == GDK_FOCUS_CHANGE && event->in) {
 		AP_UnixDialog_Goto *dlg = static_cast <AP_UnixDialog_Goto *>(data);
 		dlg->updateCache (AP_JUMPTARGET_PAGE);
 	}
@@ -87,10 +87,8 @@ AP_UnixDialog_Goto__onFocusLine (GtkWidget 		  * /*widget*/,
 								 GdkEventFocus    *event,
 								 gpointer 		  data) 
 {
-	gboolean ev_in = event->in;
-	GdkEventType ev_type = gdk_event_get_event_type((GdkEvent*)event);
-	UT_DEBUGMSG (("ROB: _onFocusLine () '%d', '%d'\n", ev_type, ev_in));
-	if (ev_type == GDK_FOCUS_CHANGE && ev_in) {
+	UT_DEBUGMSG (("ROB: _onFocusLine () '%d', '%d'\n", event->type, event->in));
+	if (event->type == GDK_FOCUS_CHANGE && event->in) {
 		AP_UnixDialog_Goto *dlg = static_cast <AP_UnixDialog_Goto *>(data);
 		dlg->updateCache (AP_JUMPTARGET_LINE);
 	}
@@ -106,10 +104,8 @@ AP_UnixDialog_Goto__onFocusBookmarks (GtkWidget 	   * /*widget*/,
 									  GdkEventFocus    *event,
 									  gpointer 		   data) 
 {
-	gboolean ev_in = event->in;
-	GdkEventType ev_type = gdk_event_get_event_type((GdkEvent*)event);
-	UT_DEBUGMSG (("ROB: _onFocusBookmarks () '%d', '%d'\n", ev_type, ev_in));
-	if (ev_type == GDK_FOCUS_CHANGE && ev_in) {
+	UT_DEBUGMSG (("ROB: _onFocusBookmarks () '%d', '%d'\n", event->type, event->in));
+	if (event->type == GDK_FOCUS_CHANGE && event->in) {
 		AP_UnixDialog_Goto *dlg = static_cast <AP_UnixDialog_Goto *>(data);
 		dlg->updateCache (AP_JUMPTARGET_BOOKMARK);
 	}
@@ -121,10 +117,8 @@ AP_UnixDialog_Goto__onFocusXMLIDs (GtkWidget 	   * /*widget*/,
 									  GdkEventFocus    *event,
 									  gpointer 		   data) 
 {
-	gboolean ev_in = event->in;
-	GdkEventType ev_type = gdk_event_get_event_type((GdkEvent*)event);
-	UT_DEBUGMSG (("MIQ: _onFocusXMLIDs () '%d', '%d'\n", ev_type, ev_in));
-	if (ev_type == GDK_FOCUS_CHANGE && ev_in)
+	UT_DEBUGMSG (("MIQ: _onFocusXMLIDs () '%d', '%d'\n", event->type, event->in));
+	if (event->type == GDK_FOCUS_CHANGE && event->in)
     {
 		AP_UnixDialog_Goto *dlg = static_cast <AP_UnixDialog_Goto *>(data);
 		dlg->updateCache (AP_JUMPTARGET_XMLID);
@@ -137,10 +131,8 @@ AP_UnixDialog_Goto__onFocusAnno (GtkWidget 	   * /*widget*/,
                                  GdkEventFocus    *event,
                                  gpointer 		   data) 
 {
-	gboolean ev_in = event->in;
-	GdkEventType ev_type = gdk_event_get_event_type((GdkEvent*)event);
-	UT_DEBUGMSG (("MIQ: _onFocusAnno () '%d', '%d'\n", ev_type, ev_in));
-	if (ev_type == GDK_FOCUS_CHANGE && ev_in)
+	UT_DEBUGMSG (("MIQ: _onFocusAnno () '%d', '%d'\n", event->type, event->in));
+	if (event->type == GDK_FOCUS_CHANGE && event->in)
     {
 		AP_UnixDialog_Goto *dlg = static_cast <AP_UnixDialog_Goto *>(data);
 		dlg->updateCache (AP_JUMPTARGET_ANNOTATION);
@@ -282,26 +274,26 @@ AP_UnixDialog_Goto::static_constructor(XAP_DialogFactory *pFactory,
 */
 AP_UnixDialog_Goto::AP_UnixDialog_Goto(XAP_DialogFactory *pDlgFactory,
 									   XAP_Dialog_Id 	 id)
-	: AP_Dialog_Goto(pDlgFactory, id),
-	  m_wDialog(nullptr),
-	  m_nbNotebook(nullptr),
-	  m_lbPage(nullptr),
-	  m_lbLine(nullptr),
-	  m_lbBookmarks(nullptr),
-	  m_lbXMLids(nullptr),
-	  m_lbAnnotations(nullptr),
-	  m_sbPage(nullptr),
-	  m_sbLine(nullptr),
-	  m_lvBookmarks(nullptr),
-	  m_btJump(nullptr),
-	  m_btPrev(nullptr),
-	  m_btNext(nullptr),
-	  m_lvXMLIDs(nullptr),
-	  m_lvAnno(nullptr),
-	  m_btClose(nullptr),
-	  m_iPageConnect(0),
-	  m_iLineConnect(0),
-	  m_JumpTarget(AP_JUMPTARGET_BOOKMARK)
+	: AP_Dialog_Goto   (pDlgFactory, id), 
+	  m_wDialog 	   (NULL),
+	  m_nbNotebook	   (NULL),
+	  m_lbPage		   (NULL),
+	  m_lbLine		   (NULL),
+	  m_lbBookmarks    (NULL),
+	  m_lbXMLids	   (NULL),
+	  m_lbAnnotations  (NULL),
+	  m_sbPage		   (NULL),
+	  m_sbLine		   (NULL),
+	  m_lvBookmarks	   (NULL),
+	  m_btJump		   (NULL),
+	  m_btPrev		   (NULL),
+	  m_btNext		   (NULL),
+      m_lvXMLIDs       (0),
+      m_lvAnno         (0),
+	  m_btClose 	   (NULL), 
+	  m_iPageConnect (0),
+	  m_iLineConnect (0),
+	  m_JumpTarget	   (AP_JUMPTARGET_BOOKMARK)
 {
 }
 
@@ -534,12 +526,12 @@ AP_UnixDialog_Goto::setupXMLIDList( GtkWidget* w )
 	g_object_unref (G_OBJECT (store));
 
 	// Column Bookmark
-	GtkCellRenderer *renderer = nullptr;
+	GtkCellRenderer *renderer = NULL;
 	renderer = gtk_cell_renderer_text_new ();
 	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (w),
 												-1, "Name", renderer,
 												"text", COLUMN_NAME,
-												nullptr);
+												NULL);
 	GtkTreeViewColumn *column = gtk_tree_view_get_column (GTK_TREE_VIEW (w), 0);
 	gtk_tree_view_column_set_sort_column_id (column, COLUMN_NAME);
 
@@ -553,8 +545,8 @@ AP_UnixDialog_Goto::setupXMLIDList( GtkWidget* w )
 void
 AP_UnixDialog_Goto::setupAnnotationList( GtkWidget* w )
 {
-	GtkTreeViewColumn *column = nullptr;
-	GtkCellRenderer *renderer = nullptr;
+	GtkTreeViewColumn *column = NULL;
+	GtkCellRenderer *renderer = NULL;
 	// Liststore and -view
 	GtkListStore *store = gtk_list_store_new ( NUM_ANNO_COLUMNS,
                                                G_TYPE_INT,
@@ -573,7 +565,7 @@ AP_UnixDialog_Goto::setupAnnotationList( GtkWidget* w )
 	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (w),
 												-1, id.c_str(), renderer,
 												"text", COLUMN_ANNO_ID,
-												nullptr);
+												NULL);
 	column = gtk_tree_view_get_column (GTK_TREE_VIEW (w), COLUMN_ANNO_ID );
 	gtk_tree_view_column_set_sort_column_id (column, COLUMN_ANNO_ID );
 
@@ -581,7 +573,7 @@ AP_UnixDialog_Goto::setupAnnotationList( GtkWidget* w )
 	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (w),
 												-1, title.c_str(), renderer,
 												"text", COLUMN_ANNO_TITLE,
-												nullptr);
+												NULL);
 	column = gtk_tree_view_get_column (GTK_TREE_VIEW (w), COLUMN_ANNO_TITLE );
 	gtk_tree_view_column_set_sort_column_id (column, COLUMN_ANNO_TITLE );
 
@@ -590,7 +582,7 @@ AP_UnixDialog_Goto::setupAnnotationList( GtkWidget* w )
 	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (w),
 												-1, author.c_str(), renderer,
 												"text", COLUMN_ANNO_AUTHOR,
-												nullptr);
+												NULL);
 	column = gtk_tree_view_get_column (GTK_TREE_VIEW (w), COLUMN_ANNO_AUTHOR );
 	gtk_tree_view_column_set_sort_column_id (column, COLUMN_ANNO_AUTHOR );
     
@@ -612,7 +604,7 @@ AP_UnixDialog_Goto::_constructWindow (XAP_Frame * /*pFrame*/)
 	UT_DEBUGMSG (("ROB: _constructWindow ()\n"));		
 
 	// load the dialog from the UI file
-	GtkBuilder* builder = newDialogBuilderFromResource("ap_UnixDialog_Goto.ui");
+	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_Goto.ui");
 
 	m_wDialog = GTK_WIDGET(gtk_builder_get_object(builder, "ap_UnixDialog_Goto"));
 	m_nbNotebook = GTK_WIDGET(gtk_builder_get_object(builder, "nbNotebook"));
@@ -637,16 +629,16 @@ AP_UnixDialog_Goto::_constructWindow (XAP_Frame * /*pFrame*/)
 	localizeLabel(GTK_WIDGET(gtk_builder_get_object(builder, "lbPosition")), pSS, AP_STRING_ID_DLG_Goto_Label_Position);
 	/* FIXME jump targets localised in xp land, make sure they work for non ascii characters */
 	const gchar **targets = getJumpTargets ();
-	const gchar *text = nullptr;
-	if ((text = targets[AP_JUMPTARGET_PAGE]) != nullptr)
+	const gchar *text = NULL;
+	if ((text = targets[AP_JUMPTARGET_PAGE]) != NULL)
 		gtk_label_set_text (GTK_LABEL (m_lbPage), text);
-	if ((text = targets[AP_JUMPTARGET_LINE]) != nullptr)
+	if ((text = targets[AP_JUMPTARGET_LINE]) != NULL)
 		gtk_label_set_text (GTK_LABEL (m_lbLine), text);
-	if ((text = targets[AP_JUMPTARGET_BOOKMARK]) != nullptr)
+	if ((text = targets[AP_JUMPTARGET_BOOKMARK]) != NULL)
 		gtk_label_set_text (GTK_LABEL (m_lbBookmarks), text);
-	if ((text = targets[AP_JUMPTARGET_XMLID]) != nullptr)
+	if ((text = targets[AP_JUMPTARGET_XMLID]) != NULL)
 		gtk_label_set_text (GTK_LABEL (m_lbXMLids), text);
-	if ((text = targets[AP_JUMPTARGET_ANNOTATION]) != nullptr)
+	if ((text = targets[AP_JUMPTARGET_ANNOTATION]) != NULL)
 		gtk_label_set_text (GTK_LABEL (m_lbAnnotations), text);
 
 
@@ -659,12 +651,12 @@ AP_UnixDialog_Goto::_constructWindow (XAP_Frame * /*pFrame*/)
 	g_object_unref (G_OBJECT (store));
 
 	// Column Bookmark
-	GtkCellRenderer *renderer = nullptr;
+	GtkCellRenderer *renderer = NULL;
 	renderer = gtk_cell_renderer_text_new ();
 	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (m_lvBookmarks),
 												-1, "Name", renderer,
 												"text", COLUMN_NAME,
-												nullptr);
+												NULL);
 	GtkTreeViewColumn *column = gtk_tree_view_get_column (GTK_TREE_VIEW (m_lvBookmarks), 0);
 	gtk_tree_view_column_set_sort_column_id (column, COLUMN_NAME);
 
@@ -718,7 +710,7 @@ AP_UnixDialog_Goto::_updateWindow ()
 	// bookmarks, detaching model for faster updates
 	GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (m_lvBookmarks));
 	g_object_ref (G_OBJECT (model));
-	gtk_tree_view_set_model (GTK_TREE_VIEW (m_lvBookmarks), nullptr);
+	gtk_tree_view_set_model (GTK_TREE_VIEW (m_lvBookmarks), NULL);
 	gtk_list_store_clear (GTK_LIST_STORE (model));
 
 	GtkTreeIter iter;
@@ -749,7 +741,7 @@ AP_UnixDialog_Goto::updateXMLIDList( GtkWidget* w )
 	// detaching model for faster updates
 	GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (w));
 	g_object_ref (G_OBJECT (model));
-	gtk_tree_view_set_model (GTK_TREE_VIEW (w), nullptr);
+	gtk_tree_view_set_model (GTK_TREE_VIEW (w), NULL);
 	gtk_list_store_clear (GTK_LIST_STORE (model));
 
     if( PD_DocumentRDFHandle rdf = getRDF() )
@@ -782,7 +774,7 @@ AP_UnixDialog_Goto::updateAnnotationList( GtkWidget* w )
 	// detaching model for faster updates
 	GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (w));
 	g_object_ref (G_OBJECT (model));
-	gtk_tree_view_set_model (GTK_TREE_VIEW (w), nullptr);
+	gtk_tree_view_set_model (GTK_TREE_VIEW (w), NULL);
 	gtk_list_store_clear (GTK_LIST_STORE (model));
 
     GtkTreeIter iter;
@@ -848,8 +840,8 @@ AP_UnixDialog_Goto::destroy ()
 	UT_DEBUGMSG (("ROB: AP_UnixDialog_Goto::destroy ()\n"));
 	modeless_cleanup ();
 	if (m_wDialog) {
-		gtk_widget_destroy(m_wDialog); // TOPLEVEL
-		m_wDialog = nullptr;
+		gtk_widget_destroy (m_wDialog);
+		m_wDialog = NULL;
 	}
 }
 

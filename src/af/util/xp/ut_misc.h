@@ -17,13 +17,20 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef UTMISC_H
+#define UTMISC_H
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
+/* pre-emptive dismissal; ut_types.h is needed by just about everything,
+ * so even if it's commented out in-file that's still a lot of work for
+ * the preprocessor to do...
+ */
+#ifndef UT_TYPES_H
 #include "ut_types.h"
+#endif
 
 #include <string>
 
@@ -38,8 +45,6 @@ public:
 	UT_Rect();
 	UT_Rect(UT_sint32 iLeft, UT_sint32 iTop, UT_sint32 iWidth, UT_sint32 iHeight);
 	UT_Rect(const UT_Rect &);
-
-	UT_Rect& operator=(const UT_Rect&) = default;
 
 	bool containsPoint(UT_sint32 x, UT_sint32 y) const;
 	void set(UT_sint32 iLeft, UT_sint32 iTop, UT_sint32 iWidth, UT_sint32 iHeight);
@@ -68,7 +73,7 @@ bool         UT_addOrReplacePathSuffix(std::string & sPath, const char* sSuffix)
 bool UT_isWordDelimiter(UT_UCSChar currentChar, UT_UCSChar followChar, UT_UCSChar prevChar);
 
 /**
- * Get the attribute "name" from atts or nullptr if no such attribute is in atts
+ * Get the attribute "name" from atts or NULL if no such attribute is in atts
  */
 ABI_EXPORT const gchar* UT_getAttribute(const gchar* name,
                                         const gchar** atts);
@@ -148,8 +153,6 @@ struct timeval
     possible since this function is used in the UT_UUID class.
  */
 void UT_gettimeofday(struct timeval *tv);
-
-int UT_clock_gettime_realtime(struct timespec *tp);
 
 typedef unsigned char UT_EthernetAddress[6];
 /*!
@@ -234,11 +237,14 @@ UT_uint32 UT_hash32(const char * p, UT_uint32 bytelen = 0);
 
 // Hack so we get AbiNativeWidget with an xp include
 #ifdef TOOLKIT_GTK_ALL
-
+#include "ut_compiler.h"
+ABI_W_NO_CONST_QUAL
 #include <gtk/gtk.h>
-
+ABI_W_POP
 typedef GtkWidget AbiNativeWidget;
 #else
 // TODO maintainers please fix their platform
 typedef void AbiNativeWidget;
 #endif
+
+#endif /* UTMISC_H */

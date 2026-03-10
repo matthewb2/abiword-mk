@@ -53,7 +53,7 @@ UT_UCS4Char    GR_Graphics::s_cDefaultGlyph   = '?';
 
 GR_Font::GR_Font():
 	m_eType(GR_FONT_UNSET),
-	m_pCharWidths(nullptr)
+	m_pCharWidths(NULL)
 {
 	s_iAllocCount++;
 	m_iAllocNo = s_iAllocCount;
@@ -88,10 +88,10 @@ UT_sint32 GR_Font::getCharWidthFromCache (UT_UCSChar c) const
 	// first of all, handle 0-width spaces ...
 	if(c == 0xFEFF || c == 0x200B || c == UCS_LIGATURE_PLACEHOLDER)
 		return 0;
-	
+
 	UT_sint32	iWidth = GR_CW_UNKNOWN;
 
-	if (m_pCharWidths == nullptr) {
+	if (m_pCharWidths == NULL) {
 		m_pCharWidths = GR_CharWidthsCache::getCharWidthCache()->getWidthsForFont(this);
 	}
 	iWidth = m_pCharWidths->getWidth(c);
@@ -113,7 +113,7 @@ bool GR_Font::doesGlyphExist(UT_UCS4Char g) const
 		UT_DEBUGMSG(("GR_Font::doesGlyphExist: glyph 0x%04x absent from font\n",g));
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -126,7 +126,7 @@ GR_CharWidths* GR_Font::newFontWidths(void) const
 #ifndef ABI_GRAPHICS_PLUGIN_NO_WIDTHS
 	return new GR_CharWidths();
 #else
-	return nullptr;
+	return NULL;
 #endif
 }
 
@@ -151,7 +151,7 @@ void	    AllCarets::enable(void)
 	{
 		m_vecCarets->getNthItem(i)->enable();
 	}
-			
+
 }
 
 void    AllCarets::JustErase(UT_sint32 xPoint,UT_sint32 yPoint)
@@ -216,8 +216,8 @@ void        AllCarets::setPendingBlink(void)
 }
 
 void		AllCarets::setCoords(UT_sint32 x, UT_sint32 y, UT_uint32 h,
-						  UT_sint32 x2, UT_sint32 y2, UT_uint32 h2, 
-						  bool bPointDirection, 
+						  UT_sint32 x2, UT_sint32 y2, UT_uint32 h2,
+						  bool bPointDirection,
 						  const UT_RGBColor * pClr)
 {
 	if((*m_pLocalCaret))
@@ -258,7 +258,7 @@ GR_Graphics::GR_Graphics()
 	  m_paintCount(0),
 	  m_bDoubleBufferingActive(false),
 	  m_bDrawingSuspended(false),
-	  m_pCaret(nullptr),
+	  m_pCaret(NULL),
 	  m_bIsPortrait(true),
 	  m_bSpawnedRedraw(false),
 	  m_bExposePending(false),
@@ -280,14 +280,16 @@ GR_Font* GR_Graphics::findFont(const char* pszFontFamily,
 							   const char* pszFontSize,
 							   const char* pszLang)
 {
-	GR_Font * pFont = nullptr;
+	GR_Font * pFont = NULL;
+
 
 	// NOTE: we currently favor a readable hash key to make debugging easier
 	// TODO: speed things up with a smaller key (the three AP pointers?)
-	std::string key = UT_std_string_sprintf("%s;%s;%s;%s;%s;%s",pszFontFamily, 
-											pszFontStyle, pszFontVariant, 
-											pszFontWeight, pszFontStretch, 
+	std::string key = UT_std_string_sprintf("%s;%s;%s;%s;%s;%s",pszFontFamily,
+											pszFontStyle, pszFontVariant,
+											pszFontWeight, pszFontStretch,
 											pszFontSize);
+
 
 	FontCache::const_iterator iter = m_hashFontCache.find(key);
 	if (iter == m_hashFontCache.end())
@@ -300,16 +302,22 @@ GR_Font* GR_Graphics::findFont(const char* pszFontFamily,
 						  pszFontStretch, pszFontSize,
 						  pszLang);
 		UT_ASSERT(pFont);
-		xxx_UT_DEBUGMSG(("Insert font %x in gr_Graphics cache \n",pFont));
+
+        xxx_UT_DEBUGMSG(("Insert font %x in gr_Graphics cache \n",pFont));
+
 		// add it to the cache
-		
-		if(pFont)
+		if(pFont){
 			m_hashFontCache.insert(std::make_pair(key, pFont));
+        }
 	}
 	else
 	{
+
 		pFont = iter->second;
+
 	}
+
+
 	return pFont;
 }
 
@@ -340,7 +348,7 @@ void GR_Graphics::endDoubleBuffering(bool token)
 	if(token == false) return;
 
 	UT_ASSERT(m_DCSwitchManagementStack.getDepth() > 0);
-	
+
 	UT_sint32 topMostSwitch;
 	m_DCSwitchManagementStack.viewTop(topMostSwitch);
 	UT_ASSERT(topMostSwitch == (UT_sint32)SWITCHED_TO_BUFFER);
@@ -365,7 +373,7 @@ void GR_Graphics::resumeDrawing(bool token)
 	if(token == false) return;
 
 	UT_ASSERT(m_DCSwitchManagementStack.getDepth() > 0);
-	
+
 	UT_sint32 topMostSwitch;
 	m_DCSwitchManagementStack.viewTop(topMostSwitch);
 	UT_ASSERT(topMostSwitch == (UT_sint32)DRAWING_SUSPENDED);
@@ -385,7 +393,7 @@ void GR_Graphics::_destroyFonts ()
 GR_Caret * GR_Graphics::getNthCaret(UT_sint32 i) const
 {
 	if (i>= m_vecCarets.getItemCount())
-		return nullptr;
+		return NULL;
 	return m_vecCarets.getNthItem(i);
 }
 
@@ -399,7 +407,7 @@ GR_Caret * GR_Graphics::getCaret(const std::string& sID) const
 			return m_vecCarets.getNthItem(i);
 		}
 	}
-	return nullptr;
+	return NULL;
 }
 
 AllCarets * GR_Graphics::allCarets(void)
@@ -430,7 +438,7 @@ void GR_Graphics::removeCaret(const std::string& sID)
 	{
 		GR_Caret* pC = m_vecCarets.getNthItem(i);
 		if (pC->getID() == sID)
-		{			
+		{
 			DELETEP(pC);
 			m_vecCarets.deleteNthItem(i);
 		}
@@ -447,7 +455,7 @@ void GR_Graphics::removeCaret(const std::string& sID)
  * key used in the xap_UnixFontManager class is different fromt the key used
  * here.
  * Until a better solution appears I'll leave this here. Other classes should
- * use _destroyFonts to remove the cache. 
+ * use _destroyFonts to remove the cache.
  */
 void GR_Graphics::invalidateCache(void)
 {
@@ -496,13 +504,8 @@ UT_sint32 GR_Graphics::_tduY(UT_sint32 layoutUnits) const
 	return tdu(layoutUnits+getPrevYOffset()) - tdu(getPrevYOffset());
 }
 
-double GR_Graphics::_tduYD(double layoutUnits) const
-{
-    return tduD(layoutUnits + static_cast<double>(getPrevYOffset())) - tduD(static_cast<double>(getPrevYOffset()));
-}
-
 /*!
- * This method converts rectangle widths and heights to device units while 
+ * This method converts rectangle widths and heights to device units while
  * taking account rounding down errors.
  * This fixes off-by-1-pixel-bugs in Rectangle widths and heights.
  */
@@ -526,12 +529,6 @@ double GR_Graphics::tduD(double layoutUnits) const
 	return (layoutUnits * static_cast<double>(getDeviceResolution()) * static_cast<double>(getZoomPercentage())) / (100.0 * static_cast<double>(getResolution()));
 }
 
-double GR_Graphics::_tduXD(double layoutUnits) const
-{
-    return tduD(layoutUnits + static_cast<double>(getPrevXOffset()))
-        - tduD(static_cast<double>(getPrevXOffset()));
-}
-
 double GR_Graphics::tluD(double deviceUnits) const
 {
 	return (deviceUnits * static_cast<double>(getResolution()) / static_cast<double>(getDeviceResolution())) * 100.0 / static_cast<double>(getZoomPercentage());
@@ -548,7 +545,7 @@ double	GR_Graphics::ftluD(double fontUnits) const
 	return (fontUnits * static_cast<double>(getResolution()) / static_cast<double>(getDeviceResolution()));
 }
 
-void GR_Graphics::setLineProperties ( double    /*inWidthPixels*/, 
+void GR_Graphics::setLineProperties ( double    /*inWidthPixels*/,
 									  JoinStyle /*inJoinStyle*/,
 									  CapStyle  /*inCapStyle*/,
 									  LineStyle /*inLineStyle*/ )
@@ -575,13 +572,13 @@ void GR_Graphics::getMaxCharacterDimension(const UT_UCSChar*s, UT_uint32 length,
 	DELETEPV(pWidths);
 
 	width = maxWidth;
-	if (maxHeight > 0) { 
+	if (maxHeight > 0) {
 		height = maxHeight;
 	}
 }
 
 UT_uint32 GR_Graphics::measureString(const UT_UCSChar* s, int iOffset,
-										 int num,  UT_GrowBufElement* pWidths, 
+										 int num,  UT_GrowBufElement* pWidths,
 									 UT_uint32 * /*height*/)
 {
 	// Generic base class version defined in terms of measureUnRemappedChar().
@@ -600,7 +597,7 @@ UT_uint32 GR_Graphics::measureString(const UT_UCSChar* s, int iOffset,
 				charWidth = 0;
 			else if(UT_isOverstrikingChar(currentChar) != UT_NOT_OVERSTRIKING && charWidth > 0)
 				charWidth = -charWidth;
-			
+
 			// if the widths is < 0 we are dealing with an
 			// overstriking character, which does not count for
 			// the overall width
@@ -674,7 +671,7 @@ void GR_Graphics::flush(void)
 	// default implementation does nothing
 }
 /*!
- * Draw the specified image at the location specified in local units 
+ * Draw the specified image at the location specified in local units
  * (xDest,yDest). xDest and yDest are in logical units.
  */
 void GR_Graphics::drawImage(GR_Image* pImg, UT_sint32 xDest, UT_sint32 yDest)
@@ -713,7 +710,7 @@ void GR_Graphics::drawCharsRelativeToBaseline(const UT_UCSChar* pChars,
 GR_Image* GR_Graphics::createNewImage(const char* pszName, const UT_ConstByteBufPtr & pBB, const std::string& mimetype,
 									  UT_sint32 iDisplayWidth, UT_sint32 iDisplayHeight, GR_Image::GRType iType)
 {
-   GR_VectorImage * vectorImage = nullptr;
+   GR_VectorImage * vectorImage = NULL;
 
    if (iType == GR_Image::GRT_Unknown) {
       if (GR_Image::getBufferType(pBB) == GR_Image::GRT_Vector)
@@ -728,15 +725,6 @@ GR_Image* GR_Graphics::createNewImage(const char* pszName, const UT_ConstByteBuf
    }
 
    return vectorImage;
-}
-
-UT_Option<UT_Rect> GR_Graphics::getClipRectOptional(void) const
-{
-    if (m_pRect) {
-        return UT_Option<UT_Rect>(*m_pRect);
-    }
-
-    return UT_Option<UT_Rect>();
 }
 
 bool GR_Graphics::_PtInPolygon(const UT_Point * pts, UT_uint32 nPoints,
@@ -777,7 +765,7 @@ void GR_Graphics::polygon(const UT_RGBColor& c, const UT_Point *pts,
 
 /*!
  * This method fills the distination rectangle with a piece of the image pImg.
- * The size and location of the piece of the image is defined by src. 
+ * The size and location of the piece of the image is defined by src.
  * src and dest are in logical units.
 */
 void GR_Graphics::fillRect(GR_Image * pImg, const UT_Rect & src, const UT_Rect & dest)
@@ -823,7 +811,7 @@ void GR_Graphics::xorRect(const UT_Rect& r)
     itemize() analyses text represented by text, notionally dividing
     it into segments that from the point of the shaper are uniform;
     this notional division is stored in GR_Itemization I.
-    
+
     The default implementation that only deals with bidi reordering
 
     derrived classes can either provide entirely different
@@ -834,7 +822,7 @@ void GR_Graphics::xorRect(const UT_Rect& r)
 bool GR_Graphics::itemize(UT_TextIterator & text, GR_Itemization & I)
 {
 	UT_return_val_if_fail(text.getStatus() == UTIter_OK, false);
-	
+
 	I.clear();
 	UT_uint32 iCurOffset = 0, iLastOffset = 0;
 	UT_uint32 iPosStart = text.getPosition();
@@ -843,9 +831,9 @@ bool GR_Graphics::itemize(UT_TextIterator & text, GR_Itemization & I)
 	while(text.getStatus() == UTIter_OK)
 	{
 		UT_BidiCharType iPrevType, iLastStrongType = UT_BIDI_UNSET, iType;
-		
+
 		UT_UCS4Char c = text.getChar();
-		
+
 		UT_return_val_if_fail(text.getStatus() == UTIter_OK, false);
 
 		iType = UT_bidiGetCharType(c);
@@ -854,7 +842,7 @@ bool GR_Graphics::itemize(UT_TextIterator & text, GR_Itemization & I)
 		// it is disabled because doing that causes bug 8099
 		iCurOffset = iLastOffset = text.getPosition();
 		++text;
-		
+
 		// this loop will cover a single homogenous item
 		while(text.getStatus() == UTIter_OK)
 		{
@@ -865,7 +853,7 @@ bool GR_Graphics::itemize(UT_TextIterator & text, GR_Itemization & I)
 
 			// remember the offset
 			iLastOffset = text.getPosition();
-			
+
 			iType = UT_bidiGetCharType(c);
 			if(iType != iPrevType)
 			{
@@ -890,21 +878,21 @@ bool GR_Graphics::itemize(UT_TextIterator & text, GR_Itemization & I)
 		++text;
 
 		UT_BidiCharType iNextType;
-		
+
 		// this loop will cover a single homogenous item
 		while(text.getStatus() == UTIter_OK)
 		{
 			iPrevType = iType;
 			if(UT_BIDI_IS_STRONG(iType))
 				iLastStrongType = iType;
-			
+
 			c = text.getChar();
 			UT_return_val_if_fail(text.getStatus() == UTIter_OK, false);
 
 			// remember the offset
 			iLastOffset = text.getPosition();
 			++text;
-			
+
 			iType = UT_bidiGetCharType(c);
 			if(iType != iPrevType)
 			{
@@ -915,10 +903,10 @@ bool GR_Graphics::itemize(UT_TextIterator & text, GR_Itemization & I)
 				// this assumption is not true; for instance in the
 				// sequence ") " the parenthesis and the space can
 				// resolve to different directions
-				// 
+				//
 				// I am leaving it here so that I do not add it one
 				// day again (Tomas, Apr 10, 2003)
-				
+
 				if(UT_BIDI_IS_NEUTRAL(iPrevType) && UT_BIDI_IS_NEUTRAL(iType))
 				{
 					// two neutral characters in a row will have the same
@@ -934,20 +922,20 @@ bool GR_Graphics::itemize(UT_TextIterator & text, GR_Itemization & I)
 					// strong one if it is followed by a strong
 					// character of identical type to the previous one
 					xxx_UT_DEBUGMSG(("GR_Graphics::itemize: strong->ntrl (c=0x%04x)\n",c));
-					
+
 					// take a peek at what follows
 					UT_uint32 iOldPos = text.getPosition();
-					
+
 					while(text.getStatus() == UTIter_OK)
 					{
 						UT_UCS4Char c2 = text.getChar();
 						UT_return_val_if_fail(text.getStatus() == UTIter_OK, false);
 
 						++text;
-						
+
 						iNextType = UT_bidiGetCharType(c2);
 						xxx_UT_DEBUGMSG(("GR_Graphics::itemize: iNextType 0x%04x\n", iNextType));
-						
+
 						if(iNextType == iPrevType)
 						{
 							bIgnore = true;
@@ -985,10 +973,10 @@ bool GR_Graphics::itemize(UT_TextIterator & text, GR_Itemization & I)
 				if(!bIgnore)
 					break;
 			}
-			
+
 		}
 #endif
-		
+
 		I.addItem(iCurOffset - iPosStart, new GR_XPItem(GRScriptType_Undefined));
 	}
 
@@ -1104,13 +1092,13 @@ bool GR_Graphics::shape(GR_ShapingInfo & si, GR_RenderInfo *& pri)
 	GR_XPRenderInfo * pRI = (GR_XPRenderInfo *)pri;
 
 	const GR_Font *pFont = si.m_pFont;
-	
+
 	// make sure that the buffers are of sufficient size ...
 	if(si.m_iLength > pRI->m_iBufferSize) //buffer too small, reallocate
 	{
 		delete[] pRI->m_pChars;
 		delete[] pRI->m_pWidths;
-			
+
 		pRI->m_pChars = new UT_UCS4Char[si.m_iLength + 1];
 		UT_return_val_if_fail(pRI->m_pChars, false);
 
@@ -1166,23 +1154,23 @@ bool GR_Graphics::shape(GR_ShapingInfo & si, GR_RenderInfo *& pri)
 			}
 		}
 	}
-	
+
 	pRI->m_eState = GRSR_BufferClean;
-	
+
 	if(pRI->isJustified())
 		justify(*pRI);
 
 	// make sure that we invalidate the static buffers if we own them
 	if(pRI->s_pOwner == pRI)
-		pRI->s_pOwner = nullptr;
-	
+		pRI->s_pOwner = NULL;
+
 	return true;
 }
 
 void GR_Graphics::appendRenderedCharsToBuff(GR_RenderInfo & ri, UT_GrowBuf & buf) const
 {
 	UT_return_if_fail(ri.getType() == GRRI_XP);
-	
+
 	GR_XPRenderInfo & RI = (GR_XPRenderInfo &) ri;
 	buf.append(reinterpret_cast<UT_GrowBufElement *>(RI.m_pChars),RI.m_iLength);
 }
@@ -1194,7 +1182,7 @@ UT_sint32 GR_Graphics::getTextWidth(GR_RenderInfo & ri)
 
 	// NB: the width array is in VISUAL order, but offset is a logical offset
 	bool bReverse = (ri.m_iVisDir == UT_BIDI_RTL);
-	
+
 	UT_sint32 iWidth = 0;
 	for (UT_sint32 i = ri.m_iOffset; i < ri.m_iLength + ri.m_iOffset; ++i)
 	{
@@ -1218,13 +1206,12 @@ UT_sint32 GR_Graphics::getTextWidth(GR_RenderInfo & ri)
 	return iWidth;
 }
 
-
-void GR_Graphics::measureRenderedCharWidths(GR_RenderInfo & ri) 
+void GR_Graphics::measureRenderedCharWidths(GR_RenderInfo & ri)
 {
 	UT_return_if_fail(ri.getType() == GRRI_XP);
 	GR_XPRenderInfo & RI = (GR_XPRenderInfo &) ri;
 	UT_return_if_fail(RI.m_pWidths);
-	
+
 	//bool bReverse = (RI.m_iVisDir == UT_BIDI_RTL);
 
 	UT_sint32 i;
@@ -1249,11 +1236,11 @@ void GR_Graphics::measureRenderedCharWidths(GR_RenderInfo & ri)
 	{
 		justify(RI);
 	}
-	
+
 	// make sure that we invalidate the static buffers if we own them
 	if(RI.s_pOwner == &RI)
-		RI.s_pOwner = nullptr;
-	
+		RI.s_pOwner = NULL;
+
 }
 
 /*!
@@ -1296,7 +1283,7 @@ void GR_Graphics::renderChars(GR_RenderInfo & ri)
 
 	drawChars(RI.s_pCharBuff,RI.m_iOffset,RI.m_iLength,RI.m_xoff,RI.m_yoff,RI.s_pAdvances);
 
-	
+
 }
 
 /*!
@@ -1307,10 +1294,10 @@ bool GR_Graphics::canBreak(GR_RenderInfo & ri, UT_sint32 &iNext, bool bAfter)
 	UT_UCS4Char c[2];
 
 	// Default to -1.
-	iNext = -1; 
+	iNext = -1;
 
 	// Check the iterator is OK.
-	UT_return_val_if_fail(ri.m_pText && ri.m_pText->getStatus() == UTIter_OK, false);
+    UT_return_val_if_fail(ri.m_pText && ri.m_pText->getStatus() == UTIter_OK, false);
 
 	// Advance the iterator by the given offset.
 	*(ri.m_pText) += ri.m_iOffset;
@@ -1330,7 +1317,7 @@ bool GR_Graphics::canBreak(GR_RenderInfo & ri, UT_sint32 &iNext, bool bAfter)
 	}
 	else
 	{
-		--(*ri.m_pText);  
+		--(*ri.m_pText);
 		c[1] = ri.m_pText->getChar();
 	}
 
@@ -1357,7 +1344,7 @@ bool GR_Graphics::canBreak(GR_RenderInfo & ri, UT_sint32 &iNext, bool bAfter)
 	iNext = iCount - 1;
 
 	// If a break was possible between the first character pair
-	// then return true. 
+	// then return true.
 	if (iNext == ri.m_iOffset)
 		return true;
 	// ...otherwise, return false.
@@ -1376,7 +1363,7 @@ bool GR_Graphics::canBreak(GR_RenderInfo & ri, UT_sint32 &iNext, bool bAfter)
    left (in some circumstance the reset can be only temporary and we
    will be asked to subsequently recalculate the justification
    information; in such case it makes sense to keep the buffers in place)
-   
+
 */
 UT_sint32 GR_Graphics::resetJustification(GR_RenderInfo & ri, bool /* bPermanent*/)
 {
@@ -1384,14 +1371,14 @@ UT_sint32 GR_Graphics::resetJustification(GR_RenderInfo & ri, bool /* bPermanent
 	GR_XPRenderInfo & RI = (GR_XPRenderInfo &)ri;
 
 	UT_return_val_if_fail(RI.m_pChars && RI.m_pWidths, 0);
-	
+
 	UT_sint32 iAccumDiff = 0;
 
 	if(RI.isJustified())
 	{
 		UT_sint32 iSpaceWidthBefore = RI.m_iSpaceWidthBeforeJustification;
 
-		if(RI.m_pWidths == nullptr)
+		if(RI.m_pWidths == NULL)
 		{
 			return 0;
 		}
@@ -1407,13 +1394,13 @@ UT_sint32 GR_Graphics::resetJustification(GR_RenderInfo & ri, bool /* bPermanent
 				RI.m_pWidths[i] = iSpaceWidthBefore;
 			}
 		}
-		
+
 		RI.m_iSpaceWidthBeforeJustification = 0xfffffff; // note one less 'f'
 		RI.m_iJustificationPoints = 0;
 		RI.m_iJustificationAmount = 0;
 
 		if(RI.s_pOwner == &RI)
-			RI.s_pOwner = nullptr;
+			RI.s_pOwner = NULL;
 
 	}
 
@@ -1481,8 +1468,8 @@ void GR_Graphics::justify(GR_RenderInfo & ri)
 	// need to leave the original values alone ...
 	UT_uint32 iPoints = ri.m_iJustificationPoints;
 	UT_sint32 iAmount = ri.m_iJustificationAmount;
-	
-	
+
+
 	if(!iAmount)
 	{
 		// this can happend near the start of the line (the line is
@@ -1501,16 +1488,16 @@ void GR_Graphics::justify(GR_RenderInfo & ri)
 		{
 			if(RI.m_pChars[i] != UCS_SPACE)
 				continue;
-			
+
 			RI.m_iSpaceWidthBeforeJustification = RI.m_pWidths[i];
-		
+
 			UT_sint32 iThisAmount = iAmount / iPoints;
 
 			RI.m_pWidths[i] += iThisAmount;
 
 			xxx_UT_DEBUGMSG(("Space at loc %d new width %d given extra width %d \n",
 							 i,pCharWidths[i],iThisAmount));
-		
+
 			iAmount -= iThisAmount;
 
 			iPoints--;
@@ -1520,11 +1507,11 @@ void GR_Graphics::justify(GR_RenderInfo & ri)
 		}
 
 		if(RI.s_pOwner == &RI)
-			RI.s_pOwner = nullptr;
+			RI.s_pOwner = NULL;
 	}
 }
 
-UT_uint32 GR_Graphics::XYToPosition(const GR_RenderInfo & ri, UT_sint32 /*x*/, 
+UT_uint32 GR_Graphics::XYToPosition(const GR_RenderInfo & ri, UT_sint32 /*x*/,
 									UT_sint32 /*y*/) const
 {
 	UT_return_val_if_fail(ri.getType() == GRRI_XP, 0);
@@ -1573,8 +1560,8 @@ void GR_Graphics::adjustDeletePosition(GR_RenderInfo & )
 //  the registerClass() function; new instances of the graphics class
 //  are obtained by newGraphics()
 //
-//  
-//  
+//
+//
 
 
 /*!
@@ -1588,7 +1575,7 @@ void GR_Graphics::adjustDeletePosition(GR_RenderInfo & )
    descriptor is a static function that returns a string that
    describes the graphics class in human-readable manner (e.g., to be
    shown in dialogues).
-   
+
    Returns true on success, false if requested id is already
    registered (except for IDs < GRID_LAST_DEFAULT, which will
    automatically be reassigned).
@@ -1604,14 +1591,14 @@ bool GR_GraphicsFactory::registerClass(GR_Allocator allocator, GR_Descriptor des
 									   UT_uint32 iClassId)
 {
 	UT_return_val_if_fail(allocator && descriptor && iClassId > GRID_LAST_DEFAULT, false);
-	
+
 	UT_sint32 indx = m_vClassIds.findItem(iClassId);
 
 	if(indx >= 0)
 	{
 		return false;
 	}
-	
+
 	m_vAllocators.addItem(allocator);
 	m_vDescriptors.addItem(descriptor);
 	m_vClassIds.addItem((UT_sint32)iClassId);
@@ -1662,7 +1649,7 @@ bool GR_GraphicsFactory::unregisterClass(UT_uint32 iClassId)
 	// cannot unregister the default graphics class, hopefully the
 	// rogue plugin will pay attention to the return value
 	UT_return_val_if_fail(iClassId == m_iDefaultScreen || iClassId == m_iDefaultPrinter, false);
-	
+
 	UT_sint32 indx = m_vClassIds.findItem(iClassId);
 
 	if(indx < 0)
@@ -1686,16 +1673,16 @@ GR_Graphics * GR_GraphicsFactory::newGraphics(UT_uint32 iClassId, GR_AllocInfo &
 
 	if(iClassId == GRID_DEFAULT_PRINT)
 		iClassId = m_iDefaultPrinter;
-	
+
 	UT_sint32 indx = m_vClassIds.findItem(iClassId);
 
 	if(indx < 0)
-		return nullptr;
+		return NULL;
 
 	GR_Allocator alloc = m_vAllocators.getNthItem(indx);
-				
+
 	if(!alloc)
-		return nullptr;
+		return NULL;
 
 	return alloc(param);
 }
@@ -1711,14 +1698,15 @@ const char *  GR_GraphicsFactory::getClassDescription(UT_uint32 iClassId) const
 	UT_sint32 indx = m_vClassIds.findItem(iClassId);
 
 	if(indx < 0)
-		return nullptr;
-					
+		return NULL;
+
 	GR_Descriptor descr = m_vDescriptors.getNthItem(indx);
-				
+
 	if(!descr)
-		return nullptr;
+		return NULL;
 
 	return descr();
+
 }
 
 bool GR_GraphicsFactory::isRegistered(UT_uint32 iClassId) const
@@ -1731,12 +1719,10 @@ bool GR_GraphicsFactory::isRegistered(UT_uint32 iClassId) const
 	return true;
 }
 
-#if defined(TOOLKIT_GTK)
+#if defined(WITH_CAIRO)
 #include "gr_CairoNullGraphics.h"
 #elif defined(TOOLKIT_WIN)
 #include "gr_Win32Graphics.h"
-#elif defined(TOOLKIT_COCOA)
-#warning implement offscreen
 #else
 #warning un-handled case
 #endif
@@ -1749,14 +1735,14 @@ GR_Graphics* GR_Graphics::newNullGraphics()
 {
 	// todo: support other platforms when possible
 
-#if defined(TOOLKIT_GTK)
+#if defined(WITH_CAIRO)
 	GR_CairoNullGraphicsAllocInfo ai;
 	return XAP_App::getApp()->newGraphics(GRID_CAIRO_NULL, (GR_AllocInfo&)ai);
 #elif defined(TOOLKIT_WIN)
-	GR_Win32AllocInfo ai (GR_Win32Graphics::createbestmetafilehdc(), GR_Win32Graphics::getDocInfo(), nullptr);
+	GR_Win32AllocInfo ai (GR_Win32Graphics::createbestmetafilehdc(), GR_Win32Graphics::getDocInfo(), NULL);
 	return XAP_App::getApp()->newGraphics(GRID_WIN32, (GR_AllocInfo&)ai);
-#elif defined(TOOLKIT_COCOA)
+#else
 #endif
 
-	return nullptr;
+	return NULL;
 }

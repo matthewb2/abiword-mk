@@ -2,7 +2,7 @@
 
 /* AbiSource Program Utilities
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2001-2021 Hubert Figuière
+ * Copyright (C) 2001-2003 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,7 +20,8 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef EV_COCOATOOLBAR_H
+#define EV_COCOATOOLBAR_H
 
 #include "ut_types.h"
 #include "xap_Types.h"
@@ -60,13 +61,13 @@ public:
 	virtual void show(void);
 	virtual void hide(void);
 
-	static	CGFloat	getButtonWidth (void)
-		{ return 28.0f; };
-	static	CGFloat	getButtonHeight (void)
-		{ return 28.0f; };
+	static	float	getButtonWidth (void)
+					{ return 28.0f; };
+	static	float	getButtonHeight (void)
+					{ return 28.0f; };
 
-	static CGFloat getToolbarHeight(void)
-		{ return getButtonHeight(); };
+	static float  getToolbarHeight(void)
+					{ return getButtonHeight(); };
 
 	NSView*	_getToolbarView(void) const
 				{ return m_wToolbar; };
@@ -79,9 +80,21 @@ protected:
 
 	NSView *						m_wToolbar;
 	NSView *						m_superView;
+	XAP_CocoaToolbar_Icons *		m_pCocoaToolbarIcons;
 private:
-	NSButton* _makeToolbarButton(int type, EV_Toolbar_Label* pLabel,
-								  XAP_Toolbar_Id tlbrid, NSView* parent,
-								  CGFloat& btnX);
+	NSButton * _makeToolbarButton (int type, EV_Toolbar_Label * pLabel,
+												XAP_Toolbar_Id tlbrid, NSView *parent,
+												float & btnX);
 	EV_CocoaToolbarTarget * 		m_target;
 };
+
+#endif /* EV_COCOATOOLBAR_H */
+
+
+
+
+
+
+
+
+

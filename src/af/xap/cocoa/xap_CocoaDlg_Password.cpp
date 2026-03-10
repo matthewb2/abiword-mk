@@ -105,7 +105,7 @@ void XAP_CocoaDialog_Password::runModal(XAP_Frame * /*pFrame*/)
 
 -(void)discardXAP
 {
-	_xap = nullptr;
+	_xap = NULL; 
 }
 
 -(void)dealloc

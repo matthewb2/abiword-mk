@@ -1,5 +1,5 @@
 /* AbiWord
- * Copyright (C) 2011-2019 Hubert Figuiere
+ * Copyright (C) 2011-2016 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,31 +17,26 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef _XAP_GTK2UTILS_H_
+#define _XAP_GTK2UTILS_H_
+
 #include <gtk/gtk.h>
 
-#define XAP_HAS_NATIVE_WINDOW(w) \
-  (gtk_widget_get_window(w) != nullptr)
+// Now onto the device were the deprecated functions are to be
+// with several line of code.
+GdkGrabStatus XAP_gdk_keyboard_grab(GdkWindow *window,
+				    gboolean owner_events,
+				    guint32 time_);
 
-/// Convenience to raise the widget window.
-void XAP_gtk_window_raise(GtkWidget*);
+GdkGrabStatus XAP_gdk_pointer_grab(GdkWindow *window,
+				   gboolean owner_events,
+				   GdkEventMask event_mask,
+				   GdkCursor *cursor,
+				   guint32 time_);
 
-/// Convenience to set the same margin on all side.
-void XAP_gtk_widget_set_margin(GtkWidget* w, gint margin);
+// http://permalink.gmane.org/gmane.comp.gnome.svn/520942
+void XAP_gdk_keyboard_ungrab(guint32 t);
 
-/// Convenience to get the entry text.
-inline
-const gchar* XAP_gtk_entry_get_text(GtkEntry* entry)
-{
-    return gtk_entry_buffer_get_text(gtk_entry_get_buffer(entry));
-}
+void XAP_gdk_pointer_ungrab(guint32 t);
 
-/// Convenience to set the entry text.
-inline
-void XAP_gtk_entry_set_text(GtkEntry* entry, const gchar* text)
-{
-  auto buffer = gtk_entry_get_buffer(entry);
-  gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(buffer), text, g_utf8_strlen(text, -1));
-}
-
-void XAP_gtk_keyboard_ungrab(GtkWidget *widget);
+#endif

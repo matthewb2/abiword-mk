@@ -56,7 +56,7 @@ class ABI_EXPORT XAP_Win32DialogHelper
 public:
 	XAP_Win32DialogHelper(XAP_Win32Dialog* p_dialog)
 	:	m_pDialog(p_dialog),
-		m_hDlg(nullptr)
+		m_hDlg(0)
 	{
 	}
 
@@ -64,7 +64,7 @@ public:
 	// (DLL instead of Abi main executable)
 	// Makes more sense to share this code rather than use bare WinAPI in plugins when possible
 	XAP_Win32DialogHelper(HWND hDlg)
-	:	m_pDialog(nullptr),
+	:	m_pDialog(0),
 		m_hDlg(hDlg)
 	{
 	}

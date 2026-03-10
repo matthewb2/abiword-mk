@@ -29,9 +29,9 @@
 
 XAP_Dialog_DocComparison::XAP_Dialog_DocComparison(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id):
 	XAP_Dialog_NonPersistent(pDlgFactory,id),
-	m_pDoc1(nullptr),
-	m_pDoc2(nullptr),
-	m_pSS(nullptr),
+	m_pDoc1(NULL),
+	m_pDoc2(NULL),
+	m_pSS(NULL),
 	m_iVersionOfDiff(0),
 	m_tTimeOfDiff(0),
 	m_iPosOfDiff(0),
@@ -94,38 +94,38 @@ bool XAP_Dialog_DocComparison::calculate(AD_Document * pDoc1, AD_Document * pDoc
 
 const char * XAP_Dialog_DocComparison::getWindowLabel() const
 {
-	UT_return_val_if_fail(m_pSS, nullptr);
+	UT_return_val_if_fail(m_pSS, NULL);
 	return m_pSS->getValue(XAP_STRING_ID_DLG_DocComparison_WindowLabel);
 }
 
 const char * XAP_Dialog_DocComparison::getFrame1Label() const
 {
-	UT_return_val_if_fail(m_pSS, nullptr);
+	UT_return_val_if_fail(m_pSS, NULL);
 	return m_pSS->getValue(XAP_STRING_ID_DLG_DocComparison_DocsCompared);
 }
 
 const char * XAP_Dialog_DocComparison::getFrame2Label() const
 {
-	UT_return_val_if_fail(m_pSS, nullptr);
+	UT_return_val_if_fail(m_pSS, NULL);
 	return m_pSS->getValue(XAP_STRING_ID_DLG_DocComparison_Results);
 }
 
 char * XAP_Dialog_DocComparison::getPath1() const
 {
-	UT_return_val_if_fail(m_pDoc1, nullptr);
+	UT_return_val_if_fail(m_pDoc1, NULL);
 	return g_strdup(UT_ellipsisPath(m_pDoc1->getFilename(), 60, 50).c_str());
 }
 
 char * XAP_Dialog_DocComparison::getPath2() const
 {
-	UT_return_val_if_fail(m_pDoc2, nullptr);
+	UT_return_val_if_fail(m_pDoc2, NULL);
 	return g_strdup(UT_ellipsisPath(m_pDoc2->getFilename(), 60, 50).c_str());
 }
 
 
 const char * XAP_Dialog_DocComparison::getResultLabel(UT_uint32 indx) const
 {
-	UT_return_val_if_fail(m_pSS, nullptr);
+	UT_return_val_if_fail(m_pSS, NULL);
 	switch(indx)
 	{
 		case 0: return m_pSS->getValue(XAP_STRING_ID_DLG_DocComparison_Relationship);
@@ -136,13 +136,13 @@ const char * XAP_Dialog_DocComparison::getResultLabel(UT_uint32 indx) const
 	}
 
 	UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
-	return nullptr;
+	return NULL;
 }
 
 
 char * XAP_Dialog_DocComparison::getResultValue(UT_uint32 indx) const
 {
-	UT_return_val_if_fail(m_pSS, nullptr);
+	UT_return_val_if_fail(m_pSS, NULL);
 	
 	UT_String S1, S2;
 	struct tm * tM;
@@ -238,13 +238,13 @@ char * XAP_Dialog_DocComparison::getResultValue(UT_uint32 indx) const
 	}
 
 	UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
-	return nullptr;
+	return NULL;
 }
 
 
 const char * XAP_Dialog_DocComparison::getButtonLabel() const
 {
-	UT_return_val_if_fail(m_pSS, nullptr);
+	UT_return_val_if_fail(m_pSS, NULL);
 	return m_pSS->getValue(XAP_STRING_ID_DLG_Close);
 }
 

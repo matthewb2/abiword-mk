@@ -1,22 +1,22 @@
 /* AbiSource Program Utilities
  * Copyright (C) 1998 AbiSource, Inc.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
  */
- 
+
 
 
 #include <windows.h>
@@ -46,7 +46,10 @@ void _UT_OutputMessage(const char *s, ...)
 
 	WCHAR wBuf[1024];
 	MultiByteToWideChar(CP_UTF8,0,sBuf,-1,wBuf,1024);
-	OutputDebugStringW(wBuf);
+	//pascal OutputDebugStringW(wBuf);
+    wprintf(wBuf); //pascal
+    fflush(stdout); //pascal
+
 #endif
 }
 
@@ -65,5 +68,5 @@ void _UT_WarningMessage(const char *s, ...)
 	va_start(marker, s);
 	_vsnprintf(sBuf, sizeof(sBuf), s, marker);
 
-	MessageBoxA(nullptr, sBuf, "Warning", MB_OK | MB_ICONWARNING); //!TODO Using ANSI function
+	MessageBoxA(NULL, sBuf, "Warning", MB_OK | MB_ICONWARNING); //!TODO Using ANSI function
 }

@@ -2,26 +2,26 @@
 
 /* AbiSource Application Framework
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2009-2020 Hubert Figuiere
- *
+ * Copyright (C) 2009-2016 Hubert Figuiere
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
 
 /*
- * Port to Maemo Development Platform
+ * Port to Maemo Development Platform 
  * Author: INdT - Renato Araujo <renato.filho@indt.org.br>
  */
 
@@ -30,8 +30,11 @@
 #include "config.h"
 #endif
 
+#include "ut_compiler.h"
+ABI_W_NO_CONST_QUAL
 #include <gtk/gtk.h>
-
+ABI_W_POP
+#include <gdk/gdkkeysyms.h> // this include seems to fix 12332 (it defines GDK_Escape)
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -88,7 +91,7 @@ XAP_Dialog * XAP_UnixDialog_FileOpenSaveAs::static_constructor(XAP_DialogFactory
 
 XAP_UnixDialog_FileOpenSaveAs::XAP_UnixDialog_FileOpenSaveAs(XAP_DialogFactory * pDlgFactory,
 														   XAP_Dialog_Id id)
-  : XAP_Dialog_FileOpenSaveAs(pDlgFactory,id), m_FC(nullptr), m_preview(nullptr), m_bSave(true)
+  : XAP_Dialog_FileOpenSaveAs(pDlgFactory,id), m_FC(0), m_preview(0), m_bSave(true)
 {
 }
 
@@ -100,7 +103,7 @@ XAP_UnixDialog_FileOpenSaveAs::~XAP_UnixDialog_FileOpenSaveAs(void)
 
 static void s_dialog_response(GtkWidget * /* widget */,
 						gint answer,
-						XAP_Dialog_FileOpenSaveAs::tAnswer * ptr)
+						XAP_Dialog_FileOpenSaveAs::tAnswer * ptr, bool bQuit = true)
 {
 	switch (answer)
 	{
@@ -111,6 +114,8 @@ static void s_dialog_response(GtkWidget * /* widget */,
 				*ptr = XAP_Dialog_FileOpenSaveAs::a_CANCEL;
 			else
 				*ptr = XAP_Dialog_FileOpenSaveAs::a_OK;
+			if (bQuit)
+				gtk_main_quit();
 			break;
 		default:
 			// do nothing
@@ -130,6 +135,7 @@ static void s_delete_clicked(GtkWidget 	* /*widget*/,
 {
 	XAP_UnixDialog_FileOpenSaveAs *dlg = static_cast<XAP_UnixDialog_FileOpenSaveAs *>(data);
 	dlg->onDeleteCancel();
+	gtk_main_quit();
 }
 
 static gint s_preview_draw(GtkWidget * /* widget */,
@@ -156,9 +162,7 @@ static void s_filetypechanged(GtkWidget * w, gpointer p)
 static gint
 fsel_key_event (GtkWidget * widget, GdkEventKey * event, XAP_Dialog_FileOpenSaveAs::tAnswer * answer)
 {
-	guint ev_keyval = 0;
-	gdk_event_get_keyval((GdkEvent*)event, &ev_keyval);
-	if (ev_keyval == GDK_KEY_Escape) {
+	if (event->keyval == GDK_KEY_Escape) {
 		g_signal_stop_emission_by_name (G_OBJECT (widget), "key_press_event");
 		s_dialog_response(widget, GTK_RESPONSE_CANCEL, answer);
 		return TRUE;
@@ -174,7 +178,7 @@ static void s_file_activated(GtkWidget * w, XAP_Dialog_FileOpenSaveAs::tAnswer *
 	// the closing of the dialog for us. Now we don't want to close the dialog 
 	// twice, hence the last 'false' parameter.
 	// Hardly elegant, but none of this code is :/ It fixes bug #11647 too - MARCM.
-	s_dialog_response(w, GTK_RESPONSE_ACCEPT, answer);
+	s_dialog_response(w, GTK_RESPONSE_ACCEPT, answer, false);
 }
 
 static void file_selection_changed  (GtkTreeSelection  * /*selection*/,
@@ -186,7 +190,7 @@ static void file_selection_changed  (GtkTreeSelection  * /*selection*/,
   dlg->previewPicture();
 }
 
-bool XAP_UnixDialog_FileOpenSaveAs::_run_main_loop(XAP_Frame * pFrame,
+bool XAP_UnixDialog_FileOpenSaveAs::_run_gtk_main(XAP_Frame * pFrame,
 													 GtkWidget * filetypes_pulldown)
 {
 	/*
@@ -218,28 +222,23 @@ bool XAP_UnixDialog_FileOpenSaveAs::_run_main_loop(XAP_Frame * pFrame,
 	{
 		while (1)
 		{
-			auto answer = gtk_dialog_run(GTK_DIALOG(m_FC));
-			switch (answer) {
-			case GTK_RESPONSE_CANCEL: 	// The easy way out
+			gtk_main();
+			if (m_answer == a_CANCEL)			// The easy way out
 				return false;
-				break;
-			case GTK_RESPONSE_ACCEPT: {
-				char *uri = gtk_file_chooser_get_uri(m_FC);
-				if (uri) {
-					m_finalPathnameCandidate = uri;
-					g_free(uri);
-				}
-				UT_ASSERT(!m_finalPathnameCandidate.empty());
-				return true;
-				break;
+
+			char *uri = gtk_file_chooser_get_uri(m_FC);
+			if (uri) {
+				m_finalPathnameCandidate = uri;
+				g_free(uri);
 			}
-			}
+			UT_ASSERT(!m_finalPathnameCandidate.empty());
+			return (m_answer == a_OK);
 		}
 	} else {
 		while(1)
 		{
-			auto answer = gtk_dialog_run(GTK_DIALOG(m_FC));
-			if (answer == GTK_RESPONSE_CANCEL)			// The easy way out
+			gtk_main();
+			if (m_answer == a_CANCEL)			// The easy way out
 				return false;
 	
 			// Give us a filename we can mangle
@@ -266,7 +265,7 @@ bool XAP_UnixDialog_FileOpenSaveAs::_run_main_loop(XAP_Frame * pFrame,
 				
 				// the index in the types table will match the index in the suffix
 				// table.  nFileType is the data we are searching for.
-				if(m_nTypeList != nullptr)
+				if(m_nTypeList != NULL)
 				{
 					for (UT_uint32 i = 0; m_nTypeList[i]; i++)
 					{
@@ -280,7 +279,7 @@ bool XAP_UnixDialog_FileOpenSaveAs::_run_main_loop(XAP_Frame * pFrame,
 				
 				bool wantSuffix = true;
 				XAP_Prefs *pPrefs= XAP_App::getApp()->getPrefs();
-				pPrefs->getPrefsValueBool(XAP_PREF_KEY_UseSuffix, wantSuffix);
+				pPrefs->getPrefsValueBool(static_cast<const gchar *>(XAP_PREF_KEY_UseSuffix), &wantSuffix);
 				UT_DEBUGMSG(("UseSuffix: %d\n", wantSuffix));
 
 				if (nFileType > 0 && getDialogId() != XAP_DIALOG_ID_FILE_SAVE_IMAGE) // 0 means autodetect
@@ -442,7 +441,7 @@ void XAP_UnixDialog_FileOpenSaveAs::fileTypeChanged(GtkWidget * w)
 //
 // Hard code a suffix
 //
-	if(strstr(sSuffix.c_str(),"gz") != nullptr)
+	if(strstr(sSuffix.c_str(),"gz") != NULL)
 	{
 		sSuffix = ".zabw";
 	}
@@ -467,10 +466,10 @@ void XAP_UnixDialog_FileOpenSaveAs::fileTypeChanged(GtkWidget * w)
 
 void XAP_UnixDialog_FileOpenSaveAs::onDeleteCancel() 
 {
-	if (m_FC != nullptr && gtk_widget_has_grab(GTK_WIDGET (m_FC))) {
+	if (m_FC != NULL && gtk_widget_has_grab(GTK_WIDGET (m_FC))) {
 		gtk_grab_remove (GTK_WIDGET (m_FC));
 	}
-	m_FC = nullptr;
+	m_FC = NULL;
 	m_answer = a_CANCEL;
 }
 
@@ -595,13 +594,13 @@ void XAP_UnixDialog_FileOpenSaveAs::runModal(XAP_Frame * pFrame)
 									 cancel.c_str(), GTK_RESPONSE_CANCEL,
 									 convertMnemonics(validate).c_str(),
 									 GTK_RESPONSE_ACCEPT,
-									 (gchar*)nullptr)
+									 (gchar*)NULL)
 		);
 
 	gtk_file_chooser_set_local_only(m_FC, FALSE);
 
 	abiSetupModalDialog(GTK_DIALOG(m_FC), pFrame, this, GTK_RESPONSE_ACCEPT);
-	GtkWidget * filetypes_pulldown = nullptr;
+	GtkWidget * filetypes_pulldown = NULL;
 
     std::string s;
 	
@@ -620,7 +619,7 @@ void XAP_UnixDialog_FileOpenSaveAs::runModal(XAP_Frame * pFrame)
 		
 		// place the preview area inside a container to get a nice border
 		GtkWidget * preview_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-		XAP_gtk_widget_set_margin(preview_hbox, 4);
+		gtk_container_set_border_width  (GTK_CONTAINER(preview_hbox), 4);
 		gtk_box_pack_start(GTK_BOX(preview_hbox), preview, TRUE, TRUE, 0);
 		
 		// attach the preview area to the dialog
@@ -644,7 +643,7 @@ void XAP_UnixDialog_FileOpenSaveAs::runModal(XAP_Frame * pFrame)
                          "label",
                          convertMnemonics(szFileTypeLabel).c_str(),
                          "xalign", 1.0,  "yalign", 0.5,
-                         "justify", GTK_JUSTIFY_RIGHT, nullptr);
+                         "justify", GTK_JUSTIFY_RIGHT, NULL);
 
 	gtk_box_pack_start(GTK_BOX(pulldown_hbox), filetypes_label, TRUE, TRUE, 0);
 
@@ -733,7 +732,7 @@ void XAP_UnixDialog_FileOpenSaveAs::runModal(XAP_Frame * pFrame)
 	// use the persistence info and/or the suggested filename
 	// to properly seed the dialog.
 	
-	gchar * szPersistDirectory = nullptr;	// we must g_free this
+	gchar * szPersistDirectory = NULL;	// we must g_free this
 
 	if (!m_initialPathname.empty())	{
 		// the caller did not supply initial pathname
@@ -771,7 +770,7 @@ void XAP_UnixDialog_FileOpenSaveAs::runModal(XAP_Frame * pFrame)
 			if (!g_path_is_absolute (m_szInitialPathname)) { // DAL: todo: is this correct?
 				gchar *dir = g_get_current_dir ();
 				gchar *file = m_szInitialPathname;
-				gchar *filename = g_build_filename (dir, file, (gchar *)nullptr);
+				gchar *filename = g_build_filename (dir, file, (gchar *)NULL);
 				m_szInitialPathname = UT_go_filename_to_uri(filename);
 				g_free(filename);
 				g_free (dir);
@@ -823,9 +822,9 @@ void XAP_UnixDialog_FileOpenSaveAs::runModal(XAP_Frame * pFrame)
 
 	gtk_widget_show(GTK_WIDGET(m_FC));
 	gtk_grab_add(GTK_WIDGET(m_FC));
-
-	bool bResult = _run_main_loop(pFrame, filetypes_pulldown);
-
+	
+	bool bResult = _run_gtk_main(pFrame,filetypes_pulldown);
+	
 	if (bResult)
 	{
 		UT_ASSERT(!m_finalPathnameCandidate.empty());
@@ -838,10 +837,10 @@ void XAP_UnixDialog_FileOpenSaveAs::runModal(XAP_Frame * pFrame)
 		m_nFileType = XAP_comboBoxGetActiveInt(GTK_COMBO_BOX(filetypes_pulldown));
 	}
 
-	if (m_FC != nullptr) {
+	if (m_FC != NULL) {
 		gtk_grab_remove (GTK_WIDGET(m_FC));
-		gtk_widget_destroy(GTK_WIDGET(m_FC)); // TOPLEVEL
-		m_FC = nullptr;
+		gtk_widget_destroy (GTK_WIDGET(m_FC));
+		m_FC = NULL;
 		FREEP(szPersistDirectory);
 	}
 
@@ -885,7 +884,7 @@ gint XAP_UnixDialog_FileOpenSaveAs::previewPicture (void)
 	int answer = 0;
 
 	FG_ConstGraphicPtr pGraphic;
-	GR_Image *pImage = nullptr;
+	GR_Image *pImage = NULL;
 
 	double		scale_factor = 0.0;
 	UT_sint32     scaled_width,scaled_height;
@@ -914,9 +913,9 @@ gint XAP_UnixDialog_FileOpenSaveAs::previewPicture (void)
 		}
 	}
 
-	GsfInput * input = nullptr;
+	GsfInput * input = NULL;
 	UT_DEBUGMSG(("file_name %s \n",file_name));
-	input = UT_go_file_open (file_name, nullptr);
+	input = UT_go_file_open (file_name, NULL);
 	if (!input)
 		goto Cleanup;
 	char Buf[4097] = "";  // 4096+nul ought to be enough
@@ -932,10 +931,10 @@ gint XAP_UnixDialog_FileOpenSaveAs::previewPicture (void)
 			goto Cleanup;
 	}
 	g_object_unref (G_OBJECT (input));
-	input = UT_go_file_open (file_name, nullptr);
+	input = UT_go_file_open (file_name, NULL);
 	size_t num_bytes = gsf_input_size(input);
-	UT_Byte * bytes = (UT_Byte *) gsf_input_read(input, num_bytes,nullptr );
-	if(bytes == nullptr)
+	UT_Byte * bytes = (UT_Byte *) gsf_input_read(input, num_bytes,NULL );
+	if(bytes == NULL)
 	{
 		    painter.drawChars (str.ucs4_str().ucs4_str(), 0, str.size(), pGr->tlu(12), pGr->tlu(static_cast<int>(alloc.height / 2)) - pGr->getFontHeight(fnt)/2);
 			g_object_unref (G_OBJECT (input));
@@ -952,7 +951,7 @@ gint XAP_UnixDialog_FileOpenSaveAs::previewPicture (void)
 	//
 	GdkPixbuf * pixbuf = pixbufForByteBuf ( pBB);
 	delete pBB;
-	if(pixbuf == nullptr)
+	if(pixbuf == NULL)
 	{
 		//
 		// Try a fallback loader here.
@@ -962,7 +961,7 @@ gint XAP_UnixDialog_FileOpenSaveAs::previewPicture (void)
 	    goto Cleanup;
 	}
 
-	pImage = new GR_UnixImage(nullptr,pixbuf);
+	pImage = new GR_UnixImage(NULL,pixbuf);
 
 	iImageWidth = gdk_pixbuf_get_width (pixbuf);
 	iImageHeight = gdk_pixbuf_get_height (pixbuf);
@@ -993,7 +992,7 @@ gint XAP_UnixDialog_FileOpenSaveAs::previewPicture (void)
 
 GdkPixbuf *  XAP_UnixDialog_FileOpenSaveAs::_loadXPM(UT_ByteBuf * pBB)
 {
-	GdkPixbuf * pixbuf = nullptr;
+	GdkPixbuf * pixbuf = NULL;
 	const char * pBC = reinterpret_cast<const char *>(pBB->getPointer(0));
 
 	UT_GenericVector<char*> vecStr;
@@ -1010,7 +1009,7 @@ GdkPixbuf *  XAP_UnixDialog_FileOpenSaveAs::_loadXPM(UT_ByteBuf * pBB)
 
 	if(k >= length)
 	{
-		return nullptr;
+		return NULL;
 	}
 
 	k++;
@@ -1020,10 +1019,10 @@ GdkPixbuf *  XAP_UnixDialog_FileOpenSaveAs::_loadXPM(UT_ByteBuf * pBB)
 	}
 	if(k >= length)
 	{
-		return nullptr;
+		return NULL;
 	}
 
-	char * sz = nullptr;
+	char * sz = NULL;
 	UT_sint32 kLen = k-iBase+1;
 	sz = static_cast<char *>(UT_calloc(kLen,sizeof(char)));
 	UT_sint32 i =0;
@@ -1057,9 +1056,9 @@ GdkPixbuf *  XAP_UnixDialog_FileOpenSaveAs::_loadXPM(UT_ByteBuf * pBB)
 			}
 			if(k >= length)
 			{
-				return nullptr;
+				return NULL;
 			}
-			sz = nullptr;
+			sz = NULL;
 			kLen = k-iBase+1;
 			sz = static_cast<char *>(UT_calloc(kLen,sizeof(char)));
 			for(i=0; i<(kLen -1); i++)
@@ -1078,7 +1077,7 @@ GdkPixbuf *  XAP_UnixDialog_FileOpenSaveAs::_loadXPM(UT_ByteBuf * pBB)
 			char * psz = vecStr.getNthItem(i);
 			FREEP(psz);
 		}
-		return nullptr;
+		return NULL;
 	}
 
 	const char ** pszStr = static_cast<const char **>(UT_calloc(vecStr.getItemCount(),sizeof(char *)));
@@ -1092,9 +1091,9 @@ GdkPixbuf *  XAP_UnixDialog_FileOpenSaveAs::_loadXPM(UT_ByteBuf * pBB)
 GdkPixbuf *  XAP_UnixDialog_FileOpenSaveAs::pixbufForByteBuf (UT_ByteBuf * pBB)
 {
 	if ( !pBB || !pBB->getLength() )
-		return nullptr;
+		return NULL;
 
-	GdkPixbuf * pixbuf = nullptr;
+	GdkPixbuf * pixbuf = NULL;
 
 	bool bIsXPM = false;
 	const char * szBuf = reinterpret_cast<const char *>(pBB->getPointer(0));
@@ -1109,15 +1108,15 @@ GdkPixbuf *  XAP_UnixDialog_FileOpenSaveAs::pixbufForByteBuf (UT_ByteBuf * pBB)
 	}
 	else
 	{
-		GError * err = nullptr;
-		GdkPixbufLoader * ldr = nullptr;
+		GError * err = 0;
+		GdkPixbufLoader * ldr = 0;
 
 		ldr = gdk_pixbuf_loader_new ();
 		if (!ldr)
 			{
 				UT_DEBUGMSG (("GdkPixbuf: couldn't create loader! WTF?\n"));
 				UT_ASSERT (ldr);
-				return nullptr ;
+				return NULL ;
 			}
 
 		if ( FALSE== gdk_pixbuf_loader_write (ldr, static_cast<const guchar *>(pBB->getPointer (0)),
@@ -1125,12 +1124,12 @@ GdkPixbuf *  XAP_UnixDialog_FileOpenSaveAs::pixbufForByteBuf (UT_ByteBuf * pBB)
 			{
 				UT_DEBUGMSG(("DOM: couldn't write to loader: %s\n", err->message));
 				g_error_free(err);
-				gdk_pixbuf_loader_close (ldr, nullptr);
+				gdk_pixbuf_loader_close (ldr, NULL);
 				g_object_unref (G_OBJECT(ldr));
-				return nullptr ;
+				return NULL ;
 			}
 		
-		gdk_pixbuf_loader_close (ldr, nullptr);
+		gdk_pixbuf_loader_close (ldr, NULL);
 		pixbuf = gdk_pixbuf_loader_get_pixbuf (ldr);
 
 		// ref before closing the loader

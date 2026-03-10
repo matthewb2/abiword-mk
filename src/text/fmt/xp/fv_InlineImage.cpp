@@ -41,21 +41,21 @@
 #define MIN_DRAG_PIXELS 8
 
 FV_VisualInlineImage::FV_VisualInlineImage (FV_View * pView)
-	: FV_Base(pView), 
+	: FV_Base(pView),
 	  m_iInlineDragMode(FV_InlineDrag_NOT_ACTIVE),
-	  m_pDragImage(nullptr),
+	  m_pDragImage(NULL),
 	  m_iLastX(0),
 	  m_iLastY(0),
 	  m_iInitialOffX(0),
 	  m_iInitialOffY(0),
 	  m_bTextCut(false),
-	  m_pDocUnderCursor(nullptr),
+	  m_pDocUnderCursor(NULL),
 	  m_bCursorDrawn(false),
 	  m_recCursor(0,0,0,0),
-	  m_pAutoScrollTimer(nullptr),
+	  m_pAutoScrollTimer(NULL),
 	  m_bDoingCopy(false),
-	  m_pImageAP(nullptr),
-	  m_screenCache(nullptr),
+	  m_pImageAP(NULL),
+	  m_screenCache(NULL),
 	  m_bIsEmbedded(false),
 	  m_bSelectionDrawn(false)
 {
@@ -65,7 +65,7 @@ FV_VisualInlineImage::FV_VisualInlineImage (FV_View * pView)
 FV_VisualInlineImage::~FV_VisualInlineImage()
 {
 	DELETEP(m_pDragImage);
-	if(m_pAutoScrollTimer != nullptr)
+	if(m_pAutoScrollTimer != NULL)
 	{
 		m_pAutoScrollTimer->stop();
 		DELETEP(m_pAutoScrollTimer);
@@ -101,7 +101,7 @@ void FV_VisualInlineImage::setMode(FV_InlineDragMode iEditMode)
 
 static UT_sint32 iExtra = 0;
 static bool bScrollRunning = false;
-static UT_Worker * s_pScroll = nullptr;
+static UT_Worker * s_pScroll = NULL;
 
 void FV_VisualInlineImage::_actuallyScroll(UT_Worker * pWorker)
 {
@@ -114,7 +114,7 @@ void FV_VisualInlineImage::_actuallyScroll(UT_Worker * pWorker)
 	FV_View * pView = pVis->m_pView;
 	pVis->getGraphics()->setClipRect(&pVis->m_recCurFrame);
 	pView->updateScreen(false);
-	pView->getGraphics()->setClipRect(nullptr);
+	pView->getGraphics()->setClipRect(NULL);
 	pVis->m_bSelectionDrawn = false;
 	bool bScrollDown = false;
 	bool bScrollUp = false;
@@ -169,7 +169,7 @@ void FV_VisualInlineImage::_actuallyScroll(UT_Worker * pWorker)
 	}
 	s_pScroll->stop();
 	delete s_pScroll;
-	s_pScroll = nullptr;
+	s_pScroll = NULL;
 	bScrollRunning = false;
 	iExtra = 0;
 }
@@ -243,7 +243,7 @@ void FV_VisualInlineImage::_mouseDrag(UT_sint32 x, UT_sint32 y)
 			}
 			else
 			{
-				m_iInlineDragMode = FV_InlineDrag_START_DRAGGING;	    
+				m_iInlineDragMode = FV_InlineDrag_START_DRAGGING;
 			}
 		}
 		m_bFirstDragDone = true;
@@ -283,7 +283,7 @@ void FV_VisualInlineImage::_mouseDrag(UT_sint32 x, UT_sint32 y)
 		}
 		if(bScrollDown || bScrollUp || bScrollLeft || bScrollRight)
 		{
-			if(m_pAutoScrollTimer != nullptr)
+			if(m_pAutoScrollTimer != NULL)
 			{
 				return;
 			}
@@ -352,11 +352,12 @@ void FV_VisualInlineImage::_mouseDrag(UT_sint32 x, UT_sint32 y)
 		}
 		if(expY.height > 0)
 		{
+
 			pG->setClipRect(&expY);
 			m_pView->updateScreen(false);
 			m_bSelectionDrawn = false;
 		}
-		pG->setClipRect(nullptr);
+		pG->setClipRect(NULL);
 		bool b = drawImage();
 		if(!b)
 		{
@@ -365,7 +366,7 @@ void FV_VisualInlineImage::_mouseDrag(UT_sint32 x, UT_sint32 y)
 		}
 		m_iLastX = x;
 		m_iLastY = y;
-		pG->setClipRect(nullptr);
+		pG->setClipRect(NULL);
 		PT_DocPosition posAtXY = getPosFromXY(x,y);
 		m_pView->_setPoint(posAtXY);
 		//m_pView->_fixInsertionPointCoords();
@@ -381,7 +382,7 @@ void FV_VisualInlineImage::_mouseDrag(UT_sint32 x, UT_sint32 y)
 		UT_Rect expY(m_recCurFrame.left,0,m_recCurFrame.width,0);
 		FV_Base::_doMouseDrag( x, y, dx, dy, expX, expY );
 		_checkDimensions();
-		
+
 		if(expX.width > 0)
 		{
 			pG->setClipRect(&expX);
@@ -395,12 +396,12 @@ void FV_VisualInlineImage::_mouseDrag(UT_sint32 x, UT_sint32 y)
 			m_pView->updateScreen(false);
 			m_bSelectionDrawn = false;
 		}
-		pG->setClipRect(nullptr);
+		pG->setClipRect(NULL);
 		GR_Painter painter(pG);
 		//
 		// Clear the previous line.
 		//
-		if(m_screenCache != nullptr)
+		if(m_screenCache != NULL)
 		{
 			prevRect.left -= pG->tlu(1);
 			prevRect.top -= pG->tlu(1);
@@ -444,8 +445,8 @@ void FV_VisualInlineImage::clearCursor(void)
 void FV_VisualInlineImage::drawCursor(PT_DocPosition newPos)
 {
 
-	fp_Run * pRunLow = nullptr;
-	fl_BlockLayout * pBlock = nullptr;
+	fp_Run * pRunLow = NULL;
+	fl_BlockLayout * pBlock = NULL;
 	UT_sint32 xLow, yLow;
 	UT_uint32 heightCaret;
 	UT_sint32 xCaret2, yCaret2;
@@ -457,7 +458,7 @@ void FV_VisualInlineImage::drawCursor(PT_DocPosition newPos)
 	m_recCursor.width =  getGraphics()->tlu(2); // the cursor is 2 device units wide, not
 												// logical units
 	m_recCursor.height = heightCaret;
-	UT_ASSERT(m_pDocUnderCursor == nullptr);
+	UT_ASSERT(m_pDocUnderCursor == NULL);
 	GR_Painter painter(getGraphics());
 	m_pDocUnderCursor = painter.genImageFromRectangle(m_recCursor);
 	UT_RGBColor black(0,0,0);
@@ -466,39 +467,39 @@ void FV_VisualInlineImage::drawCursor(PT_DocPosition newPos)
 }
 
 /*!
- * This method returns the Attributes/Properties pointer of the image at 
- location (X,y). It return nullptr if there is no image at (x,y)
+ * This method returns the Attributes/Properties pointer of the image at
+ location (X,y). It return NULL if there is no image at (x,y)
 */
 PP_AttrProp * FV_VisualInlineImage::getImageAPFromXY(UT_sint32 x, UT_sint32 y)
 {
-  PP_AttrProp * pAP = nullptr;
+  PP_AttrProp * pAP = NULL;
   getImageFromSelection(x, y, &pAP );
   return pAP;
 }
 /*!
  * This method creates an image from the current selection. It sets
- * the drag rectangle, the initial offsets and the initial positions 
+ * the drag rectangle, the initial offsets and the initial positions
  * of the cursor.
  */
 void FV_VisualInlineImage::getImageFromSelection(UT_sint32 x, UT_sint32 y,PP_AttrProp ** pAP )
 {
 //
 // OK first work out the locations in the document of the anchor and point
-//	
+//
 	PT_DocPosition posAtXY = m_pView->getDocPositionFromXY(x,y,false);
 	UT_sint32 x1,y1,x2,y2;
 	UT_uint32 height;
-	
+
 	bool bEOL = false;
 	bool bDirection;
-	fl_BlockLayout * pBlock = nullptr;
-	fp_Run * pRun = nullptr;
+	fl_BlockLayout * pBlock = NULL;
+	fp_Run * pRun = NULL;
 	m_pView->_findPositionCoords(posAtXY,bEOL,x1,y1,x2,y2,height,bDirection,&pBlock,&pRun);
 	if(!pBlock)
 	{
-	    if(pAP != nullptr)
+	    if(pAP != NULL)
 	    {
-	      *pAP = nullptr;
+	      *pAP = NULL;
 	      return;
 	    }
 	    m_iInlineDragMode = FV_InlineDrag_NOT_ACTIVE;
@@ -506,9 +507,9 @@ void FV_VisualInlineImage::getImageFromSelection(UT_sint32 x, UT_sint32 y,PP_Att
 	}
 	if(!pRun)
 	{
-	    if(pAP != nullptr)
+	    if(pAP != NULL)
 	    {
-	      *pAP = nullptr;
+	      *pAP = NULL;
 	      return;
 	    }
 	    m_iInlineDragMode = FV_InlineDrag_NOT_ACTIVE;
@@ -516,15 +517,15 @@ void FV_VisualInlineImage::getImageFromSelection(UT_sint32 x, UT_sint32 y,PP_Att
 	}
 	while(pRun && (pRun->getLength() == 0))
 	  pRun = pRun->getNextRun();
-	if(pAP != nullptr)
+	if(pAP != NULL)
 	{
-	    if(pRun == nullptr)
-	      *pAP = nullptr;
+	    if(pRun == NULL)
+	      *pAP = NULL;
 	    else
 	      *pAP = const_cast<PP_AttrProp*>(pRun->getSpanAP());
 	    return;
 	}
-	if(pRun == nullptr)
+	if(pRun == NULL)
 	{
 	  m_iInlineDragMode = FV_InlineDrag_NOT_ACTIVE;
 	  return;
@@ -604,9 +605,9 @@ void FV_VisualInlineImage::mouseCut(UT_sint32 x, UT_sint32 y)
 		UT_sint32 x1,x2,y1,y2,iHeight;
 		bool bEOL = false;
 		bool bDir = false;
-		
-		fp_Run * pRun = nullptr;
-		
+
+		fp_Run * pRun = NULL;
+
 		pRun = pBlock->findPointCoords(posLow,bEOL,x1,y1,x2,y2,iHeight,bDir);
 		while(pRun && ((pRun->getType() != FPRUN_IMAGE) && (pRun->getType() != FPRUN_EMBED)))
 		{
@@ -652,7 +653,7 @@ void FV_VisualInlineImage::mouseLeftPress(UT_sint32 x, UT_sint32 y)
 		UT_sint32 x1,x2,y1,y2,iHeight;
 		bool bEOL = false;
 		bool bDir = false;
-		fp_Run * pRun = nullptr;
+		fp_Run * pRun = NULL;
 		pRun = pBlock->findPointCoords(pos,bEOL,x1,y1,x2,y2,iHeight,bDir);
 		while(pRun && ((pRun->getType() != FPRUN_IMAGE) && (pRun->getType() != FPRUN_EMBED)))
 		{
@@ -738,13 +739,13 @@ void FV_VisualInlineImage::cleanUP(void)
   m_iInitialOffX = 0;
   m_iInitialOffY = 0;
   m_bFirstDragDone = false;
-  m_pImageAP = nullptr;
+  m_pImageAP = NULL;
   m_bDoingCopy = false;
   m_pView->updateScreen(false);
   m_bSelectionDrawn = false;
   while(m_iGlobCount > 0)
     _endGlob();
- 
+
 }
 
 /*!
@@ -752,7 +753,7 @@ void FV_VisualInlineImage::cleanUP(void)
  * (x,y) point.
  * It sets the FV_ImageDragMode and the FV_InlineDragWhat mode depending
  * on which control is selected at the (x,y) position.
- * 
+ *
  *        top left     top edge     top right
  *             X----------X----------X
  *             |                     |
@@ -763,10 +764,10 @@ void FV_VisualInlineImage::cleanUP(void)
  *             X----------X----------X
  *        Bot left    Bot edge    Bot right
  *
- * An (x,y) point that does not fall in a specified control sets drag 
+ * An (x,y) point that does not fall in a specified control sets drag
  * whole frame mode.
  *
- * Also sets the image attributes/property list variables 
+ * Also sets the image attributes/property list variables
  * m_sAttributes, m_sProperties
  */
 void FV_VisualInlineImage::setDragType(UT_sint32 x,UT_sint32 y, bool bDrawImage){
@@ -890,9 +891,9 @@ void FV_VisualInlineImage::mouseCopy(UT_sint32 x, UT_sint32 y)
 		UT_sint32 x1,x2,y1,y2,iHeight;
 		bool bEOL = false;
 		bool bDir = false;
-		
-		fp_Run * pRun = nullptr;
-		
+
+		fp_Run * pRun = NULL;
+
 		pRun = pBlock->findPointCoords(pos,bEOL,x1,y1,x2,y2,iHeight,bDir);
 		while(pRun && ((pRun->getType() != FPRUN_IMAGE) && (pRun->getType() != FPRUN_EMBED)  ))
 		{
@@ -939,16 +940,16 @@ void FV_VisualInlineImage::mouseCopy(UT_sint32 x, UT_sint32 y)
 	// Get a copy of the image data
 	//
 	UT_ConstByteBufPtr pBytes;
-	const char * dataId = nullptr;
+	const char * dataId = NULL;
 	m_pView->getSelectedImage(&dataId);
-	if(dataId == nullptr)
+	if(dataId == NULL)
 	{
 	  UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
 	  cleanUP();
 	  return;
 	}
 	std::string sMimeType;
-	getDoc()->getDataItemDataByName(dataId, pBytes, &sMimeType, nullptr);
+	getDoc()->getDataItemDataByName(dataId, pBytes, &sMimeType, NULL);
 	//
 	// Save it in the document under a new name
 	//
@@ -982,7 +983,7 @@ PT_DocPosition FV_VisualInlineImage::getPosFromXY(UT_sint32 x, UT_sint32 y) cons
  */
 void FV_VisualInlineImage::mouseRelease(UT_sint32 x, UT_sint32 y)
 {
-        if(m_pAutoScrollTimer != nullptr)
+        if(m_pAutoScrollTimer != NULL)
 	{
 		m_pAutoScrollTimer->stop();
 		DELETEP(m_pAutoScrollTimer);
@@ -1004,7 +1005,7 @@ void FV_VisualInlineImage::mouseRelease(UT_sint32 x, UT_sint32 y)
 	  PT_DocPosition posAtXY = getPosFromXY(x,y);
 	  m_pView->setPoint(posAtXY);
 	  getGraphics()->setClipRect( &m_recCurFrame);
-	  getGraphics()->setClipRect(nullptr);
+	  getGraphics()->setClipRect(NULL);
 	  m_iInlineDragMode  = FV_InlineDrag_NOT_ACTIVE;
 	  m_pView->getMouseContext(x,y);
 	  m_pView->updateScreen(false);
@@ -1021,12 +1022,12 @@ void FV_VisualInlineImage::mouseRelease(UT_sint32 x, UT_sint32 y)
 	//
 	// Fixme Put in code to insert image here.
 	//
-	  const gchar* szDataID = nullptr;
-	  const gchar* szTitle = nullptr;
-	  const gchar* szDescription = nullptr;
-	  const gchar* szWidth = nullptr;
-	  const gchar* szHeight = nullptr;
-	  const gchar* szEmbed = nullptr;
+	  const gchar* szDataID = 0;
+	  const gchar* szTitle = 0;
+	  const gchar* szDescription = 0;
+	  const  gchar* szWidth = 0;
+	  const  gchar * szHeight = 0;
+	  const gchar * szEmbed= NULL;
 	  if(!m_bDoingCopy)
 	  {
 	    bool bFound = m_pImageAP->getAttribute("dataid",szDataID);
@@ -1120,7 +1121,7 @@ void FV_VisualInlineImage::mouseRelease(UT_sint32 x, UT_sint32 y)
 	  //
 	  //	  getGraphics()->setClipRect( &m_recCurFrame);
 	  //m_pView->updateScreen(false);
-	  //getGraphics()->setClipRect(nullptr);
+	  //getGraphics()->setClipRect(NULL);
 	  m_bDoingCopy = false;
 	  m_iInlineDragMode = FV_InlineDrag_NOT_ACTIVE;
 	  UT_Rect newImgBounds = m_recCurFrame;
@@ -1149,7 +1150,7 @@ void FV_VisualInlineImage::mouseRelease(UT_sint32 x, UT_sint32 y)
 	// Clear the previous line.
 	//
 	    GR_Painter painter(getGraphics());
-	    if(m_screenCache != nullptr)
+	    if(m_screenCache != NULL)
 	    {
 	        UT_Rect prevRect = m_recCurFrame;
 		prevRect.left -= getGraphics()->tlu(1);
@@ -1176,7 +1177,7 @@ void FV_VisualInlineImage::mouseRelease(UT_sint32 x, UT_sint32 y)
 
 bool FV_VisualInlineImage::drawImage(void)
 {
-	if(m_pDragImage == nullptr)
+	if(m_pDragImage == NULL)
 	{
 		UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
 		return false;

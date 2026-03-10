@@ -1,4 +1,3 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t; -*- */
 /* AbiSource Program Utilities
  * Copyright (C) 1998 AbiSource, Inc.
  *
@@ -49,7 +48,7 @@
 
 bool UT_XML_cloneNoAmpersands(gchar *& rszDest, const gchar * szSource)
 {
-	if (szSource == nullptr)
+	if (szSource == NULL)
 		return false;
 
 	UT_uint32 length = strlen(szSource) + 1;
@@ -75,7 +74,7 @@ bool UT_XML_cloneNoAmpersands(gchar *& rszDest, const gchar * szSource)
 
 bool UT_XML_cloneConvAmpersands(gchar *& rszDest, const gchar * szSource)
 {
-	if (szSource == nullptr)
+	if (szSource == NULL)
 		return false;
 
 	UT_uint32 length = strlen(szSource) + 1;
@@ -106,11 +105,11 @@ bool UT_XML_cloneConvAmpersands(gchar *& rszDest, const gchar * szSource)
 /* This uses the clone no ampersands but dumps into a static buffer */
 const gchar *UT_XML_transNoAmpersands(const gchar * szSource)
 {
-	static gchar *rszDestBuffer = nullptr;
+	static gchar *rszDestBuffer = NULL;
 	static UT_uint32 iDestBufferLength = 0;
 
-	if (szSource == nullptr)
-		return nullptr;
+	if (szSource == NULL)
+		return NULL;
 
 	UT_uint32 length = strlen(szSource) + 1;
 	if (length > iDestBufferLength) {
@@ -121,7 +120,7 @@ const gchar *UT_XML_transNoAmpersands(const gchar * szSource)
 		rszDestBuffer = static_cast<gchar *>(UT_calloc(length, sizeof(gchar)));
 
 		if (!rszDestBuffer)
-			return nullptr;
+			return NULL;
 
 		iDestBufferLength = length;
 	}
@@ -251,7 +250,7 @@ bool UT_isValidXML(const char *pString)
 	if(!pString)
 		return true;
 
-	if(!g_utf8_validate(pString, -1, nullptr))
+	if(!g_utf8_validate(pString, -1, NULL))
 		return false;
 
 	const UT_Byte * s = reinterpret_cast<const UT_Byte *>(pString);
@@ -267,6 +266,97 @@ bool UT_isValidXML(const char *pString)
 	}
 
 	return true;
+}
+
+/*!
+    XML cannot contain any control characters except \t, \n, \r, see bug 8565
+    (http://www.w3.org/TR/REC-xml/#charsets)
+    
+    This function removes any illegal characters and invalid utf-8 sequences.
+
+    The return value of true indicates that the string was modified
+*/
+bool UT_validXML(char * pString)
+{
+	if(!pString)
+		return false;
+
+	UT_ASSERT(sizeof(gchar) == sizeof(UT_Byte));
+	const UT_Byte * p = reinterpret_cast<const UT_Byte *>(pString);	// gchar is signed...
+	
+	bool bChanged = false;
+	UT_uint32 len = strlen(pString);
+
+	int bytesInSequence = 0;
+	int bytesExpectedInSequence = 0;
+
+	UT_String s;
+	s.reserve(len);
+
+	for (UT_uint32 k=0; k<len; k++)
+	{
+		if (p[k] < 0x80)						// plain us-ascii part of latin-1
+		{
+			if(bytesInSequence != 0)
+				bChanged = true;
+
+			// UT_Byte is unsigned char, hence p[k] always >= 0
+			if(p[k] < ' ' /*&& p[k] >= 0*/ && p[k] != '\t' && p[k] != '\n' && p[k] != '\r')
+			{
+				bChanged = true;
+			}
+			else
+				s += p[k];
+				
+			bytesInSequence = 0;
+			bytesExpectedInSequence = 0;
+		}
+		else if ((p[k] & 0xf0) == 0xf0)			// lead byte in 4-byte surrogate pair
+		{
+			if(bytesInSequence != 0)
+				bChanged = true;
+			
+			UT_ASSERT_HARMLESS( UT_NOT_IMPLEMENTED );
+			bytesExpectedInSequence = 4;
+			bytesInSequence = 1;
+		}
+		else if ((p[k] & 0xe0) == 0xe0)			// lead byte in 3-byte sequence
+		{
+			if(bytesInSequence != 0)
+				bChanged = true;
+			
+			bytesExpectedInSequence = 3;
+			bytesInSequence = 1;
+		}
+		else if ((p[k] & 0xc0) == 0xc0)			// lead byte in 2-byte sequence
+		{
+			if(bytesInSequence != 0)
+				bChanged = true;
+			
+			bytesExpectedInSequence = 2;
+			bytesInSequence = 1;
+		}
+		else if ((p[k] & 0x80) == 0x80)			// trailing byte in multi-byte sequence
+		{
+			bytesInSequence++;
+			if (bytesInSequence == bytesExpectedInSequence)		// final byte in multi-byte sequence
+			{
+				for(UT_sint32 i = k - bytesInSequence + 1; i <= (UT_sint32)k; i++)
+				{
+					s += p[i];
+				}
+				
+				bytesInSequence = 0;
+				bytesExpectedInSequence = 0;
+			}
+		}
+	}
+
+	strncpy(pString, s.c_str(), s.length());
+
+	// make sure we null-terminate
+	pString[s.length()] = 0;
+	return bChanged;
 }
 
 void UT_decodeUTF8string(const gchar * pString, UT_uint32 len, UT_GrowBuf * pResult)
@@ -404,8 +494,8 @@ UT_uint32 UT_UCS2_strlen(const UT_UCS2Char * string)
 
 UT_UCS2Char * UT_UCS2_strstr(const UT_UCS2Char * phaystack, const UT_UCS2Char * pneedle)
 {
-	const UT_UCS2Char *haystack, *needle;
-	UT_UCS2Char b, c;
+	register const UT_UCS2Char *haystack, *needle;
+	register UT_UCS2Char b, c;
 
 	haystack = phaystack;
 	needle = pneedle;
@@ -430,8 +520,8 @@ UT_UCS2Char * UT_UCS2_strstr(const UT_UCS2Char * phaystack, const UT_UCS2Char * 
 
 		for (;;)
         {
-			UT_UCS2Char a;
-			const UT_UCS2Char *rhaystack, *rneedle;
+			register UT_UCS2Char a;
+			register const UT_UCS2Char *rhaystack, *rneedle;
 
 			do
             {
@@ -570,8 +660,8 @@ UT_UCS2Char UT_UCS2_tolower(UT_UCS2Char c)
 
 UT_UCS2Char * UT_UCS2_stristr(const UT_UCS2Char * phaystack, const UT_UCS2Char * pneedle)
 {
-	const UT_UCS2Char *haystack, *needle;
-	UT_UCS2Char b, c;
+	register const UT_UCS2Char *haystack, *needle;
+	register UT_UCS2Char b, c;
 
 	haystack = phaystack;
 	needle = pneedle;
@@ -596,8 +686,8 @@ UT_UCS2Char * UT_UCS2_stristr(const UT_UCS2Char * phaystack, const UT_UCS2Char *
 
 		for (;;)
         {
-			UT_UCS2Char a;
-			const UT_UCS2Char *rhaystack, *rneedle;
+			register UT_UCS2Char a;
+			register const UT_UCS2Char *rhaystack, *rneedle;
 
 			do
             {
@@ -696,7 +786,7 @@ char * UT_UCS2_strcpy_to_char(char * dest, const UT_UCS2Char * src)
 
 	UT_ASSERT_NOT_REACHED();
 
-	return nullptr;
+	return NULL;
 }
 
 bool UT_UCS2_cloneString(UT_UCS2Char ** dest, const UT_UCS2Char * src)
@@ -988,8 +1078,8 @@ UT_UCS4Char * UT_UCS4_strnrev(UT_UCS4Char * src, UT_uint32 n)
 
 UT_UCS4Char * UT_UCS4_strstr(const UT_UCS4Char * phaystack, const UT_UCS4Char * pneedle)
 {
-	const UT_UCS4Char *haystack, *needle;
-	UT_UCS4Char b, c;
+	register const UT_UCS4Char *haystack, *needle;
+	register UT_UCS4Char b, c;
 
 	haystack = static_cast<const UT_UCS4Char *>(phaystack);
 	needle = static_cast<const UT_UCS4Char *>(pneedle);
@@ -1014,8 +1104,8 @@ UT_UCS4Char * UT_UCS4_strstr(const UT_UCS4Char * phaystack, const UT_UCS4Char * 
 
 		for (;;)
         {
-			UT_UCS4Char a;
-			const UT_UCS4Char *rhaystack, *rneedle;
+			register UT_UCS4Char a;
+			register const UT_UCS4Char *rhaystack, *rneedle;
 
 			do
             {
@@ -1067,7 +1157,7 @@ UT_UCS4Char * UT_UCS4_strstr(const UT_UCS4Char * phaystack, const UT_UCS4Char * 
  foundneedle:
 	return const_cast<UT_UCS4Char *>(haystack);
  ret0:
-	return nullptr;
+	return 0;
 }
 
 UT_sint32 UT_UCS4_strcmp(const UT_UCS4Char* left, const UT_UCS4Char* right)
@@ -1155,8 +1245,8 @@ UT_UCS4Char UT_UCS4_tolower(UT_UCS4Char c)
 
 UT_UCS4Char * UT_UCS4_stristr(const UT_UCS4Char * phaystack, const UT_UCS4Char * pneedle)
 {
-	const UT_UCS4Char *haystack, *needle;
-	UT_UCS4Char b, c;
+	register const UT_UCS4Char *haystack, *needle;
+	register UT_UCS4Char b, c;
 
 	haystack = static_cast<const UT_UCS4Char *>(phaystack);
 	needle = static_cast<const UT_UCS4Char *>(pneedle);
@@ -1181,8 +1271,8 @@ UT_UCS4Char * UT_UCS4_stristr(const UT_UCS4Char * phaystack, const UT_UCS4Char *
 
 		for (;;)
         {
-			UT_UCS4Char a;
-			const UT_UCS4Char *rhaystack, *rneedle;
+			register UT_UCS4Char a;
+			register const UT_UCS4Char *rhaystack, *rneedle;
 
 			do
             {
@@ -1234,7 +1324,7 @@ UT_UCS4Char * UT_UCS4_stristr(const UT_UCS4Char * phaystack, const UT_UCS4Char *
  foundneedle:
 	return const_cast<UT_UCS4Char *>(haystack);
  ret0:
-	return nullptr;
+	return 0;
 }
 /****************************************************************************/
 
@@ -1487,7 +1577,7 @@ static const char * s_pass_value (const char *& csstr)
 static const char * s_pass_string (const char *& csstr_ptr)
 {
 	if (*csstr_ptr == 0) 
-		return nullptr;
+		return 0;
 	
 	const char * csstr = csstr_ptr;
 	
@@ -1563,7 +1653,7 @@ static void s_pass_whitespace (const char *& csstr)
 void UT_parse_attributes(const char * attributes,
 						 std::map<std::string, std::string> & map)
 {
-	if (attributes == nullptr)
+	if ( attributes == 0) 
 		return;
 	if (*attributes == 0) 
 		return;
@@ -1612,7 +1702,7 @@ void UT_parse_attributes(const char * attributes,
 void UT_parse_properties(const char * properties,
 									std::map<std::string, std::string> & map)
 {
-	if (properties == nullptr)
+	if ( properties == 0) 
 		return;
 	if (*properties == 0) 
 		return;
@@ -1716,8 +1806,8 @@ bool UT_bidiReorderString(const UT_UCS4Char * pStrIn, UT_uint32 len, UT_BidiChar
 	// compiler should remove this code if the bug does not exist
 	if(sizeof(FriBidiChar) > sizeof(UT_UCS4Char))
 	{
-		static FriBidiChar* pFBDC = nullptr;
-		static FriBidiChar* pFBDC2 = nullptr;
+		static FriBidiChar* pFBDC = NULL;
+		static FriBidiChar* pFBDC2 = NULL;
 		static UT_uint32 iFBDlen = 0;
 
 		if(iFBDlen < len + 1)
@@ -1741,7 +1831,7 @@ bool UT_bidiReorderString(const UT_UCS4Char * pStrIn, UT_uint32 len, UT_BidiChar
 
 		pFBDC[i] = 0;
 
-		int iRet = fribidi_log2vis (pFBDC, len, &baseDir, pFBDC2, nullptr, nullptr, nullptr);
+		int iRet = fribidi_log2vis (pFBDC, len, &baseDir, pFBDC2, NULL, NULL, NULL);
 
 		for(i = 0; i < len; ++i)
 		{
@@ -1754,7 +1844,7 @@ bool UT_bidiReorderString(const UT_UCS4Char * pStrIn, UT_uint32 len, UT_BidiChar
 	}
 	else
 	{
-		return (0 != fribidi_log2vis ((FriBidiChar *)pStrIn, len, &baseDir, (FriBidiChar*)pStrOut, nullptr, nullptr, nullptr));
+		return (0 != fribidi_log2vis ((FriBidiChar *)pStrIn, len, &baseDir, (FriBidiChar*)pStrOut, NULL, NULL, NULL));
 	}
 	
 #else
@@ -1775,7 +1865,7 @@ bool UT_bidiMapLog2Vis(const UT_UCS4Char * pStrIn, UT_uint32 len, UT_BidiCharTyp
 	// if this assert fails, we have a serious problem ...
 	UT_ASSERT_HARMLESS( sizeof(UT_UCS4Char) == sizeof(FriBidiChar) );
 	return (0 != fribidi_log2vis ((FriBidiChar *)pStrIn, len, &baseDir,
-								  nullptr, (FriBidiStrIndex*)pL2V, (FriBidiStrIndex*)pV2L, (FriBidiLevel*)pEmbed));
+								  NULL, (FriBidiStrIndex*)pL2V, (FriBidiStrIndex*)pV2L, (FriBidiLevel*)pEmbed));
 #else
 	UT_return_val_if_fail( pL2V && pV2L && pEmbed, false );
 	for(UT_uint32 i = 0; i < len; ++i)

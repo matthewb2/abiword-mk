@@ -582,15 +582,15 @@ public:
 	IE_Imp_RTF_Sniffer();
 	virtual ~IE_Imp_RTF_Sniffer() {}
 
-	virtual const IE_SuffixConfidence * getSuffixConfidence() override;
-	virtual const IE_MimeConfidence * getMimeConfidence() override;
+	virtual const IE_SuffixConfidence * getSuffixConfidence ();
+	virtual const IE_MimeConfidence * getMimeConfidence ();
 	virtual UT_Confidence_t recognizeContents (const char * szBuf,
-									UT_uint32 iNumbytes) override;
+									UT_uint32 iNumbytes);
 	virtual bool getDlgLabels (const char ** szDesc,
 							   const char ** szSuffixList,
-							   IEFileType * ft) override;
+							   IEFileType * ft);
 	virtual UT_Error constructImporter (PD_Document * pDocument,
-										IE_Imp ** ppie) override;
+										IE_Imp ** ppie);
 
 };
 
@@ -604,7 +604,7 @@ public:
 	virtual bool		pasteFromBuffer(PD_DocumentRange * pDocRange,
 										const unsigned char * pData,
                                         UT_uint32 lenData,
-                                        const char * szEncoding = nullptr) override;
+                                        const char * szEncoding = 0);
 	UT_sint32 get_vecWord97ListsCount(void) const
         { return m_vecWord97Lists.size();}
 	RTF_msword97_list *  get_vecWord97NthList(UT_sint32 i) const
@@ -625,7 +625,7 @@ public:
 	};
 
 protected:
-	virtual UT_Error	_loadFile(GsfInput * input) override;
+	virtual UT_Error	_loadFile(GsfInput * input);
 	UT_Error			_parseFile(GsfInput * fp);
 	UT_Error			_writeHeader(GsfInput * fp);
 	UT_Error            _parseHdrFtr ();
@@ -947,7 +947,7 @@ private:
 	std::vector<RTF_msword97_listOverride*> m_vecWord97ListOverride;
 	void _appendHdrFtr ();
 	bool _appendField (const gchar *xmlField,
-                       const gchar ** pszAttribs=nullptr);
+                       const gchar ** pszAttribs=NULL);
 	gchar *_parseFldinstBlock (UT_ByteBuf & buf, gchar *xmlField,
                                   bool & isXML);
 	bool                m_bAppendAnyway;

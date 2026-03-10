@@ -1,4 +1,4 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
 /* AbiWord
  * Copyright (C) 2003 Dom Lachowicz
  * Copyright (C) 2004 Martin Sevior
@@ -21,8 +21,6 @@
  */
 
 #include <stdlib.h>
-
-#include <string>
 
 #include "ut_string.h"
 #include "ut_assert.h"
@@ -143,8 +141,8 @@ void AP_CocoaDialog_Stylist::event_Close(void)
 void AP_CocoaDialog_Stylist::setStyleInGUI(void)
 {
 	UT_sint32 row,col;
-	std::string sCurStyle = getCurStyle();
-	if((getStyleTree() == nullptr) || (sCurStyle.size() == 0))
+	UT_UTF8String sCurStyle = *getCurStyle();
+	if((getStyleTree() == NULL) || (sCurStyle.size() == 0))
 	{
 		updateDialog();
 	}
@@ -200,11 +198,11 @@ void AP_CocoaDialog_Stylist::styleClicked(UT_sint32 row, UT_sint32 col)
 		UT_sint32 col_count = getStyleTree()->getNumCols(row);
 		if ((col >= 0) && (col < col_count))
 		{
-			std::string sStyle;
+			UT_UTF8String sStyle;
 
 			getStyleTree()->getStyleAtRowCol(sStyle, row, col);
 
-			UT_DEBUGMSG(("StyleClicked row %d col %d style %s \n", row, col, sStyle.c_str()));
+			UT_DEBUGMSG(("StyleClicked row %d col %d style %s \n", (int) row, (int) col, sStyle.utf8_str()));
 
 			setCurStyle(sStyle);
 		}
@@ -291,7 +289,7 @@ void  AP_CocoaDialog_Stylist::_fillTree(void)
 	StyleNode *currentChild;
 	
 	Stylist_tree * pStyleTree = getStyleTree();
-	if(pStyleTree == nullptr)
+	if(pStyleTree == NULL)
 	{
 		updateDialog();
 		pStyleTree = getStyleTree();
@@ -318,7 +316,7 @@ void  AP_CocoaDialog_Stylist::_fillTree(void)
 			UT_DEBUGMSG(("Adding Heading %s at row %d \n",sTmp.c_str(),row));
 
 			[m_items addObject:currentChild];
-			std::string sTmp2;
+			UT_UTF8String sTmp2;
 			for(col =0 ; col < pStyleTree->getNumCols(row); col++)
 			{
 				if(!pStyleTree->getStyleAtRowCol(sTmp2,row,col))
@@ -326,8 +324,8 @@ void  AP_CocoaDialog_Stylist::_fillTree(void)
 					UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
 					break;
 				}
-				[currentChild addChild:[[[StyleNode alloc] initWithValue:sTmp2.c_str() row:row andCol:col] autorelease]];
-				UT_DEBUGMSG(("Adding style %s at row %d col %d \n", sTmp2.c_str(), row, col + 1));
+				[currentChild addChild:[[[StyleNode alloc] initWithValue:sTmp2.utf8_str() row:row andCol:col] autorelease]];
+				UT_DEBUGMSG(("Adding style %s at row %d col %d \n",sTmp2.utf8_str(),row,col+1));
 			}
 		}
 		else
@@ -352,7 +350,7 @@ void  AP_CocoaDialog_Stylist::_populateWindowData(void)
 - (id)initFromNib
 {
 	if (self = [super initWithWindowNibName:@"ap_CocoaDialog_Stylist"]) {
-		_xap = nullptr;
+		_xap = NULL; 
 		_enabled = true;
 	}
 	return self;
@@ -360,7 +358,7 @@ void  AP_CocoaDialog_Stylist::_populateWindowData(void)
 
 - (void)discardXAP
 {
-	_xap = nullptr;
+	_xap = NULL; 
 }
 
 - (void)dealloc

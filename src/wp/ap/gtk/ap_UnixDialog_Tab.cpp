@@ -34,7 +34,6 @@
 // This header defines some functions for Unix dialogs,
 // like centering them, measuring them, etc.
 #include "xap_UnixDialogHelper.h"
-#include "xap_GtkUtils.h"
 
 #include "fl_BlockLayout.h"
 
@@ -71,7 +70,7 @@ AP_UnixDialog_Tab__onDefaultTabFocusOut (GtkWidget 	   * /*widget*/,
 										 GdkEventFocus *event,
 										 gpointer 		data)
 {	
-	if (gdk_event_get_event_type((GdkEvent*)event) == GDK_FOCUS_CHANGE) {
+	if (event->type == GDK_FOCUS_CHANGE) {
 		AP_UnixDialog_Tab *dlg = static_cast<AP_UnixDialog_Tab*>(data);
 		dlg->onDefaultTabFocusOut ();
 	}
@@ -105,7 +104,7 @@ AP_UnixDialog_Tab__onPositionFocusOut (GtkWidget 	 * /*widget*/,
 {
 	xxx_UT_DEBUGMSG (("onPositionFocusOut() '%d' \n", event->type));
 	
-	if (gdk_event_get_event_type((GdkEvent*)event) == GDK_FOCUS_CHANGE) {
+	if (event->type == GDK_FOCUS_CHANGE) {
 		AP_UnixDialog_Tab *dlg = static_cast<AP_UnixDialog_Tab*>(data);
 		dlg->onPositionFocusOut ();
 	}
@@ -175,15 +174,15 @@ AP_UnixDialog_Tab::static_constructor (XAP_DialogFactory *pDlgFactory,
 AP_UnixDialog_Tab::AP_UnixDialog_Tab (XAP_DialogFactory *pDlgFactory,
 									  XAP_Dialog_Id 	 id)
   : AP_Dialog_Tab  (pDlgFactory, id),
-	m_pBuilder(nullptr),
-	m_wDialog(nullptr),
-	m_sbDefaultTab(nullptr),
-	m_exUserTabs(nullptr),
-	m_lvTabs(nullptr),
-	m_btDelete(nullptr),
-	m_sbPosition(nullptr),
-	m_cobAlignment(nullptr),
-	m_cobLeader(nullptr)
+	m_pBuilder(NULL),
+	m_wDialog	   (NULL),
+	m_sbDefaultTab (NULL),
+	m_exUserTabs   (NULL),
+	m_lvTabs	   (NULL),
+	m_btDelete	   (NULL),
+	m_sbPosition   (NULL),
+	m_cobAlignment (NULL),
+	m_cobLeader	   (NULL)
 {
 }
 
@@ -229,15 +228,18 @@ void AP_UnixDialog_Tab::runModal (XAP_Frame *pFrame)
 
 	// TODO save state of expander
 
-	gtk_widget_destroy(m_wDialog); // TOPLEVEL
-	m_wDialog = nullptr;
+	// GtkWidget *wDialog = m_wDialog;
+	// m_wDialog = NULL;
+    // gtk_widget_destroy (wDialog);
+    gtk_widget_destroy (m_wDialog);
+	m_wDialog = NULL;
 }
 
 GtkWidget * 
 AP_UnixDialog_Tab::_constructWindow ()
 {
 	// load the dialog from the UI file
-	m_pBuilder = newDialogBuilderFromResource("ap_UnixDialog_Tab.ui");
+	m_pBuilder = newDialogBuilder("ap_UnixDialog_Tab.ui");
 	GtkWidget *wDialog = GTK_WIDGET(gtk_builder_get_object(m_pBuilder, "ap_UnixDialog_Tab"));
 	m_exUserTabs = GTK_WIDGET(gtk_builder_get_object(m_pBuilder, "exUserTabs"));
 
@@ -273,7 +275,7 @@ AP_UnixDialog_Tab::_constructWindow ()
 	gtk_grid_attach(GTK_GRID(grNew), m_cobAlignment, 1, 1, 1, 1);
 
 
-	gchar *trans = nullptr;
+	gchar *trans = NULL;
 
 	// placeholder so we stick to the enum's ordering
 	// does not show up in UI
@@ -339,18 +341,18 @@ AP_UnixDialog_Tab::_constructWindow ()
 	g_object_unref (G_OBJECT (store));
 
 	// column
-	GtkCellRenderer *renderer = nullptr;
+	GtkCellRenderer *renderer = NULL;
 	renderer = gtk_cell_renderer_text_new ();
 	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (m_lvTabs),
 												-1, "Name", renderer,
 												"text", COLUMN_TAB,
-												nullptr);
+												NULL);
 	GtkTreeViewColumn *column = gtk_tree_view_get_column (GTK_TREE_VIEW (m_lvTabs), 0);
 	gtk_tree_view_column_set_sort_column_id (column, COLUMN_TAB);
 
 	// FIXME not implemented dialog before move to GtkBuilder
-	m_LeaderMapping[FL_LEADER_THICKLINE] = nullptr;
-	m_LeaderMapping[FL_LEADER_EQUALSIGN] = nullptr;
+	m_LeaderMapping[FL_LEADER_THICKLINE] = NULL;
+	m_LeaderMapping[FL_LEADER_EQUALSIGN] = NULL;
 
 	_connectSignals (m_pBuilder);
 
@@ -428,7 +430,7 @@ AP_UnixDialog_Tab::onDefaultTabChanged (double value)
 
 	UT_DEBUGMSG(("onDefaultTabChanged() %s\n", text));
 
-	XAP_gtk_entry_set_text (GTK_ENTRY (m_sbDefaultTab), text);
+	gtk_entry_set_text (GTK_ENTRY (m_sbDefaultTab), text);
 
     _storeWindowData ();
 }
@@ -437,11 +439,11 @@ AP_UnixDialog_Tab::onDefaultTabChanged (double value)
 void 
 AP_UnixDialog_Tab::onDefaultTabFocusOut ()
 {
-	const gchar *text = XAP_gtk_entry_get_text (GTK_ENTRY (m_sbDefaultTab));
+	const gchar *text = gtk_entry_get_text (GTK_ENTRY (m_sbDefaultTab));
 	UT_LocaleTransactor t(LC_NUMERIC, "C"); // FIXME: remove when we support localized dimensions
 	if (UT_isValidDimensionString (text)) {
 		// set
-		float pos = strtof(text, nullptr);
+		float pos = strtof(text, NULL);
 		if (pos != gtk_spin_button_get_value (GTK_SPIN_BUTTON (m_sbDefaultTab))) {
 
 			UT_Dimension dim = UT_determineDimension(text, _getDimension ());
@@ -455,7 +457,7 @@ AP_UnixDialog_Tab::onDefaultTabFocusOut ()
 
 			g_signal_handler_block (G_OBJECT (m_sbDefaultTab), m_hSigDefaultTabChanged);
 			gtk_spin_button_set_value (GTK_SPIN_BUTTON (m_sbDefaultTab), pos);
-			XAP_gtk_entry_set_text (GTK_ENTRY (m_sbDefaultTab), text);
+			gtk_entry_set_text (GTK_ENTRY (m_sbDefaultTab), text);
 			g_signal_handler_unblock (G_OBJECT (m_sbDefaultTab), m_hSigDefaultTabChanged);
 		}
 	}
@@ -466,7 +468,7 @@ AP_UnixDialog_Tab::onDefaultTabFocusOut ()
 		const gchar *dimtext = UT_formatDimensionString (dim, value);
 
 		g_signal_handler_block (G_OBJECT (m_sbDefaultTab), m_hSigDefaultTabChanged);
-		XAP_gtk_entry_set_text (GTK_ENTRY (m_sbDefaultTab), dimtext);
+		gtk_entry_set_text (GTK_ENTRY (m_sbDefaultTab), dimtext);
 		g_signal_handler_unblock (G_OBJECT (m_sbDefaultTab), m_hSigDefaultTabChanged);
 
 	    _storeWindowData ();
@@ -486,7 +488,7 @@ AP_UnixDialog_Tab::onAddTab ()
 	if (gtk_tree_model_get_iter_first(model, &iter)) {
 		do {
 			gtk_tree_model_get (model, &iter, 0, &value, -1);
-			pos = strtof (value, nullptr);
+			pos = strtof (value, NULL);
 			free(value);
 			if (pos > max)
 				max = pos;
@@ -502,7 +504,7 @@ AP_UnixDialog_Tab::onAddTab ()
 
 	g_signal_handler_block (G_OBJECT (m_sbPosition), m_hSigPositionChanged);
 	gtk_spin_button_set_value (GTK_SPIN_BUTTON (m_sbPosition), pos);
-	XAP_gtk_entry_set_text (GTK_ENTRY (m_sbPosition), text.c_str ());
+	gtk_entry_set_text (GTK_ENTRY (m_sbPosition), text.c_str ());
 	g_signal_handler_unblock (G_OBJECT (m_sbPosition), m_hSigPositionChanged);
 	
 	g_signal_handler_block (G_OBJECT (m_cobAlignment), m_hSigAlignmentChanged);
@@ -546,7 +548,7 @@ AP_UnixDialog_Tab::onPositionChanged (double value)
 	const gchar *text = UT_formatDimensionString (dim, value);
 	g_signal_handler_block(G_OBJECT (m_sbPosition), m_hSigPositionChanged);
 	g_signal_handler_block(G_OBJECT (m_tsSelection), m_hTabSelected);
-	XAP_gtk_entry_set_text (GTK_ENTRY (m_sbPosition), text);
+	gtk_entry_set_text (GTK_ENTRY (m_sbPosition), text);
 
 	_event_TabChange ();
 	_event_Update ();
@@ -558,7 +560,7 @@ AP_UnixDialog_Tab::onPositionChanged (double value)
 void 
 AP_UnixDialog_Tab::onPositionFocusOut ()
 {
-	const gchar *text = XAP_gtk_entry_get_text (GTK_ENTRY (m_sbPosition));
+	const gchar *text = gtk_entry_get_text (GTK_ENTRY (m_sbPosition));
 	UT_LocaleTransactor t(LC_NUMERIC, "C"); // FIXME: remove when we support localized dimensions
 	if (UT_isValidDimensionString (text)) {
 		// set
@@ -574,7 +576,7 @@ AP_UnixDialog_Tab::onPositionFocusOut ()
 
 		g_signal_handler_block (G_OBJECT (m_sbPosition), m_hSigPositionChanged);
 		gtk_spin_button_set_value (GTK_SPIN_BUTTON (m_sbPosition), pos);
-		XAP_gtk_entry_set_text (GTK_ENTRY (m_sbPosition), dimtext);
+		gtk_entry_set_text (GTK_ENTRY (m_sbPosition), dimtext);
 		g_signal_handler_unblock (G_OBJECT (m_sbPosition), m_hSigPositionChanged);
 
 		_event_Update ();
@@ -586,7 +588,7 @@ AP_UnixDialog_Tab::onPositionFocusOut ()
 		const gchar *dimtext = UT_formatDimensionString (dim, value);
 
 		g_signal_handler_block (G_OBJECT (m_sbPosition), m_hSigPositionChanged);
-		XAP_gtk_entry_set_text (GTK_ENTRY (m_sbPosition), dimtext);
+		gtk_entry_set_text (GTK_ENTRY (m_sbPosition), dimtext);
 		g_signal_handler_unblock (G_OBJECT (m_sbPosition), m_hSigPositionChanged);
 	}
 }
@@ -666,7 +668,7 @@ AP_UnixDialog_Tab::_gatherLeader ()
 	const gchar *text =  gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (m_cobLeader));
 	for (guint i = 0; i < __FL_LEADER_MAX; i++) {
 		
-		if (m_LeaderMapping[i] == nullptr)
+		if (m_LeaderMapping[i] == NULL)
 			break;
 
 		UT_DEBUGMSG (("ROB: %d='%s' (%s)\n", i, m_LeaderMapping[i], text));
@@ -718,7 +720,7 @@ AP_UnixDialog_Tab::_setDefaultTabStop (const gchar *defaultTabStop)
 
 	g_signal_handler_block (G_OBJECT (m_sbDefaultTab), m_hSigDefaultTabChanged);
 	gtk_spin_button_set_value (GTK_SPIN_BUTTON (m_sbDefaultTab), pos);
-	XAP_gtk_entry_set_text (GTK_ENTRY (m_sbDefaultTab), text.utf8_str());
+	gtk_entry_set_text (GTK_ENTRY (m_sbDefaultTab), text.utf8_str());
 	g_signal_handler_unblock (G_OBJECT (m_sbDefaultTab), m_hSigDefaultTabChanged);
 }
 
@@ -770,7 +772,7 @@ AP_UnixDialog_Tab::_setSelectTab (UT_sint32 v)
 const char * 
 AP_UnixDialog_Tab::_gatherTabEdit ()
 {
-	return XAP_gtk_entry_get_text (GTK_ENTRY (m_sbPosition));
+	return gtk_entry_get_text (GTK_ENTRY (m_sbPosition));
 }
 
 //! Set selected tab stop position.
@@ -785,7 +787,7 @@ AP_UnixDialog_Tab::_setTabEdit (const char *pszStr)
 
 	g_signal_handler_block (G_OBJECT (m_sbPosition), m_hSigPositionChanged);
 	gtk_spin_button_set_value (GTK_SPIN_BUTTON (m_sbPosition), pos);
-	XAP_gtk_entry_set_text (GTK_ENTRY (m_sbPosition), pszStr);
+	gtk_entry_set_text (GTK_ENTRY (m_sbPosition), pszStr);
 	g_signal_handler_unblock (G_OBJECT (m_sbPosition), m_hSigPositionChanged);
 }
 
@@ -805,7 +807,7 @@ AP_UnixDialog_Tab::_clearList ()
 GtkWidget *
 AP_UnixDialog_Tab::_lookupWidget (tControl id)
 {
-	UT_return_val_if_fail (id < id_last, nullptr);
+	UT_return_val_if_fail (id < id_last, NULL);
 
 	switch (id) {
 
@@ -843,7 +845,7 @@ AP_UnixDialog_Tab::_lookupWidget (tControl id)
 			return GTK_WIDGET(gtk_builder_get_object(m_pBuilder, "btClose"));
 		
 		default:
-			return nullptr;
+			return NULL;
 	}
 }
 

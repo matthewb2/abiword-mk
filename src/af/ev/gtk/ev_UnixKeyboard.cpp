@@ -17,10 +17,13 @@
  * 02110-1301 USA.
  */
 
+#include "ut_compiler.h"
+
 #include <stdio.h>
 #include <string.h>
-
+ABI_W_NO_CONST_QUAL
 #include <gtk/gtk.h>
+ABI_W_POP
 
 #include "ut_types.h"
 #include "ut_assert.h"
@@ -56,17 +59,13 @@ bool ev_UnixKeyboard::keyPressEvent(AV_View* pView, GdkEventKey* e)
 	EV_EditEventMapperResult result;
 	EV_EditMethod * pEM;
 
-	GdkModifierType ev_state = (GdkModifierType)0;
-	gdk_event_get_state((GdkEvent*)e, &ev_state);
-
-	UT_uint32 charData = 0;
-	gdk_event_get_keyval((GdkEvent*)e, &charData);
+	UT_uint32 charData = e->keyval;
 
 	pView->setVisualSelectionEnabled(false);
 
-	if (ev_state & GDK_SHIFT_MASK)
+	if (e->state & GDK_SHIFT_MASK)
 		state |= EV_EMS_SHIFT;
-	if (ev_state & GDK_CONTROL_MASK)
+	if (e->state & GDK_CONTROL_MASK)
 	{
 		state |= EV_EMS_CONTROL;
 
@@ -75,19 +74,16 @@ bool ev_UnixKeyboard::keyPressEvent(AV_View* pView, GdkEventKey* e)
 			// Gdk does us the favour of working out a translated keyvalue for us,
 			// but with the Ctrl keys, we do not want that -- see bug 9545
 			// Ported to use Gdk instead of Xkb for bug 13766.
-			auto ev_window = gdk_event_get_window((GdkEvent*)e);
-			GdkKeymap* keymap = gdk_keymap_get_for_display(gdk_window_get_display(ev_window));
+			GdkKeymap* keymap = gdk_keymap_get_for_display(gdk_window_get_display(e->window));
 			guint keyval;
-			guint16 ev_keycode = 0;
-			gdk_event_get_keycode((GdkEvent*)e, &ev_keycode);
-			if (gdk_keymap_translate_keyboard_state(keymap, ev_keycode,
-													(GdkModifierType)ev_state, e->group,
-													&keyval, nullptr, nullptr, nullptr)) {
+			if (gdk_keymap_translate_keyboard_state(keymap, e->hardware_keycode,
+													(GdkModifierType)e->state, e->group,
+													&keyval, NULL, NULL, NULL)) {
 				charData = keyval;
 			}
 		}
 	}
-	if (ev_state & (GDK_MOD1_MASK))
+	if (e->state & (GDK_MOD1_MASK))
 		state |= EV_EMS_ALT;
 
 	if (s_isVirtualKeyCode(charData))
@@ -120,7 +116,7 @@ bool ev_UnixKeyboard::keyPressEvent(AV_View* pView, GdkEventKey* e)
 
 			case EV_EEMR_COMPLETE:
 				UT_ASSERT(pEM);
-				invokeKeyboardMethod(pView, pEM, nullptr, 0); // no char data to offer
+				invokeKeyboardMethod(pView,pEM,0,0); // no char data to offer
 				return true;
 
 			case EV_EEMR_INCOMPLETE:

@@ -1,4 +1,4 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
 
 /* AbiSource Program Utilities
  * Copyright (C) 1998-2000 AbiSource, Inc.
@@ -29,13 +29,17 @@
 #include "config.h"
 #endif
 
+#include "ut_compiler.h"
+
 #include <string.h>
 #include <stdlib.h>
 
 #include <string>
 
 #include <gdk/gdkkeysyms.h>
+ABI_W_NO_CONST_QUAL
 #include <gtk/gtk.h>
+ABI_W_POP
 #include <goffice/gtk/go-combo-box.h>
 #include <goffice/gtk/go-combo-color.h>
 
@@ -66,7 +70,6 @@
 #include "ap_Toolbar_Id.h"
 #include "ap_UnixStockIcons.h"
 #include "ev_UnixFontCombo.h"
-#include "xap_GtkUtils.h"
 
 #ifdef ENABLE_MENUBUTTON
 #include "ev_UnixMenuBar.h"
@@ -98,7 +101,7 @@ toolbar_append_item_with_proxy (GtkToolbar *toolbar,
 	GtkToolItem *tool_item;
 
 	UT_ASSERT(GTK_IS_TOOLBAR (toolbar));
-	UT_ASSERT(widget != nullptr);
+	UT_ASSERT(widget != NULL);
 
 	if (GTK_IS_TOOL_ITEM (widget)) {
 		tool_item = GTK_TOOL_ITEM (widget);
@@ -139,7 +142,7 @@ toolbar_append_item (GtkToolbar *toolbar,
 					 gboolean	 show)
 {
 	return toolbar_append_item_with_proxy(toolbar, widget, text,
-                                          show, nullptr, nullptr);
+                                          show, NULL, NULL);
 }
 
 /*!
@@ -162,7 +165,7 @@ toolbar_append_button (GtkToolbar 	*toolbar,
 	icon = gtk_image_new_from_icon_name (stock_id, GTK_ICON_SIZE_LARGE_TOOLBAR);
 	item = gtk_tool_button_new (icon, label);
 	g_free (stock_id);
-	stock_id = nullptr;
+	stock_id = NULL;
 	*handler_id = g_signal_connect (G_OBJECT (item), "clicked", handler, data);
 
 	return (GtkWidget *) toolbar_append_item (toolbar, GTK_WIDGET (item),
@@ -192,7 +195,7 @@ toolbar_append_toggle (GtkToolbar 	*toolbar,
 	gtk_tool_button_set_icon_widget(GTK_TOOL_BUTTON(item), icon);
 	gtk_tool_button_set_label(GTK_TOOL_BUTTON(item), label);
 	g_free (stock_id);
-	stock_id = nullptr;
+	stock_id = NULL;
 	*handler_id = g_signal_connect (G_OBJECT (item), "toggled", handler, data);
 
 	return (GtkWidget *) toolbar_append_item (toolbar, GTK_WIDGET (item),
@@ -221,7 +224,7 @@ toolbar_append_menubutton (GtkToolbar 	*toolbar,
 						   gpointer		 data, 
 						   gulong		*handler_id)
 {
-	GtkToolItem *item = gtk_menu_tool_button_new (nullptr, nullptr);
+	GtkToolItem *item = gtk_menu_tool_button_new (NULL, NULL);
 	gtk_menu_tool_button_set_menu (GTK_MENU_TOOL_BUTTON (item), menu);
 
 	/* We want to hide the button part of the menu button -- to prevent
@@ -241,7 +244,7 @@ toolbar_append_menubutton (GtkToolbar 	*toolbar,
 			gtk_widget_hide_all (button);
 
 			g_signal_connect(G_OBJECT (button), "show",
-							 G_CALLBACK (menubutton_show_cb), nullptr);
+							 G_CALLBACK (menubutton_show_cb), NULL);
 
 			g_list_free (children);
 		}
@@ -282,19 +285,19 @@ combo_box_set_active_text (GtkComboBox *combo,
 
 	model = gtk_combo_box_get_model (combo);
 	next = gtk_tree_model_get_iter_first (model, &iter);
-	value = nullptr;
+	value = NULL;
 	iter_valid = FALSE;
 	while (next) {
 		gtk_tree_model_get (model, &iter, 
 							0, &value, 
 							-1);
 		if (0 == strcmp (text, value)) {
-			g_free (value); value = nullptr;
+			g_free (value); value = NULL;
 			iter_valid = true;
 			break;
 		}
 		g_free (value);
-		value = nullptr;
+		value = NULL;
 		next = gtk_tree_model_iter_next (model, &iter);
 	}
 
@@ -331,7 +334,7 @@ combo_box_set_active_text (GtkComboBox *combo,
 class _wd								// a private little class to help
 {										// us remember all the widgets that
 public:									// we create...
-	_wd(EV_UnixToolbar * pUnixToolbar, XAP_Toolbar_Id id, GtkWidget * widget = nullptr)
+	_wd(EV_UnixToolbar * pUnixToolbar, XAP_Toolbar_Id id, GtkWidget * widget = NULL)
 	{
 		m_pUnixToolbar = pUnixToolbar;
 		m_id = id;
@@ -355,7 +358,7 @@ public:									// we create...
 		wd->m_pUnixToolbar->setCurrentEvent(event);
 		if (!wd->m_blockSignal)
 		{
-			wd->m_pUnixToolbar->toolbarEvent(wd, nullptr, 0);
+			wd->m_pUnixToolbar->toolbarEvent(wd, 0, 0);
 		}
 	};
 
@@ -446,9 +449,7 @@ public:									// we create...
 	{
 		GtkComboBox *combo;
 
-		guint ev_keyval = 0;
-		gdk_event_get_keyval((GdkEvent*)event, &ev_keyval);
-		if (ev_keyval == GDK_KEY_Return) {
+		if (event->keyval == GDK_KEY_Return) {
 			combo = GTK_COMBO_BOX (gtk_widget_get_parent (widget));
 			s_combo_apply_changes (combo, wd);
 		}
@@ -520,7 +521,7 @@ public:									// we create...
 			wd->m_pUnixToolbar->m_pFontPreview) {
 				UT_DEBUGMSG(("ev_UnixToolbar - deleting FontPreview %p \n",wd->m_pUnixToolbar));
 			    delete wd->m_pUnixToolbar->m_pFontPreview;
-				wd->m_pUnixToolbar->m_pFontPreview = nullptr;
+				wd->m_pUnixToolbar->m_pFontPreview = NULL;
 				wd->m_pUnixToolbar->m_pFontPreviewPositionX = -1;
 		}
 	};
@@ -556,7 +557,7 @@ public:									// we create...
 	{
 		const char *text;
 		// TODO Rob: move this into ev_UnixFontCombo
-		gchar *buffer = nullptr;
+		gchar *buffer = NULL;
 		GtkTreeModel *model = gtk_combo_box_get_model (combo);
 		if (GTK_IS_TREE_MODEL_SORT (model)) {
 
@@ -582,7 +583,7 @@ public:									// we create...
 			if (wd->m_pUnixToolbar->m_pFontPreview) {
 				UT_DEBUGMSG(("ev_UnixToolbar - deleting FontPreview %p \n",wd->m_pUnixToolbar));
 			    delete wd->m_pUnixToolbar->m_pFontPreview;
-				wd->m_pUnixToolbar->m_pFontPreview = nullptr;
+				wd->m_pUnixToolbar->m_pFontPreview = NULL;
 				wd->m_pUnixToolbar->m_pFontPreviewPositionX = -1;
 			}
 		}
@@ -655,11 +656,11 @@ static void s_proxy_activated(GtkMenuItem * item, _wd * wd)
 		XAP_UnixApp * pUnixApp = wd->m_pUnixToolbar->getApp();
 		const EV_EditMethodContainer * pEMC = pUnixApp->getEditMethodContainer();
 		UT_return_if_fail(pEMC);
-		EV_EditMethod * pEM = nullptr;
+		EV_EditMethod * pEM = NULL;
 
 		AV_View * pView = wd->m_pUnixToolbar->getFrame()->getCurrentView();
 		pEM = pEMC->findEditMethodByName(editMethod);
-		wd->m_pUnixToolbar->invokeToolbarMethod(pView, pEM, nullptr, 0);
+		wd->m_pUnixToolbar->invokeToolbarMethod(pView, pEM, NULL, 0);
 }
 
 EV_UnixToolbar::EV_UnixToolbar(XAP_UnixApp 	*pUnixApp, 
@@ -669,15 +670,15 @@ EV_UnixToolbar::EV_UnixToolbar(XAP_UnixApp 	*pUnixApp,
   : EV_Toolbar(pUnixApp->getEditMethodContainer(),
 			   szToolbarLayoutName,
 			   szToolbarLabelSetName), 
-	m_pFontPreview(nullptr),
+	m_pFontPreview(NULL),
 	m_pFontPreviewPositionX(-1),
 	m_pUnixApp(pUnixApp),
 	m_pFrame(pFrame),
-	m_pViewListener(nullptr),
-	m_eEvent(nullptr),
-	m_wToolbar(nullptr),
-	m_wHSizeGroup(nullptr),
-	m_wVSizeGroup(nullptr)
+	m_pViewListener(NULL),
+	m_eEvent(NULL),
+	m_wToolbar(NULL),
+	m_wHSizeGroup(NULL),
+	m_wVSizeGroup(NULL)
 {}
 
 EV_UnixToolbar::~EV_UnixToolbar(void)
@@ -716,7 +717,7 @@ bool EV_UnixToolbar::toolbarEvent(_wd 				* wd,
 	// make sure we ignore presses on "down" group buttons
 	if (pAction->getItemType() == EV_TBIT_GroupButton)
 	{
-		const char * szState = nullptr;
+		const char * szState = 0;
 		EV_Toolbar_ItemState tis = pAction->getToolbarItemState(pView,&szState);
 
 		if (EV_TIS_ShouldBeToggled(tis))
@@ -764,7 +765,7 @@ UT_sint32 EV_UnixToolbar::destroy(void)
 //
 // Code gratutiously stolen from gtkbox.c
 //
-	GList *list = nullptr;
+	GList *list = NULL;
 	bool bFound = false;
 	for( list = gtk_container_get_children(wBox); !bFound && list; list = list->next)
 	{
@@ -789,7 +790,7 @@ UT_sint32 EV_UnixToolbar::destroy(void)
 //
 // Finally destroy the old toolbar widget
 //
-	gtk_container_remove(GTK_CONTAINER(gtk_widget_get_parent(m_wToolbar)), m_wToolbar);
+	gtk_widget_destroy(m_wToolbar);
 	return pos;
 }
 
@@ -823,7 +824,7 @@ static void setDragIcon(GtkWidget * wwd, GtkImage * img)
   else if (GTK_IMAGE_STOCK == gtk_image_get_storage_type(img))
     {
 #if 0
-      gchar * stk = nullptr ;
+      gchar * stk = NULL ;
       GtkIconSize icn_sz ;
       
       // TODO: this doesn't work, possibly a GTK2 bug...
@@ -838,18 +839,17 @@ static void setDragIcon(GtkWidget * wwd, GtkImage * img)
 */
 GtkToolbarStyle EV_UnixToolbar::getStyle(void)
 {
-	std::string value;
-	m_pUnixApp->getPrefsValue(XAP_PREF_KEY_ToolbarAppearance, value);
-	UT_ASSERT(!value.empty());
-
+	const gchar * szValue = NULL;
+	m_pUnixApp->getPrefsValue(XAP_PREF_KEY_ToolbarAppearance,&szValue);
+	UT_ASSERT((szValue) && (*szValue));
+	
 	GtkToolbarStyle style = GTK_TOOLBAR_ICONS;
-	if (value == "text") {
+	if (g_ascii_strcasecmp(szValue,"text")==0)
 		style = GTK_TOOLBAR_TEXT;
-	} else if (value == "both") {
+	else if (g_ascii_strcasecmp(szValue,"both")==0)
 		style = GTK_TOOLBAR_BOTH;
-	}
 
-	return style;
+	return style;	
 }
 
 bool EV_UnixToolbar::synthesize(void)
@@ -986,7 +986,7 @@ bool EV_UnixToolbar::synthesize(void)
 				setDragIcon(wwd, dragimage); // does not take dragimage ownership
 				g_object_unref(dragimage);
 				g_free (stock_id);
-				stock_id = nullptr;
+				stock_id = NULL;
 				gtk_drag_dest_set(wwd,static_cast<GtkDestDefaults>(GTK_DEST_DEFAULT_ALL),
 									s_AbiTBTargets,1,
 									GDK_ACTION_COPY);
@@ -1011,9 +1011,9 @@ bool EV_UnixToolbar::synthesize(void)
 				if (wd->m_id == AP_TOOLBAR_ID_FMT_SIZE) {
 					combo = gtk_combo_box_text_new_with_entry();
 					GtkEntry *entry = GTK_ENTRY(gtk_bin_get_child(GTK_BIN(combo)));
-					g_object_set (G_OBJECT(entry), "can-focus", TRUE, nullptr);
+					g_object_set (G_OBJECT(entry), "can-focus", TRUE, NULL);
 					gtk_entry_set_width_chars (entry, 4);
-					g_signal_connect (G_OBJECT (entry), "insert-text", G_CALLBACK (_wd::s_insert_text_cb), nullptr);
+					g_signal_connect (G_OBJECT (entry), "insert-text", G_CALLBACK (_wd::s_insert_text_cb), NULL);
 					g_signal_connect (G_OBJECT (entry), "focus-out-event", G_CALLBACK (_wd::s_focus_out_event_cb), (gpointer) wd);
 					g_signal_connect (G_OBJECT (entry), "key-press-event", G_CALLBACK (_wd::s_key_press_event_cb), (gpointer) wd);
 					// same size for font and font-size combos
@@ -1070,7 +1070,7 @@ bool EV_UnixToolbar::synthesize(void)
 							fonts[m] = v->getNthItem(m);
 						}						
 						abi_font_combo_set_fonts (ABI_FONT_COMBO (combo), fonts);
-						g_free (fonts); fonts = nullptr;
+						g_free (fonts); fonts = NULL;
 					}
 					else {
 						for (gint m=0; m < items; m++) {
@@ -1104,50 +1104,48 @@ bool EV_UnixToolbar::synthesize(void)
 				GdkPixbuf 		*pixbuf;
 				GtkWidget		*combo;
 				GOColorGroup 	*cg;
-
-				const gchar* abi_stock_id;
 				const gchar		*action_name;
-				XAP_String_Id label_id;
-				const gchar* color_group;
-				GCallback callback;
 
 				UT_ASSERT (g_ascii_strcasecmp(pLabel->getIconName(),"NoIcon") != 0);
 
-				if (pAction->getItemType() == EV_TBIT_ColorFore) {
+			    if (pAction->getItemType() == EV_TBIT_ColorFore) {
+					const XAP_StringSet * pSS = XAP_App::getApp()->getStringSet();
+					std::string sClear;
+					pSS->getValueUTF8(XAP_STRING_ID_TB_ClearForeground,sClear);
+
 					action_name = "dlgColorPickerFore";
-					abi_stock_id = ABIWORD_COLOR_FORE;
-					label_id = XAP_STRING_ID_TB_ClearForeground;
-					color_group = "fore_color_group";
-					callback = G_CALLBACK(s_fore_color_changed);
-				} else {
+					pixbuf
+						= gtk_icon_theme_load_icon(gtk_icon_theme_get_default(),
+												   ABIWORD_COLOR_FORE,
+												   GTK_ICON_SIZE_LARGE_TOOLBAR,
+												   GTK_ICON_LOOKUP_USE_BUILTIN,
+												   NULL);
+					cg = go_color_group_fetch ("fore_color_group", m_wToolbar);
+					combo = go_combo_color_new (pixbuf, sClear.c_str(), 0, cg);
+
+					wd->m_widget = combo;
+					g_signal_connect (G_OBJECT (combo), "color-changed",
+									  G_CALLBACK (s_fore_color_changed), wd);
+				}
+				else {
+					const XAP_StringSet * pSS = XAP_App::getApp()->getStringSet();
+					std::string sClear;
+					pSS->getValueUTF8(XAP_STRING_ID_TB_ClearBackground,sClear);
+
 					action_name = "dlgColorPickerBack";
-					abi_stock_id = ABIWORD_COLOR_BACK;
-					label_id = XAP_STRING_ID_TB_ClearBackground;
-					color_group = "back_color_group";
-					callback = G_CALLBACK(s_back_color_changed);
-				}
-				const XAP_StringSet * pSS = XAP_App::getApp()->getStringSet();
-				std::string sClear;
-				pSS->getValueUTF8(label_id, sClear);
+					pixbuf
+						= gtk_icon_theme_load_icon(gtk_icon_theme_get_default(),
+												   ABIWORD_COLOR_BACK,
+												   GTK_ICON_SIZE_LARGE_TOOLBAR,
+												   GTK_ICON_LOOKUP_USE_BUILTIN,
+												   NULL);
+					cg = go_color_group_fetch ("back_color_group", m_wToolbar);
+					combo = go_combo_color_new (pixbuf, sClear.c_str(), 0, cg);
 
-				GError* err = nullptr;
-				pixbuf
-					= gtk_icon_theme_load_icon(gtk_icon_theme_get_default(),
-											   abi_stock_get_gtk_stock_id(abi_stock_id),
-											   GTK_ICON_SIZE_LARGE_TOOLBAR,
-											   GTK_ICON_LOOKUP_USE_BUILTIN,
-											   &err);
-				if (err) {
-					UT_DEBUGMSG(("err: %s\n", err->message));
-					g_error_free(err);
+					wd->m_widget = combo;
+					g_signal_connect (G_OBJECT (combo), "color-changed",
+									  G_CALLBACK (s_back_color_changed), wd);
 				}
-				UT_ASSERT(pixbuf);
-				cg = go_color_group_fetch (color_group, m_wToolbar);
-				combo = go_combo_color_new (pixbuf, sClear.c_str(), 0, cg);
-
-				wd->m_widget = combo;
-				g_signal_connect (G_OBJECT (combo), "color-changed",
-								  callback, wd);
 				go_combo_box_set_relief (GO_COMBO_BOX (combo), GTK_RELIEF_NONE);
 				go_combo_color_set_instant_apply (GO_COMBO_COLOR (combo), TRUE);
 				if (pixbuf) {
@@ -1178,7 +1176,7 @@ bool EV_UnixToolbar::synthesize(void)
 #ifdef ENABLE_MENUBUTTON
 			case EV_TBIT_MenuButton:
 			{
-				GtkWidget * wMenu = nullptr;
+				GtkWidget * wMenu = NULL;
 				EV_UnixMenuBar * pBar =
 					dynamic_cast<EV_UnixMenuBar*>(m_pFrame->getMainMenu());
 
@@ -1194,10 +1192,10 @@ bool EV_UnixToolbar::synthesize(void)
 											   pLabel->getIconName(),
 											   pLabel->getToolbarLabel(),
 											   szToolTip,
-											   nullptr,
-											   nullptr,
-											   nullptr,
-											   nullptr);
+											   NULL, 
+											   NULL,
+											   NULL, 
+											   NULL);
 				
 				GtkWidget * wwd = wd->m_widget;
 				
@@ -1251,7 +1249,7 @@ void EV_UnixToolbar::_releaseListener(void)
 	if (!m_pViewListener)
 		return;
 	DELETEP(m_pViewListener);
-	m_pViewListener = nullptr;
+	m_pViewListener = 0;
 	m_lid = 0;
 }
 	
@@ -1299,8 +1297,7 @@ bool EV_UnixToolbar::refreshToolbar(AV_View * pView, AV_ChangeMask mask)
 		{
 		case EV_TLF_Normal:
 			{
-				const char * szState = nullptr;
-				std::string sLoc;
+				const char * szState = 0;
 				EV_Toolbar_ItemState tis = pAction->getToolbarItemState(pView,&szState);
 
                 if( tis & EV_TIS_Hidden )
@@ -1366,12 +1363,13 @@ bool EV_UnixToolbar::refreshToolbar(AV_View * pView, AV_ChangeMask mask)
 							ret = combo_box_set_active_text(combo, fsz, wd->m_handlerId);
 						}
 						if (!ret) {
-							XAP_gtk_entry_set_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(combo))), 
+							gtk_entry_set_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(combo))), 
 											   szState);
 						}
 					}
 					else if (wd->m_id == AP_TOOLBAR_ID_FMT_STYLE) {
 #define BUILTIN_INDEX "builtin-index"
+						std::string sLoc;
 						pt_PieceTable::s_getLocalisedStyleName(szState, sLoc);
 						szState = sLoc.c_str();
 						gint idx = GPOINTER_TO_INT(g_object_steal_data(G_OBJECT(combo), BUILTIN_INDEX));
@@ -1401,7 +1399,7 @@ bool EV_UnixToolbar::refreshToolbar(AV_View * pView, AV_ChangeMask mask)
 						if (wd->m_pUnixToolbar->m_pFontPreview) {
 							UT_DEBUGMSG(("ev_UnixToolbar - deleting FontPreview %p \n",wd->m_pUnixToolbar));
 						    delete wd->m_pUnixToolbar->m_pFontPreview;
-							wd->m_pUnixToolbar->m_pFontPreview = nullptr;
+							wd->m_pUnixToolbar->m_pFontPreview = NULL;
 							wd->m_pUnixToolbar->m_pFontPreviewPositionX = 0;
 						}
 					}
@@ -1484,9 +1482,9 @@ bool EV_UnixToolbar::repopulateStyles(void)
 //
 	UT_uint32 count = m_pToolbarLayout->getLayoutItemCount();
 	UT_uint32 i =0;
-	EV_Toolbar_LayoutItem * pLayoutItem = nullptr;
+	EV_Toolbar_LayoutItem * pLayoutItem = NULL;
 	XAP_Toolbar_Id id = 0;
-	_wd * wd = nullptr;
+	_wd * wd = NULL;
 	for(i=0; i < count; i++)
 	{
 		pLayoutItem = m_pToolbarLayout->getLayoutItem(i);

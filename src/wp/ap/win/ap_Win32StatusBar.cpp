@@ -204,8 +204,8 @@ void ap_usb_ProgressListener::notify()
 
 AP_Win32StatusBar::AP_Win32StatusBar(XAP_Frame * pFrame)
 	: AP_StatusBar(pFrame),
-	  m_hwndStatusBar(nullptr),
-	  m_pOrgStatusbarWndProc(nullptr),
+	  m_hwndStatusBar(NULL),
+	  m_pOrgStatusbarWndProc(NULL),
 	  m_iPrevWidth(-1),
 	  m_iDIR(0)
 {
@@ -247,19 +247,19 @@ HWND AP_Win32StatusBar::createWindow(HWND hwndFrame,
 		specified in the CreateWindowEx function.	
 	
 	*/
-	m_hwndStatusBar = UT_CreateWindowEx(0, STATUSCLASSNAMEW, nullptr,
+	m_hwndStatusBar = UT_CreateWindowEx(0, STATUSCLASSNAMEW, NULL,
 										WS_CHILD | WS_VISIBLE | SBS_SIZEGRIP,
 										0, 0, 0, 0,
-										hwndFrame, nullptr, app->getInstance(),nullptr);
+										hwndFrame, NULL, app->getInstance(),NULL);
 	// add progress bar and hide it 
 	//  set the color and range 
-	m_hwndProgressBar= UT_CreateWindowEx(0, PROGRESS_CLASSW, nullptr,
+	m_hwndProgressBar= UT_CreateWindowEx(0, PROGRESS_CLASSW, NULL,
 			WS_CHILD | WS_VISIBLE|PBS_MARQUEE,
 			0, 0, 0, 0,
-			m_hwndStatusBar, nullptr, app->getInstance(),nullptr);
+			m_hwndStatusBar, NULL, app->getInstance(),NULL);
 	SendMessage(m_hwndProgressBar,PBM_SETRANGE,0,MAKELONG(0,100));
-
-	UT_return_val_if_fail (m_hwndStatusBar, nullptr);
+	
+	UT_return_val_if_fail (m_hwndStatusBar,0);	
 
 	// route messages through our handler first (to size the status panels).
 	m_pOrgStatusbarWndProc = reinterpret_cast<WNDPROC>(SetWindowLongPtrW(

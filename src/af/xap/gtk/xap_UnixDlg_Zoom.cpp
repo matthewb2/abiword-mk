@@ -53,18 +53,18 @@ XAP_UnixDialog_Zoom::XAP_UnixDialog_Zoom(XAP_DialogFactory * pDlgFactory,
 					 XAP_Dialog_Id id)
   : XAP_Dialog_Zoom(pDlgFactory,id)
 {
-  m_windowMain = nullptr;
+  m_windowMain = NULL;
     
-  m_radio200 = 		nullptr;
-  m_radio100 = 		nullptr;
-  m_radio75 = 		nullptr;
-  m_radioPageWidth = 	nullptr;
-  m_radioWholePage = 	nullptr;
-  m_radioPercent = 	nullptr;
+  m_radio200 = 		NULL;
+  m_radio100 = 		NULL;
+  m_radio75 = 		NULL;
+  m_radioPageWidth = 	NULL;
+  m_radioWholePage = 	NULL;
+  m_radioPercent = 	NULL;
   
-  m_spinPercent = nullptr;
+  m_spinPercent = NULL;
   
-  m_radioGroup = nullptr;
+  m_radioGroup = NULL;
 }
 
 XAP_UnixDialog_Zoom::~XAP_UnixDialog_Zoom(void)
@@ -203,7 +203,7 @@ GtkWidget * XAP_UnixDialog_Zoom::_constructWindow(void)
 	const XAP_StringSet * pSS = m_pApp->getStringSet();
 	
 	// load the dialog from the UI file
-	GtkBuilder* builder = newDialogBuilderFromResource("xap_UnixDlg_Zoom.ui");
+	GtkBuilder* builder = newDialogBuilder("xap_UnixDlg_Zoom.ui");
 	
 	// Update our member variables with the important widgets that 
 	// might need to be queried or altered later

@@ -1,6 +1,5 @@
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2021 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +17,8 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef AP_Dialog_Columns_H
+#define AP_Dialog_Columns_H
 
 #include "xap_Frame.h"
 #include "xap_Dialog.h"
@@ -51,13 +51,13 @@ public:
 	virtual ~AP_Columns_preview(void);
 
 	// data twiddlers
-	virtual void drawImmediate(const UT_Rect* clip = nullptr) override;
+	void			draw(const UT_Rect *clip=NULL);
 
 	void			set(UT_uint32 iColumns, bool bLines)
 					{
 						m_iColumns = iColumns;
 						m_bLineBetween = bLines;
-						queueDraw();
+						draw();
 					}
 
 private:
@@ -76,16 +76,11 @@ public:
 	AP_Dialog_Columns(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_Dialog_Columns(void);
 
-	virtual void runModal(XAP_Frame * pFrame) override = 0;
+	virtual void					runModal(XAP_Frame * pFrame) = 0;
 	virtual void					enableLineBetweenControl(bool bState = true) = 0;
 
 
 	void							setColumns(UT_uint32 iColumns);
-
-	AP_Columns_preview* getColumnsPreview() const
-	{
-		return m_pColumnsPreview;
-	}
 
 	typedef enum { a_OK, a_CANCEL } tAnswer;
 	AP_Dialog_Columns::tAnswer getAnswer(void) const;
@@ -136,3 +131,5 @@ private:
 	double                     m_dMarginLeft;
 	double                     m_dMarginRight;
 };
+
+#endif /* AP_Dialog_Columns_H */

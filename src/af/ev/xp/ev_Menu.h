@@ -1,4 +1,3 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t -*- */
 /* AbiSource Program Utilities
  * Copyright (C) 1998 AbiSource, Inc.
  *
@@ -52,11 +51,11 @@ public:
 	bool invokeMenuMethod(AV_View * pView,
 						  EV_EditMethod * pEM,
 						  UT_UCSChar * pData,
-						  UT_uint32 dataLength) const;
+						  UT_uint32 dataLength);
 
 	bool invokeMenuMethod(AV_View* pView,
 						  EV_EditMethod* pEM,
-						  const UT_String& szScriptName) const;
+						  const UT_String& szScriptName);
 
 	const EV_Menu_Layout *		getLayout() const { return m_pMenuLayout; }
 	const EV_Menu_LabelSet *	getLabelSet() const { return m_pMenuLabelSet; }
@@ -67,8 +66,8 @@ public:
 
 protected:
 	const char ** 				getLabelName(XAP_App * pApp,
-											 const EV_Menu_Action * pAction, const EV_Menu_Label * pLabel) const;
-	XAP_App *					getApp() const { return m_pApp; }
+											 const EV_Menu_Action * pAction, const EV_Menu_Label * pLabel);
+	XAP_App *					getApp() { return m_pApp; }
 
 // private: TODO: our inherited classes should have no business with our variables!
 	EV_EditMethodContainer *	m_pEMC;

@@ -55,8 +55,8 @@ AP_UnixDialog_Break::AP_UnixDialog_Break(XAP_DialogFactory * pDlgFactory,
 										 XAP_Dialog_Id id)
 	: AP_Dialog_Break(pDlgFactory,id)
 {
-	m_windowMain = nullptr;
-	m_radioGroup = nullptr;
+	m_windowMain = NULL;
+	m_radioGroup = NULL;
 }
 
 AP_UnixDialog_Break::~AP_UnixDialog_Break(void)
@@ -99,7 +99,7 @@ GtkWidget * AP_UnixDialog_Break::_constructWindow(void)
 	const XAP_StringSet * pSS = m_pApp->getStringSet();
 	
 
-	GtkBuilder * builder = newDialogBuilderFromResource("ap_UnixDialog_Break.ui");
+	GtkBuilder * builder = newDialogBuilder("ap_UnixDialog_Break.ui");
 	
 	// Update our member variables with the important widgets that 
 	// might need to be queried or altered later
@@ -169,7 +169,7 @@ GtkWidget * AP_UnixDialog_Break::_findRadioByID(AP_Dialog_Break::breakType b)
 			return static_cast<GtkWidget *>(item->data);
 	}
 
-	return nullptr;
+	return NULL;
 }
 
 AP_Dialog_Break::breakType AP_UnixDialog_Break::_getActiveRadioItem(void)

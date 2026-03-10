@@ -31,7 +31,7 @@
 XAP_FontPreview::XAP_FontPreview()
 	: m_width(PREVIEW_WIDTH)
 	, m_height(PREVIEW_HEIGHT)
-	, m_pFontPreview(nullptr)
+	, m_pFontPreview(NULL)
 {
 	UT_UCS4_cloneString_char (&m_drawString, PREVIEW_ENTRY_DEFAULT_STRING);
 }
@@ -48,15 +48,16 @@ void XAP_FontPreview::_createFontPreviewFromGC(GR_Graphics * gc,
 {
 	UT_ASSERT(gc);
 	UT_DEBUGMSG(("SEVIOR!!!!!!!!!!! font priview created!!!!!\n"));
-	m_pFontPreview = new XAP_Preview_FontPreview(gc,nullptr);
+	m_pFontPreview = new XAP_Preview_FontPreview(gc,NULL);
 	UT_return_if_fail(m_pFontPreview);
-	
+
 	m_pFontPreview->setDrawString(m_drawString);
 	m_pFontPreview->setVecProperties(&m_mapProps);
 	m_pFontPreview->setWindowSize(width, height);
 	m_width = gc->tlu(width);
 	m_height = gc->tlu(height);
-	addOrReplaceVecProp("font-size","36pt");
+	//pascal addOrReplaceVecProp("font-size","36pt");
+    addOrReplaceVecProp("font-size","8pt"); //pascal
 }
 
 void XAP_FontPreview::addOrReplaceVecProp(const std::string & pszProp,
@@ -81,6 +82,6 @@ void XAP_FontPreview::setText(const gchar * pFontFamily)
 void XAP_FontPreview::draw()
 {
   if (m_pFontPreview)
-    m_pFontPreview->queueDraw();
+    m_pFontPreview->draw();
 }
 

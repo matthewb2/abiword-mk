@@ -37,13 +37,9 @@ GR_CairoPrintGraphics::~GR_CairoPrintGraphics()
 GR_Font * GR_CairoPrintGraphics::getGUIFont(void)
 {
     UT_ASSERT_NOT_REACHED ();
-    return nullptr;
+    return NULL;
 }
 
-void GR_CairoPrintGraphics::queueDraw(const UT_Rect*)
-{
-    UT_ASSERT_NOT_REACHED();
-}
 
 bool GR_CairoPrintGraphics::queryProperties(GR_Graphics::Properties gp) const
 {

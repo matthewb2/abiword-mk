@@ -87,7 +87,7 @@ AP_Dialog_FormatFrame::AP_Dialog_FormatFrame(XAP_DialogFactory * pDlgFactory, XA
 	  m_lineStyle(LS_NORMAL),
 	
 	  m_answer(a_OK),
-	  m_pFormatFramePreview(nullptr),
+	  m_pFormatFramePreview(NULL),
 	  m_bSettingsChanged(false),
 
 	  m_borderColorRight(0,0,0),
@@ -112,13 +112,13 @@ AP_Dialog_FormatFrame::AP_Dialog_FormatFrame(XAP_DialogFactory * pDlgFactory, XA
 	  m_sBorderThicknessTop("1.00pt"),
 	  m_sBorderThicknessBottom("1.00pt"),
 
-	  m_pAutoUpdaterMC(nullptr),
+	  m_pAutoUpdaterMC(NULL),
 	  m_bDestroy_says_stopupdating(false),
 	  m_bAutoUpdate_happening_now(false),
 	  m_iOldPos(0),
 	  m_sImagePath(""),
 	  m_iGraphicType(0),
-	  m_pImage(nullptr),
+	  m_pImage(NULL),
 	  m_bSensitive(false),
 	  m_bSetWrapping(false),
 	  m_bLineToggled(false),
@@ -146,7 +146,7 @@ void AP_Dialog_FormatFrame::setActiveFrame(XAP_Frame * /*pFrame*/)
 void AP_Dialog_FormatFrame::ConstructWindowName(void)
 {
 	const XAP_StringSet * pSS = m_pApp->getStringSet();
-	gchar * tmp = nullptr;
+	gchar * tmp = NULL;
 	UT_XML_cloneNoAmpersands(tmp, pSS->getValue(AP_STRING_ID_DLG_FormatFrameTitle));
 	BuildWindowName(static_cast<char *>(m_WindowName),static_cast<char*>(tmp),sizeof(m_WindowName));  
 	FREEP(tmp);
@@ -163,14 +163,14 @@ void AP_Dialog_FormatFrame::startUpdater(void)
 
 void AP_Dialog_FormatFrame::stopUpdater(void)
 {
-	if(m_pAutoUpdaterMC == nullptr)
+	if(m_pAutoUpdaterMC == NULL)
 	{
 		return;
 	}
 	m_bDestroy_says_stopupdating = true;
 	m_pAutoUpdaterMC->stop();
 	DELETEP(m_pAutoUpdaterMC);
-	m_pAutoUpdaterMC = nullptr;
+	m_pAutoUpdaterMC = NULL;
 }
 /*!
  Autoupdater of the dialog.
@@ -425,7 +425,7 @@ void AP_Dialog_FormatFrame::setCurFrameProps(void)
 	m_borderThicknessTop    = 1.0f;
 	m_borderThicknessBottom = 1.0f;
 
-    m_sBorderThickness = "1.00pt";
+	m_sBorderThickness = "1.00pt",
  
 	m_sBorderThicknessRight  = "1.00pt";
 	m_sBorderThicknessLeft   = "1.00pt";
@@ -446,14 +446,14 @@ void AP_Dialog_FormatFrame::setCurFrameProps(void)
 
 	if (pDoc->getStruxOfTypeFromPosition(pos, PTX_SectionFrame, &sdh))
 		if (PT_AttrPropIndex api = pDoc->getAPIFromSDH(sdh)) {
-			const PP_AttrProp * pAP = nullptr;
+			const PP_AttrProp * pAP = 0;
 			if (pDoc->getAttrProp(api, &pAP))
 				if (pAP) {
 					m_bSensitive = true;
 
 #define REPLACE_CELL_PROPERTY(X) \
 	do { \
-		const gchar * prop = nullptr; \
+		const gchar * prop = 0; \
 		if (pAP->getProperty(X, prop)) \
 			PP_addOrSetAttribute(X, prop, m_vecProps); \
 		else \
@@ -687,7 +687,7 @@ void AP_Dialog_FormatFrame::applyChanges()
 
 	//Check if the position mode changed. Update xpos and ypos parameters if necessary
 	fl_FrameLayout * pFL = pView->getFrameLayout();
-	fl_BlockLayout * pCloseBL = nullptr;
+	fl_BlockLayout * pCloseBL = NULL;
 	const std::string sMode = PP_getAttribute("position-to", m_vecProps);
 
 	if (((pFL->getFramePositionTo() == FL_FRAME_POSITIONED_TO_BLOCK) &&
@@ -702,7 +702,7 @@ void AP_Dialog_FormatFrame::applyChanges()
 		if (pFrameC)
 		{
 			fv_FrameStrings FrameStrings;
-			fp_Page * pPage = nullptr;
+			fp_Page * pPage = NULL;
 			UT_sint32 iXposPage = pFrameC->getX() - pFrameC->getXPad();
 			UT_sint32 iYposPage = pFrameC->getY() - pFrameC->getYPad();
 			UT_sint32 xp = 0;
@@ -1080,7 +1080,7 @@ AP_FormatFrame_preview::~AP_FormatFrame_preview()
 {
 }
 
-void AP_FormatFrame_preview::drawImmediate(const UT_Rect* clip)
+void AP_FormatFrame_preview::draw(const UT_Rect *clip)
 {
 	UT_UNUSED(clip);
 	GR_Painter painter(m_gc);

@@ -1,4 +1,4 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
 
 // UT_Stringbuf.cpp
 
@@ -26,6 +26,8 @@
 #include <algorithm>
 
 #include <libxml/uri.h>
+#include <libxml/parser.h>
+#include <libxml/xmlmemory.h>
 
 #include <glib.h>
 
@@ -53,8 +55,8 @@
 
 
 UT_UTF8Stringbuf::UT_UTF8Stringbuf () :
-	m_psz(nullptr),
-	m_pEnd(nullptr),
+	m_psz(0),
+	m_pEnd(0),
 	m_strlen(0),
 	m_buflen(0)
 {
@@ -62,8 +64,8 @@ UT_UTF8Stringbuf::UT_UTF8Stringbuf () :
 }
 
 UT_UTF8Stringbuf::UT_UTF8Stringbuf (const UT_UTF8Stringbuf & rhs) :
-	m_psz(nullptr),
-	m_pEnd(nullptr),
+	m_psz(0),
+	m_pEnd(0),
 	m_strlen(0),
 	m_buflen(0)
 {
@@ -71,8 +73,8 @@ UT_UTF8Stringbuf::UT_UTF8Stringbuf (const UT_UTF8Stringbuf & rhs) :
 }
 
 UT_UTF8Stringbuf::UT_UTF8Stringbuf (const char * sz, size_t n /* == 0 => null-termination */) :
-	m_psz(nullptr),
-	m_pEnd(nullptr),
+	m_psz(0),
+	m_pEnd(0),
 	m_strlen(0),
 	m_buflen(0)
 {
@@ -102,8 +104,7 @@ void UT_UTF8Stringbuf::assign (const char * sz, size_t n /* == 0 => null-termina
 // technically it could differentiate, since UCS-4 is only 31-bit, but...
 UT_UTF8Stringbuf::UCS4Char UT_UTF8Stringbuf::charCode (const char * str)
 {
-	if (str == nullptr)
-		return 0;
+	if ( str == 0) return 0;
 	if (*str == 0) return 0;
 
 	const char * p = str;
@@ -188,7 +189,7 @@ UT_UTF8Stringbuf::UCS4Char UT_UTF8Stringbuf::charCode (const char * str)
 
 void UT_UTF8Stringbuf::append (const char * sz, size_t n /* == 0 => null-termination */)
 {
-	if (sz == nullptr)
+	if (sz == 0) 
 		return;
 	if (!grow ((n?n:strlen(sz)) + 1)) 
 		return;
@@ -285,7 +286,7 @@ void UT_UTF8Stringbuf::append (const char * sz, size_t n /* == 0 => null-termina
 
 void UT_UTF8Stringbuf::append (const UT_UTF8Stringbuf & rhs)
 {
-	if (grow (rhs.byteLength () + 1) && rhs.data() != nullptr)
+	if (grow (rhs.byteLength () + 1) && rhs.data() != NULL)
 	{
 		memcpy (m_pEnd, rhs.data (), rhs.byteLength ());
 		m_strlen += rhs.utf8Length ();
@@ -796,18 +797,16 @@ void UT_UTF8Stringbuf::escapeMIME ()
 
 void UT_UTF8Stringbuf::clear ()
 {
-	if (m_psz)
-		g_free (m_psz);
-	m_psz = nullptr;
-	m_pEnd = nullptr;
+	if (m_psz) g_free (m_psz);
+	m_psz = 0;
+	m_pEnd = 0;
 	m_strlen = 0;
 	m_buflen = 0;
 }
 
 void UT_UTF8Stringbuf::insert (char *& ptr, const char * str, size_t utf8length)
 {
-	if (str == nullptr)
-		return;
+	if ( str == 0) return;
 	if (*str == 0) return;
 
 	if ((ptr < m_psz) || (ptr > m_pEnd)) return;
@@ -838,12 +837,11 @@ bool UT_UTF8Stringbuf::grow (size_t length)
 {
 	if (length + 1 <= (m_buflen - (m_pEnd - m_psz))) return true;
 
-	if (m_psz == nullptr)
+	if (m_psz == 0)
 	{
 		if (length == 0) return true;
 		m_psz = static_cast<char *>(g_try_malloc(length));
-		if (m_psz == nullptr)
-			return false;
+		if (m_psz == 0) return false;
 		m_strlen = 0;
 		m_buflen = length;
 		m_pEnd = m_psz;
@@ -855,8 +853,7 @@ bool UT_UTF8Stringbuf::grow (size_t length)
 	size_t end_offset = m_pEnd - m_psz;
 
 	char * more = static_cast<char *>(g_try_realloc(static_cast<void *>(m_psz), new_length));
-	if (more == nullptr)
-		return false;
+	if (more == 0) return false;
 	m_psz = more;
 	m_pEnd = m_psz + end_offset;
 	m_buflen = new_length;
@@ -865,8 +862,8 @@ bool UT_UTF8Stringbuf::grow (size_t length)
 
 UT_UTF8Stringbuf::UTF8Iterator::UTF8Iterator (const UT_UTF8Stringbuf * strbuf) :
 	m_strbuf(strbuf),
-	m_utfbuf(nullptr),
-	m_utfptr(nullptr)
+	m_utfbuf(0),
+	m_utfptr(0)
 {
 	sync ();
 }
@@ -891,33 +888,31 @@ void UT_UTF8Stringbuf::UTF8Iterator::operator=(const char * position)
 
 const char * UT_UTF8Stringbuf::UTF8Iterator::current ()
 {
-	if (!sync ())
-		return nullptr;
-	if ((*m_utfptr & 0xc0) == 0x80)
-		return nullptr; // oops - a 'continuing' byte 
+	if (!sync ()) return 0;
+	if ((*m_utfptr & 0xc0) == 0x80) return 0; // oops - a 'continuing' byte 
 	return m_utfptr;
 }
 
 const char * UT_UTF8Stringbuf::UTF8Iterator::start ()
 {
 	if (!sync ()) 
-		return nullptr;
+		return 0;
 	return m_utfbuf;
 }
 
 const char * UT_UTF8Stringbuf::UTF8Iterator::end ()
 {
 	if (!sync ()) 
-		return nullptr;
+		return 0;
 	return m_utfbuf + m_strbuf->byteLength ();
 }
 
 const char * UT_UTF8Stringbuf::UTF8Iterator::advance ()
 {
 	if (!sync ()) 
-		return nullptr;
+		return 0;
 	if (*m_utfptr == 0) 
-		return nullptr;
+		return 0;
 	do {
 		m_utfptr++;
 	} while ((*m_utfptr & 0xc0) == 0x80); // a 'continuing' byte 
@@ -927,9 +922,9 @@ const char * UT_UTF8Stringbuf::UTF8Iterator::advance ()
 const char * UT_UTF8Stringbuf::UTF8Iterator::retreat ()
 {
 	if (!sync ()) 
-		return nullptr;
+		return 0;
 	if (m_utfptr == m_utfbuf) 
-		return nullptr;
+		return 0;
 	do {
 		m_utfptr--;
 	} while ((*m_utfptr & 0xc0) == 0x80); // a 'continuing' byte 
@@ -939,14 +934,14 @@ const char * UT_UTF8Stringbuf::UTF8Iterator::retreat ()
 // returns false only if there is no string data
 bool UT_UTF8Stringbuf::UTF8Iterator::sync ()
 {
-	if (m_strbuf == nullptr)
+	if (m_strbuf == 0) 
 		return false;
 
 	const char * utf8_buffer = m_strbuf->data ();
-	if (utf8_buffer == nullptr)
+	if (utf8_buffer == 0)
 	{
-		m_utfbuf = nullptr;
-		m_utfptr = nullptr;
+		m_utfbuf = 0;
+		m_utfptr = 0;
 		return false;
 	}
 

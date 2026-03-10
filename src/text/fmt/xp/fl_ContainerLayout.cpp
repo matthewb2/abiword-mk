@@ -56,16 +56,16 @@ fl_ContainerLayout::fl_ContainerLayout(fl_ContainerLayout* pMyLayout, pf_Frag_St
 	: fl_Layout(iStrux, sdh),
 	  m_iConType(iType),
 	  m_pMyLayout(pMyLayout),
-	  m_pPrev(nullptr),
-	  m_pNext(nullptr),
-	  m_pFirstL(nullptr),
-	  m_pLastL(nullptr),
-	  m_pFirstContainer(nullptr),
-	  m_pLastContainer(nullptr),
+	  m_pPrev(NULL),
+	  m_pNext(NULL),
+	  m_pFirstL(NULL),
+	  m_pLastL(NULL),
+	  m_pFirstContainer(NULL),
+	  m_pLastContainer(NULL),
 	  m_eHidden(FP_VISIBLE),
 	  m_iFoldedLevel(0)
 {
-//	UT_ASSERT(pMyLayout != nullptr);
+//	UT_ASSERT(pMyLayout != NULL);
 	setAttrPropIndex(indexAP);
 	if(pMyLayout)
 	{
@@ -76,19 +76,19 @@ fl_ContainerLayout::fl_ContainerLayout(fl_ContainerLayout* pMyLayout, pf_Frag_St
 fl_ContainerLayout::~fl_ContainerLayout()
 {
 #if 1
-	m_pMyLayout = nullptr;
-	m_pFirstL = nullptr;
-	m_pLastL = nullptr;
-	m_pPrev = nullptr;
-	m_pNext = nullptr;
-	m_pFirstContainer = nullptr;
-	m_pLastContainer = nullptr;
+	m_pMyLayout = NULL;
+	m_pFirstL = NULL;
+	m_pLastL = NULL;
+	m_pPrev = NULL;
+	m_pNext = NULL;
+	m_pFirstContainer = NULL;
+	m_pLastContainer = NULL;
 #endif
 }
 
 bool fl_ContainerLayout::_getPropertiesAP(const PP_AttrProp*& pAP)
 {
-	pAP = nullptr;
+	pAP = NULL;
 	FPVisibility eVisibility = getAP(pAP);
 	UT_return_val_if_fail(pAP, false);
 
@@ -103,7 +103,7 @@ bool fl_ContainerLayout::_getPropertiesAP(const PP_AttrProp*& pAP)
 	}
 	// evaluate "display" property
 	// display property
-	const char* pszDisplay = nullptr;
+	const char* pszDisplay = NULL;
 	pAP->getProperty("display", (const gchar *&)pszDisplay);
 	if(isHidden() == FP_VISIBLE && pszDisplay && !strcmp(pszDisplay, "none"))
 	{
@@ -173,7 +173,7 @@ FPVisibility fl_ContainerLayout::getAP(const PP_AttrProp *& pAP)const
 	bool bShow     = pView->isShowRevisions();
 	bool bHiddenRevision = false;
 
-	UT_Option<std::unique_ptr<PP_RevisionAttr>> unused;
+	std::unique_ptr<PP_RevisionAttr> unused;
 	getAttrProp(&pAP, unused, bShow, iId, bHiddenRevision);
 
 	if(bHiddenRevision)
@@ -199,7 +199,7 @@ void fl_ContainerLayout::getSpanAP(UT_uint32 blockPos, bool bLeft, const PP_Attr
 	bool bShow     = pView->isShowRevisions();
 	bool bHiddenRevision = false;
 
-	UT_Option<std::unique_ptr<PP_RevisionAttr>> unused;
+	std::unique_ptr<PP_RevisionAttr> unused;
 	getSpanAttrProp(blockPos, bLeft, &pSpanAP, unused, bShow,iId,bHiddenRevision);
 }
 
@@ -247,11 +247,11 @@ const char * fl_ContainerLayout::getContainerString(void)
  */
 const char*	fl_ContainerLayout::getAttribute(const char * pszName) const
 {
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	getAP(pAP);
-	UT_return_val_if_fail(pAP, nullptr);
+	UT_return_val_if_fail(pAP, NULL);
 	
-	const gchar* pszAtt = nullptr;
+	const gchar* pszAtt = NULL;
 	pAP->getAttribute(static_cast<const gchar*>(pszName), pszAtt);
 
 	return pszAtt;
@@ -262,7 +262,7 @@ const char*	fl_ContainerLayout::getAttribute(const char * pszName) const
  */
 UT_sint32 fl_ContainerLayout::getLevelInList(void)
 {
-      fl_BlockLayout * pBList = nullptr;
+      fl_BlockLayout * pBList = NULL;
       if(getContainerType() == FL_CONTAINER_BLOCK)
       {
 	   pBList = static_cast<fl_BlockLayout * >(this);
@@ -279,18 +279,18 @@ UT_sint32 fl_ContainerLayout::getLevelInList(void)
 	  {
 	       pBList = pBList->getPrevBlockInDocument();
 	  }
-	  if(pBList == nullptr)
+	  if(pBList == NULL)
 	  {
 	       bLoop = false;
 	       break;
 	  }
-	  const PP_AttrProp * pAP = nullptr;
+	  const PP_AttrProp * pAP = NULL;
 	  pBList->getAP(pAP);
-	  const gchar * szLid=nullptr;
+	  const gchar * szLid=NULL;
 	  UT_uint32 id=0;
 
 	  if (!pAP || !pAP->getAttribute(PT_LISTID_ATTRIBUTE_NAME, szLid))
-	       szLid = nullptr;
+	       szLid = NULL;
 	  if (szLid)
 	  {
 	       id = atoi(szLid);
@@ -359,11 +359,11 @@ UT_uint32 fl_ContainerLayout::getFoldedID(void)
  */
 void fl_ContainerLayout::lookupFoldedLevel(void)
 {
-	const PP_AttrProp* pSectionAP = nullptr;
+ 	const PP_AttrProp* pSectionAP = NULL;
 
 	getAP(pSectionAP);
 
-	const gchar *pszTEXTFOLDED = nullptr;
+	const gchar *pszTEXTFOLDED = NULL;
 	if(!pSectionAP || !pSectionAP->getProperty("text-folded",pszTEXTFOLDED))
 	{
 		m_iFoldedLevel = 0;
@@ -373,7 +373,7 @@ void fl_ContainerLayout::lookupFoldedLevel(void)
 		m_iFoldedLevel = atoi(pszTEXTFOLDED);
 	}
 	xxx_UT_DEBUGMSG(("FOlded Level is %d \n",m_iFoldedLevel));
-    pszTEXTFOLDED = nullptr;
+    pszTEXTFOLDED = NULL;
 	if(!pSectionAP || !pSectionAP->getProperty("text-folded-id",pszTEXTFOLDED))
 	{
 		m_iFoldedID = 0;
@@ -440,16 +440,16 @@ fl_ContainerLayout * fl_ContainerLayout::getPrev(void) const
 fl_DocSectionLayout * fl_ContainerLayout::getDocSectionLayout(void) const
 {
 	fl_ContainerLayout * pCL = myContainingLayout();
-	while(pCL!= nullptr && ((pCL->getContainerType() != FL_CONTAINER_DOCSECTION) && (pCL->getContainerType() != FL_CONTAINER_HDRFTR)))
+	while(pCL!= NULL && ((pCL->getContainerType() != FL_CONTAINER_DOCSECTION) && (pCL->getContainerType() != FL_CONTAINER_HDRFTR)))
 	{
 		pCL = pCL->myContainingLayout();
 	}
-	if(pCL== nullptr)
+	if(pCL== NULL)
 	{
 		UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
-		return nullptr;
+		return NULL;
 	}
-	fl_DocSectionLayout * pDSL = nullptr;
+	fl_DocSectionLayout * pDSL = NULL;
 	if(pCL->getContainerType() == FL_CONTAINER_HDRFTR)
 	{
 		pDSL = static_cast<fl_HdrFtrSectionLayout *>(pCL)->getDocSectionLayout();
@@ -462,7 +462,7 @@ fl_DocSectionLayout * fl_ContainerLayout::getDocSectionLayout(void) const
 }
 
 /*!
- * Return the fl_ContainerLayout that "owns" this. Set to nullptr for
+ * Return the fl_ContainerLayout that "owns" this. Set to NULL for
  * fl_DocSectionLayout
  */
 fl_ContainerLayout * fl_ContainerLayout::myContainingLayout(void) const
@@ -473,7 +473,7 @@ fl_ContainerLayout * fl_ContainerLayout::myContainingLayout(void) const
 /*!
  * If this container is contained by a HdrFtrSectionLayout return it. 
  * Otherwise return
- * nullptr.
+ * NULL.
  */
 fl_HdrFtrSectionLayout * fl_ContainerLayout::getHdrFtrLayout(void)
 {
@@ -487,7 +487,7 @@ fl_HdrFtrSectionLayout * fl_ContainerLayout::getHdrFtrLayout(void)
 	{
 		return static_cast<fl_HdrFtrSectionLayout *>(pCL);
 	}
-	return nullptr;
+	return NULL;
 }
 
 FL_DocLayout* fl_ContainerLayout::getDocLayout(void) const
@@ -502,7 +502,7 @@ FL_DocLayout* fl_ContainerLayout::getDocLayout(void) const
 
 void fl_ContainerLayout::setContainingLayout(fl_ContainerLayout * pL)
 {
-//	UT_ASSERT(pL != nullptr); // useful for debugging
+//	UT_ASSERT(pL != NULL); // useful for debugging
 	m_pMyLayout = pL;
 }
 
@@ -515,9 +515,9 @@ void fl_ContainerLayout::add(fl_ContainerLayout* pL)
 {
 	if (m_pLastL)
 	{
-		UT_ASSERT(m_pLastL->getNext() == nullptr);
+		UT_ASSERT(m_pLastL->getNext() == NULL);
 
-		pL->setNext(nullptr);
+		pL->setNext(NULL);
 		pL->setPrev(m_pLastL);
 		m_pLastL->setNext(pL);
 		m_pLastL = pL;
@@ -525,9 +525,9 @@ void fl_ContainerLayout::add(fl_ContainerLayout* pL)
 	else
 	{
 		UT_ASSERT(!m_pFirstL);
-		UT_DEBUGMSG(("add: doing First = Last = nullptr \n"));
-		pL->setNext(nullptr);
-		pL->setPrev(nullptr);
+		UT_DEBUGMSG(("add: doing First = Last = NULL \n"));
+		pL->setNext(NULL);
+		pL->setPrev(NULL);
 		m_pFirstL = pL;
 		m_pLastL = m_pFirstL;
 	}
@@ -547,12 +547,12 @@ fl_BlockLayout* fl_ContainerLayout::getNextBlockInDocument(void) const
 	{
 	  pNext = getFirstLayout();
 	}
-	fl_ContainerLayout * pOld = nullptr;
+	fl_ContainerLayout * pOld = NULL;
 	UT_uint32 depth = 0;
 	next_is_null :
-	if(pNext == nullptr)
+	if(pNext == NULL)
 	{
-		while((pNext == nullptr) && ((pOld != nullptr) || (depth == 0)))
+		while((pNext == NULL) && ((pOld != NULL) || (depth == 0)))
 	    {
 			fl_ContainerLayout * pPrevOld = pOld;
 			if(depth > 0)
@@ -564,13 +564,13 @@ fl_BlockLayout* fl_ContainerLayout::getNextBlockInDocument(void) const
 				pOld = myContainingLayout();
 			}
 			depth++;
-			if(pOld != nullptr) // HdrFtr's have myContainingLayout == nullptr
+			if(pOld != NULL) // HdrFtr's have myContainingLayout == NULL
 			{
 				pNext = pOld->getNext();
 			}
 			if(pPrevOld == pOld)
 			{
-				pOld = nullptr;
+				pOld = NULL;
 			}
 		}
 	}
@@ -591,7 +591,7 @@ fl_BlockLayout* fl_ContainerLayout::getNextBlockInDocument(void) const
 		}
 		else if(pNext->getContainerType() == FL_CONTAINER_FRAME)
 		{
-			if(pNext->getFirstLayout() == nullptr)
+			if(pNext->getFirstLayout() == NULL)
 			{
 			     pNext = pNext->getNext();
 			}
@@ -607,7 +607,7 @@ fl_BlockLayout* fl_ContainerLayout::getNextBlockInDocument(void) const
 		else if(pNext->getContainerType() == FL_CONTAINER_TOC)
 		{
 			pNext = pNext->getNext();
-			if(pNext == nullptr)
+			if(pNext == NULL)
 			{
 				goto next_is_null;
 			}
@@ -615,7 +615,7 @@ fl_BlockLayout* fl_ContainerLayout::getNextBlockInDocument(void) const
 		else if(pNext->getContainerType() == FL_CONTAINER_FOOTNOTE)
 		{
 			pNext = pNext->getNext();
-			if(pNext == nullptr)
+			if(pNext == NULL)
 			{
 				goto next_is_null;
 			}
@@ -623,7 +623,7 @@ fl_BlockLayout* fl_ContainerLayout::getNextBlockInDocument(void) const
 		else if(pNext->getContainerType() == FL_CONTAINER_ANNOTATION)
 		{
 			pNext = pNext->getNext();
-			if(pNext == nullptr)
+			if(pNext == NULL)
 			{
 				goto next_is_null;
 			}
@@ -631,7 +631,7 @@ fl_BlockLayout* fl_ContainerLayout::getNextBlockInDocument(void) const
 		else if(pNext->getContainerType() == FL_CONTAINER_RDFANCHOR)
 		{
 			pNext = pNext->getNext();
-			if(pNext == nullptr)
+			if(pNext == NULL)
 			{
 				goto next_is_null;
 			}
@@ -639,32 +639,32 @@ fl_BlockLayout* fl_ContainerLayout::getNextBlockInDocument(void) const
 		else if(pNext->getContainerType() == FL_CONTAINER_ENDNOTE)
 		{
 			pNext = pNext->getNext();
-			if(pNext == nullptr)
+			if(pNext == NULL)
 			{
 				goto next_is_null;
 			}
 		}
 		else
 		{
-			pNext = nullptr;
+			pNext = NULL;
 			break;
 		}
-		if(pNext == nullptr)
+		if(pNext == NULL)
 		{
 				goto next_is_null;
 		}
 	}
-	return nullptr;
+	return NULL;
 }
 
 fl_BlockLayout* fl_ContainerLayout::getPrevBlockInDocument(void) const
 {
 	fl_ContainerLayout * pPrev = getPrev();
-	fl_ContainerLayout * pOld = nullptr;
+	fl_ContainerLayout * pOld = NULL;
 	UT_uint32 depth = 0;
-	if(pPrev == nullptr)
+	if(pPrev == NULL)
 	{
-		while((pPrev == nullptr) && ((pOld != nullptr) || (depth == 0)))
+		while((pPrev == NULL) && ((pOld != NULL) || (depth == 0)))
 	    {
 			fl_ContainerLayout * pPrevOld = pOld;
 			if(depth > 0)
@@ -676,13 +676,13 @@ fl_BlockLayout* fl_ContainerLayout::getPrevBlockInDocument(void) const
 				pOld = myContainingLayout();
 			}
 			depth++;
-			if(pOld != nullptr) // HdrFtr's can have nullptr myContainingLayout's
+			if(pOld != NULL) // HdrFtr's can have NULL myContainingLayout's
 			{
 				pPrev = pOld->getPrev();
 			}
 			if(pPrevOld == pOld )
 			{
-				pOld = nullptr;
+				pOld = NULL;
 			}
 		}
 	}
@@ -699,7 +699,7 @@ fl_BlockLayout* fl_ContainerLayout::getPrevBlockInDocument(void) const
 		}
 		else if(pPrev->getContainerType() == FL_CONTAINER_FRAME)
 		{
-			if(pPrev->getLastLayout() == nullptr)
+			if(pPrev->getLastLayout() == NULL)
 			{
 			     pPrev = pPrev->getPrev();
 			}
@@ -738,10 +738,10 @@ fl_BlockLayout* fl_ContainerLayout::getPrevBlockInDocument(void) const
 		}
 		else
 		{
-			pPrev = nullptr;
+			pPrev = NULL;
 			break;
 		}
-		if(pPrev == nullptr)
+		if(pPrev == NULL)
 		{
 			if(pOld && pOld->myContainingLayout())
 			{
@@ -749,7 +749,7 @@ fl_BlockLayout* fl_ContainerLayout::getPrevBlockInDocument(void) const
 			}
 		}
 	}
-	return nullptr;
+	return NULL;
 }
 
 /*!
@@ -792,7 +792,7 @@ fl_ContainerLayout * fl_ContainerLayout::getLastLayout(void) const
  */
 fl_ContainerLayout * fl_ContainerLayout::insert(pf_Frag_Strux* sdh, fl_ContainerLayout * pPrev, PT_AttrPropIndex indexAP,fl_ContainerType iType)
 {
-	fl_ContainerLayout* pL=nullptr;
+	fl_ContainerLayout* pL=NULL;
 	switch (iType)
 	{
 	case FL_CONTAINER_BLOCK:
@@ -801,11 +801,11 @@ fl_ContainerLayout * fl_ContainerLayout::insert(pf_Frag_Strux* sdh, fl_Container
 		{
 			pL = static_cast<fl_ContainerLayout *>(new fl_BlockLayout(sdh, pPrev, static_cast<fl_SectionLayout *>(this), indexAP,true));
 		}
-		else if ((pPrev!= nullptr) && (pPrev->getContainerType() == FL_CONTAINER_TABLE))
+		else if ((pPrev!= NULL) && (pPrev->getContainerType() == FL_CONTAINER_TABLE))
 		{
 			pL = static_cast<fl_ContainerLayout *>(new fl_BlockLayout(sdh,pPrev, static_cast<fl_SectionLayout *>(pPrev->myContainingLayout()), indexAP));
 		}
-		else if ((pPrev!= nullptr) && (pPrev->getContainerType() == FL_CONTAINER_ANNOTATION))
+		else if ((pPrev!= NULL) && (pPrev->getContainerType() == FL_CONTAINER_ANNOTATION))
 		{
 			pL = static_cast<fl_ContainerLayout *>(new fl_BlockLayout(sdh,pPrev, static_cast<fl_SectionLayout *>(this), indexAP));
 			fp_Container * pFirstC = pL->getFirstContainer();
@@ -815,7 +815,7 @@ fl_ContainerLayout * fl_ContainerLayout::insert(pf_Frag_Strux* sdh, fl_Container
 			if(pFirstC)
 			  pFirstC->recalcMaxWidth(true);
 		}
-		else if ((pPrev!= nullptr) && (pPrev->getContainerType() == FL_CONTAINER_RDFANCHOR))
+		else if ((pPrev!= NULL) && (pPrev->getContainerType() == FL_CONTAINER_RDFANCHOR))
 		{
 			pL = static_cast<fl_ContainerLayout *>(new fl_BlockLayout(sdh,pPrev, static_cast<fl_SectionLayout *>(this), indexAP));
 		}
@@ -835,7 +835,7 @@ fl_ContainerLayout * fl_ContainerLayout::insert(pf_Frag_Strux* sdh, fl_Container
 		  {
 		    pOldFirst->setPrev(pL);
 		  }
-		  if(pPrev->getLastLayout() == nullptr)
+		  if(pPrev->getLastLayout() == NULL)
 		  {
 		    pPrev->setLastLayout(pL);
 		  }
@@ -920,7 +920,7 @@ fl_ContainerLayout * fl_ContainerLayout::insert(pf_Frag_Strux* sdh, fl_Container
 					  sdh, indexAP, this));
 		if (pPrev)
 			pPrev->_insertIntoList(pL);
-		static_cast<fl_TOCLayout *>(pL)->getNewContainer(nullptr);
+		static_cast<fl_TOCLayout *>(pL)->getNewContainer(NULL);
 		break;
 	}
 	case FL_CONTAINER_ENDNOTE:
@@ -938,7 +938,7 @@ fl_ContainerLayout * fl_ContainerLayout::insert(pf_Frag_Strux* sdh, fl_Container
 		break;
 	}
 
-	if (pL == nullptr)
+	if (pL == NULL)
 	{
 		return pL;
 	}
@@ -986,18 +986,18 @@ void fl_ContainerLayout::_insertIntoList(fl_ContainerLayout * pL)
 */
 void fl_ContainerLayout::_insertFirst(fl_ContainerLayout * pL)
 {
-	if(m_pFirstL == nullptr)
+	if(m_pFirstL == NULL)
 	{
 		m_pFirstL = pL;
-		pL->setPrev(nullptr);
-		pL->setNext(nullptr);
+		pL->setPrev(NULL);
+		pL->setNext(NULL);
 		m_pLastL = pL;
 		return;
 	}
 	fl_ContainerLayout * pOldFirst = m_pFirstL;
 	m_pFirstL = pL;
 	pL->setNext(pOldFirst);
-	pL->setPrev(nullptr);
+	pL->setPrev(NULL);
 	pOldFirst->setPrev(pL);
 }
 
@@ -1008,7 +1008,7 @@ void fl_ContainerLayout::remove(fl_ContainerLayout * pL)
 {
 	UT_ASSERT(pL);
 	UT_ASSERT(m_pFirstL);
-	fl_ContainerLayout* prev = pL->getPrev(); // can be nullptr
+	fl_ContainerLayout* prev = pL->getPrev(); // can be NULL
 
 	if (prev)
 	{
@@ -1046,7 +1046,7 @@ void fl_ContainerLayout::remove(fl_ContainerLayout * pL)
 		m_pFirstL = m_pFirstL->getNext();
 		if (!m_pFirstL)
 		{
-			m_pLastL = nullptr;
+			m_pLastL = NULL;
 		}
 	}
 
@@ -1055,7 +1055,7 @@ void fl_ContainerLayout::remove(fl_ContainerLayout * pL)
 		m_pLastL = m_pLastL->getPrev();
 		if (!m_pLastL)
 		{
-			m_pFirstL = nullptr;
+			m_pFirstL = NULL;
 		}
 	}
 	if(getContainerType() != FL_CONTAINER_BLOCK)
@@ -1063,13 +1063,13 @@ void fl_ContainerLayout::remove(fl_ContainerLayout * pL)
 	  fl_SectionLayout * pSL = static_cast<fl_SectionLayout *>(this);
 	  pSL->removeFromUpdate(pL);
 	}
-	pL->setNext(nullptr);
-	pL->setPrev(nullptr);
-	pL->setContainingLayout(nullptr);
+	pL->setNext(NULL);
+	pL->setPrev(NULL);
+	pL->setContainingLayout(NULL);
 	if(pL->getContainerType() == FL_CONTAINER_BLOCK)
 	{
 		UT_ASSERT(getContainerType() != FL_CONTAINER_BLOCK);
-		static_cast<fl_BlockLayout *>(pL)->setSectionLayout(nullptr);
+		static_cast<fl_BlockLayout *>(pL)->setSectionLayout(NULL);
 	}
 }
 
@@ -1106,9 +1106,9 @@ fp_Run * fl_ContainerLayout::getFirstRun(void) const
 		const fl_BlockLayout * pBL = static_cast<const fl_BlockLayout *>(this);
 		return pBL->getFirstRun();
 	}
-	else if(getFirstLayout() == nullptr)
+	else if(getFirstLayout() == NULL)
 	{
-		return nullptr;
+		return NULL;
 	}
 	return getFirstLayout()->getFirstRun();
 }
@@ -1126,7 +1126,7 @@ UT_uint32 fl_ContainerLayout::getPosition(bool bActualBlockPos) const
 	if(!bActualBlockPos && (getContainerType() != FL_CONTAINER_TOC))
 	{
 		pL = static_cast<fl_ContainerLayout *>(getNextBlockInDocument());
-		if(pL == nullptr)
+		if(pL == NULL)
 		{
 		  PT_DocPosition pos = getDocLayout()->getDocument()->getStruxPosition(getStruxDocHandle());
 		  return pos;
@@ -1146,7 +1146,7 @@ fl_HdrFtrSectionLayout*	fl_ContainerLayout::getHdrFtrSectionLayout(void) const
 {
 	if(getContainerType() != FL_CONTAINER_SHADOW)
 	{
-		return nullptr;
+		return NULL;
 	}
 	const fl_HdrFtrShadow * pHFS = static_cast<const fl_HdrFtrShadow * >(this);
 	return pHFS->getHdrFtrSectionLayout();
@@ -1201,13 +1201,13 @@ bool fl_ContainerLayout::isOnScreen() const
 
 	if(bHidden)
 		return false;
-
-	std::vector<UT_Rect> vRect;
-	std::vector<fp_Page*> vPages;
+	
+	UT_GenericVector<UT_Rect*> vRect;
+	UT_GenericVector<fp_Page*> vPages;
 
 	pView->getVisibleDocumentPagesAndRectangles(vRect, vPages);
 
-	UT_uint32 iCount = vPages.size();
+	UT_uint32 iCount = vPages.getItemCount();
 
 	if(!iCount)
 		return false;
@@ -1228,17 +1228,17 @@ bool fl_ContainerLayout::isOnScreen() const
 		{
 			for(UT_uint32 i = 0; i < iCount; i++)
 			{
-				fp_Page * pPage = vPages[i];
+				fp_Page * pPage = vPages.getNthItem(i);
 
 				if(pPage == pMyPage)
 				{
 					UT_Rect r;
-					const UT_Rect& pR = vRect[i];
+					UT_Rect *pR = vRect.getNthItem(i);
 
 					if(!pC->getPageRelativeOffsets(r))
 						break;
 				
-					bRet = r.intersectsRect(&pR);
+					bRet = r.intersectsRect(pR);
 					break;
 				}
 		
@@ -1250,7 +1250,8 @@ bool fl_ContainerLayout::isOnScreen() const
 
 		pC = static_cast<fp_Container*>(pC->getNext());
 	}
-
+	
+	UT_VECTOR_PURGEALL(UT_Rect*,vRect);
 	return bRet;
 }
 
@@ -1258,7 +1259,7 @@ bool fl_ContainerLayout::isOnScreen() const
 
 void fl_ContainerLayout::addFrame(fl_FrameLayout * pFrame)
 {
-	UT_DEBUGMSG(("Adding frame %p to list in container %p \n", (void*)pFrame, (void*)this));
+	UT_DEBUGMSG(("Adding frame %p to list in container %p \n",pFrame,this));
 	UT_sint32 i = m_vecFrames.findItem(pFrame);
 	if(i>= 0)
 	{
@@ -1286,7 +1287,7 @@ fl_FrameLayout * fl_ContainerLayout::getNthFrameLayout(UT_sint32 i) const
 {
 	if(i> getNumFrames())
 	{
-		return nullptr;
+		return NULL;
 	}
 	return m_vecFrames.getNthItem(i);
 }
@@ -1296,7 +1297,7 @@ fp_FrameContainer * fl_ContainerLayout::getNthFrameContainer(UT_sint32 i) const
 {
 	if(i> getNumFrames())
 	{
-		return nullptr;
+		return NULL;
 	}
 	fl_FrameLayout * pFrame= m_vecFrames.getNthItem(i);
 	fp_FrameContainer * pFC = static_cast<fp_FrameContainer *>(pFrame->getFirstContainer());
@@ -1305,14 +1306,14 @@ fp_FrameContainer * fl_ContainerLayout::getNthFrameContainer(UT_sint32 i) const
 
 bool fl_ContainerLayout::removeFrame(fl_FrameLayout * pFrame)
 {
-	UT_DEBUGMSG(("Remove Frame %p from this container %p \n", (void*)pFrame, (void*)this));
+	UT_DEBUGMSG(("Remove Frame %p from this container %p \n",pFrame,this));
 	UT_sint32 i = m_vecFrames.findItem(pFrame);
 	if(i >= 0)
 	{
 		m_vecFrames.deleteNthItem(i);
 		if (pFrame->getParentContainer() == this)
 		{
-			pFrame->setParentContainer(nullptr);
+			pFrame->setParentContainer(NULL);
 		}
 		return true;
 	}

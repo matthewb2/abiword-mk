@@ -105,7 +105,7 @@ void XAP_CocoaDialog_History::event_Cancel()
 
 -(void)discardXAP
 {
-	_xap = nullptr;
+	_xap = NULL; 
 }
 
 -(void)dealloc

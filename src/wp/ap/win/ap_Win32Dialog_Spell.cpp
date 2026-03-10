@@ -72,7 +72,7 @@ void AP_Win32Dialog_Spell::runModal(XAP_Frame * pFrame)
 	// raise the dialog
 	XAP_Win32App * pWin32App = static_cast<XAP_Win32App *>(m_pApp);
 
-	LPCWSTR lpTemplate = nullptr;
+	LPCWSTR lpTemplate = NULL;
 
 	UT_return_if_fail (m_id == AP_DIALOG_ID_SPELL);
 
@@ -89,18 +89,18 @@ BOOL CALLBACK AP_Win32Dialog_Spell::s_dlgProc(HWND hWnd,UINT msg,WPARAM wParam,L
 	// This is a static function.
 
 	AP_Win32Dialog_Spell * pThis;
-	
+
 	switch (msg)
 	{
 	case WM_INITDIALOG:
 		pThis = (AP_Win32Dialog_Spell *)lParam;
 		SetWindowLongPtrW(hWnd,DWLP_USER,lParam);
 		return pThis->_onInitDialog(hWnd,wParam,lParam);
-		
+
 	case WM_COMMAND:
 		pThis = (AP_Win32Dialog_Spell *)GetWindowLongPtrW(hWnd,DWLP_USER);
 		return pThis->_onCommand(hWnd,wParam,lParam);
-		
+
 	default:
 		return 0;
 	}
@@ -114,7 +114,7 @@ BOOL CALLBACK AP_Win32Dialog_Spell::s_dlgProc(HWND hWnd,UINT msg,WPARAM wParam,L
 BOOL AP_Win32Dialog_Spell::_onInitDialog(HWND hWnd, WPARAM /*wParam*/, LPARAM /*lParam*/)
 {
 	const XAP_StringSet * pSS = m_pApp->getStringSet();
-	
+
 	UT_Win32LocaleString str;
 
 	str.fromUTF8(pSS->getValue(AP_STRING_ID_DLG_Spell_SpellTitle));
@@ -132,7 +132,7 @@ BOOL AP_Win32Dialog_Spell::_onInitDialog(HWND hWnd, WPARAM /*wParam*/, LPARAM /*
 	_DS(SPELL_BTN_CHANGE,		DLG_Spell_Change);
 	_DS(SPELL_BTN_CHANGEALL,	DLG_Spell_ChangeAll);
 
-	// remember the windows we're using 
+	// remember the windows we're using
 	m_hwndDlg = hWnd;
 	m_hwndSentence = GetDlgItem(hWnd, AP_RID_DIALOG_SPELL_RICH_SENTENCE);
 	m_hwndChangeTo = GetDlgItem(hWnd, AP_RID_DIALOG_SPELL_EDIT_CHANGE);
@@ -141,7 +141,7 @@ BOOL AP_Win32Dialog_Spell::_onInitDialog(HWND hWnd, WPARAM /*wParam*/, LPARAM /*
 	// set initial state
 	makeWordVisible();
 	_showMisspelledWord();
-	XAP_Win32DialogHelper::s_centerDialog(hWnd);			
+	XAP_Win32DialogHelper::s_centerDialog(hWnd);
 
 	return 1;							// 1 == we did not call SetFocus()
 }
@@ -182,9 +182,17 @@ void AP_Win32Dialog_Spell::_showMisspelledWord(void)
 // FIXME: this is broken - should take iLength characters from p
 // and convert them to char. I.e., first substr p, then
 // convert. But output length is not necessarily related to iLength!
-		str.fromUCS4(p);
-		str[iLength]=0L;
-		SendMessageW(m_hwndSentence, WM_SETTEXT, 0, (LPARAM)str.c_str());
+		//str.fromUCS4(p); //pascal
+		//std::wstring sss(str.c_str());
+		//str[iLength]=0L;
+
+        char * buf;
+		buf = new char [iLength + 1];
+		UT_UCS4_strncpy_to_char(buf, p, iLength);
+		buf[iLength] = '\0';
+		SendMessage(m_hwndSentence, WM_SETTEXT, 0, (LPARAM)buf);
+		DELETEP(buf);
+
 	}
 	sum += iLength;
 
@@ -202,14 +210,18 @@ void AP_Win32Dialog_Spell::_showMisspelledWord(void)
 // FIXME: this is broken - should take iLength characters from p
 // and convert them to char. I.e., first substr p, then
 // convert. But output length is not necessarily related to iLength!
-		//char * buf;
-		//buf = new char [iLength + 1];
-		str.fromUCS4(p);
-		str[iLength]=L'\0';
-		//UT_UCS4_strncpy_to_char(buf, p, iLength);
-		//buf[iLength] = '\0';
-		SendMessageW(m_hwndSentence, EM_REPLACESEL, FALSE, (LPARAM)str.c_str());
-		//DELETEP(buf);
+
+		//str.fromUCS4(p);//pascal
+		//std::wstring sss1(str.c_str());
+		//str[iLength]=L'\0';
+		//SendMessageW(m_hwndSentence, EM_REPLACESEL, FALSE, (LPARAM)str.c_str());
+
+		char * buf;
+		buf = new char [iLength + 1];
+		UT_UCS4_strncpy_to_char(buf, p, iLength);
+		buf[iLength] = '\0';
+		SendMessage(m_hwndSentence, EM_REPLACESEL, FALSE, (LPARAM)buf);
+		DELETEP(buf);
 	}
 	sum += iLength;
 
@@ -228,12 +240,15 @@ void AP_Win32Dialog_Spell::_showMisspelledWord(void)
 // FIXME: this is broken - should take iLength characters from p
 // and convert them to char. I.e., first substr p, then
 // convert. But output length is not necessarily related to iLength!
-		//buf = new char [iLength + 1];
-		//UT_UCS4_strncpy_to_char(buf, p, iLength);
-		str.fromUCS4(p);
-		str[iLength] = L'\0';
-		SendMessageW(m_hwndSentence, EM_REPLACESEL, FALSE, (LPARAM)str.c_str());
-		//DELETEP(buf);
+		//str.fromUCS4(p); //pascal
+		//std::wstring sss2(str.c_str());
+		//str[iLength] = L'\0';
+        char * buf;
+		buf = new char [iLength + 1];
+		UT_UCS4_strncpy_to_char(buf, p, iLength);
+		buf[iLength] = '\0';
+		SendMessage(m_hwndSentence, EM_REPLACESEL, FALSE, (LPARAM)buf);
+        DELETEP(buf);
 	}
 
 	// insert suggestions
@@ -245,8 +260,8 @@ void AP_Win32Dialog_Spell::_showMisspelledWord(void)
 
 		m_iSelectedRow = -1;
 		_toggleChangeButtons(false);
-	} 
-	else 
+	}
+	else
 	{
 		for (UT_sint32 i = 0; i < m_Suggestions->getItemCount(); i++)
 		{
@@ -254,11 +269,13 @@ void AP_Win32Dialog_Spell::_showMisspelledWord(void)
 			len = UT_UCS4_strlen(p);
 			if (len)
 			{
-				//buf = new char [len + 1];
-				//UT_UCS4_strcpy_to_char(buf, p);
-				str.fromUCS4(p);
-				SendMessageW(m_hwndSuggest, LB_ADDSTRING, 0, (LPARAM)str.c_str());
-				//DELETEP(buf);
+			    char * buf;
+				buf = new char [len + 1];
+				UT_UCS4_strcpy_to_char(buf, p);
+				//pascal str.fromUCS4(p);
+				//pascal SendMessageW(m_hwndSuggest, LB_ADDSTRING, 0, (LPARAM)str.c_str());
+				SendMessage(m_hwndSuggest, LB_ADDSTRING, 0, (LPARAM)buf);
+				DELETEP(buf);
 			}
 		}
 
@@ -277,10 +294,10 @@ void AP_Win32Dialog_Spell::_showMisspelledWord(void)
 void AP_Win32Dialog_Spell::_suggestChange(void)
 {
 	// cast is to match Unix usage
-	// should be safe here, because there just aren't that many suggestions 
+	// should be safe here, because there just aren't that many suggestions
 	m_iSelectedRow = (short) SendMessageW(m_hwndSuggest, LB_GETCURSEL, 0, 0);
 
-	if (!m_Suggestions->getItemCount()) 
+	if (!m_Suggestions->getItemCount())
 	{
 		// FIXME: this should insert the original word, surely!
 
@@ -305,12 +322,12 @@ void AP_Win32Dialog_Spell::_suggestChange(void)
 // returns a pointer which needs to be FREEP'd by the caller
 static UT_UCSChar * s_getUCSText(HWND hwnd)
 {
-	char * pBuf = nullptr;
-	UT_UCSChar * pUCS = nullptr;
+	char * pBuf = NULL;
+	UT_UCSChar * pUCS = NULL;
 
 	DWORD len = GetWindowTextLength(hwnd);
 	if (!len)
-		return nullptr;
+		return NULL;
 
 	pBuf = new char [len + 1];
 	if (!pBuf)
@@ -328,12 +345,12 @@ FreeMemory:
 	DELETEP(pBuf);
 	FREEP(pUCS);
 
-	return nullptr;
+	return NULL;
 }
 
 void AP_Win32Dialog_Spell::_change(void)
 {
-	UT_UCSChar * replace = nullptr;
+	UT_UCSChar * replace = NULL;
 
 	if (m_iSelectedRow != -1)
 	{
@@ -343,7 +360,7 @@ void AP_Win32Dialog_Spell::_change(void)
 	else
 	{
 		replace = s_getUCSText(m_hwndChangeTo);
-		if (!UT_UCS4_strlen(replace)) 
+		if (!UT_UCS4_strlen(replace))
 		{
 			FREEP(replace);
 			return;
@@ -357,7 +374,7 @@ void AP_Win32Dialog_Spell::_change(void)
 
 void AP_Win32Dialog_Spell::_changeAll(void)
 {
-	UT_UCSChar * replace = nullptr;
+	UT_UCSChar * replace = NULL;
 	if (m_iSelectedRow != -1)
 	{
 		replace = (UT_UCSChar*) m_Suggestions->getNthItem(m_iSelectedRow);
@@ -367,7 +384,7 @@ void AP_Win32Dialog_Spell::_changeAll(void)
 	else
 	{
 		replace = s_getUCSText(m_hwndChangeTo);
-		if (!UT_UCS4_strlen(replace)) 
+		if (!UT_UCS4_strlen(replace))
 		{
 			FREEP(replace);
 			return;
@@ -418,7 +435,7 @@ BOOL AP_Win32Dialog_Spell::_onCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		case EN_SETFOCUS:
 			{
 				// set scroll position so misspelled word is centered
-				SendMessageW(m_hwndSentence, EM_SETSEL, (WPARAM) m_iWordOffsetInSentence, 
+				SendMessageW(m_hwndSentence, EM_SETSEL, (WPARAM) m_iWordOffsetInSentence,
                             (LPARAM) m_iWordOffsetInSentence);
 				SendMessageW(m_hwndSentence, EM_SCROLLCARET, 0, 0);
 			}
@@ -427,7 +444,7 @@ BOOL AP_Win32Dialog_Spell::_onCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		default:
 			return 0;
 		}
-		
+
 	case AP_RID_DIALOG_SPELL_EDIT_CHANGE:
 		switch (wNotifyCode)
 		{
@@ -450,7 +467,7 @@ BOOL AP_Win32Dialog_Spell::_onCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		default:
 			return 0;
 		}
-		
+
 	case AP_RID_DIALOG_SPELL_LIST_SUGGEST:
 		switch (HIWORD(wParam))
 		{

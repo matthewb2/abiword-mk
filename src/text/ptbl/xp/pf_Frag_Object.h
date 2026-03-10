@@ -47,14 +47,14 @@ public:
 
 	po_Bookmark *			getBookmark() const;
 
-	virtual bool            usesXID() const override {return true;}
+	virtual bool            usesXID() const {return true;}
 
 #ifdef PT_TEST
-	virtual void			__dump(FILE * fp) const override;
+	virtual void			__dump(FILE * fp) const;
 #endif
 
 protected:
-	virtual bool            _isContentEqual(const pf_Frag &f2) const override;
+	virtual bool            _isContentEqual(const pf_Frag &f2) const;
 
 	PTObjectType			m_objectType;
 	void *					m_pObjectSubclass;

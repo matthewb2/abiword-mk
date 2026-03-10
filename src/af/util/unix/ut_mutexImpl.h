@@ -33,14 +33,14 @@ class UT_MutexImpl
 public:
 
 	UT_MutexImpl ()
-		: mMutex(nullptr)
+		: mMutex ( 0 )
 		{
 #if GLIB_CHECK_VERSION(2,32,0)
 			mMutex = &mStaticMutex;
 			g_mutex_init(&mStaticMutex);
 #else
 			if (!g_thread_supported ())
-				g_thread_init (nullptr);
+				g_thread_init (NULL);
 			mMutex = g_mutex_new () ;
 			UT_ASSERT ( mMutex ) ;
 #endif

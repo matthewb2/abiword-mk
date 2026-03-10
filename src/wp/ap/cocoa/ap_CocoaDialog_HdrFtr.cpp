@@ -94,7 +94,7 @@ void AP_CocoaDialog_HdrFtr::eventCancel (void)
 void AP_CocoaDialog_HdrFtr::CheckChanged(id checkbox)
 {
 	int state = [checkbox state];
-	setValue(static_cast<HdrFtr_Control>([checkbox tag]), (state == NSControlStateValueOn ? true : false), true);
+	setValue(static_cast<HdrFtr_Control>([checkbox tag]), (state == NSOnState ? true : false), true);
 }
 
 /*!
@@ -115,7 +115,7 @@ void AP_CocoaDialog_HdrFtr::RestartSpinChanged(UT_sint32 RestartValue)
 
 -(void)discardXAP
 {
-	_xap = nullptr;
+	_xap = NULL; 
 }
 
 -(void)dealloc
@@ -159,7 +159,7 @@ void AP_CocoaDialog_HdrFtr::RestartSpinChanged(UT_sint32 RestartValue)
 			[restartStepper setEnabled:YES];
 			[restartAtLabel setEnabled:YES];
 			[restartAtData setEnabled:YES];
-			[restartPgNumberBtn setState:NSControlStateValueOn];
+			[restartPgNumberBtn setState:NSOnState];
 		}
 		else {
 			[restartStepper setEnabled:NO];
@@ -169,7 +169,7 @@ void AP_CocoaDialog_HdrFtr::RestartSpinChanged(UT_sint32 RestartValue)
 		UT_sint32 j = static_cast<UT_sint32>(AP_Dialog_HdrFtr::HdrEven);
 		for(j = static_cast<UT_sint32>(AP_Dialog_HdrFtr::HdrEven) ; j<= static_cast<UT_sint32>(AP_Dialog_HdrFtr::FtrLast); j++)	{
 			bool value = _xap->getValue( static_cast<AP_Dialog_HdrFtr::HdrFtr_Control>(j));
-			[[[[self window] contentView] viewWithTag:j] setState:(value ? NSControlStateValueOn : NSControlStateValueOff)];
+			[[[[self window] contentView] viewWithTag:j] setState:(value ? NSOnState : NSOffState)];
 		}
 	}
 }
@@ -203,7 +203,7 @@ void AP_CocoaDialog_HdrFtr::RestartSpinChanged(UT_sint32 RestartValue)
 {
 	UT_UNUSED(sender);
 	UT_sint32 RestartValue = [restartAtData intValue];
-	if([restartPgNumberBtn state] == NSControlStateValueOn)
+	if([restartPgNumberBtn state] == NSOnState)
 	{
 		[restartAtLabel setEnabled:YES];
 		[restartAtData setEnabled:YES];

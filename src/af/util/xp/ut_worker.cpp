@@ -35,7 +35,7 @@ UT_Worker::~UT_Worker ()
  * Protected constructor for this base-class
  */
 UT_Worker::UT_Worker ()
-  : m_pInstanceData(nullptr), m_pCallback(nullptr)
+  : m_pInstanceData(0), m_pCallback(0)
 {
 }
 
@@ -117,7 +117,7 @@ UT_WorkerFactory::~UT_WorkerFactory()
  * and \param data. It will try to create the type of UT_Worker
  * specified by \param mode. The mode values can be ORed together.
  * IDLE is given preference over TIMER. \return a valid UT_Worker
- * on success, nullptr on failure. \param outMode will be set to the
+ * on success, NULL on failure. \param outMode will be set to the
  * type of object constructed, so that you can static_cast<> it to
  * the proper type for further manipulation, should it be needed
  */
@@ -126,7 +126,7 @@ UT_Worker * UT_WorkerFactory::static_constructor ( UT_WorkerCallback cb,
 						   UT_WorkerFactory::ConstructMode & outMode )
 {
 
-  UT_Worker * tmp = nullptr;
+  UT_Worker * tmp = 0;
   
   // give preference to CAN_USE_IDLE
 
@@ -150,6 +150,6 @@ UT_Worker * UT_WorkerFactory::static_constructor ( UT_WorkerCallback cb,
   }
 
 
-  UT_ASSERT(tmp != nullptr);
+  UT_ASSERT(tmp != 0);
   return tmp;
 }

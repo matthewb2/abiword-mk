@@ -62,11 +62,10 @@ public:
 	{  return m_iAID; }
 
 
-	virtual void drawImmediate(const UT_Rect* clip = nullptr) override;
+	virtual void	draw(const UT_Rect *clip=NULL);
 	void			clearScreen(void);
-	void			setXY(UT_sint32 x, UT_sint32 y);
-	void            setOffset(UT_sint32 ioff);
-	virtual void	setActiveFrame(XAP_Frame *pFrame) override;
+	void			setXY(UT_sint32 x, UT_sint32 y);                                void            setOffset(UT_sint32 ioff);
+	void			setActiveFrame(XAP_Frame *pFrame);
 	void			setSizeFromAnnotation(void);
 
 protected:

@@ -26,10 +26,13 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 
+#ifndef UT_TYPES_H
 #include "ut_types.h"
+#endif
 #include "ut_bytebuf.h"
+#include "ut_string_class.h"
+#include "ut_vector.h"
 #include "ut_uuid.h"
 #include "time.h"
 
@@ -55,19 +58,19 @@ class ABI_EXPORT AD_VersionData
 
 	virtual ~AD_VersionData();
 
-	AD_VersionData & operator= (const AD_VersionData &v);
+	AD_VersionData & operator = (const AD_VersionData &v);
 
-	bool operator== (const AD_VersionData &v) const;
+	bool operator == (const AD_VersionData &v);
 
-	UT_uint32      getId() const {return m_iId;}
-	time_t         getTime() const;
-	time_t         getStartTime() const {return m_tStart;}
-	const UT_UUID& getUID() const {return *m_pUUID;}
+	UT_uint32      getId()const{return m_iId;}
+	time_t         getTime()const;
+	time_t         getStartTime()const {return m_tStart;}
+	const UT_UUID& getUID()const {return (const UT_UUID&)*m_pUUID;}
 	bool           newUID(); // true on success
 
 	void           setId(UT_uint32 iid) {m_iId = iid;}
 
-	bool           isAutoRevisioned() const {return m_bAutoRevision;}
+	bool           isAutoRevisioned()const {return m_bAutoRevision;}
 	void           setAutoRevisioned(bool autorev);
 
 	UT_uint32      getTopXID() const {return m_iTopXID;}
@@ -140,8 +143,8 @@ public:
 	// TODO - this should be returning IEFileType,
 	// but that's AP stuff, so it's not here
 
-	virtual UT_Error		readFromFile(const char * szFilename, int ieft, const char * props = nullptr) = 0;
-	virtual UT_Error		importFile(const char * szFilename, int ieft, bool markClean = false, bool bImportStylesFirst = true, const char * props = nullptr) = 0;
+	virtual UT_Error		readFromFile(const char * szFilename, int ieft, const char * props = NULL) = 0;
+	virtual UT_Error		importFile(const char * szFilename, int ieft, bool markClean = false, bool bImportStylesFirst = true, const char * props = NULL) = 0;
 	virtual UT_Error		newDocument() = 0;
 	virtual bool			isDirty(void) const = 0;
 	virtual void            forceDirty() {m_bForcedDirty = true;};
@@ -151,8 +154,8 @@ public:
 	virtual bool			undoCmd(UT_uint32 repeatCount) = 0;
 	virtual bool			redoCmd(UT_uint32 repeatCount) = 0;
 
-	UT_Error		        saveAs(const char * szFilename, int ieft, const char * props = nullptr);
-	UT_Error		        saveAs(const char * szFilename, int ieft, bool cpy, const char * props = nullptr);
+	UT_Error		        saveAs(const char * szFilename, int ieft, const char * props = NULL);
+	UT_Error		        saveAs(const char * szFilename, int ieft, bool cpy, const char * props = NULL);
 	UT_Error		        save(void);
 	virtual bool			createDataItem(const char * szName,
 										   bool bBase64,
@@ -170,16 +173,16 @@ public:
 	/**
 	 * Returns the # of seconds since the last save of this file
 	 */
-	time_t          getTimeSinceSave () const { return (time(nullptr) - m_lastSavedTime); }
+	time_t          getTimeSinceSave () const { return (time(NULL) - m_lastSavedTime); }
 	time_t          getLastSavedTime() const {return m_lastSavedTime;}
 	void            setLastSavedTime(time_t t) {m_lastSavedTime = t;}
 	virtual UT_uint32 getLastSavedAsType() const = 0;
 
-	time_t          getTimeSinceOpen () const { return (time(nullptr) - m_lastOpenedTime); }
+	time_t          getTimeSinceOpen () const { return (time(NULL) - m_lastOpenedTime); }
 	time_t          getLastOpenedTime() const {return m_lastOpenedTime;}
 	void            setLastOpenedTime(time_t t) {m_lastOpenedTime = t;}
 
-	time_t          getEditTime()const {return (m_iEditTime + (time(nullptr) - m_lastOpenedTime));}
+	time_t          getEditTime()const {return (m_iEditTime + (time(NULL) - m_lastOpenedTime));}
 	void            setEditTime(UT_uint32 t) {m_iEditTime = t;}
 
 	void            setDocVersion(UT_uint32 i){m_iVersion = i;}
@@ -198,9 +201,9 @@ public:
 	virtual bool getAnnotationProp (const std::string & key, std::string & outProp) const = 0;
 
 	// history tracking
-	void            addRecordToHistory(AD_VersionData&& v);
+	void            addRecordToHistory(const AD_VersionData & v);
 	void            purgeHistory();
-	UT_uint32       getHistoryCount() const {return m_vHistory.size();}
+	UT_sint32       getHistoryCount()const {return m_vHistory.getItemCount();}
 	UT_uint32       getHistoryNthId(UT_sint32 i)const;
 	time_t          getHistoryNthTime(UT_sint32 i)const;
 	time_t          getHistoryNthTimeStarted(UT_sint32 i)const;
@@ -210,7 +213,7 @@ public:
 	UT_uint32       getHistoryNthTopXID(UT_sint32 i)const;
 
 	AD_HISTORY_STATE       verifyHistoryState(UT_uint32 &iVersion) const;
-	const AD_VersionData*  findHistoryRecord(UT_uint32 iVersion) const;
+	const AD_VersionData * findHistoryRecord(UT_uint32 iVersion) const;
     bool                   showHistory(AV_View * pView);
 
 	bool            areDocumentsRelated (const AD_Document &d) const;
@@ -239,11 +242,10 @@ public:
 
 	bool            addRevision(UT_uint32 iId, const UT_UCS4Char * pDesc, UT_uint32 iLen,
 								time_t tStart, UT_uint32 iVersion, bool bGenCR=true);
-	bool            addRevision(AD_Revision&& pRev, bool bGenCR = true);
+	bool            addRevision(AD_Revision * pRev, bool bGenCR=true);
 	virtual bool    createAndSendDocPropCR( const gchar ** pAtts, const gchar ** pProps) = 0;
 
-	const std::vector<AD_Revision>& getRevisions() const {return m_vRevisions;}
-	std::vector<AD_Revision>& getRevisions() {return m_vRevisions;}
+	const UT_GenericVector<AD_Revision*> &         getRevisions() {return m_vRevisions;}
 	UT_uint32           getHighestRevisionId() const;
 	const AD_Revision*  getHighestRevision() const;
 	UT_sint32           getRevisionIndxFromId(UT_uint32 iId) const;
@@ -288,8 +290,8 @@ public:
 	virtual UT_uint32   getTopXID() const = 0;
 
  protected:
-	virtual UT_Error	_saveAs(const char * szFilename, int ieft, const char * props = nullptr) = 0;
-	virtual UT_Error	_saveAs(const char * szFilename, int ieft, bool cpy, const char * props = nullptr) = 0;
+	virtual UT_Error	_saveAs(const char * szFilename, int ieft, const char * props = NULL) = 0;
+	virtual UT_Error	_saveAs(const char * szFilename, int ieft, bool cpy, const char * props = NULL) = 0;
 	virtual UT_Error	_save(void) = 0;
 
 	void            _purgeRevisionTable();
@@ -311,8 +313,8 @@ private:
 	XAP_ResourceManager *	m_pResourceManager;
 
 	int				m_iRefCount;
-	std::string	    m_szFilename;
-	std::string		m_szEncodingName;
+	std::string		m_szFilename;
+	UT_String		m_szEncodingName;
 
 	bool			m_bPieceTableChanging;
 	time_t          m_lastSavedTime;
@@ -322,8 +324,8 @@ private:
 
 	// these are for tracking versioning
 	bool            m_bHistoryWasSaved;
-	std::vector<AD_VersionData>   m_vHistory;
-	std::vector<AD_Revision> m_vRevisions;
+	UT_Vector       m_vHistory;
+	UT_GenericVector<AD_Revision*> m_vRevisions;
 
 	bool            m_bMarkRevisions;
 	bool            m_bShowRevisions;

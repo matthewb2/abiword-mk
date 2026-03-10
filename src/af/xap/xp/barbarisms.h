@@ -1,5 +1,5 @@
 /* AbiSuite
- * Copyright (C) Jordi Mas i Hern√†ndez
+ * Copyright (C) Jordi Mas i Hern‡ndez
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,14 +17,14 @@
  * 02110-1301 USA.
  */
 
-#pragma once
-
-#include <vector>
-
+#include "ut_vector.h"
 #include "ut_xml.h"
 #include "ut_hash.h"
 
 #include "ut_string_class.h"
+
+#ifndef BARBARISMS_H
+#define BARBARISMS_H
 
 class ABI_EXPORT BarbarismChecker : public UT_XML::Listener
 {
@@ -36,23 +36,23 @@ public:
 
 	bool checkWord(const UT_UCSChar * word32, size_t length);
 
-	bool suggestWord(const UT_UCSChar *word32, size_t length,
-                         const std::unique_ptr<std::vector<UT_UCSChar*>>& pVecsugg);
+	bool suggestWord(const UT_UCSChar *word32, size_t length, UT_GenericVector<UT_UCSChar*>* pVecsugg);
 
 	/*
 		Implementation of UT_XML::Listener
 	*/
-	void startElement(const gchar *name, const gchar **atts) override;
-	void endElement(const gchar *) override {};
-	void charData(const gchar *, int) override {};
+	void startElement(const gchar *name, const gchar **atts);
+	void endElement(const gchar *){};
+	void charData(const gchar *, int){};
 
 private:
 
-	bool suggestExactWord(const UT_UCSChar *word32, size_t length,
-                              const std::unique_ptr<std::vector<UT_UCSChar*>>& pVecsugg);
+	bool suggestExactWord(const UT_UCSChar *word32, size_t length,	UT_GenericVector<UT_UCSChar*>* pVecsugg);
 
 	UT_GenericStringMap<UT_GenericVector<UT_UCS4Char *>*>	m_map;
 	UT_GenericVector<UT_UCS4Char *>*		m_pCurVector;
 
-	std::string m_sLang;
+	UT_String m_sLang;
 };
+
+#endif // BARBARISMS_H

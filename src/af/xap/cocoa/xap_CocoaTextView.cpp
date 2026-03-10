@@ -30,6 +30,7 @@
 #include "ev_NamedVirtualKey.h"
 
 #include "xap_App.h"
+#import "xap_CocoaCompat.h"
 #include "xap_CocoaTextView.h"
 #include "xap_CocoaToolPalette.h"
 #include "xap_Frame.h"
@@ -41,9 +42,9 @@
 
 @implementation XAP_CocoaTextView
 
-- (id)initWith:(XAP_Frame *)frame andFrame:(NSRect)windowFrame andName:(NSString*)name
+- (id)initWith:(XAP_Frame *)frame andFrame:(NSRect)windowFrame
 {
-	if (![super initWith:frame andFrame:windowFrame andName:name]) {
+	if (![super initWith:frame andFrame:windowFrame]) {
 		return nil;
 	}
 	m_hasMarkedText = NO;
@@ -67,7 +68,7 @@
 	pEM = XAP_App::getApp()->getEditMethodContainer()->findEditMethodByName(method);
 	AV_View * pView = m_pFrame->getCurrentView();
 	EV_Keyboard * pCocoaKeyboard = m_pFrame->getKeyboard();
-	pCocoaKeyboard->invokeKeyboardMethod(pView, pEM, nullptr, 0);
+	pCocoaKeyboard->invokeKeyboardMethod(pView,pEM,0,0);
 }
 
 
@@ -431,7 +432,7 @@
 	 */
 
 	if (FV_View * pView = static_cast<FV_View *>(m_pFrame->getCurrentView())) {
-		NSString * str = nil;
+		NSString * str = 0;
 
 		if ([aString isKindOfClass:[NSString class]]) {
 			str = (NSString *) aString;

@@ -1,6 +1,6 @@
 /* AbiSource Application Framework
  * Copyright (C) 1998-2000 AbiSource, Inc.
- * Copyright (C) 2009-2021 Hubert Figuiere
+ * Copyright (C) 2009 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,14 +18,15 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef AP_COCOAPREVIEW_ANNOTATION_H
+#define AP_COCOAPREVIEW_ANNOTATION_H
 
 #include <Cocoa/Cocoa.h>
 
 #include "ap_Preview_Annotation.h"
 
 class XAP_Frame;
-class GR_Graphics;
+class GR_CairoGraphics;
 @class XAP_CocoaNSView;
 
 class AP_CocoaPreview_Annotation : public AP_Preview_Annotation
@@ -47,7 +48,9 @@ public:
 
 private:
 	// parent frame
-	GR_Graphics * 	m_gc;
+	GR_CairoGraphics * 	m_gc;
 	NSWindow * 			m_pPreviewWindow;
 	XAP_CocoaNSView * 			m_pDrawingArea;
 };
+
+#endif /* AP_COCOAPREVIEW_ANNOTATION_H */

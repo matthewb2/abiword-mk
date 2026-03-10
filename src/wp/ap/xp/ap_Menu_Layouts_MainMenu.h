@@ -56,7 +56,7 @@ BeginLayout(Main,0)
 		Separator()
 		MenuItem(AP_MENU_ID_FILE_PAGESETUP)
 #if defined(TOOLKIT_GTK_ALL) || defined (TOOLKIT_WIN)
-		MenuItem(AP_MENU_ID_FILE_PRINT_PREVIEW)
+		//pascal MenuItem(AP_MENU_ID_FILE_PRINT_PREVIEW)    //don't work - need an external program
 #endif
 		MenuItem(AP_MENU_ID_FILE_PRINT)
 #endif
@@ -128,7 +128,7 @@ BeginLayout(Main,0)
 		MenuItem(AP_MENU_ID_VIEW_WEB)
 		MenuItem(AP_MENU_ID_VIEW_PRINT)
 #if !XAP_SIMPLE_MENU
-		MenuItem(AP_MENU_ID_WEB_WEBPREVIEW)
+//pascal MenuItem(AP_MENU_ID_WEB_WEBPREVIEW)   //probleme d'uri donc on supprime
 		Separator()
 		BeginSubMenu(AP_MENU_ID_VIEW_TOOLBARS)
 			MenuItem(AP_MENU_ID_VIEW_TB_1)
@@ -496,6 +496,9 @@ BeginLayout(Main,0)
 		MenuItem(AP_MENU_ID_HELP_CHECKVER)
 		MenuItem(AP_MENU_ID_HELP_REPORT_BUG)
 		Separator()
+#ifdef TOOLKIT_GTK_ALL
+		MenuItem(AP_MENU_ID_HELP_ABOUT_GNOMEOFFICE)
+#endif
 #ifndef TOOLKIT_GTK_ALL
 		MenuItem(AP_MENU_ID_HELP_CREDITS)
 #endif

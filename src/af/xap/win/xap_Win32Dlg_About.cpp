@@ -1,19 +1,19 @@
 /* AbiSource Application Framework
  * Copyright (C) 1998 AbiSource, Inc.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
  */
 
@@ -62,7 +62,7 @@ XAP_Win32Dialog_About::XAP_Win32Dialog_About(XAP_DialogFactory * pDlgFactory,
 											 XAP_Dialog_Id id)
 	: XAP_Dialog_About(pDlgFactory,id)
 {
-	m_pGrImageSidebar = nullptr;
+	m_pGrImageSidebar = NULL;
 }
 
 XAP_Win32Dialog_About::~XAP_Win32Dialog_About(void)
@@ -89,22 +89,27 @@ void XAP_Win32Dialog_About::runModal(XAP_Frame * pFrame)
     UT_Win32LocaleString str, strbis;
 	m_pFrame = pFrame;
 
-	UT_ByteBufPtr pBB(new UT_ByteBuf(g_pngSidebar_sizeof));
-	pBB->ins(0,g_pngSidebar,g_pngSidebar_sizeof);
+	//pascal UT_ByteBuf * pBB = new UT_ByteBuf(g_pngSidebar_sizeof);
+	//pascal pBB->ins(0,g_pngSidebar,g_pngSidebar_sizeof);
+
+    UT_ByteBufPtr ppBB(new UT_ByteBuf(g_pngSidebar_sizeof));
+
+	ppBB->ins(0,g_pngSidebar,g_pngSidebar_sizeof);
 
 	UT_sint32 iImageWidth;
 	UT_sint32 iImageHeight;
-		
-	UT_PNG_getDimensions(pBB, iImageWidth, iImageHeight);
-	
-	m_pGrImageSidebar = new GR_Win32Image(nullptr);
-	m_pGrImageSidebar->convertFromBuffer(pBB, "image/png", iImageWidth, iImageHeight);
 
+	UT_PNG_getDimensions(ppBB, iImageWidth, iImageHeight);
+
+	m_pGrImageSidebar = new GR_Win32Image(NULL);
+	m_pGrImageSidebar->convertFromBuffer(ppBB, "image/png", iImageWidth, iImageHeight);
+
+	//pascal DELETEP(pBB);
 	const wchar_t * pClassName = L"AbiSource_About";
-	
+
 	ATOM a = UT_RegisterClassEx(CS_HREDRAW | CS_VREDRAW, (WNDPROC) s_dlgProc, pWin32App->getInstance(),
-								nullptr, LoadCursorW(nullptr, (LPCWSTR)IDC_ARROW), GetSysColorBrush(COLOR_BTNFACE), nullptr,
-								nullptr, pClassName);
+								NULL, LoadCursorW(NULL, (LPCWSTR)IDC_ARROW), GetSysColorBrush(COLOR_BTNFACE), NULL,
+								NULL, pClassName);
 	if (!a)
 	{
 		::MessageBeep(MB_ICONEXCLAMATION);
@@ -125,7 +130,7 @@ void XAP_Win32Dialog_About::runModal(XAP_Frame * pFrame)
 			if (GetMonitorInfoW(m,&mi))
 				rcScreen = mi.rcWork;
 		}
-	} else 
+	} else
 #endif
 		SystemParametersInfoW(SPI_GETWORKAREA,0,&rcScreen,0);
 
@@ -140,10 +145,14 @@ void XAP_Win32Dialog_About::runModal(XAP_Frame * pFrame)
 	pWin32App->enableAllTopLevelWindows(FALSE);
 
 	wchar_t buf[1024];
+	//pascal
+
 	const XAP_StringSet*  pSS = XAP_App::getApp()->getStringSet();
-	str.fromUTF8 (pSS->getValue(XAP_STRING_ID_DLG_ABOUT_Title));
+/*	str.fromUTF8 (pSS->getValue(XAP_STRING_ID_DLG_ABOUT_Title));
 	strbis.fromASCII (XAP_App::getApp()->getApplicationName());
 	swprintf(buf, str.c_str(), strbis.c_str());
+*/
+	swprintf(buf, L"About AbiWord Personal");
 
 	HWND hwndAbout = UT_CreateWindowEx(	0L, pClassName,
 										buf,
@@ -153,9 +162,9 @@ void XAP_Win32Dialog_About::runModal(XAP_Frame * pFrame)
 										ABOUT_WIDTH,
 										ABOUT_HEIGHT,
 										hWndFrame,
-										nullptr,
+										NULL,
 										pWin32App->getInstance(),
-										nullptr);
+										NULL);
 	if (!hwndAbout)
 	{
 		UnregisterClassW(pClassName, pWin32App->getInstance());
@@ -169,8 +178,8 @@ void XAP_Win32Dialog_About::runModal(XAP_Frame * pFrame)
 	GetClientRect(hwndAbout, &rcClient);
 	const int iWidth  = rcClient.right;
 	const int iHeight = rcClient.bottom;
-	
-	str.fromUTF8 (pSS->getValue(XAP_STRING_ID_DLG_OK));		
+
+	str.fromUTF8 (pSS->getValue(XAP_STRING_ID_DLG_OK));
 	HWND hwndOK = CreateWindowW(L"BUTTON",
 							   str.c_str(),
 							   WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_DEFPUSHBUTTON,
@@ -181,7 +190,7 @@ void XAP_Win32Dialog_About::runModal(XAP_Frame * pFrame)
 							   hwndAbout,
 							   (HMENU) IDOK,
 							   pWin32App->getInstance(),
-							   nullptr);
+							   NULL);
 
 	HWND hwndURL = CreateWindowW(L"BUTTON",
 								L"www.abisource.com",
@@ -193,11 +202,12 @@ void XAP_Win32Dialog_About::runModal(XAP_Frame * pFrame)
 								hwndAbout,
 								(HMENU) ID_BUTTON_URL,
 								pWin32App->getInstance(),
-								nullptr);
+								NULL);
 
-    str.fromUTF8 (XAP_App::getApp()->getApplicationName());
+    //str.fromUTF8 (XAP_App::getApp()->getApplicationName()); str.c_str(), //pascal
+    swprintf(buf, L"AbiWord Personal"); //pascal
 	HWND hwndStatic_Heading = CreateWindowW(L"STATIC",
-										   str.c_str(),
+										   buf,
 										   WS_CHILD | WS_VISIBLE | SS_CENTER,
 										   iImageWidth,
 										   BUTTON_GAP,
@@ -206,12 +216,12 @@ void XAP_Win32Dialog_About::runModal(XAP_Frame * pFrame)
 										   hwndAbout,
 										   (HMENU) 3001,
 										   pWin32App->getInstance(),
-										   nullptr);
+										   NULL);
 
 	const char *versiontext=pSS->getValue(XAP_STRING_ID_DLG_ABOUT_Version);
 	UT_UTF8String version = UT_UTF8String_sprintf(versiontext,XAP_App::s_szBuild_Version);
 	str.fromUTF8(version.utf8_str());
-   
+
 	HWND hwndStatic_Version = CreateWindowW(L"STATIC",
 										   str.c_str(),
 										   WS_CHILD | WS_VISIBLE | SS_CENTER,
@@ -222,7 +232,7 @@ void XAP_Win32Dialog_About::runModal(XAP_Frame * pFrame)
 										   hwndAbout,
 										   (HMENU) 3002,
 										   pWin32App->getInstance(),
-										   nullptr);
+										   NULL);
 
     str.fromASCII (XAP_ABOUT_COPYRIGHT);
 	HWND hwndStatic_Copyright = CreateWindowW(L"STATIC",
@@ -235,11 +245,12 @@ void XAP_Win32Dialog_About::runModal(XAP_Frame * pFrame)
 											 hwndAbout,
 											 (HMENU) 3003,
 											 pWin32App->getInstance(),
-											 nullptr);
+											 NULL);
 
     str.fromASCII (XAP_App::getApp()->getApplicationName());
 	strbis.fromASCII (XAP_ABOUT_GPL_LONG);
 	swprintf(buf, strbis.c_str(), str.c_str());
+
 	HWND hwndStatic_GPL = CreateWindowW(L"STATIC",
 									   buf,
 									   WS_CHILD | WS_VISIBLE | SS_LEFT,
@@ -250,10 +261,11 @@ void XAP_Win32Dialog_About::runModal(XAP_Frame * pFrame)
 									   hwndAbout,
 									   (HMENU) 3004,
 									   pWin32App->getInstance(),
-									   nullptr);
+									   NULL);
 
-	HWND hwndStatic_USP_Version = nullptr;
-
+	HWND hwndStatic_USP_Version = 0;
+//pascal
+/*
 	if(pWin32App->getLastFocussedFrame()->getCurrentView()->getGraphics()->getClassId()==GRID_WIN32_UNISCRIBE)
 	{
 		GR_Win32USPGraphics * pUSP = static_cast<GR_Win32USPGraphics*>(
@@ -270,16 +282,16 @@ void XAP_Win32Dialog_About::runModal(XAP_Frame * pFrame)
 												   hwndAbout,
 												   (HMENU) 3005,
 												   pWin32App->getInstance(),
-												   nullptr);
-	
-		
+												   NULL);
+
+
 	}
-	
+*/
 	LOGFONTW lf;
 	memset(&lf, 0, sizeof(lf));
 
 	wcscpy(lf.lfFaceName, L"MS Shell Dlg 2");
-	
+
 	lf.lfHeight = 13;
 	lf.lfWeight = 0;
 	HFONT hfontPrimary = CreateFontIndirectW(&lf);
@@ -289,10 +301,10 @@ void XAP_Win32Dialog_About::runModal(XAP_Frame * pFrame)
 	HFONT hfontSmall = CreateFontIndirectW(&lf);
 
 	wcscpy(lf.lfFaceName, L"Arial");
-	lf.lfHeight = 36;
-	lf.lfWeight = FW_BOLD; 
+	lf.lfHeight = 30; //pascal 36
+	lf.lfWeight = FW_BOLD;
 	HFONT hfontHeading = CreateFontIndirectW(&lf);
-	
+
 	SendMessageW(hwndStatic_Heading, WM_SETFONT, (WPARAM) hfontHeading, 0);
 
 	HWND rgFontReceivers[] =
@@ -307,16 +319,16 @@ void XAP_Win32Dialog_About::runModal(XAP_Frame * pFrame)
 
 	if(hwndStatic_USP_Version)
 		SendMessageW(hwndStatic_USP_Version, WM_SETFONT, (WPARAM) hfontSmall, 0);
-	
+
 	// the event loop
 	{
 		MSG msg;
 
 		s_bEventLoopDone = false;
-	
+
 		while (!s_bEventLoopDone)
 		{
-			if (GetMessageW(&msg, nullptr, 0, 0))
+			if (GetMessageW(&msg, NULL, 0, 0))
 			{
 				if( hwndAbout && IsDialogMessageW( hwndAbout, &msg ) )
 					continue;
@@ -358,14 +370,14 @@ BOOL CALLBACK XAP_Win32Dialog_About::s_dlgProc(HWND hWnd,UINT msg,WPARAM wParam,
 	{
 		return UT_DefWindowProc(hWnd, msg, wParam, lParam);
 	}
-	
+
 	switch (msg)
 	{
 	case WM_PAINT:
 	{
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
-			
+
 		RECT	r;
 		GetClientRect(hWnd, &r);
 		r.right = pThis->m_pGrImageSidebar->getDisplayWidth();
@@ -375,13 +387,13 @@ BOOL CALLBACK XAP_Win32Dialog_About::s_dlgProc(HWND hWnd,UINT msg,WPARAM wParam,
 		GR_Win32AllocInfo ai(hdc,hWnd);
 		GR_Win32Graphics *pGR = (GR_Win32Graphics *)XAP_App::getApp()->newGraphics(ai);
 		UT_return_val_if_fail(pGR, 0);
-		
+
 		pGR->drawImage(pThis->m_pGrImageSidebar,
 					   0,
 					   (r.bottom - pThis->m_pGrImageSidebar->getDisplayHeight())/2);
 
 		delete pGR;
-		
+
 		EndPaint(hWnd,&ps);
 		return 0;
 	}
@@ -396,7 +408,7 @@ BOOL CALLBACK XAP_Win32Dialog_About::s_dlgProc(HWND hWnd,UINT msg,WPARAM wParam,
 			s_bEventLoopDone = true;
 			return 0;
 		}
-		
+
 		break;
 	}
 
@@ -425,7 +437,7 @@ BOOL XAP_Win32Dialog_About::_onCommand(HWND /*hWnd*/, WPARAM wParam, LPARAM /*lP
 	case ID_BUTTON_URL:
 		XAP_App::getApp()->openURL("http://www.abisource.com/");
 		return 0;
-		
+
 	default:							// we did not handle this notification
 		UT_DEBUGMSG(("WM_Command for id %ld\n",wId));
 		return 0;						// return zero to let windows take care of it.

@@ -1,6 +1,6 @@
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2001, 2003, 2005-2021 Hubert Figuière
+ * Copyright (C) 2001, 2003, 2005 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,8 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef AP_COCOADIALOG_LISTS_H
+#define AP_COCOADIALOG_LISTS_H
 
 #import <Cocoa/Cocoa.h>
 
@@ -26,7 +27,7 @@
 #include "ut_timer.h"
 #include "xap_CocoaDialog_Utilities.h"
 
-class GR_CocoaGraphics;
+class GR_CocoaCairoGraphics;
 class XAP_CocoaFrame;
 class AP_CocoaDialog_Lists;
 
@@ -89,9 +90,9 @@ class AP_CocoaDialog_Lists;
 - (NSMenuItem*)selectedListType;
 - (void)setStyleMenu:(int)type;
 - (void)selectFolding:(int)folding;
-- (NSInteger)selectedTab;
+- (int)selectedTab;
 
-- (NSInteger)listAction;
+- (int)listAction;
 
 - (IBAction)applyAction:(id)sender;
 - (IBAction)cancelAction:(id)sender;
@@ -119,19 +120,19 @@ class AP_CocoaDialog_Lists: public AP_Dialog_Lists
 
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 
-	virtual void runModeless(XAP_Frame * pFrame) override;
-	virtual void destroy(void) override;
-	virtual void activate(void) override;
-	virtual void notifyActiveFrame(XAP_Frame *pFrame) override;
-	virtual void runModal(XAP_Frame * pFrame) override;
-	virtual void setFoldLevelInGUI(void) override;
-	virtual bool isPageLists(void) const override;
+	virtual void			runModeless(XAP_Frame * pFrame);
+	virtual void			destroy(void);
+	virtual void			activate(void);
+	virtual void			notifyActiveFrame(XAP_Frame *pFrame);
+	virtual void            runModal(XAP_Frame * pFrame);
+	virtual void                    setFoldLevelInGUI(void);
+	virtual bool                    isPageLists(void);
 	/* CALLBACKS */
 
 	void					customChanged(void);
 	void					applyClicked(void);
 	void					typeChanged(int type);
-	void previewInvalidate(void);
+	void					previewExposed(void);
 
 	/* Just Plain Useful Functions */
 
@@ -148,18 +149,27 @@ class AP_CocoaDialog_Lists: public AP_Dialog_Lists
 	void					_fillNoneStyleMenu(NSMenu *listmenu);
 	void					_fillFontMenu(NSPopUpButton* menu);
 
-	void _foldingChanged(NSInteger i)
+	void					_foldingChanged(int i)
 		{
-			setCurrentFold(static_cast<UT_sint32>(i));
+			setCurrentFold(i);
 		}
  protected:
 	void					_setRadioButtonLabels(void);
 	void					_gatherData(void);
  private:
-	GR_CocoaGraphics* m_pPreviewWidget;
+	GR_CocoaCairoGraphics *		m_pPreviewWidget;
 	UT_Timer *				m_pAutoUpdateLists;
 	bool					m_bDontUpdate;
 	bool					m_bDestroy_says_stopupdating;
 	bool					m_bAutoUpdate_happening_now;
 	AP_CocoaDialog_ListsController* m_dlg;
 };
+
+#endif /* AP_COCOADIALOG_LISTS_H */
+
+
+
+
+
+
+

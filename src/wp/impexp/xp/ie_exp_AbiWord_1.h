@@ -36,14 +36,14 @@ public:
 	IE_Exp_AbiWord_1_Sniffer ();
 	virtual ~IE_Exp_AbiWord_1_Sniffer () {}
 
-	virtual UT_Confidence_t supportsMIME (const char * szMIME) override;
+	UT_Confidence_t supportsMIME (const char * szMIME);
 
-	virtual bool recognizeSuffix (const char * szSuffix) override;
+	virtual bool recognizeSuffix (const char * szSuffix);
 	virtual bool getDlgLabels (const char ** szDesc,
 							   const char ** szSuffixList,
-							   IEFileType * ft) override;
+							   IEFileType * ft);
 	virtual UT_Error constructExporter (PD_Document * pDocument,
-										IE_Exp ** ppie) override;
+										IE_Exp ** ppie);
 };
 
 class ABI_EXPORT IE_Exp_AbiWord_1 : public IE_Exp_XML
@@ -53,7 +53,7 @@ public:
 	virtual ~IE_Exp_AbiWord_1();
 
 protected:
-	virtual UT_Error _writeDocument(void) override;
+	virtual UT_Error	_writeDocument(void);
 
 private:
 	bool m_bIsTemplate;

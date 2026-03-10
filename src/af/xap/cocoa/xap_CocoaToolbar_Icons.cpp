@@ -87,7 +87,7 @@ static NSPoint s_ButtonMenuPoint[3] = {
 
 - (void)drawRect:(NSRect)aRect
 {
-	if ([self state] == NSControlStateValueOn)
+	if ([self state] == NSOnState)
 	{
 		[[NSColor colorWithCalibratedWhite:0.0f alpha:0.25] set];
 
@@ -135,13 +135,13 @@ XAP_CocoaToolbar_Icons::~XAP_CocoaToolbar_Icons(void)
 
 NSString * XAP_CocoaToolbar_Icons::getPNGNameForIcon(const char * szIconID)
 {
-	const char * szIconName = nullptr;
+	const char * szIconName = NULL;
 
 	if (XAP_Toolbar_Icons::_findIconNameForID(szIconID, &szIconName))
 	{
 		UT_UTF8String name(szIconName);
 
-		if (const char * suffix = strstr(szIconName, "_xpm"))
+		if (char * suffix = strstr(szIconName, "_xpm"))
 		{
 			name.assign(szIconName, suffix - szIconName);
 		}

@@ -78,7 +78,7 @@ fl_AutoNum::fl_AutoNum(	UT_uint32 id,
 						const gchar * lDecimal,
 						PD_Document * pDoc,
 						FV_View * pView)
-	:	m_pParent(nullptr),
+	:	m_pParent(0),
 		m_pDoc(pDoc),
 		m_pView(pView),
 		m_List_Type(lType),
@@ -91,7 +91,7 @@ fl_AutoNum::fl_AutoNum(	UT_uint32 id,
 		m_bDirty(false),
 		m_ioffset(0),
 		m_bWordMultiStyle(true),
-		m_pParentItem(nullptr)
+		m_pParentItem(0)
 {
 	// Set in Block???
 	memset(m_pszDelim, 0, 80);
@@ -137,14 +137,14 @@ void fl_AutoNum::addItem(pf_Frag_Strux* pItem)
 void fl_AutoNum::fixHierarchy(void)
 {
 	fl_AutoNumPtr pParent;
-	const char * pszParentID =nullptr;
+	const char * pszParentID =NULL;
 #if 1
 	UT_uint32 docParentID = 0;
 	if (!m_items.empty())
 	{
 		pf_Frag_Strux* sdh = m_items.front();
 		XAP_Frame * pFrame = XAP_App::getApp()->getLastFocussedFrame();
-		FV_View* pView = nullptr;
+		FV_View* pView = NULL;
 		if (pFrame)
 			pView = static_cast<FV_View *>(pFrame->getCurrentView());
 
@@ -241,7 +241,7 @@ void    fl_AutoNum::findAndSetParentItem(void)
 		return;
 	}
 	pf_Frag_Strux* pCurFirst =  m_items.front();
-	if(pCurFirst == nullptr)
+	if(pCurFirst == NULL)
 		return;
 	PT_DocPosition posCur = m_pDoc->getStruxPosition(pCurFirst);
 	PT_DocPosition posParent = 0;
@@ -250,15 +250,15 @@ void    fl_AutoNum::findAndSetParentItem(void)
 	UT_uint32 iList;
 	fl_AutoNumPtr pClosestAuto;
 	PT_DocPosition posClosest = 0;
-	pf_Frag_Strux* pClosestItem = nullptr;
+	pf_Frag_Strux* pClosestItem = NULL;
 	bool bReparent = false;
-	if(m_pParent != nullptr)
+	if(m_pParent != NULL)
 	{
 		UT_uint32 i=0;
 		for(i=0; i <m_pParent->getNumLabels(); i++)
 		{
 			pf_Frag_Strux* pParentItem = m_pParent->getNthBlock(i);
-			if(pParentItem != nullptr)
+			if(pParentItem != NULL)
 			{
 				posParent = m_pDoc->getStruxPosition(pParentItem);
 				if( posParent > posClosest && posParent < posCur)
@@ -275,7 +275,7 @@ void    fl_AutoNum::findAndSetParentItem(void)
 // Reparent this list if the first item of the parent is after the first
 // item of this list.
 //
-	if((m_pParent == nullptr) || (posClosest == 0))
+	if((m_pParent == NULL) || (posClosest == 0))
 	{
 		for(iList = 0; iList < cnt; iList++)
 		{
@@ -283,15 +283,15 @@ void    fl_AutoNum::findAndSetParentItem(void)
 			UT_uint32 i=0;
 			pf_Frag_Strux* pParentItem = pParent->getNthBlock(i);
 			posParent=0;
-			if(pParentItem != nullptr)
+			if(pParentItem != NULL)
 			{
 				posParent = m_pDoc->getStruxPosition(pParentItem);
 			}
-			while(pParentItem != nullptr && (posParent < posCur))
+			while(pParentItem != NULL && (posParent < posCur))
 			{
 				i++;
 				pParentItem = pParent->getNthBlock(i);
-				if(pParentItem != nullptr)
+				if(pParentItem != NULL)
 				{
 					posParent = m_pDoc->getStruxPosition(pParentItem);
 				}
@@ -324,7 +324,7 @@ void    fl_AutoNum::findAndSetParentItem(void)
 			_setParentID(m_pParent->getID());
 		}
 	}
-	if(m_pParent != nullptr)
+	if(m_pParent != NULL)
 	{
 		m_iLevel = m_pParent->getLevel()+ 1;
 		//
@@ -402,7 +402,7 @@ void    fl_AutoNum::_getLabelstr( UT_UCSChar labelStr[], UT_uint32 * insPoint,
 	}
 	rightDelim[i - rTmp] = '\0';
 
-	if(m_pParent != nullptr  && m_List_Type < BULLETED_LIST)
+	if(m_pParent != NULL  && m_List_Type < BULLETED_LIST)
 	{
 		m_pParent->_getLabelstr( labelStr, insPoint, depth+1,getParentItem());
 		if(*insPoint != 0)
@@ -595,7 +595,7 @@ const UT_UCSChar * fl_AutoNum::getLabel(const pf_Frag_Strux* pItem)  const
 	_getLabelstr( label, &insPoint, depth , pItem);
 	if(insPoint == 0 )
 	{
-		return static_cast<const UT_UCSChar *>(nullptr);
+		return static_cast<const UT_UCSChar *>(NULL);
 	}
 	else
 	{
@@ -622,7 +622,6 @@ bool fl_AutoNum::isDirty() const
 void fl_AutoNum::setDelim(const gchar * lDelim)
 {
 	strncpy( m_pszDelim, lDelim, 80);
-	m_pszDelim[80] = 0;
 	m_bDirty = true;
 }
 
@@ -742,7 +741,7 @@ void fl_AutoNum::prependItem(pf_Frag_Strux* pItem, const pf_Frag_Strux* pNext, b
 {
 	UT_sint32 ndx, i;
 	UT_ASSERT(pItem);
-	pf_Frag_Strux* pPrev = nullptr;
+	pf_Frag_Strux* pPrev = NULL;
 	if(m_items.hasItem(pItem)) {
 		return;
 	}
@@ -757,7 +756,7 @@ void fl_AutoNum::prependItem(pf_Frag_Strux* pItem, const pf_Frag_Strux* pNext, b
 		fixListOrder(); // safety!!
 	if(m_pDoc->areListUpdatesAllowed() == false)
 		return;
-	if(pPrev != nullptr)
+	if(pPrev != NULL)
 	{
 		// scan through all the lists and update parent pointers
 
@@ -794,7 +793,7 @@ void fl_AutoNum::removeItem(const pf_Frag_Strux* pItem)
 		_updateItems(0, nullptr);
 		return;
 	}
-	pf_Frag_Strux* ppItem = nullptr;
+	pf_Frag_Strux* ppItem = NULL;
 	if(ndx > 0)
 	{
 		ppItem =  m_items.at(ndx - 1);
@@ -810,7 +809,7 @@ void fl_AutoNum::removeItem(const pf_Frag_Strux* pItem)
 		if( pItem == pAuto->getParentItem())
 		{
 			pAuto->setParentItem(ppItem);
-			if(ppItem == nullptr)
+			if(ppItem == NULL)
 			{
 				UT_uint32 level = pAuto->getLevel();
 				if(level > 0)
@@ -902,7 +901,7 @@ fl_AutoNumConstPtr fl_AutoNum::getAutoNumFromSdh(const pf_Frag_Strux* sdh) const
 pf_Frag_Strux* fl_AutoNum::getLastItemInHeiracy(void) const
 {
        fl_AutoNumConstPtr pAuto = shared_from_this();
-       pf_Frag_Strux*  pLastItem = nullptr;
+       pf_Frag_Strux*  pLastItem = NULL;
        bool bLoop = true;
        fl_AutoNumPtr pNext;
        UT_uint32 numLists = m_pDoc->getListsCount();
@@ -939,7 +938,7 @@ bool fl_AutoNum::isEmpty() const
 
 pf_Frag_Strux* fl_AutoNum::getFirstItem() const
 {
-	return (!m_items.empty() ? m_items.front() : nullptr);
+	return (!m_items.empty() ? m_items.front() : NULL);
 }
 
 
@@ -967,7 +966,7 @@ bool fl_AutoNum::doesItemHaveLabel(const fl_BlockLayout * pItem) const
 			}
 		}
 		pRun = pRun->getNextRun();
-		if(pRun == nullptr)
+		if(pRun == NULL)
 		{
 			bStop = true;
 			return false;
@@ -1016,7 +1015,7 @@ void fl_AutoNum::_setParent(const fl_AutoNumPtr & pParent)
 {
 	if (pParent.get() == this)
 	{
-		m_pParent = nullptr;
+		m_pParent = NULL;
 		m_iParentID = 0;
 		m_bDirty = true;
 		return;
@@ -1062,7 +1061,7 @@ void fl_AutoNum::update(UT_uint32 start)
 	if (isUpdating())
 		return;
 	//_calculateLabelStr(0);
-	if(!_updateItems(start, nullptr))
+	if(!_updateItems(start, NULL))
 		return;
 	pf_Frag_Strux* sdh = getFirstItem();
 	UT_return_if_fail(sdh);
@@ -1156,7 +1155,7 @@ pf_Frag_Strux* fl_AutoNum::getPrevInList(const pf_Frag_Strux* pItem) const
 {
 	UT_sint32 itemloc = m_items.findItem(pItem);
 	if (itemloc == -1 || itemloc == 0)
-		return nullptr;
+		return NULL;
 	return m_items.at(static_cast<UT_uint32>(itemloc) - 1);
 }
 

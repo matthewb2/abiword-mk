@@ -1,7 +1,8 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:nil; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
+
 /* AbiSource Application Framework
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2001-2003, 2009-2021 Hubert Figuière
+ * Copyright (C) 2001-2003, 2009 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,7 +20,8 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef XAP_COCOADIALOG_FILEOPENSAVEAS_H
+#define XAP_COCOADIALOG_FILEOPENSAVEAS_H
 
 #import <Cocoa/Cocoa.h>
 
@@ -28,21 +30,25 @@
 class XAP_CocoaFrame;
 class XAP_CocoaDialog_FileOpenSaveAs;
 
-@interface XAP_OpenSavePanel_AccessoryController
-    : NSViewController <NSOpenSavePanelDelegate> {
-    IBOutlet NSTextField* oFTLabel;
-    IBOutlet NSPopUpButton* oFTPopUp;
 
-    XAP_CocoaDialog_FileOpenSaveAs* _xap;
+@interface XAP_OpenSavePanel_AccessoryController 
+	: NSObject<NSOpenSavePanelDelegate>
+{
+	IBOutlet NSTextField *		oFTLabel;
+	IBOutlet NSPopUpButton *	oFTPopUp;
+	IBOutlet NSView *			oFTAccessoryView;
+
+	XAP_CocoaDialog_FileOpenSaveAs *	_xap;
 }
 
 - (id)initWithXAP:(XAP_CocoaDialog_FileOpenSaveAs*)xap;
 
-- (void)setFileTypeLabel:(const std::string&)label;
+- (NSView *)fileTypeAccessoryView;
+- (void)setFileTypeLabel:(const std::string &)label;
 - (void)setSelectedFileType:(int)type;
 
 - (void)removeItemsOfFileTypesMenu;
-- (void)addItemWithTitle:(NSString*)title fileType:(int)type;
+- (void)addItemWithTitle:(NSString *)title fileType:(int)type;
 
 - (IBAction)selectFileType:(id)sender;
 @end
@@ -52,28 +58,30 @@ class XAP_CocoaDialog_FileOpenSaveAs;
 class XAP_CocoaDialog_FileOpenSaveAs : public XAP_Dialog_FileOpenSaveAs
 {
 public:
-    XAP_CocoaDialog_FileOpenSaveAs(XAP_DialogFactory* pDlgFactory, XAP_Dialog_Id dlgid);
-    virtual ~XAP_CocoaDialog_FileOpenSaveAs(void);
+	XAP_CocoaDialog_FileOpenSaveAs(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id dlgid);
+	virtual ~XAP_CocoaDialog_FileOpenSaveAs(void);
 
-    virtual void runModal(XAP_Frame* pFrame);
+	virtual void			runModal(XAP_Frame * pFrame);
 
-    static XAP_Dialog* static_constructor(XAP_DialogFactory*, XAP_Dialog_Id dlgid);
+	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id dlgid);
 
-    void _setSelectedFileType(UT_sint32 type);
+	void	_setSelectedFileType (UT_sint32 type);
 
 private:
-    NSSavePanel* _makeOpenPanel();
-    NSSavePanel* _makeSavePanel(const std::string& label);
+	NSSavePanel * _makeOpenPanel();
+	NSSavePanel * _makeSavePanel(const std::string & label);
 
-    XAP_OpenSavePanel_AccessoryController* m_accessoryViewsController;
+	XAP_OpenSavePanel_AccessoryController *	m_accessoryViewsController;
 
-    NSSavePanel* m_panel;
-    NSMutableArray* m_fileTypes;
+	NSSavePanel	*							m_panel;
+	NSMutableArray *						m_fileTypes;
 
-    const char* m_szFileTypeDescription;
-    UT_uint32 m_fileTypeCount;
+	const char *							m_szFileTypeDescription;
+	UT_uint32								m_szFileTypeCount;
 
-    bool m_bPanelActive;
-    bool m_bOpenPanel;
-    bool m_bIgnoreCancel;
+	bool									m_bPanelActive;
+	bool									m_bOpenPanel;
+	bool									m_bIgnoreCancel;
 };
+
+#endif /* XAP_COCOADIALOG_FILEOPENSAVEAS_H */

@@ -80,12 +80,12 @@ public:
 		{
 		}
 		
-	virtual PD_Document* getMergeDocument() const override
+	virtual PD_Document* getMergeDocument () const
 		{
 			return m_doc;
 		}
 	
-	virtual bool fireUpdate() override
+	virtual bool fireUpdate () 
 		{
 			if (!m_doc)
 				return false;
@@ -125,36 +125,37 @@ public:
 				m_pGraphics->endPrint();
 		}
 		
-	virtual PD_Document* getMergeDocument() const override
+	virtual PD_Document* getMergeDocument () const
 		{
 			return m_doc;
 		}
 	
-	virtual bool fireUpdate() override
+	virtual bool fireUpdate () 
 		{
 			FL_DocLayout *pDocLayout = new FL_DocLayout(m_doc,m_pGraphics);
-			FV_View printView(XAP_App::getApp(), nullptr, pDocLayout);
+			FV_View printView(XAP_App::getApp(),0,pDocLayout);
 			//pDocLayout->setView (&printView);
 			pDocLayout->fillLayouts();
 			pDocLayout->formatAll();
-			pDocLayout->recalculateTOCFields();
-
+			pDocLayout->recalculateTOCFields();			
+				
 			if (!m_bPrintedFirstPage)
 				if (m_pGraphics->startPrint())
 					m_bPrintedFirstPage = true;
-
+			
 
 			if (m_bPrintedFirstPage) {
 
 				dg_DrawArgs da;
+				memset(&da, 0, sizeof(da));
 				da.pG = m_pGraphics;
-
+				
 				for (UT_sint32 k = 1; (k <= pDocLayout->countPages()); k++)
 				{
 					UT_uint32 iHeight = pDocLayout->getHeight() / pDocLayout->countPages();
 					m_pGraphics->m_iRasterPosition = (k-1)*iHeight;
 					m_pGraphics->startPage(m_szFile.utf8_str(), m_iter++, printView.getPageSize().isPortrait(), pDocLayout->getWidth(), iHeight);
-					printView.drawPage(k-1, &da);
+					printView.draw(k-1, &da);
 				}
 			}
 
@@ -235,8 +236,8 @@ bool AP_Convert::convertTo(const char * szSourceFilename,
 	UT_Error error = UT_OK;
 
 	UT_return_val_if_fail(targetFormat != IEFT_Unknown, false);
-	UT_return_val_if_fail(szSourceFilename != nullptr, false);
-	UT_return_val_if_fail(szTargetFilename != nullptr, false);
+	UT_return_val_if_fail(szSourceFilename != NULL, false);
+	UT_return_val_if_fail(szTargetFilename != NULL, false);
 
 	PD_Document * pNewDoc = new PD_Document();
 	UT_return_val_if_fail(pNewDoc, false);
@@ -360,7 +361,7 @@ bool AP_Convert::convertTo(const char * szFilename,
       char * fileDup = g_strdup ( szFilename );
       
       char *tmp = strrchr(fileDup, '.');
-      if (tmp != nullptr)
+      if (tmp != NULL)
 	*tmp = '\0';
       
       file = fileDup;
@@ -408,7 +409,7 @@ bool AP_Convert::print(const char * szFile, GR_Graphics * pGraphics, const char 
 		
 		// create a new layout and view object for the doc
 		FL_DocLayout *pDocLayout = new FL_DocLayout(pDoc,pGraphics);
-		FV_View printView(XAP_App::getApp(), nullptr, pDocLayout);
+		FV_View printView(XAP_App::getApp(),0,pDocLayout);
 		pDocLayout->setView (&printView);
 		pDocLayout->fillLayouts();
 		pDocLayout->formatAll();
@@ -440,7 +441,7 @@ bool AP_Convert::print(const char * szFile, GR_Graphics * pGraphics, const char 
 		    page_descriptions = g_strsplit(props_map["pages"].c_str(), ",", -1);
 
 		    int i = 0;
-		    while (page_descriptions[i] != nullptr)
+		    while (page_descriptions[i] != NULL)
 		      {
 			char *description = page_descriptions[i];
 			i++;
@@ -499,7 +500,7 @@ bool AP_Convert::printFirstPage(GR_Graphics * pGraphics,PD_Document * pDoc)
 		// create a new layout and view object for the doc
 
 	FL_DocLayout *pDocLayout = new FL_DocLayout(pDoc,pGraphics);
-	FV_View printView(XAP_App::getApp(), nullptr, pDocLayout);
+	FV_View printView(XAP_App::getApp(),0,pDocLayout);
 	pDocLayout->setView (&printView);
 	pDocLayout->fillLayouts();
 	pDocLayout->formatAll();

@@ -57,7 +57,7 @@ AP_Dialog_Lists::getWindowTitleStringId()
 
 AP_Dialog_Lists::AP_Dialog_Lists(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id)
 :	AP_Dialog_Modeless(pDlgFactory, id, "interface/dialoglists"),
-	m_pView(nullptr),
+	m_pView(0),
 	m_Answer(a_CLOSE),
 	m_isListAtPoint(false),
 	m_previousListExistsAtPoint(false),
@@ -81,9 +81,9 @@ AP_Dialog_Lists::AP_Dialog_Lists(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id 
 	m_bResumeList(0),
 	m_bisCustomized(0),
 	m_bguiChanged(false),
-	m_paragraphPreview(nullptr),
-	m_pListsPreview(nullptr),
-	m_pFakeDoc(nullptr),
+	m_paragraphPreview(0),
+	m_pListsPreview(0),
+	m_pFakeDoc(0),
 	m_bDirty(false),
 	m_bIsModal(false),
 	m_iCurrentLevel(0),
@@ -91,8 +91,8 @@ AP_Dialog_Lists::AP_Dialog_Lists(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id 
 {
 	for(UT_uint32 i=0; i<4; i++)
 	{
-		m_pFakeLayout[i] = nullptr;
-		m_pFakeSdh[i] = nullptr;
+		m_pFakeLayout[i] = NULL;
+		m_pFakeSdh[i] = NULL;
 	}
 
 	m_WindowName[0] = '\0';
@@ -182,7 +182,7 @@ void AP_Dialog_Lists::event_PreviewAreaExposed(void)
 	if (m_pListsPreview)
 	{
 		fillFakeLabels();
-		m_pListsPreview->queueDraw();
+		m_pListsPreview->draw();
 	}
 	else
 	{
@@ -317,11 +317,11 @@ void AP_Dialog_Lists::Apply(void)
 		m_OutProps.addItem((void *) "field-font");
 		m_OutProps.addItem((void *) m_pszFont.c_str());
 		m_OutProps.addItem((void *) "margin-left");
-		m_Output[2] = UT_convertInchesToDimensionString(DIM_IN, m_fAlign, nullptr);
+		m_Output[2] =	UT_convertInchesToDimensionString(DIM_IN, m_fAlign, 0);
 		m_OutProps.addItem((void *) m_Output[2].c_str());
 
 		m_OutProps.addItem((void *) "text-indent");
-		m_Output[3] = UT_convertInchesToDimensionString(DIM_IN, m_fIndent, nullptr);
+		m_Output[3] = UT_convertInchesToDimensionString(DIM_IN, m_fIndent, 0);
 		m_OutProps.addItem((void *) m_Output[3].c_str());
 		m_Answer = a_OK;
 		return;
@@ -425,7 +425,7 @@ void AP_Dialog_Lists::Apply(void)
 				{
 					fl_BlockLayout * pBlock = (fl_BlockLayout *) vBlock.getNthItem(i);
 					fl_BlockLayout * rBlock = (fl_BlockLayout *) pBlock->getPrev();
-					if(rBlock != nullptr)
+					if(rBlock != NULL)
 					{
 						pBlock->resumeList(rBlock);
 						pBlock->getDocument()->enableListUpdates();
@@ -459,7 +459,7 @@ void AP_Dialog_Lists::Apply(void)
 				{
 					fl_BlockLayout * pBlock = (fl_BlockLayout *) vBlock.getNthItem(i);
 					fl_BlockLayout * rBlock = (fl_BlockLayout *) pBlock->getPrev();
-					if(rBlock != nullptr)
+					if(rBlock != NULL)
 					{
 						pBlock->resumeList(rBlock);
 						pBlock->getDocument()->enableListUpdates();
@@ -506,7 +506,7 @@ void AP_Dialog_Lists::Apply(void)
 		{
 			fl_BlockLayout * pBlock = (fl_BlockLayout *) vBlock.getNthItem(i);
 			fl_BlockLayout * rBlock = pBlock->getPreviousListOfSameMargin();
-			if(rBlock != nullptr)
+			if(rBlock != NULL)
 			{
 				pBlock->resumeList(rBlock);
 				pBlock->getDocument()->enableListUpdates();
@@ -680,7 +680,7 @@ void  AP_Dialog_Lists::generateFakeLabels(void)
 	for(i=0; i<4; i++)
 	{
 		DELETEP(m_pFakeLayout[i]);
-		m_pFakeSdh[i] = new pf_Frag_Strux_Block(nullptr,0);
+		m_pFakeSdh[i] = new pf_Frag_Strux_Block(NULL,0);
 		m_pFakeLayout[i] = new fl_Layout((PTStruxType) 0 , m_pFakeSdh[i] );
 	}
 	//
@@ -709,9 +709,9 @@ UT_UCSChar * AP_Dialog_Lists::getListLabel(UT_sint32 itemNo)
 	UT_ASSERT_HARMLESS(itemNo < 4);
 	static UT_UCSChar lab[80];
 	const UT_UCSChar * tmp  = m_pFakeAuto->getLabel(m_pFakeSdh[itemNo]);
-	if(tmp == nullptr)
+	if(tmp == NULL)
 	{
-		return nullptr;
+		return NULL;
 	}
 	UT_sint32 cnt = UT_MIN(UT_UCS4_strlen(tmp),80);
 	UT_sint32 i;
@@ -810,7 +810,7 @@ void AP_Dialog_Lists::fillDialogFromBlock(void)
 {
 	PP_PropertyVector va,vp;
 
-	if (getBlock()->getPreviousList() != nullptr)
+	if (getBlock()->getPreviousList() != NULL)
 	{
 		m_previousListExistsAtPoint = true;
 	}
@@ -824,9 +824,9 @@ void AP_Dialog_Lists::fillDialogFromBlock(void)
 //
 // First get the fold level.
 //
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	getBlock()->getAP(pAP);
-	const gchar *pszTEXTFOLDED = nullptr;
+	const gchar *pszTEXTFOLDED = NULL;
 	if(!pAP || !pAP->getProperty("text-folded",pszTEXTFOLDED))
 	{
 		m_iCurrentLevel = 0;
@@ -955,7 +955,7 @@ void AP_Dialog_Lists::fillDialogFromBlock(void)
 			m_iLevel = 1;
 		}
 	}
-	if(getAutoNum() != nullptr)
+	if(getAutoNum() != NULL)
 	{
 		m_iID = getAutoNum()->getID();
 		m_DocListType = getAutoNum()->getType();
@@ -988,7 +988,7 @@ void AP_Dialog_Lists::PopulateDialogData(void)
 	if(m_isListAtPoint == true)
 	{
 		const UT_UCSChar * tmp1 =  getBlock()->getListLabel();
-		if(tmp1 != nullptr)
+		if(tmp1 != NULL)
 		{
 			UT_sint32 cnt = UT_MIN(UT_UCS4_strlen(tmp1),80);
 			UT_sint32 i;
@@ -1029,11 +1029,11 @@ UT_sint32  AP_Dialog_Lists::findVecItem(UT_GenericVector<const gchar*> * v, cons
 	if(i < 0)
 		return i;
 	UT_sint32 j;
-	const char * pszV = nullptr;
+	const char * pszV = NULL;
 	for(j= 0; j<i ;j=j+2)
 	{
 		pszV = (char *) v->getNthItem(j);
-		if( (pszV != nullptr) && (strcmp( pszV,key) == 0))
+		if( (pszV != NULL) && (strcmp( pszV,key) == 0))
 			break;
 	}
 	if( j < i && pszV)
@@ -1084,7 +1084,7 @@ AV_View * AP_Dialog_Lists::getAvView(void)
 AP_Lists_preview::AP_Lists_preview(GR_Graphics * gc, AP_Dialog_Lists * pLists)
 :	XAP_Preview(gc),
 	m_pLists(pLists),
-	m_pFont(nullptr),
+	m_pFont(NULL),
 	m_fAlign(0.0f),
 	m_fIndent(0.0f),
 	m_iLine_height(0),
@@ -1111,12 +1111,12 @@ void AP_Lists_preview::setData(const gchar * pszFont,float fAlign,float fIndent)
 	{
 		m_pFont = m_gc->findFont("Times New Roman",
 								 "normal", "", "normal",
-								 "", "16pt", nullptr);
+								 "", "16pt", NULL);
 	}
 	else
 	{
 		m_pFont = m_gc->findFont((char *)pszFont, "normal", "", "normal",
-								 "", "16pt", nullptr);
+								 "", "16pt", NULL);
 	}	
 	UT_ASSERT_HARMLESS(m_pFont);
 	
@@ -1125,7 +1125,7 @@ void AP_Lists_preview::setData(const gchar * pszFont,float fAlign,float fIndent)
 }
 
 
-void AP_Lists_preview::drawImmediate(const UT_Rect* clip)
+void AP_Lists_preview::draw(const UT_Rect *clip)
 {
 	UT_UNUSED(clip);
 	UT_return_if_fail(m_pFont);
@@ -1174,7 +1174,7 @@ void AP_Lists_preview::drawImmediate(const UT_Rect* clip)
 		UT_UCSChar * lv = getLists()->getListLabel(i);
 		UT_sint32 len =0;
 
-		if(lv != nullptr)
+		if(lv != NULL)
 		{
 			//
 			// This code is here because UT_UCS_copy_char is broken
@@ -1190,7 +1190,7 @@ void AP_Lists_preview::drawImmediate(const UT_Rect* clip)
 			len = UT_UCS4_strlen(ucs_label);
 			yloc = yoff + iAscent + (iHeight - 2*yoff -iFont)*i/4;
 			//    painter.drawChars(ucs_label,0,len,xoff+indent,yloc);
-			twidth = m_gc->measureString(ucs_label,0,len,nullptr);
+			twidth = m_gc->measureString(ucs_label,0,len,NULL);
 			if(twidth > maxw)
 				maxw = twidth;
 		}
@@ -1242,7 +1242,7 @@ void AP_Lists_preview::drawImmediate(const UT_Rect* clip)
 			UT_UCSChar * lv = getLists()->getListLabel(i/2);
 			UT_sint32 len =0;
 
-			if(lv != nullptr)
+			if(lv != NULL)
 			{
 				len = UT_MIN(UT_UCS4_strlen(lv),49);
 

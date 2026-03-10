@@ -17,8 +17,10 @@
  * 02110-1301 USA.
  */
 
+#include "ut_compiler.h"
+ABI_W_NO_CONST_QUAL
 #include <gtk/gtk.h>
-
+ABI_W_POP
 #include "ut_types.h"
 #include "ut_assert.h"
 #include "ut_debugmsg.h"
@@ -33,7 +35,7 @@ class ap_usb_TextListener : public AP_StatusBarFieldListener
 {
 public:
 	ap_usb_TextListener(AP_StatusBarField *pStatusBarField, GtkWidget *pLabel) : AP_StatusBarFieldListener(pStatusBarField) { m_pLabel = pLabel; }
-	virtual void notify() override;
+	virtual void notify(); 
 
 protected:
 	GtkWidget *m_pLabel;
@@ -56,7 +58,7 @@ void ap_usb_TextListener::notify()
 		gint iOldWidthRequest, iOldHeightRequest;
 		gtk_widget_get_size_request(m_pLabel, &iOldWidthRequest, &iOldHeightRequest);
 		gtk_widget_set_size_request(m_pLabel, -1, -1);
-		gtk_widget_get_preferred_size(m_pLabel, &requisition, nullptr);
+		gtk_widget_get_preferred_size(m_pLabel, &requisition, NULL);
 		if (requisition.width > iOldWidthRequest)
 			gtk_widget_set_size_request(m_pLabel, requisition.width, -1);
 		else
@@ -72,7 +74,7 @@ public:
         { 
 	    m_wProgress = wProgress; 
 	}
-	virtual void notify() override;
+	virtual void notify(); 
 
 protected:
 	GtkWidget *m_wProgress;
@@ -100,8 +102,8 @@ void ap_usb_ProgressListener::notify()
 AP_UnixStatusBar::AP_UnixStatusBar(XAP_Frame * pFrame)
 	: AP_StatusBar(pFrame)
 {
-	m_wStatusBar = nullptr;
-	m_wProgressFrame = nullptr;
+	m_wStatusBar = NULL;
+	m_wProgressFrame = NULL;
 }
 
 AP_UnixStatusBar::~AP_UnixStatusBar(void)
@@ -140,11 +142,11 @@ GtkWidget * AP_UnixStatusBar::createWidget(void)
 
 		// set up a frame for status bar elements so they look like status bar elements, 
 		// and not just normal widgets
-		GtkWidget *pStatusBarElement = nullptr;
+		GtkWidget *pStatusBarElement = NULL;
 		UT_DEBUGMSG(("Fill method %d \n",pf->getFillMethod()));
 		if (pf->getFillMethod() == REPRESENTATIVE_STRING || (pf->getFillMethod() == MAX_POSSIBLE)){ //AP_StatusBarField_TextInfo *pf_TextInfo = dynamic_cast<AP_StatusBarField_TextInfo*>(pf))
 		  AP_StatusBarField_TextInfo *pf_TextInfo = static_cast<AP_StatusBarField_TextInfo*>(pf);
-			pStatusBarElement = gtk_frame_new(nullptr);
+			pStatusBarElement = gtk_frame_new(NULL);
 			gtk_frame_set_shadow_type(GTK_FRAME(pStatusBarElement), GTK_SHADOW_IN);
 			
 			GtkWidget *pStatusBarElementLabel = gtk_label_new(pf_TextInfo->getRepresentativeString());
@@ -165,7 +167,7 @@ GtkWidget * AP_UnixStatusBar::createWidget(void)
 			// size and place
 			if (pf_TextInfo->getFillMethod() == REPRESENTATIVE_STRING) {
 				GtkRequisition requisition;
-				gtk_widget_get_preferred_size(pStatusBarElementLabel, &requisition, nullptr);
+				gtk_widget_get_preferred_size(pStatusBarElementLabel, &requisition, NULL);
 				gtk_widget_set_size_request(pStatusBarElementLabel, requisition.width, -1);
 
 				gtk_box_pack_start(GTK_BOX(m_wStatusBar), pStatusBarElement, FALSE, FALSE, 0);
@@ -180,8 +182,8 @@ GtkWidget * AP_UnixStatusBar::createWidget(void)
 		else if(pf->getFillMethod() == 	PROGRESS_BAR)
 		{
 			GtkRequisition requisition;
-			pStatusBarElement = gtk_frame_new(nullptr);
-			gtk_widget_get_preferred_size(pStatusBarElement, &requisition, nullptr);
+			pStatusBarElement = gtk_frame_new(NULL);
+			gtk_widget_get_preferred_size(pStatusBarElement, &requisition, NULL);
 			gtk_widget_set_size_request(pStatusBarElement, -1, requisition.height);
 			gtk_frame_set_shadow_type(GTK_FRAME(pStatusBarElement), GTK_SHADOW_IN);
 

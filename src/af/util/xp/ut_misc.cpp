@@ -144,7 +144,7 @@ std::string UT_pathSuffix(std::string path)
 	// local path. If so, then we can convert it into a proper URI
 	if (!isUri && !isFilename)
 	{
-		char* uri = g_filename_to_uri(path.c_str(), nullptr, nullptr);
+		char* uri = g_filename_to_uri(path.c_str(), NULL, NULL);
 		if (!uri)
 			return "";
 		path = uri;
@@ -216,7 +216,7 @@ bool UT_isWordDelimiter(UT_UCSChar currentChar, UT_UCSChar followChar, UT_UCSCha
 		case G_UNICODE_TITLECASE_LETTER:
 		case G_UNICODE_UPPERCASE_LETTER:
 		case G_UNICODE_OTHER_LETTER:
-		case G_UNICODE_SPACING_MARK:
+		case G_UNICODE_COMBINING_MARK:
 		case G_UNICODE_ENCLOSING_MARK:
 		case G_UNICODE_NON_SPACING_MARK:
 		case G_UNICODE_DECIMAL_NUMBER:
@@ -259,7 +259,7 @@ bool UT_isWordDelimiter(UT_UCSChar currentChar, UT_UCSChar followChar, UT_UCSCha
 
 const gchar* UT_getAttribute(const gchar* name, const gchar** atts)
 {
-	UT_return_val_if_fail( atts, nullptr );
+	UT_return_val_if_fail( atts, NULL );
 
 	const gchar** p = atts;
 
@@ -273,7 +273,7 @@ const gchar* UT_getAttribute(const gchar* name, const gchar** atts)
 	if (*p)
 		return p[1];
 	else
-		return nullptr;
+		return NULL;
 }
 
 bool isTrue( const char* s )
@@ -445,7 +445,7 @@ void UT_VersionInfo::makeVersString()
 */
 const gchar ** UT_splitPropsToArray(gchar * pProps)
 {
-		UT_return_val_if_fail( pProps, nullptr);
+		UT_return_val_if_fail( pProps, NULL);
 	
 		UT_uint32 iLen = strlen(pProps);
 	
@@ -456,7 +456,7 @@ const gchar ** UT_splitPropsToArray(gchar * pProps)
 			--i;
 		}
 
-		char * semi = nullptr;
+		char * semi = NULL;
 		const char * p = pProps;
  		while((semi = (char *) strchr(p, ';')))
 		{
@@ -469,7 +469,7 @@ const gchar ** UT_splitPropsToArray(gchar * pProps)
 		UT_uint32 iPropCount = i;
 		UT_uint32 j = 0;
 		const gchar ** pPropsArray = new const gchar *[2 * iPropCount + 1];
-		UT_return_val_if_fail( pPropsArray, nullptr );
+		UT_return_val_if_fail( pPropsArray, NULL );
 	
 		const char * pStart = pProps;
 
@@ -480,7 +480,7 @@ const gchar ** UT_splitPropsToArray(gchar * pProps)
 			{
 				pPropsArray[j++] = pStart;
 				char * colon = (char *)  strchr(pStart, ':');
-				UT_return_val_if_fail( colon,nullptr );
+				UT_return_val_if_fail( colon,NULL );
 				*colon = 0;
 				pPropsArray[j++] = colon + 1;
 
@@ -493,9 +493,9 @@ const gchar ** UT_splitPropsToArray(gchar * pProps)
 			}
 		}
 	
-		UT_return_val_if_fail( j == 2 * iPropCount, nullptr );
+		UT_return_val_if_fail( j == 2 * iPropCount, NULL );
 
-		pPropsArray[j] = nullptr;
+		pPropsArray[j] = NULL;
 		return pPropsArray;
 }
 
@@ -550,26 +550,8 @@ UT_uint32 UT_hash32(const char * p, UT_uint32 bytelen)
 
 #undef MYZERO
 
-#if defined(__MACH__) && !defined(CLOCK_REALTIME)
-#include <mach/clock.h>
-#include <mach/mach.h>
-#endif
 
-// compat layer for clock_gettime(). macOS don't have it.
-// https://gist.github.com/jbenet/1087739
-int UT_clock_gettime_realtime(struct timespec *tp)
-{
-#if defined(__MACH__) && !defined(CLOCK_REALTIME)
-	// OS X does not have clock_gettime, use clock_get_time
-	clock_serv_t cclock;
-	mach_timespec_t mts;
-	host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
-	clock_get_time(cclock, &mts);
-	mach_port_deallocate(mach_task_self(), cclock);
-	tp->tv_sec = mts.tv_sec;
-	tp->tv_nsec = mts.tv_nsec;
-	return 0;
-#else
-	return clock_gettime(CLOCK_REALTIME, tp);
-#endif
-}
+
+
+
+

@@ -58,7 +58,7 @@ AP_Dialog_Modeless::AP_Dialog_Modeless( XAP_DialogFactory * pDlgFactory,
                                         XAP_Dialog_Id id,
                                         const char * helpUrl )
 	: XAP_Dialog_Modeless( pDlgFactory, id, helpUrl )
-    , m_pView(nullptr)
+    , m_pView(0)
     , m_answer( a_CLOSE )
 {
 }
@@ -116,7 +116,7 @@ bool AP_Dialog_Modeless::setView(FV_View * /*view*/)
 	if (getActiveFrame())
 		m_pView = (FV_View *) getActiveFrame()->getCurrentView();
 	else
-		m_pView = nullptr;
+		m_pView = NULL;
 	return true;
 }
 
@@ -127,6 +127,6 @@ FV_View * AP_Dialog_Modeless::getView(void) const
 	if (pFrame)
 		return (FV_View *) pFrame->getCurrentView();
 	else
-		return nullptr;
+		return NULL;
 }
 

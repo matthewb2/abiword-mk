@@ -39,11 +39,11 @@ public:
 	AP_Dialog_FormatTOC(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_Dialog_FormatTOC(void);
 
-	virtual void runModeless(XAP_Frame * pFrame) override = 0;
+	virtual void runModeless(XAP_Frame * pFrame) = 0;
 
 	void              startUpdater(void);
 	void              stopUpdater(void);
-	void              setActiveFrame(XAP_Frame *pFrame) override;
+    void              setActiveFrame(XAP_Frame *pFrame);
 	void              event_update(void);
 	void              finalize(void);
 	void              Apply(void);
@@ -51,16 +51,15 @@ public:
     virtual void      setSensitivity(bool bSensitive) = 0;
 	static void       autoUpdate(UT_Worker * pTimer);
 	void              updateDialog(void);
-	std::string     getNewStyle(const std::string & sProp) const;
+	UT_UTF8String     getNewStyle(UT_UTF8String & sProp);
 	bool              setPropFromDoc(const char * szProp);
-	void              setTOCProperty(const std::string & sProp, 
-					 const std::string & sVal);
+	void              setTOCProperty(UT_UTF8String & sProp, UT_UTF8String & sVal);
 	void              setTOCProperty(const char * szProp, const char * szVal);
 	void              fillTOCPropsFromDoc(void);
 	void              applyTOCPropsToDoc(void);
-	std::string     getTOCPropVal(const std::string & sProp) const;
-	std::string     getTOCPropVal(const char * szProp) const;
-	std::string     getTOCPropVal(const char * szProp,UT_sint32 i) const;
+    UT_UTF8String     getTOCPropVal(UT_UTF8String & sProp);
+    UT_UTF8String     getTOCPropVal(const char * szProp);
+    UT_UTF8String     getTOCPropVal(const char * szProp,UT_sint32 i);
 	const UT_GenericVector<const gchar*> *       getVecTABLeadersLabel(void)
 		{ return & m_vecTABLeadersLabel;}
 	const UT_GenericVector<const gchar*> *       getVecTABLeadersProp(void)
@@ -83,7 +82,7 @@ private:
 	UT_uint32             m_iTick;
 	const PP_AttrProp *   m_pAP;
 	bool                  m_bTOCFilled;
-	std::string           m_sTOCProps;
+	UT_UTF8String         m_sTOCProps;
 	UT_GenericVector<const gchar*> m_vecTABLeadersLabel;
 	UT_GenericVector<const gchar*> m_vecTABLeadersProp;
 	UT_sint32   m_iMainLevel;

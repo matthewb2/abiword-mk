@@ -2,7 +2,7 @@
 
 /* AbiSource Application Framework
  * Copyright (C) 2002 AbiSource, Inc.
- * Copyright (C) 2004 Hubert FiguiÃ¨re
+ * Copyright (C) 2004 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

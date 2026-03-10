@@ -1,7 +1,5 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 2003 Dom Lachowicz
- * Copyright (C) 2019 Hubert Figuière
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,7 +26,6 @@
 // This header defines some functions for Unix dialogs,
 // like centering them, measuring them, etc.
 #include "xap_UnixDialogHelper.h"
-#include "xap_GtkUtils.h"
 
 #include "xap_App.h"
 #include "ap_UnixApp.h"
@@ -89,7 +86,7 @@ XAP_Dialog * AP_UnixDialog_MailMerge::static_constructor(XAP_DialogFactory * pFa
 
 AP_UnixDialog_MailMerge::AP_UnixDialog_MailMerge(XAP_DialogFactory * pDlgFactory,
 										 XAP_Dialog_Id id)
-	: AP_Dialog_MailMerge(pDlgFactory,id)
+	: AP_Dialog_MailMerge(pDlgFactory,id), m_windowMain(NULL)
 {
 }
 
@@ -128,6 +125,13 @@ static void s_destroy_clicked(GtkWidget * /*widget*/,
 	dlg->event_Close();
 }
 
+static void s_delete_clicked(GtkWidget * widget,
+							 gpointer,
+							 gpointer * /*dlg*/)
+{
+	abiDestroyWidget(widget);
+}
+
 static void s_response_triggered(GtkWidget * widget, gint resp, AP_UnixDialog_MailMerge * dlg)
 {
 	UT_return_if_fail(widget && dlg);
@@ -142,7 +146,7 @@ static void s_response_triggered(GtkWidget * widget, gint resp, AP_UnixDialog_Ma
 
 void AP_UnixDialog_MailMerge::event_AddClicked ()
 {
-	setMergeField (XAP_gtk_entry_get_text (GTK_ENTRY(m_entry)));
+	setMergeField (gtk_entry_get_text (GTK_ENTRY(m_entry)));
 	addClicked();
 }
 
@@ -151,7 +155,7 @@ GtkWidget * AP_UnixDialog_MailMerge::_constructWindow(void)
 	const XAP_StringSet * pSS = m_pApp->getStringSet();
 	
 	// load the dialog from the UI file
-	GtkBuilder* builder = newDialogBuilderFromResource("ap_UnixDialog_MailMerge.ui");
+	GtkBuilder* builder = newDialogBuilder("ap_UnixDialog_MailMerge.ui");
 	
 	// Update our member variables with the important widgets that 
 	// might need to be queried or altered later
@@ -177,7 +181,6 @@ GtkWidget * AP_UnixDialog_MailMerge::_constructWindow(void)
 
 	localizeButtonUnderline(GTK_WIDGET(gtk_builder_get_object(builder, "btInsert")), pSS, AP_STRING_ID_DLG_InsertButton);
 
-	connectBasicSignals();
 	g_signal_connect_after(G_OBJECT(m_treeview),
 						   "cursor-changed",
 						   G_CALLBACK(s_types_clicked),
@@ -194,6 +197,10 @@ GtkWidget * AP_UnixDialog_MailMerge::_constructWindow(void)
 	g_signal_connect(G_OBJECT(m_windowMain),
 			   "destroy",
 			   G_CALLBACK(s_destroy_clicked),
+			   (gpointer) this);
+	g_signal_connect(G_OBJECT(m_windowMain),
+			   "delete_event",
+			   G_CALLBACK(s_delete_clicked),
 			   (gpointer) this);
 
 	g_object_unref(G_OBJECT(builder));
@@ -216,7 +223,7 @@ void AP_UnixDialog_MailMerge::setFieldList()
 	model = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_INT);
 	column = gtk_tree_view_get_column (GTK_TREE_VIEW(m_treeview), 0);
 	if (!column) {
-		column = gtk_tree_view_column_new_with_attributes ("Format", gtk_cell_renderer_text_new (), "text", 0, nullptr);
+		column = gtk_tree_view_column_new_with_attributes ("Format", gtk_cell_renderer_text_new (), "text", 0, NULL);
 		gtk_tree_view_append_column(GTK_TREE_VIEW(m_treeview), column);
 	}
 	
@@ -241,5 +248,5 @@ void AP_UnixDialog_MailMerge::setFieldList()
 void AP_UnixDialog_MailMerge::fieldClicked(UT_uint32 index)
 {
 	const std::string & str = m_vecFields[index];
-	XAP_gtk_entry_set_text (GTK_ENTRY(m_entry), str.c_str());
+	gtk_entry_set_text (GTK_ENTRY(m_entry), str.c_str());
 }

@@ -1,7 +1,7 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
 /* AbiSource Application Framework
  * Copyright (C) 1998, 1999 AbiSource, Inc.
- * Copyright (C) 2004-2021 Hubert Figuière
+ * Copyright (C) 2004 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,7 +27,7 @@
 #include <memory>
 
 #include <glib.h>
-#include <gsf/gsf.h>
+#include <gsf/gsf-utils.h>
 
 #include "ut_types.h"
 #include "ut_assert.h"
@@ -77,22 +77,22 @@ XAP_StateData::XAP_StateData()
 }
 
 
-XAP_App * XAP_App::m_pApp = nullptr;
+XAP_App * XAP_App::m_pApp = NULL;
 
 XAP_App * XAP_App::getApp() {return m_pApp;}
 
 XAP_App::XAP_App(const char * szAppName)
 	: m_szAppName(szAppName),
-	  m_szAbiSuiteLibDir(nullptr),
-	  m_pEMC(nullptr),
-	  m_pBindingSet(nullptr),
-	  m_pMenuActionSet(nullptr),
-	  m_pToolbarActionSet(nullptr),
-	  m_pDict(nullptr),
-	  m_prefs(nullptr),
-	  m_lastFocussedFrame(nullptr),
-	  m_pMenuFactory(nullptr),
-	  m_pToolbarFactory(nullptr),
+	  m_szAbiSuiteLibDir(NULL),
+	  m_pEMC(NULL),
+	  m_pBindingSet(NULL),
+	  m_pMenuActionSet(NULL),
+	  m_pToolbarActionSet(NULL),
+	  m_pDict(NULL),
+	  m_prefs(NULL),
+	  m_lastFocussedFrame(NULL),
+	  m_pMenuFactory(NULL),
+	  m_pToolbarFactory(NULL),
 	  m_bAllowCustomizing(true),
 	  m_bAreCustomized(true),
 	  m_bDebugBool(false),
@@ -100,25 +100,25 @@ XAP_App::XAP_App(const char * szAppName)
 	  m_bEnableSmoothScrolling(true),
       m_bDisableDoubleBuffering(false),
       m_bNoGUI(false),
-	  m_pKbdLang(nullptr), // must not be deleted by destructor !!!
-	  m_pUUIDGenerator(nullptr),
-	  m_pGraphicsFactory(nullptr),
+	  m_pKbdLang(NULL), // must not be deleted by destructor !!!
+ 	  m_pUUIDGenerator(NULL),
+	  m_pGraphicsFactory(NULL),
 	  m_iDefaultGraphicsId(0),
-	  m_pInputModes(nullptr),
-	  m_pImpl(nullptr),
-	  m_pScriptLibrary(nullptr)
+	  m_pInputModes(NULL),
+	  m_pImpl(NULL),
+	  m_pScriptLibrary(NULL)
 {
 #ifdef DEBUG
 	_fundamentalAsserts(); // see the comments in the function itself
-	UT_DEBUGMSG(("ZZZZZZZZZZZZZZZZZZZZZZZaaaaaaaaaaaaaaAbiSuite Home |%s|\n",XAP_App::s_szAbiSuite_Home ));
+	UT_DEBUGMSG(("AbiSuite Home |%s|\n",XAP_App::s_szAbiSuite_Home ));
 
 #endif
 
 	m_pGraphicsFactory = new GR_GraphicsFactory;
 	UT_ASSERT( m_pGraphicsFactory );
-	
+
 	m_pImpl = XAP_AppImpl::static_constructor();
-	
+
 	UT_ASSERT(szAppName && *szAppName);
 	m_pApp = this;
 
@@ -140,7 +140,7 @@ XAP_App::~XAP_App()
 
 	// run thru and destroy all frames on our window list.
 	UT_VECTOR_PURGEALL(XAP_Frame *, m_vecFrames);
-	// when can have nullptr pointers....
+	// when can have NULL pointers....
 
 	FREEP(m_szAbiSuiteLibDir);
 	DELETEP(m_pEMC);
@@ -164,7 +164,7 @@ XAP_App::~XAP_App()
 	DELETEP(m_pScriptLibrary);
 
 	/* reset the static pointer, since it is no longer valid */
-	m_pApp = nullptr;
+	m_pApp = NULL;
 }
 
 const char* XAP_App::getBuildId ()
@@ -203,8 +203,8 @@ const char* XAP_App::getAbiSuiteHome ()
 }
 
 /*! this function is silly */
-const XAP_EncodingManager* XAP_App::getEncodingManager() const 
-{ 
+const XAP_EncodingManager* XAP_App::getEncodingManager() const
+{
 	return XAP_EncodingManager::get_instance();
 }
 
@@ -220,11 +220,11 @@ EV_Toolbar_ActionSet *XAP_App::getToolbarActionSet()
 
 /*!
  * Returns a pointer to the requested plugin if it is loaded.
- * Return nullptr otherwise.
+ * Return NULL otherwise.
  */
-XAP_Module* XAP_App::getPlugin(const char* szPluginName) const
+XAP_Module * XAP_App::getPlugin(const char * szPluginName)
 {
-     XAP_Module * pModule = nullptr;
+     XAP_Module * pModule = NULL;
      const UT_GenericVector<XAP_Module*> * pVec = XAP_ModuleManager::instance().enumModules ();
      bool bFound = false;
      for (UT_sint32 i = 0; (i < pVec->size()) && !bFound; i++)
@@ -238,7 +238,7 @@ XAP_Module* XAP_App::getPlugin(const char* szPluginName) const
      }
      if(!bFound)
      {
-           return nullptr;
+           return NULL;
      }
      return pModule;
 }
@@ -249,8 +249,8 @@ XAP_Module* XAP_App::getPlugin(const char* szPluginName) const
 bool XAP_App::registerEmbeddable(GR_EmbedManager * pEmbed, const char *uid)
 {
 	 UT_return_val_if_fail( pEmbed, false );
-	 
-	 if (uid == nullptr)
+
+	 if (uid == NULL)
 		uid = pEmbed->getObjectType();
 	 if (uid && *uid && m_mapEmbedManagers.find(uid) == m_mapEmbedManagers.end())
      {
@@ -262,12 +262,12 @@ bool XAP_App::registerEmbeddable(GR_EmbedManager * pEmbed, const char *uid)
 
 
 /*!
- * UnRegister an embeddable plugin with XAP_App. The plugin itself is 
+ * UnRegister an embeddable plugin with XAP_App. The plugin itself is
  * responsible for actually deleting the object.
  */
 bool XAP_App::unRegisterEmbeddable(const char *uid)
 {
-  if (uid == nullptr || *uid == 0)
+  if (uid == NULL || *uid == 0)
     return false;
   std::map<std::string, GR_EmbedManager *>::iterator i = m_mapEmbedManagers.find(uid);
   if(i != m_mapEmbedManagers.end())
@@ -282,20 +282,17 @@ bool XAP_App::unRegisterEmbeddable(const char *uid)
  * Return a copy of the requested embedable plugin or a default manager.
  * The calling routine must delete this.
  */
-GR_EmbedManager * XAP_App:: getEmbeddableManager(GR_Graphics * pG, const char * szObjectType) const
+GR_EmbedManager * XAP_App:: getEmbeddableManager(GR_Graphics * pG, const char * szObjectType)
 {
-	GR_EmbedManager * pCur = nullptr;
-	if (szObjectType && szObjectType != nullptr) {
-		auto iter = m_mapEmbedManagers.find(szObjectType);
-		if (iter != m_mapEmbedManagers.end()) {
-			pCur = iter->second;
-		}
-	}
-	if(pCur != nullptr) {
-		UT_DEBUGMSG(("Found a plugin of type %s \n",pCur->getObjectType()));
-		return pCur->create(pG);
-	}
-	return new GR_EmbedManager(pG);
+     GR_EmbedManager * pCur = NULL;
+	 if (szObjectType && szObjectType != 0)
+       pCur =  m_mapEmbedManagers[szObjectType];
+     if(pCur != NULL)
+     {
+       UT_DEBUGMSG(("Found a plugin of type %s \n",pCur->getObjectType()));
+       return pCur->create(pG);
+     }
+     return new GR_EmbedManager(pG);
 }
 
 bool XAP_App::initialize(const char * szKeyBindingsKey, const char * szKeyBindingsDefaultValue)
@@ -311,7 +308,7 @@ bool XAP_App::initialize(const char * szKeyBindingsKey, const char * szKeyBindin
 
 	// HACK: for now, this works from XAP code
 	// TODO: where should this really go?
-	char * szPathname = g_build_filename(getUserPrivateDirectory(), "custom.dic", nullptr);
+	char * szPathname = g_build_filename(getUserPrivateDirectory(), "custom.dic", NULL);
 	UT_ASSERT(szPathname);
 	m_pDict = new XAP_Dictionary(szPathname);
 	FREEP(szPathname);
@@ -322,25 +319,26 @@ bool XAP_App::initialize(const char * szKeyBindingsKey, const char * szKeyBindin
 // Set Smooth Scrolling
 //
 	bool bEnableSmooth = true;
-	getPrefsValueBool(XAP_PREF_KEY_EnableSmoothScrolling, bEnableSmooth);
+	getPrefsValueBool(XAP_PREF_KEY_EnableSmoothScrolling, &bEnableSmooth);
 	if(bEnableSmooth)
 		setEnableSmoothScrolling(true);
 	else
 		setEnableSmoothScrolling(false);
 
 	//
-	// Need to initialize the random number generator. 
+	// Need to initialize the random number generator.
 	//
-	UT_uint32 t = static_cast<UT_uint32>(time(nullptr));
+	UT_uint32 t = static_cast<UT_uint32>(time(NULL));
 	UT_srandom(t);
 
 	// Input mode initilization, taken out of the XAP_Frame
-	std::string bindings;
-	EV_EditBindingMap * pBindingMap = nullptr;
+	const char * szBindings = NULL;
+	EV_EditBindingMap * pBindingMap = NULL;
 
-	if (getPrefsValue(szKeyBindingsKey, bindings) && !bindings.empty()) {
-		pBindingMap = m_pApp->getBindingMap(bindings.c_str());
-	}
+	if ((getPrefsValue(szKeyBindingsKey,
+				 static_cast<const gchar**>(&szBindings))) &&
+	    (szBindings) && (*szBindings))
+		pBindingMap = m_pApp->getBindingMap(szBindings);
 	if (!pBindingMap)
 		pBindingMap = m_pApp->getBindingMap(szKeyBindingsDefaultValue);
 	UT_ASSERT(pBindingMap);
@@ -351,20 +349,22 @@ bool XAP_App::initialize(const char * szKeyBindingsKey, const char * szKeyBindin
 		UT_ASSERT(m_pInputModes);
 	}
 	bool bResult;
-	bResult = m_pInputModes->createInputMode(bindings.c_str(), pBindingMap);
+	bResult = m_pInputModes->createInputMode(szBindings,pBindingMap);
 	UT_ASSERT(bResult);
-	bResult = m_pInputModes->setCurrentMap(bindings.c_str());
+	bResult = m_pInputModes->setCurrentMap(szBindings);
 	UT_ASSERT(bResult);
 	UT_UNUSED(bResult); // TODO deal with the error
 
 	// check if the prefs are set to use specific graphics class
-	std::string graphics;
-	if (getPrefsValue(XAP_PREF_KEY_DefaultGraphics, graphics)) {
+	const char * pszGraphics = NULL;
+	if(getPrefsValue(XAP_PREF_KEY_DefaultGraphics, &pszGraphics))
+	{
 		UT_uint32 iID = 0;
 
 		// please leave this in hex format (the constants are defined in gr_Graphics.h as hex)
-		sscanf(graphics.c_str(),"%x", &iID);
-		if (iID != 0) {
+		sscanf(pszGraphics,"%x", &iID);
+		if(iID != 0)
+		{
 			UT_DEBUGMSG(("Graphics %d requested as default\n", iID));
 
 			// first of all, check that it is registered
@@ -390,24 +390,24 @@ bool XAP_App::initialize(const char * szKeyBindingsKey, const char * szKeyBindin
  * Plugins can register themselves here if they want to receive
  * notifications of document changes.
  */
-bool XAP_App::addListener(AV_Listener * pListener, 
+bool XAP_App::addListener(AV_Listener * pListener,
 							 AV_ListenerId * pListenerId)
 {
 	UT_sint32 kLimit = m_vecPluginListeners.getItemCount();
 	UT_sint32 k;
 
 	// see if we can recycle a cell in the vector.
-	UT_DEBUGMSG(("Asked to register pListener %p \n", (void*)pListener));
-	
+	UT_DEBUGMSG(("Asked to register pListener %p \n",pListener));
+
 	for (k=0; k<kLimit; k++)
-		if (m_vecPluginListeners.getNthItem(k) == nullptr)
+		if (m_vecPluginListeners.getNthItem(k) == 0)
 		{
-			static_cast<void>(m_vecPluginListeners.setNthItem(k,pListener,nullptr));
+			static_cast<void>(m_vecPluginListeners.setNthItem(k,pListener,NULL));
 			goto ClaimThisK;
 		}
 
 	// otherwise, extend the vector for it.
-	
+
 	if (m_vecPluginListeners.addItem(pListener,&k) != 0)
 	{
 		UT_DEBUGMSG(("Failed! id %d \n",k));
@@ -417,7 +417,7 @@ bool XAP_App::addListener(AV_Listener * pListener,
   ClaimThisK:
 
 	// give our vector index back to the caller as a "Listener Id".
-	
+
 	*pListenerId = k;
 	return true;
 }
@@ -430,7 +430,7 @@ bool XAP_App::removeListener(AV_ListenerId listenerId)
 {
 	if (listenerId == (AV_ListenerId) -1)
 		return false;
-	
+
 	if (m_vecPluginListeners.getNthItem(listenerId)) {
 		m_vecPluginListeners.deleteNthItem(listenerId);
 		return true;
@@ -444,23 +444,23 @@ bool XAP_App::removeListener(AV_ListenerId listenerId)
 bool XAP_App::notifyListeners(AV_View * pView, const AV_ChangeMask hint, void * pPrivateData)
 {
 	/*
-		App-specific logic calls this virtual method when relevant portions of 
+		App-specific logic calls this virtual method when relevant portions of
 		the view state *may* have changed.  (That's why it's called a hint.)
 
-		This base class implementation doesn't do any filtering of those 
-		hints, it just broadcasts those hints to all listeners.  
+		This base class implementation doesn't do any filtering of those
+		hints, it just broadcasts those hints to all listeners.
 
-		Subclasses are encouraged to improve the quality of those hints by 
-		filtering out mask bits which haven't *actually* changed since the 
-		last notification.  To do so, they would 
+		Subclasses are encouraged to improve the quality of those hints by
+		filtering out mask bits which haven't *actually* changed since the
+		last notification.  To do so, they would
 
 			- copy the hint (it's passed as a const),
-			- clear any irrelevant bits, and 
+			- clear any irrelevant bits, and
 			- call this implementation on the way out
 
-		Good hinting logic is app-specific, and non-trivial to tune, but it's 
-		worth doing, because it helps minimizes flicker for things like 
-		toolbar button state.  
+		Good hinting logic is app-specific, and non-trivial to tune, but it's
+		worth doing, because it helps minimizes flicker for things like
+		toolbar button state.
 	*/
 
 	// make sure there's something left
@@ -469,9 +469,9 @@ bool XAP_App::notifyListeners(AV_View * pView, const AV_ChangeMask hint, void * 
 	{
 		return false;
 	}
-	
+
 	// notify listeners of a change.
-		
+
 	AV_ListenerId lid;
 	AV_ListenerId lidCount = m_vecPluginListeners.getItemCount();
 
@@ -510,7 +510,9 @@ const char * XAP_App::getApplicationTitleForTitleBar() const
 	// can copy to the title bar of a window.
 
 	//sprintf(_title, "%s (www.abisource.com)", m_szAppName);
-	sprintf(_title, "%s", m_szAppName);
+	//sprintf(_title, "%s", m_szAppName); //pascal
+
+    sprintf(_title, "%s Personal", m_szAppName);
 
 	return _title;
 }
@@ -539,9 +541,9 @@ EV_EditMethodContainer * XAP_App::getEditMethodContainer() const
 	return m_pEMC;
 }
 
-EV_EditBindingMap * XAP_App::getBindingMap(const char * szName) const
+EV_EditBindingMap * XAP_App::getBindingMap(const char * szName)
 {
-	UT_return_val_if_fail(m_pBindingSet, nullptr);
+	UT_return_val_if_fail(m_pBindingSet,NULL);
 	return m_pBindingSet->getMap(szName);
 }
 
@@ -570,8 +572,8 @@ bool XAP_App::rememberFrame(XAP_Frame * pFrame, XAP_Frame * pCloneOf)
 	{
 		// locate vector of this frame's clones
 		CloneMap::const_iterator iter = m_hashClones.find(pCloneOf->getViewKey());
-		
-		UT_GenericVector<XAP_Frame*> * pvClones = nullptr;
+
+		UT_GenericVector<XAP_Frame*> * pvClones = NULL;
 
 		if (iter != m_hashClones.end())
 		{
@@ -618,7 +620,7 @@ bool XAP_App::rememberFrame(XAP_Frame * pFrame, XAP_Frame * pCloneOf)
 				f->updateTitle();
 		}
 	}
-	
+
 	// TODO do something here...
 	notifyFrameCountChange();
 	return true;
@@ -628,12 +630,12 @@ bool XAP_App::forgetFrame(XAP_Frame * pFrame)
 {
 	UT_return_val_if_fail(pFrame,false);
 
-	// If this frame is the currently focussed frame write in nullptr
+	// If this frame is the currently focussed frame write in NULL
 	// until another frame appears
 
 	if(pFrame == m_lastFocussedFrame )
 	{
-		m_lastFocussedFrame = static_cast<XAP_Frame *>(nullptr);
+		m_lastFocussedFrame = static_cast<XAP_Frame *>(NULL);
 	}
 
 	if (pFrame->getViewNumber() > 0)
@@ -659,7 +661,7 @@ bool XAP_App::forgetFrame(XAP_Frame * pFrame)
 			// see how many clones are left
 			UT_uint32 count = pvClones->getItemCount();
 			UT_ASSERT(count > 0);
-			XAP_Frame * f = nullptr;
+			XAP_Frame * f = NULL;
 
 			if (count == 1)
 			{
@@ -717,7 +719,7 @@ bool XAP_App::forgetClones(XAP_Frame * pFrame)
 
 	UT_GenericVector<XAP_Frame*> vClones;
 	getClones(&vClones, pFrame);
-	
+
 	for (UT_sint32 i = 0; i < vClones.getItemCount(); i++)
 	{
 		XAP_Frame * f = static_cast<XAP_Frame *>(vClones.getNthItem(i));
@@ -735,7 +737,7 @@ bool XAP_App::getClones(UT_GenericVector<XAP_Frame*> *pvClonesCopy, XAP_Frame * 
 
 	// locate vector of this frame's clones
 	CloneMap::const_iterator iter = m_hashClones.find(pFrame->getViewKey());
-	UT_GenericVector<XAP_Frame*> * pvClones = nullptr;
+	UT_GenericVector<XAP_Frame*> * pvClones = NULL;
 	if (iter != m_hashClones.end()) {
 		pvClones = iter->second;
 	}
@@ -760,7 +762,7 @@ bool XAP_App::updateClones(XAP_Frame * pFrame)
 
 		UT_uint32 count = pvClones->getItemCount();
 		UT_ASSERT(count > 0);
-		XAP_Frame * f = nullptr;
+		XAP_Frame * f = NULL;
 
 		for (UT_uint32 j=0; j<count; j++)
 		{
@@ -786,8 +788,8 @@ UT_sint32 XAP_App::getFrameCount() const
 
 XAP_Frame * XAP_App::getFrame(UT_sint32 ndx) const
 {
-	XAP_Frame * pFrame = nullptr;
-	
+	XAP_Frame * pFrame = NULL;
+
 	if (ndx < m_vecFrames.getItemCount())
 	{
 		pFrame = m_vecFrames.getNthItem(ndx);
@@ -795,12 +797,12 @@ XAP_Frame * XAP_App::getFrame(UT_sint32 ndx) const
 	}
 	return pFrame;
 }
-	
+
 UT_sint32 XAP_App::findFrame(XAP_Frame * pFrame) const
 {
 	return m_vecFrames.findItem(pFrame);
 }
-	
+
 UT_sint32 XAP_App::findFrame(const char * szFilename) const
 {
 	if (!szFilename || !*szFilename)
@@ -840,10 +842,10 @@ const char * XAP_App::getAbiSuiteLibDir() const
 	return m_szAbiSuiteLibDir;
 }
 
-bool XAP_App::findAbiSuiteLibFile(std::string& path, const char* filename, const char* subdir) const
+bool XAP_App::findAbiSuiteLibFile(std::string & path, const char * filename, const char * subdir)
 {
 	if (!filename)
-	{ 
+	{
 		return false;
 	}
 
@@ -868,9 +870,9 @@ bool XAP_App::findAbiSuiteLibFile(std::string& path, const char* filename, const
 	return bFound;
 }
 
-bool XAP_App::findAbiSuiteAppFile(std::string& path, const char* filename, const char* subdir) const
+bool XAP_App::findAbiSuiteAppFile(std::string & path, const char * filename, const char * subdir)
 {
-	if (!filename) 
+	if (!filename)
 	{
 		return false;
 	}
@@ -925,22 +927,28 @@ XAP_Prefs * XAP_App::getPrefs() const
 	return m_prefs;
 }
 
-bool XAP_App::getPrefsValue(const std::string& key, std::string & stValue) const
+bool XAP_App::getPrefsValue(const gchar * szKey, const gchar ** pszValue) const
 {
-	if (!m_prefs) {
+	if (!m_prefs)
 		return false;
-	}
 
-	return m_prefs->getPrefsValue(key, stValue);
+	return m_prefs->getPrefsValue(szKey,pszValue);
 }
 
-bool XAP_App::getPrefsValueBool(const std::string& key, bool& bValue) const
+bool XAP_App::getPrefsValue(const UT_String &stKey, UT_String &stValue) const
 {
-	if (!m_prefs) {
+	if (!m_prefs)
 		return false;
-	}
 
-	return m_prefs->getPrefsValueBool(key, bValue);
+	return m_prefs->getPrefsValue(stKey, stValue);
+}
+
+bool XAP_App::getPrefsValueBool(const gchar * szKey, bool * pbValue) const
+{
+	if (!m_prefs)
+		return false;
+
+	return m_prefs->getPrefsValueBool(szKey,pbValue);
 }
 
 void XAP_App::rememberFocussedFrame( void * pJustFocussedFrame)
@@ -948,9 +956,9 @@ void XAP_App::rememberFocussedFrame( void * pJustFocussedFrame)
 	m_lastFocussedFrame = static_cast<XAP_Frame *>(pJustFocussedFrame);
 
 	UT_sint32 i = safefindFrame( m_lastFocussedFrame);
-	if(i < 0 ) 
-	{   
-		m_lastFocussedFrame = static_cast<XAP_Frame *>(nullptr);
+	if(i < 0 )
+	{
+		m_lastFocussedFrame = static_cast<XAP_Frame *>(NULL);
 	}
 	notifyModelessDlgsOfActiveFrame(m_lastFocussedFrame);
 }
@@ -971,17 +979,17 @@ UT_sint32 XAP_App::safefindFrame( XAP_Frame * f) const
 
 void XAP_App::clearLastFocussedFrame()
 {
-	m_lastFocussedFrame = static_cast<XAP_Frame *>(nullptr);
+	m_lastFocussedFrame = static_cast<XAP_Frame *>(NULL);
 }
 
 XAP_Frame* XAP_App::getLastFocussedFrame() const
 {
-		if(m_lastFocussedFrame == static_cast<XAP_Frame *>(nullptr))
-			return static_cast<XAP_Frame *>(nullptr);
+		if(m_lastFocussedFrame == static_cast<XAP_Frame *>(NULL))
+			return static_cast<XAP_Frame *>(NULL);
 	UT_sint32 i = safefindFrame(m_lastFocussedFrame);
 	if( i>= 0)
 		return m_lastFocussedFrame;
-	return static_cast<XAP_Frame *>(nullptr);
+	return static_cast<XAP_Frame *>(NULL);
 }
 
 XAP_Frame * XAP_App::findValidFrame() const
@@ -995,14 +1003,14 @@ void XAP_App::clearIdTable()
 	for(UT_sint32 i =0; i <= NUM_MODELESSID; i++)
 	{
 		m_IdTable[i].id =  -1;
-		m_IdTable[i].pDialog = static_cast<XAP_Dialog_Modeless *>(nullptr);
+		m_IdTable[i].pDialog = static_cast<XAP_Dialog_Modeless *>(NULL);
 	}
 }
 
 void XAP_App::rememberModelessId(UT_sint32 id, XAP_Dialog_Modeless * pDialog)
 {
 	// find a free slot in the m_IdTable
- 
+
 	UT_sint32 i;
 	for(i=0; (i<= NUM_MODELESSID) && (m_IdTable[i].id !=  -1); i++) {
 
@@ -1022,7 +1030,7 @@ void XAP_App::forgetModelessId( UT_sint32 id )
 	UT_sint32 i;
 	for(i=0; i <= NUM_MODELESSID && m_IdTable[i].id != id; i++) {
 
-	} 
+	}
 	if(i >  NUM_MODELESSID)
 	{
 //
@@ -1031,13 +1039,13 @@ void XAP_App::forgetModelessId( UT_sint32 id )
 		return;
 	}
 	m_IdTable[i].id =  -1;
-	m_IdTable[i].pDialog = static_cast<XAP_Dialog_Modeless *>(nullptr);
+	m_IdTable[i].pDialog = static_cast<XAP_Dialog_Modeless *>(NULL);
 }
 
-bool XAP_App::isModelessRunning(UT_sint32 id) const
+bool XAP_App::isModelessRunning(UT_sint32 id)
 {
 	// returns true if the modeless dialog given by id is running
-	
+
 	UT_sint32 i;
 	for(i=0; i <= NUM_MODELESSID && m_IdTable[i].id != id; i++) {
 
@@ -1049,8 +1057,8 @@ bool XAP_App::isModelessRunning(UT_sint32 id) const
 	UT_ASSERT( m_IdTable[i].id == id );
 	return true;
 }
-        
-XAP_Dialog_Modeless * XAP_App::getModelessDialog( UT_sint32 i) const
+
+XAP_Dialog_Modeless * XAP_App::getModelessDialog( UT_sint32 i)
 {
 	// Retrieve pDialog from the table based on its location in the table
 	return m_IdTable[i].pDialog;
@@ -1064,12 +1072,12 @@ void XAP_App::closeModelessDlgs()
 	{
 		if(m_IdTable[i].id >= 0)
 		{
-			if(getModelessDialog(i) != static_cast<XAP_Dialog_Modeless *>(nullptr))
+			if(getModelessDialog(i) != static_cast<XAP_Dialog_Modeless *>(NULL))
 			{
 				getModelessDialog(i)->destroy();
 			}
 			m_IdTable[i].id = -1;
-			m_IdTable[i].pDialog = nullptr;
+			m_IdTable[i].pDialog = NULL;
 		}
 	}
 }
@@ -1079,7 +1087,7 @@ void XAP_App::notifyModelessDlgsOfActiveFrame(XAP_Frame *p_Frame)
 {
 	for(UT_sint32 i=0; i <= NUM_MODELESSID; i++)
 	{
-		if(getModelessDialog(i) != static_cast<XAP_Dialog_Modeless *>(nullptr))
+		if(getModelessDialog(i) != static_cast<XAP_Dialog_Modeless *>(NULL))
 		{
 			getModelessDialog(i)->setActiveFrame(p_Frame);
 		}
@@ -1090,7 +1098,7 @@ void XAP_App::notifyModelessDlgsCloseFrame(XAP_Frame *p_Frame)
 {
 	for(UT_sint32 i=0; i <= NUM_MODELESSID; i++)
 	{
-		if(getModelessDialog(i) != static_cast<XAP_Dialog_Modeless *>(nullptr))
+		if(getModelessDialog(i) != static_cast<XAP_Dialog_Modeless *>(NULL))
 		{
 			getModelessDialog(i)->notifyCloseFrame(p_Frame);
 		}
@@ -1104,9 +1112,13 @@ bool XAP_App::setGeometry(UT_sint32 x, UT_sint32 y, UT_uint32 width, UT_uint32 h
 	return prefs->setGeometry(x, y, width, height, flags);
 }
 
-bool XAP_App::getGeometry(UT_sint32* x, UT_sint32* y, UT_uint32* width, UT_uint32* height, UT_uint32* flags) const
+bool XAP_App::getGeometry(UT_sint32 *x, UT_sint32 *y, UT_uint32 *width, UT_uint32 *height, UT_uint32 *flags)
 {
 	XAP_Prefs *prefs = getPrefs();
+	//pascal
+	if(prefs == NULL)
+        return false;
+
 	return prefs->getGeometry(x, y, width, height, flags);
 }
 
@@ -1146,7 +1158,7 @@ void XAP_App::parseAndSetGeometry(const char *string)
 		nflags |= PREF_FLAG_GEOMETRY_NOUPDATE;
 		setGeometry(nx, ny, nw, nh, nflags);
 	}
-} 
+}
 
 /*!
     translate given language tag into static UT_LangRecord stored in
@@ -1157,7 +1169,7 @@ void XAP_App::setKbdLanguage(const char * pszLang)
 {
 	if(!pszLang)
 	{
-		m_pKbdLang = nullptr;
+		m_pKbdLang = NULL;
 	}
 	else
 	{
@@ -1166,23 +1178,23 @@ void XAP_App::setKbdLanguage(const char * pszLang)
 
 		// ensure that the change is shown in our status bar
 	    bool bChangeLang = false;
-		getPrefsValueBool(XAP_PREF_KEY_ChangeLanguageWithKeyboard, bChangeLang);
+		getPrefsValueBool(XAP_PREF_KEY_ChangeLanguageWithKeyboard, &bChangeLang);
 
 		if(bChangeLang && m_pKbdLang)
 		{
 			UT_return_if_fail(m_pKbdLang->m_szLangCode);
-			
+
 			// invoke appropriate formatting method if it exists
 			const EV_EditMethodContainer * pEMC = getEditMethodContainer();
 
 			if(pEMC)
 			{
 				EV_EditMethod * pEM = pEMC->findEditMethodByName("language");
-			
+
 				if (pEM)
 				{
 					XAP_Frame * pFrame = getLastFocussedFrame();
-					
+
 					if(pFrame)
 					{
 						AV_View * pView = pFrame->getCurrentView();
@@ -1233,9 +1245,9 @@ XAP_App::getDocuments( const AD_Document * pExclude ) const
     application, excluding document pointed to by pExclude
 
     \param v: UT_Vector into which to store the document pointers
-    
+
     \para pExclude: pointer to a document to exclude from enumeration,
-                    can be nullptr (e.g., if this function is called from
+                    can be NULL (e.g., if this function is called from
                     inside a document, it might be desirable to
                     exclude that document)
 */
@@ -1266,16 +1278,16 @@ void XAP_App::enumerateDocuments(UT_Vector & v, const AD_Document * pExclude) co
 
 EV_EditEventMapper * XAP_App::getEditEventMapper(void) const
 {
-	UT_return_val_if_fail(m_pInputModes,nullptr);
+	UT_return_val_if_fail(m_pInputModes,NULL);
 	return m_pInputModes->getCurrentMap();
 }
 
 UT_sint32 XAP_App::setInputMode(const char * szName, bool bForce)
 {
 	UT_sint32 i;
-	
+
 	UT_DEBUGMSG(("XAP_App::setInputMode: %s %d\n", szName, bForce));
-	
+
 	UT_return_val_if_fail(m_pInputModes,-1);
 	const char * szCurrentName = m_pInputModes->getCurrentMapName();
 	if (!bForce && (g_ascii_strcasecmp(szName,szCurrentName) == 0))
@@ -1292,23 +1304,23 @@ UT_sint32 XAP_App::setInputMode(const char * szName, bool bForce)
 		bResult = m_pInputModes->createInputMode(szName,pBindingMap);
 		UT_return_val_if_fail(bResult,-1);
 	}
-	
+
 	// note: derrived classes will need to update keyboard
 	// note: and mouse after we return.
 
 	UT_DEBUGMSG(("Setting InputMode to [%s] for the current window.\n",szName));
-	
+
 	bool bStatus = m_pInputModes->setCurrentMap(szName);
-	
+
 	// notify all the frames about the INPUTMODE change
 	for (i = 0; i < getFrameCount(); i++) {
 		getFrame(i)->getCurrentView()->notifyListeners(AV_CHG_INPUTMODE);
 	}
-	
+
 	// rebuild menu's
 	UT_DEBUGMSG(("XAP_App::setInputMode:: rebuilding menu's!"));
 	rebuildMenus();
-	
+
 	return (bStatus);
 }
 
@@ -1324,7 +1336,7 @@ const char * XAP_App::getInputMode(void) const
 */
 GR_Graphics * XAP_App::newGraphics(GR_AllocInfo &param) const
 {
-	UT_return_val_if_fail(m_pGraphicsFactory, nullptr);
+	UT_return_val_if_fail(m_pGraphicsFactory, NULL);
 
 	if(param.isPrinterGraphics())
 	{
@@ -1341,7 +1353,7 @@ GR_Graphics * XAP_App::newGraphics(GR_AllocInfo &param) const
 */
 GR_Graphics * XAP_App::newGraphics(UT_uint32 iClassId, GR_AllocInfo &param) const
 {
-	UT_return_val_if_fail(m_pGraphicsFactory, nullptr);
+	UT_return_val_if_fail(m_pGraphicsFactory, NULL);
 
 	return m_pGraphicsFactory->newGraphics(iClassId, param);
 }
@@ -1350,20 +1362,20 @@ void XAP_App::setDefaultGraphicsId(UT_uint32 i)
 {
 	if(i == GRID_UNKNOWN)
 		return;
-	
+
 	m_iDefaultGraphicsId = i;
 
 	if(i < GRID_LAST_BUILT_IN && i > GRID_LAST_DEFAULT)
 	{
 		// change the preference settings
 		UT_return_if_fail(m_prefs)
-			
+
 		XAP_PrefsScheme *pPrefsScheme = m_prefs->getCurrentScheme();
 		UT_return_if_fail(pPrefsScheme);
 
 		UT_String s;
 		UT_String_sprintf(s, "%d", i);
-		
+
 		pPrefsScheme->setValue(XAP_PREF_KEY_DefaultGraphics, s.c_str());
 	}
 }
@@ -1410,10 +1422,10 @@ bool XAP_App::saveState(bool bQuit)
 
 	UT_sint32 i;
 	UT_sint32 j;
-	
+
 	for(i = 0, j = 0; i < m_vecFrames.getItemCount(); ++i, ++j)
 	{
-		XAP_Frame * pFrame = nullptr;
+		XAP_Frame * pFrame = NULL;
 
 		if(i == 0)
 			pFrame = pLastFrame;
@@ -1425,14 +1437,14 @@ bool XAP_App::saveState(bool bQuit)
 			// we have done this frame, but need to do the one at pos 0 in its place
 			pFrame = m_vecFrames[0];
 		}
-		
+
 
 		if(!pFrame)
 		{
 			--j;
 			continue;
 		}
-		
+
 		AD_Document * pDoc = pFrame->getCurrentDoc();
 
 		if(!pDoc)
@@ -1442,7 +1454,7 @@ bool XAP_App::saveState(bool bQuit)
 		}
 
 		UT_Error e = UT_OK;
-		
+
 		if(pDoc->isDirty())
 		{
 			// need to decide what to do about dirty documents; perhaps we should keep a
@@ -1457,7 +1469,7 @@ bool XAP_App::saveState(bool bQuit)
 				s += HIBERNATED_EXT;
 				e = pDoc->saveAs(s.utf8_str(), 0);
 			}
-			
+
 			bRet &= (UT_OK == e);
 		}
 
@@ -1466,12 +1478,12 @@ bool XAP_App::saveState(bool bQuit)
 			// no storage space left -- nothing more we can do with this document, so move
 			// to the next one (do not break, we need to deal with anything that is not
 			// saved)
-			
-			--j;      // we want to preserve the j value 
+
+			--j;      // we want to preserve the j value
 			continue;
 		}
-		
-			
+
+
 		const std::string & file = pDoc->getFilename();
 		if(!file.empty() && file.size() < XAP_SD_FILENAME_LENGTH)
 		{
@@ -1493,7 +1505,7 @@ bool XAP_App::saveState(bool bQuit)
 	}
 
 	sd.iFileCount = j;
-	
+
 	if(!_saveState(sd))
 		return false;
 
@@ -1533,12 +1545,12 @@ bool XAP_App::retrieveState()
 	XAP_StateData sd;
 
 	bool bRet = true;
-	
+
 	if(!_retrieveState(sd))
 		return false;
 
 	UT_return_val_if_fail(sd.iFileCount <= XAP_SD_MAX_FILES, false);
-		
+
 	// now do our thing with it:
 	//  * open the files stored in the data
 	//  * move carets and scrollbars to the saved positions
@@ -1547,29 +1559,31 @@ bool XAP_App::retrieveState()
 	// we should only be restoring state with no docs already
 	// opened
 	UT_return_val_if_fail(m_vecFrames.getItemCount() <= 1, false);
-	XAP_Frame * pFrame = nullptr;
+	XAP_Frame * pFrame = NULL;
 
 	if(m_vecFrames.getItemCount())
 		pFrame = m_vecFrames.getNthItem(0);
 
 	// if there is a frame, it should be one with unmodified untitled document
+
+	//pascal todo pFrame->getFilename() devient strcmp(pFrame->getFilename(), "") != 0
 	UT_return_val_if_fail( !pFrame || (!pFrame->getFilename() && !pFrame->isDirty()), false );
-		
+
 	UT_Error errorCode = UT_IE_IMPORTERROR;
-	
+
 	for(UT_uint32 i = 0; i < sd.iFileCount; ++i)
 	{
 		if(!pFrame)
 			pFrame = newFrame();
-		
+
 		if (!pFrame)
 			return false;
-		
+
 		// Open a complete but blank frame, then load the document into it
-		errorCode = pFrame->loadDocument((const char *)nullptr, 0 /*IEFT_Unknown*/);
+		errorCode = pFrame->loadDocument((const char *)NULL, 0 /*IEFT_Unknown*/);
 
 		bRet &= (errorCode == UT_OK);
-		
+
 		if (errorCode == UT_OK)
 			pFrame->show();
 	    else
@@ -1578,7 +1592,7 @@ bool XAP_App::retrieveState()
 		errorCode = pFrame->loadDocument(sd.filenames[i], 0 /*IEFT_Unknown*/);
 
 		bRet &= (errorCode == UT_OK);
-		
+
 		if (errorCode != UT_OK)
 			continue;
 
@@ -1591,7 +1605,7 @@ bool XAP_App::retrieveState()
 			bRet = false;
 			continue;
 		}
-		
+
 		pView->setPoint(sd.iDocPos[i]);
 		pView->setXScrollOffset(sd.iXScroll[i]);
 		pView->setYScrollOffset(sd.iYScroll[i]);
@@ -1601,7 +1615,7 @@ bool XAP_App::retrieveState()
 		if(p)
 		{
 			// remove extension
-			p = nullptr;
+			p = 0;
 			AD_Document * pDoc = pFrame->getCurrentDoc();
 
 			if(pDoc)
@@ -1611,10 +1625,10 @@ bool XAP_App::retrieveState()
 				pFrame->updateTitle();
 			}
 		}
-		
-		
+
+
 		// frame used -- next doc needs a new one
-		pFrame = nullptr;
+		pFrame = NULL;
 	}
 
 	// set focus to the first frame

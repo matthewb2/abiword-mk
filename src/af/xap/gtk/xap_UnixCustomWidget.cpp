@@ -1,6 +1,5 @@
 /* AbiSource Application Framework
  * Copyright (C) 2010 Patrik Fimml
- * Copyright (C) 2021 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,11 +17,26 @@
  * 02110-1301 USA.
  */
 
-#include <gtk/gtk.h>
-
-#include "ut_assert.h"
-#include "ut_misc.h"
 #include "xap_UnixCustomWidget.h"
+
+void XAP_UnixCustomWidget::queueDraw(const UT_Rect *clip)
+{
+	GtkWidget *widget = getWidget();
+	UT_ASSERT(widget);
+
+	if (!clip)
+		gtk_widget_queue_draw(widget);
+	else
+	{
+		gtk_widget_queue_draw_area(
+				widget,
+				clip->left,
+				clip->top,
+				clip->width,
+				clip->height
+			);
+	}
+}
 
 void XAP_UnixCustomWidget::_fe::draw(XAP_UnixCustomWidget *self, cairo_t *cr)
 {
@@ -31,5 +45,5 @@ void XAP_UnixCustomWidget::_fe::draw(XAP_UnixCustomWidget *self, cairo_t *cr)
 	cairo_clip_extents(cr, &x1, &y1, &x2, &y2);
 
 	UT_Rect r(x1, y1, x2 - x1, y2 - y1);
-	self->drawImmediate(&r);
+	self->draw(&r);
 }

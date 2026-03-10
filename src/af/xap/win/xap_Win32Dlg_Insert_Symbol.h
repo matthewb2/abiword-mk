@@ -46,16 +46,11 @@ public:
 		{
 		}
 
-	void	draw(const UT_Rect *clip=nullptr)
+	void	draw(const UT_Rect *clip=NULL)
 		{
 		UT_UNUSED(clip);
 		m_pSymbolDraw->drawarea(m_CurrentSymbol, m_PreviousSymbol);
 		}
-		
-		virtual void drawImmediate(const UT_Rect* pRect = nullptr) override
-{
-    draw();
-}
 
 //protected:
 

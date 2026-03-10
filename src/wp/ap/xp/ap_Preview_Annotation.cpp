@@ -42,7 +42,7 @@ AP_Preview_Annotation::AP_Preview_Annotation(XAP_DialogFactory * pDlgFactory,XAP
 	m_sAuthor("n/a"),
 	m_sDescription("n/a")
 {
-	m_gc = nullptr;
+	m_gc = NULL;
 }
 
 AP_Preview_Annotation::~AP_Preview_Annotation()
@@ -90,7 +90,7 @@ void AP_Preview_Annotation::_createAnnotationPreviewFromGC(GR_Graphics * gc, UT_
 void AP_Preview_Annotation::setSizeFromAnnotation(void)
 {
 	FV_View * pView = static_cast<FV_View *>(getActiveFrame()->getCurrentView());
-	GR_Graphics * pG = nullptr;
+	GR_Graphics * pG = NULL;
 	UT_return_if_fail(pView);
 	pG = pView->getGraphics();
 
@@ -98,7 +98,7 @@ void AP_Preview_Annotation::setSizeFromAnnotation(void)
 	GR_Font * pFont = pG->findFont("Times New Roman", "normal",
 				       "normal", "normal",
 				       "normal", "12pt",
-				       nullptr);
+				       NULL);
 	UT_return_if_fail(pFont);
 	
 	double rat = 100./static_cast<double>(pG->getZoomPercentage());
@@ -107,7 +107,7 @@ void AP_Preview_Annotation::setSizeFromAnnotation(void)
 	m_drawString = m_sDescription;
 	UT_sint32 len = m_drawString.size();
 	pG->setFont(pFont);
-	UT_sint32 iwidth = pG->measureString(m_drawString.ucs4_str(),0,len,nullptr) + pG->tlu(6);
+	UT_sint32 iwidth = pG->measureString(m_drawString.ucs4_str(),0,len,NULL) + pG->tlu(6);
 	iwidth = static_cast<UT_sint32>(static_cast<double>(iwidth));
 	m_width = static_cast<UT_sint32>(static_cast<double>(pG->tdu(iwidth))*rat);
 	m_height = static_cast<UT_sint32>(static_cast<double>(pG->tdu(iHeight))*rat);
@@ -116,7 +116,7 @@ void AP_Preview_Annotation::setSizeFromAnnotation(void)
 	UT_DEBUGMSG(("SetSize from Annotation width %d rat %f \n",m_width,rat));
 }
 
-void AP_Preview_Annotation::drawImmediate(const UT_Rect* clip)
+void AP_Preview_Annotation::draw(const UT_Rect *clip)
 {
 	UT_UNUSED(clip);
 	m_drawString = m_sDescription;
@@ -127,7 +127,7 @@ void AP_Preview_Annotation::drawImmediate(const UT_Rect* clip)
 	m_pFont = m_gc->findFont("Times New Roman", "normal",
 							 "normal", "normal",
 							 "normal", "12pt",
-							 nullptr);
+							 NULL);
 	UT_ASSERT_HARMLESS(m_pFont);
 	if(!m_pFont)
 	{

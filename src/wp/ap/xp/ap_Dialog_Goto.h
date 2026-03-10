@@ -49,7 +49,7 @@ public:
 	// values.
   	bool						setView(FV_View * view);
   	FV_View * 					getView() const;
-	virtual void	setActiveFrame(XAP_Frame *pFrame) override;
+	void						setActiveFrame(XAP_Frame *pFrame);
 	static const char **        getJumpTargets();
 	PD_DocumentRDFHandle        getRDF();
 

@@ -120,7 +120,7 @@ void AP_CocoaDialog_ToggleCase::runModal(XAP_Frame * /*pFrame*/)
 
 - (void)discardXAP
 {
-	_xap = nullptr;
+	_xap = NULL;
 }
 
 - (void)windowDidLoad

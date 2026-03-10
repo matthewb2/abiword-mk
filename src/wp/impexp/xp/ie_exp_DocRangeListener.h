@@ -49,14 +49,14 @@ public:
   virtual ~IE_Exp_DocRangeListener(){}
 
   virtual bool		populate(fl_ContainerLayout* sfh,
-				 const PX_ChangeRecord * pcr) override;
+				 const PX_ChangeRecord * pcr);
 
   virtual bool		populateStrux(pf_Frag_Strux* sdh,
 				      const PX_ChangeRecord * pcr,
-				      fl_ContainerLayout* * psfh) override;
+				      fl_ContainerLayout* * psfh);
 
   virtual bool		change(fl_ContainerLayout* /*sfh*/,
-			       const PX_ChangeRecord * /*pcr*/) override
+			       const PX_ChangeRecord * /*pcr*/)
 		{return true;}
 
   virtual bool		insertStrux(fl_ContainerLayout* /*sfh*/,
@@ -65,12 +65,12 @@ public:
 				    PL_ListenerId /*lid*/,
 				    void (* /*pfnBindHandles*/)(pf_Frag_Strux* sdhNew,
 								PL_ListenerId lid,
-								fl_ContainerLayout* sfhNew)) override
+								fl_ContainerLayout* sfhNew))
   { return true;}
 
-	virtual bool		signal(UT_uint32 /*iSignal*/) override
+	virtual bool		signal(UT_uint32 /*iSignal*/)
 		{ return true;}
-	virtual PLListenerType getType() const override
+	virtual PLListenerType getType() const
 		{
 			return PTL_UNKNOWN;
 		}

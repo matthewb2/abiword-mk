@@ -257,7 +257,7 @@ void AP_CocoaDialog_Replace::_updateLists()
 
 -(void)discardXAP
 {
-	_xap = nullptr;
+	_xap = NULL;
 }
 
 -(void)dealloc
@@ -364,35 +364,35 @@ void AP_CocoaDialog_Replace::_updateLists()
 
 - (bool)matchCase
 {
-	return ([_matchCaseBtn state] != NSControlStateValueOff);
+	return ([_matchCaseBtn state] != NSOffState);
 }
 
 - (void)setMatchCase:(bool)val
 {
-	[_matchCaseBtn setState:(val?NSControlStateValueOn:NSControlStateValueOff)];
+	[_matchCaseBtn setState:(val?NSOnState:NSOffState)];
 }
 
 - (bool)wholeWord
 {
-	return ([_wholeWordBtn state] != NSControlStateValueOff);
+	return ([_wholeWordBtn state] != NSOffState);
 }
 
 
 - (void)setWholeWord:(bool)val
 {
-	[_wholeWordBtn setState:(val?NSControlStateValueOn:NSControlStateValueOff)];
+	[_wholeWordBtn setState:(val?NSOnState:NSOffState)];
 }
 
 
 - (bool)findReverse
 {
-	return ([_findReverseBtn state] != NSControlStateValueOff);
+	return ([_findReverseBtn state] != NSOffState);
 }
 
 
 - (void)setFindReverse:(bool)val
 {
-	[_findReverseBtn setState:(val?NSControlStateValueOn:NSControlStateValueOff)];
+	[_findReverseBtn setState:(val?NSOnState:NSOffState)];
 }
 
 

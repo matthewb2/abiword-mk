@@ -1,5 +1,5 @@
 /* AbiSource Application Framework
- * Copyright (C) 2011-2019 Hubert Figuiere
+ * Copyright (C) 2011-2014 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,30 +18,14 @@
  */
 
 #include "src/af/util/xp/t/ut_bytebuf.t.cpp"
-#undef TFSUITE
 #include "src/af/util/xp/t/ut_types.t.cpp"
-#undef TFSUITE
 #include "src/af/util/xp/t/ut_locale.t.cpp"
-#undef TFSUITE
 #include "src/af/util/xp/t/ut_misc.t.cpp"
-#undef TFSUITE
 #include "src/af/util/xp/t/ut_option.t.cpp"
-#undef TFSUITE
 #include "src/af/util/xp/t/ut_vector.t.cpp"
-#undef TFSUITE
-#include "src/af/util/xp/t/ut_stack.t.cpp"
-#undef TFSUITE
 #include "src/af/util/xp/t/ut_string.t.cpp"
-#undef TFSUITE
 #include "src/af/util/xp/t/ut_std_string.t.cpp"
-#undef TFSUITE
 #include "src/af/util/xp/t/ut_string_class.t.cpp"
-#undef TFSUITE
-#include "src/af/xap/xp/t/xap_Prefs.t.cpp"
-#undef TFSUITE
 #include "src/text/ptbl/xp/t/pf_Fragments.t.cpp"
-#undef TFSUITE
 #include "src/text/ptbl/xp/t/pt_PieceTable.t.cpp"
-#undef TFSUITE
 #include "src/text/ptbl/xp/t/pp_PropertyMap.t.cpp"
-#undef TFSUITE

@@ -240,11 +240,9 @@ UT_HashColor::~UT_HashColor ()
 const char * UT_HashColor::setColor (const char * color)
 {
 	m_colorBuffer[0] = 0;
-	if (color == nullptr)
-		return nullptr;
+	if (color == 0) return 0;
 
-	if (color[0] == '#')
-		return setHashIfValid (color + 1);
+	if (color[0] == '#') return setHashIfValid (color + 1);
 
 	return lookupNamedColor (color);
 }
@@ -268,16 +266,14 @@ const char * UT_HashColor::setColor (unsigned char r, unsigned char g, unsigned 
 const char * UT_HashColor::lookupNamedColor (const char * color_name)
 {
 	m_colorBuffer[0] = 0;
-	if (color_name == nullptr)
-		return nullptr;
+	if (color_name == 0) return 0;
 
 	size_t length = sizeof (s_Colors) / sizeof (s_Colors[0]);
 
-	colorToRGBMapping * id = nullptr;
+	colorToRGBMapping * id = 0;
 	id = static_cast<colorToRGBMapping *>(bsearch (color_name, s_Colors, static_cast<int>(length), sizeof (colorToRGBMapping), color_compare));
 
-	if (id == nullptr)
-		return nullptr;
+	if (id == 0) return 0;
 
 	return setColor (id->m_red, id->m_green, id->m_blue);
 }
@@ -285,8 +281,7 @@ const char * UT_HashColor::lookupNamedColor (const char * color_name)
 const char * UT_HashColor::setHashIfValid (const char * color_hash)
 {
 	m_colorBuffer[0] = 0;
-	if (color_hash == nullptr)
-		return nullptr;
+	if (color_hash == 0) return 0;
 
 	bool isValid = true;
 	for (int i = 0; i < 6; i++)
@@ -309,8 +304,7 @@ const char * UT_HashColor::setHashIfValid (const char * color_hash)
 		}
 		if (!isValid) break;
 	}
-	if (!isValid)
-		return nullptr;
+	if (!isValid) return 0;
 
 	m_colorBuffer[0] = '#';
 	m_colorBuffer[7] = 0;
@@ -415,7 +409,7 @@ UT_ColorPatImpl::~UT_ColorPatImpl()
 
 
 UT_RGBColor::UT_RGBColor()
-    : m_patImpl(nullptr)
+    : m_patImpl(NULL)
 {
 	m_red = 0;
 	m_grn = 0;
@@ -424,7 +418,7 @@ UT_RGBColor::UT_RGBColor()
 }
 
 UT_RGBColor::UT_RGBColor(unsigned char red, unsigned char grn, unsigned char blu, bool bTransparent)
-    : m_patImpl(nullptr)
+    : m_patImpl(NULL)
 {
 	m_red = red;
 	m_grn = grn;
@@ -438,7 +432,7 @@ UT_RGBColor::UT_RGBColor(const UT_RGBColor &c)
 	m_grn = c.m_grn;
 	m_blu = c.m_blu;
 	m_bIsTransparent = c.m_bIsTransparent;
-    m_patImpl = ( c.m_patImpl ? c.m_patImpl->clone() : nullptr );
+    m_patImpl = ( c.m_patImpl ? c.m_patImpl->clone() : NULL );
 }
 
 UT_RGBColor::UT_RGBColor(const UT_ColorPatImpl * pat)
@@ -459,18 +453,14 @@ UT_RGBColor::~UT_RGBColor()
 
 UT_RGBColor & UT_RGBColor::operator=(const  UT_RGBColor &c)
 {
-    if (&c == this) {
-        return *this;
-    }
-
-    m_red = c.m_red;
-    m_grn = c.m_grn;
-    m_blu = c.m_blu;
-    m_bIsTransparent = c.m_bIsTransparent;
+	m_red = c.m_red;
+	m_grn = c.m_grn;
+	m_blu = c.m_blu;
+	m_bIsTransparent = c.m_bIsTransparent;
     if(m_patImpl) {
         delete m_patImpl;
     }
-    m_patImpl = ( c.m_patImpl ? c.m_patImpl->clone() : nullptr );
+    m_patImpl = ( c.m_patImpl ? c.m_patImpl->clone() : NULL );
 
     return *this;
 }

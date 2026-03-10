@@ -74,7 +74,7 @@ AP_Preview_Abi::AP_Preview_Abi(GR_Graphics * gc, UT_uint32 iWidth,
 //
 	double curWidth = 0.0;
 	double curHeight = 0.0;
-	if((previewMode != PREVIEW_ADJUSTED_PAGE)  && (pDoc != nullptr))
+	if((previewMode != PREVIEW_ADJUSTED_PAGE)  && (pDoc != NULL))
 	{
 		curWidth = pDoc->m_docPageSize.Width(DIM_IN);
 		curHeight = pDoc->m_docPageSize.Height(DIM_IN);
@@ -89,7 +89,7 @@ AP_Preview_Abi::AP_Preview_Abi(GR_Graphics * gc, UT_uint32 iWidth,
 //
 // Make a new document
 //
-	if(pDoc == nullptr)
+	if(pDoc == NULL)
 	{
 		m_pDocument = new PD_Document();
 		m_pDocument->newDocument();
@@ -186,7 +186,7 @@ AP_Preview_Abi::AP_Preview_Abi(GR_Graphics * gc, UT_uint32 iWidth,
 		// events from both the scroll-related edit methods and from the UI 
         // callbacks.
         //
-		// AV_ScrollObj * pScrollObj = nullptr;
+		// AV_ScrollObj * pScrollObj = NULL;
 		//
 		// The pScrollbarViewListener receives change notifications as 
 		// the document changes. This ViewListener is responsible for 
@@ -197,7 +197,7 @@ AP_Preview_Abi::AP_Preview_Abi(GR_Graphics * gc, UT_uint32 iWidth,
 		// the frame itself here
 		// otherwise lots of this code was stolen from ap_UnixFrame.cpp
 		//
-		//  ap_Scrollbar_ViewListener * pScrollbarViewListener = nullptr;
+		//  ap_Scrollbar_ViewListener * pScrollbarViewListener = NULL;
 //  		AV_ListenerId lid;
 //  		AV_ListenerId lidScrollbarViewListener;
 //  		pScrollObj = new AV_ScrollObj(this,_scrollFuncX,_scrollFuncY);
@@ -217,10 +217,9 @@ AP_Preview_Abi::~AP_Preview_Abi()
 	UNREFP(m_pDocument);
 }
 
-void AP_Preview_Abi::drawImmediate(const UT_Rect *clip)
+void AP_Preview_Abi::draw(const UT_Rect *clip)
 {
 	UT_UNUSED(clip);
-	// this calls FV_View::_draw()
 	getView()->updateScreen(false);
 }
 

@@ -1,6 +1,5 @@
 /* AbiSource Program Utilities
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2021 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,13 +17,15 @@
  * 02110-1301 USA.
  */
 
-#pragma once
 
-#include <string>
-#include <vector>
+
+#ifndef EV_MENU_LAYOUTS_H
+#define EV_MENU_LAYOUTS_H
 
 #include "ut_types.h"
 #include "xap_Types.h"
+#include "ut_vector.h"
+#include "ut_string_class.h"
 
 /*****************************************************************
 ******************************************************************
@@ -37,13 +38,14 @@
 ******************************************************************
 *****************************************************************/
 
-typedef enum _ev_Menu_LayoutFlags {
-    EV_MLF_Normal,
-    EV_MLF_BeginSubMenu,
-    EV_MLF_EndSubMenu,
-    EV_MLF_BeginPopupMenu,
-    EV_MLF_EndPopupMenu,
-    EV_MLF_Separator
+typedef enum _ev_Menu_LayoutFlags
+{
+	EV_MLF_Normal,
+	EV_MLF_BeginSubMenu,
+	EV_MLF_EndSubMenu,
+	EV_MLF_BeginPopupMenu,
+	EV_MLF_EndPopupMenu,
+	EV_MLF_Separator
 
 } EV_Menu_LayoutFlags;
 
@@ -52,38 +54,40 @@ typedef enum _ev_Menu_LayoutFlags {
 class ABI_EXPORT EV_Menu_LayoutItem
 {
 public:
-    EV_Menu_LayoutItem(XAP_Menu_Id id, EV_Menu_LayoutFlags flags);
-    ~EV_Menu_LayoutItem();
+	EV_Menu_LayoutItem(XAP_Menu_Id id, EV_Menu_LayoutFlags flags);
+	~EV_Menu_LayoutItem();
 
-    XAP_Menu_Id getMenuId() const;
-    EV_Menu_LayoutFlags getMenuLayoutFlags() const;
+	XAP_Menu_Id						getMenuId() const;
+	EV_Menu_LayoutFlags				getMenuLayoutFlags() const;
 
 private:
-    XAP_Menu_Id m_id;
-    EV_Menu_LayoutFlags m_flags;
+	XAP_Menu_Id						m_id;
+	EV_Menu_LayoutFlags				m_flags;
 };
 
 /*****************************************************************/
 
 class EV_Menu_LabelSet;
 
-class ABI_EXPORT EV_Menu_Layout /* a glorified array with bounds checking */
+class ABI_EXPORT EV_Menu_Layout					/* a glorified array with bounds checking */
 {
 public:
-    EV_Menu_Layout(const std::string& szName, UT_uint32 nrLayoutItems);
-    ~EV_Menu_Layout();
+	EV_Menu_Layout(const UT_String &szName, UT_uint32 nrLayoutItems);
+	~EV_Menu_Layout();
 
-    bool setLayoutItem(UT_uint32 indexLayoutItem, XAP_Menu_Id id, EV_Menu_LayoutFlags flags);
-    XAP_Menu_Id addLayoutItem(UT_uint32 indexLayoutItem, EV_Menu_LayoutFlags flags);
-    void addFakeLayoutItem(UT_uint32 indexLayoutItem, EV_Menu_LayoutFlags flags);
-    EV_Menu_LayoutItem* getLayoutItem(UT_uint32 indexLayoutItem) const;
-    UT_uint32 getLayoutIndex(XAP_Menu_Id id) const;
-    const std::string& getName() const;
-    UT_uint32 getLayoutItemCount() const;
-    inline UT_uint32 size() const { return getLayoutItemCount(); }
+	bool					setLayoutItem(UT_sint32 indexLayoutItem, XAP_Menu_Id id, EV_Menu_LayoutFlags flags);
+	XAP_Menu_Id				addLayoutItem(UT_sint32 indexLayoutItem, EV_Menu_LayoutFlags flags);
+	void					addFakeLayoutItem(UT_sint32 indexLayoutItem, EV_Menu_LayoutFlags flags);
+	EV_Menu_LayoutItem *	getLayoutItem(UT_sint32 indexLayoutItem) const;
+	UT_sint32				getLayoutIndex(XAP_Menu_Id id) const;
+	const char *			getName() const;
+	UT_sint32				getLayoutItemCount() const;
+	inline UT_sint32		size() const { return getLayoutItemCount(); }
 
 private:
-    std::string m_stName; /* the name of our layout (like "MainMenu") */
-    std::vector<EV_Menu_LayoutItem*> m_layoutTable;
-    XAP_Menu_Id m_iMaxId;
+	UT_String			    m_stName;			/* the name of our layout (like "MainMenu") */
+	UT_GenericVector <EV_Menu_LayoutItem *> m_layoutTable;
+	XAP_Menu_Id				m_iMaxId;
 };
+
+#endif /* EV_MENU_LAYOUTS_H */

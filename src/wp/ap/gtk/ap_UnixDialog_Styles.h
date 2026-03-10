@@ -1,6 +1,6 @@
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (c) 2009-2021 Hubert Figuière
+ * Copyright (c) 2009 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,8 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef AP_UnixDialog_Styles_H
+#define AP_UnixDialog_Styles_H
 
 #include <string>
 #include <list>
@@ -28,7 +29,7 @@
 #include "ut_types.h"
 #include "ut_string.h"
 #include "ap_Dialog_Styles.h"
-#include "xap_GtkUtils.h"
+
 
 class XAP_UnixFrame;
 class GR_CairoGraphics;
@@ -44,16 +45,14 @@ public:
 	AP_UnixDialog_Styles(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_UnixDialog_Styles(void);
 
-	virtual void runModal(XAP_Frame * pFrame) override;
+	virtual void			runModal(XAP_Frame * pFrame);
 
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 
 	// callbacks can fire these events
 
-	void event_paraPreviewInvalidate(void);
-	void event_paraPreviewDraw(void);
-	void event_charPreviewInvalidate(void);
-	void event_charPreviewDraw(void);
+	void                            event_paraPreviewExposed(void);
+	void                            event_charPreviewExposed(void);
 
 	virtual void			event_Apply(void);
 	virtual void			event_Close(void);
@@ -78,8 +77,7 @@ public:
 	void         event_ModifyNumbering();
 	void         event_ModifyTabs();
 	void         event_ModifyLanguage();
-	void event_ModifyPreviewInvalidate();
-	void event_ModifyPreviewDraw();
+	void         event_ModifyPreviewExposed();
 	void         event_RemoveProperty(void);
 	void         rebuildDeleteProps(void);
 	void         event_basedOn(void);
@@ -111,8 +109,8 @@ protected:
 	void                            _populateCList(void);
 	void 				_storeWindowData(void) const;
 	void				_connectSignals(void) const;
-	virtual const char * getCurrentStyle(void) const override;
-	virtual void setDescription(const char * desc) const override;
+	virtual const char * getCurrentStyle (void) const;
+	virtual void setDescription (const char * desc) const;
 
 	GR_CairoGraphics	* m_pParaPreviewWidget;
 	GR_CairoGraphics	* m_pCharPreviewWidget;
@@ -148,7 +146,7 @@ protected:
 	void        _constructFormatList(GtkWidget * FormatMenu);
 	void        _connectModifySignals(void);
 	void        _constructModifyDialogContents(GtkWidget * modifyDialog);
-	virtual void setModifyDescription( const char * desc) override;
+	virtual void setModifyDescription( const char * desc);
 	bool        _populateModify(void);
 
 	GR_CairoGraphics	* m_pAbiPreviewWidget;
@@ -183,3 +181,5 @@ private:
 	bool m_bBlockModifySignal;
 	std::string m_sNewStyleName;
 };
+
+#endif /* AP_UnixDialog_Styles_H */

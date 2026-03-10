@@ -46,63 +46,63 @@ bool pt_PieceTable::_unlinkStrux(pf_Frag_Strux * pfs,
 #if DEBUG
 	if(pfs->getStruxType() == PTX_SectionTable)
 	{
-		UT_DEBUGMSG(("_unlink Strux Table %p \n", (void*)pfs));
+		UT_DEBUGMSG(("_unlink Strux Table %p \n",pfs));
 	}
 	else if(pfs->getStruxType() == PTX_SectionCell)
 	{
-		UT_DEBUGMSG(("_unlink Strux Cell %p \n", (void*)pfs));
+		UT_DEBUGMSG(("_unlink Strux Cell %p \n",pfs));
 	}	
 	else if(pfs->getStruxType() == PTX_EndTable)
 	{
-		UT_DEBUGMSG(("_unlink Strux End Table %p \n", (void*)pfs));
+		UT_DEBUGMSG(("_unlink Strux End Table %p \n",pfs));
 	}	
 	else if(pfs->getStruxType() == PTX_EndCell)
 	{
-		UT_DEBUGMSG(("_unlink Strux EndCell %p \n", (void*)pfs));
+		UT_DEBUGMSG(("_unlink Strux EndCell %p \n",pfs));
 	}
 	else if(pfs->getStruxType() == PTX_SectionFrame)
 	{
-		UT_DEBUGMSG(("_unlink Strux SectionFrame %p \n", (void*)pfs));
+		UT_DEBUGMSG(("_unlink Strux SectionFrame %p \n",pfs));
 	}
 	else if(pfs->getStruxType() == PTX_EndFrame)
 	{
-		UT_DEBUGMSG(("_unlink Strux EndFrame %p \n", (void*)pfs));
+		UT_DEBUGMSG(("_unlink Strux EndFrame %p \n",pfs));
 	}
 	else if(pfs->getStruxType() == PTX_Block)
 	{
-		UT_DEBUGMSG(("_unlink Strux Block %p \n", (void*)pfs));
+		UT_DEBUGMSG(("_unlink Strux Block %p \n",pfs));
 	}
 	else if(pfs->getStruxType() == PTX_Section)
 	{
-		UT_DEBUGMSG(("_unlink Strux Section %p \n", (void*)pfs));
+		UT_DEBUGMSG(("_unlink Strux Section %p \n",pfs));
 	}
 	else if(pfs->getStruxType() == PTX_SectionHdrFtr)
 	{
-		UT_DEBUGMSG(("_unlink HdrFtr Strux Section %p \n", (void*)pfs));
+		UT_DEBUGMSG(("_unlink HdrFtr Strux Section %p \n",pfs));
 	}
 	else if(pfs->getStruxType() == PTX_SectionFootnote)
 	{
-		UT_DEBUGMSG(("_unlink Strux SectionFootnote %p \n", (void*)pfs));
+		UT_DEBUGMSG(("_unlink Strux SectionFootnote %p \n",pfs));
 	}
 	else if(pfs->getStruxType() == PTX_EndFootnote)
 	{
-		UT_DEBUGMSG(("_unlink Strux EndFootnote %p \n", (void*)pfs));
+		UT_DEBUGMSG(("_unlink Strux EndFootnote %p \n",pfs));
 	}
 	else if(pfs->getStruxType() == PTX_SectionEndnote)
 	{
-		UT_DEBUGMSG(("_unlink Strux SectionEndnote %p \n", (void*)pfs));
+		UT_DEBUGMSG(("_unlink Strux SectionEndnote %p \n",pfs));
 	}
 	else if(pfs->getStruxType() == PTX_EndEndnote)
 	{
-		UT_DEBUGMSG(("_unlink Strux EndEndnote %p \n", (void*)pfs));
+		UT_DEBUGMSG(("_unlink Strux EndEndnote %p \n",pfs));
 	}
 	else if(pfs->getStruxType() == PTX_SectionTOC)
 	{
-		UT_DEBUGMSG(("_unlink Strux SectionTOC %p \n", (void*)pfs));
+		UT_DEBUGMSG(("_unlink Strux SectionTOC %p \n",pfs));
 	}
 	else if(pfs->getStruxType() == PTX_EndTOC)
 	{
-		UT_DEBUGMSG(("_unlink Strux EndTOC %p \n", (void*)pfs));
+		UT_DEBUGMSG(("_unlink Strux EndTOC %p \n",pfs));
 	}
 //	m_pDocument->miniDump(pfs, 2);
 #endif
@@ -150,14 +150,14 @@ bool pt_PieceTable::_unlinkStrux_Block(pf_Frag_Strux * pfs,
 
 	// find the previous strux (either a paragraph or something else).
 
-	pf_Frag_Strux * pfsPrev = nullptr;
+	pf_Frag_Strux * pfsPrev = NULL;
 	_getStruxFromPosition(pfs->getPos(),&pfsPrev, true); // should that really skip footnotes?
 	UT_return_val_if_fail (pfsPrev, false);			// we have a block that's not in a section ??
 	//
 	// Code to prevent a crash. But this should not happen and if it does not everything will
     // be deleted - Sevior.
 	//
-	if(pfsPrev == nullptr)
+	if(pfsPrev == NULL)
 	{
 		_unlinkFrag(pfs,ppfEnd,pfragOffsetEnd);
 		UT_DEBUGMSG(("shoudln't happen."));
@@ -191,10 +191,10 @@ bool pt_PieceTable::_unlinkStrux_Block(pf_Frag_Strux * pfs,
 		//
 		// Check to see if this is the first section of the document.
 		//
-		if(pfsPrev->getPrev() == nullptr)
+		if(pfsPrev->getPrev() == NULL)
 		{
 		  pf_Frag * pfNext = pfs->getNext();
-		  if(pfNext == nullptr)
+		  if(pfNext == NULL)
 		  {
 		    //
 		    // Cannot delete this because then there will be no page
@@ -297,7 +297,7 @@ bool pt_PieceTable::_unlinkStrux_Section(pf_Frag_Strux * pfs,
 
 	// find the previous strux (either a paragraph or something else).
 
-	pf_Frag_Strux * pfsPrev = nullptr;
+	pf_Frag_Strux * pfsPrev = NULL;
 	pf_Frag * pf = pfs->getPrev();
 	while (pf && (!pfsPrev || isFootnote(pf) || isEndFootnote(pf)))
 	{
@@ -542,62 +542,62 @@ bool pt_PieceTable::_deleteHdrFtrsFromSectionStruxIfPresent(pf_Frag_Strux_Sectio
 	//
 	// FIXME: Handle all the new header/footer types.
 	PT_AttrPropIndex indexAP = pfStruxSec->getIndexAP();
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	getAttrProp(indexAP, &pAP);
 	UT_Vector vecHdrFtr;
 	UT_String HeaderV,HeaderEvenV,HeaderLastV,HeaderFirstV;
 	UT_String FooterV,FooterEvenV,FooterLastV,FooterFirstV;
 	vecHdrFtr.clear();
-	const gchar * szHeaderV = nullptr;
+	const gchar * szHeaderV = NULL;
 	bool bres = pAP->getAttribute("header",szHeaderV);
 	if(szHeaderV && *szHeaderV && (strcmp(szHeaderV,"0") != 0))
 	{
 		HeaderV = szHeaderV;
 		vecHdrFtr.addItem((void *) HeaderV.c_str());
 	}
-	szHeaderV =  nullptr;
+	szHeaderV =  NULL;
 	bres = pAP->getAttribute("header-even",szHeaderV);
 	if(szHeaderV && *szHeaderV && (strcmp(szHeaderV,"0") != 0))
 	{
 		HeaderEvenV = szHeaderV;
 		vecHdrFtr.addItem((void *) HeaderEvenV.c_str());
 	}
-	szHeaderV =  nullptr;
+	szHeaderV =  NULL;
 	bres = pAP->getAttribute("header-last",szHeaderV);
 	if(szHeaderV && *szHeaderV && (strcmp(szHeaderV,"0") != 0))
 	{
 		HeaderLastV = szHeaderV;
 		vecHdrFtr.addItem((void *) HeaderLastV.c_str());
 	}
-	szHeaderV =  nullptr;
+	szHeaderV =  NULL;
 	bres = pAP->getAttribute("header-first",szHeaderV);
 	if(szHeaderV && *szHeaderV && (strcmp(szHeaderV,"0") != 0))
 	{
 		HeaderFirstV = szHeaderV;
 		vecHdrFtr.addItem((void *) HeaderFirstV.c_str());
 	}
-	szHeaderV =  nullptr;
+	szHeaderV =  NULL;
 	bres = pAP->getAttribute("footer",szHeaderV);
 	if(szHeaderV && *szHeaderV && (strcmp(szHeaderV,"0") != 0))
 	{
 		FooterV = szHeaderV;
 		vecHdrFtr.addItem((void *) FooterV.c_str());
 	}
-	szHeaderV =  nullptr;
+	szHeaderV =  NULL;
 	bres = pAP->getAttribute("footer-even",szHeaderV);
 	if(szHeaderV && *szHeaderV && (strcmp(szHeaderV,"0") != 0))
 	{
 		FooterEvenV = szHeaderV;
 		vecHdrFtr.addItem((void *) FooterEvenV.c_str());
 	}
-	szHeaderV =  nullptr;
+	szHeaderV =  NULL;
 	bres = pAP->getAttribute("footer-last",szHeaderV);
 	if(szHeaderV && *szHeaderV && (strcmp(szHeaderV,"0") != 0))
 	{
 		FooterLastV = szHeaderV;
 		vecHdrFtr.addItem((void *) FooterLastV.c_str());
 	}
-	szHeaderV =  nullptr;
+	szHeaderV =  NULL;
 	bres = pAP->getAttribute("footer-first",szHeaderV);
 	if(szHeaderV && *szHeaderV && (strcmp(szHeaderV,"0") != 0))
 	{
@@ -614,7 +614,7 @@ bool pt_PieceTable::_deleteHdrFtrsFromSectionStruxIfPresent(pf_Frag_Strux_Sectio
 // This section has a header or footer attribute. Scan the piecetable to see
 // if there is a header strux somewhere with an ID that matches our section.
 //
-	pf_Frag * curFrag = nullptr;
+	pf_Frag * curFrag = NULL;
 //
 // Do this loop for all and headers and footers.
 //
@@ -623,7 +623,7 @@ bool pt_PieceTable::_deleteHdrFtrsFromSectionStruxIfPresent(pf_Frag_Strux_Sectio
 	{
 		curFrag = static_cast<pf_Frag *>(pfStruxSec);
 		bool bFoundIt = false;
-		pf_Frag_Strux * curStrux = nullptr;
+		pf_Frag_Strux * curStrux = NULL;
 		while(curFrag != getFragments().getLast() && !bFoundIt)
 		{
 			if(curFrag->getType() == pf_Frag::PFT_Strux)
@@ -635,18 +635,18 @@ bool pt_PieceTable::_deleteHdrFtrsFromSectionStruxIfPresent(pf_Frag_Strux_Sectio
 // OK we've got a candidate
 //
 					PT_AttrPropIndex indexAPHdr = curStrux->getIndexAP();
-					const PP_AttrProp * pAPHdr = nullptr;
+					const PP_AttrProp * pAPHdr = NULL;
 					getAttrProp(indexAPHdr, &pAPHdr);
-					const gchar * szID = nullptr;
+					const gchar * szID = NULL;
 					bres = pAPHdr->getAttribute("id",szID);
 					UT_DEBUGMSG(("SEVIOR: Found candidate id = %s \n",szID));
-					if(bres && (szID != nullptr))
+					if(bres && (szID != NULL))
 					{
 					//
 					// Look for a match.
 					//
 						szHeaderV = (const char *) vecHdrFtr.getNthItem(i);
-						if(szHeaderV != nullptr && strcmp(szHeaderV,szID) == 0)
+						if(szHeaderV != NULL && strcmp(szHeaderV,szID) == 0)
 						{
 							bFoundIt = true;
 						}
@@ -676,7 +676,7 @@ void pt_PieceTable::_deleteHdrFtrStruxWithNotify( pf_Frag_Strux * pfFragStruxHdr
 // First we need the document position of the header/footer strux.
 //
 	UT_DEBUGMSG(("SEVIOR: Deleting hdrftr \n"));
-	const pf_Frag * pfFrag = nullptr;
+	const pf_Frag * pfFrag = NULL;
 	pfFrag = static_cast<pf_Frag *>(pfFragStruxHdrFtr);
 	// TODO HdrFtrPos is unused
 	UT_DebugOnly<PT_DocPosition> HdrFtrPos = getFragPosition(pfFrag);
@@ -701,7 +701,7 @@ void pt_PieceTable::_deleteHdrFtrStruxWithNotify( pf_Frag_Strux * pfFragStruxHdr
 		}
 		else
 		{
-			UT_DEBUGMSG(("Adding strux %p of type %d at Pos %d to strux vector for delete \n", (void*)pfs, pfs->getStruxType(), pfs->getPos()));
+			UT_DEBUGMSG(("Adding strux %p of type %d at Pos %d to strux vector for delete \n",pfs,pfs->getStruxType(),pfs->getPos()));
 			posLastStrux = pfs->getPos();
 			vecFragStrux.addItem((void *) pfFrag);
 			pfFrag = pfFrag->getNext();
@@ -747,7 +747,7 @@ void pt_PieceTable::_deleteHdrFtrStruxWithNotify( pf_Frag_Strux * pfFragStruxHdr
 	if(TextEndPos > TextStartPos)
 	{
 		UT_uint32 iRealDeleteCount;
-		deleteSpan(TextStartPos,TextEndPos,nullptr,iRealDeleteCount,true);
+		deleteSpan(TextStartPos,TextEndPos,NULL,iRealDeleteCount,true);
 		// TODO -- is this right with revisions ???
 	}
 //
@@ -763,7 +763,7 @@ void pt_PieceTable::_deleteHdrFtrStruxWithNotify( pf_Frag_Strux * pfFragStruxHdr
 // the HdrFtr to be properly recreated on undo (Since it needs blocks to be
 // present before it can be created.)
 //
-	bres = _deleteStruxWithNotify(pfFragStruxHdrFtr->getPos(),pfFragStruxHdrFtr,nullptr,nullptr);
+	bres = _deleteStruxWithNotify(pfFragStruxHdrFtr->getPos(),pfFragStruxHdrFtr,NULL,NULL);
 	for(i=1; i<count; i++)
 	{
 		pf_Frag_Strux * pfs = (pf_Frag_Strux *) vecFragStrux.getNthItem(i);
@@ -775,12 +775,12 @@ void pt_PieceTable::_deleteHdrFtrStruxWithNotify( pf_Frag_Strux * pfFragStruxHdr
 		UT_DEBUGMSG(("Delete Strux at %d strux type is %d \n",pfs->getPos(),pfs->getStruxType()));
 		if(pfs->getStruxType() != PTX_SectionHdrFtr)
 		{
-			bres = _deleteStruxWithNotify(pfs->getPos(),pfs,nullptr,nullptr);
+			bres = _deleteStruxWithNotify(pfs->getPos(),pfs,NULL,NULL);
 		}
 		UT_return_if_fail (bres);
 	}
 	UT_return_if_fail (bres);
-//	deleteSpan(HdrFtrPos,TextStartPos,nullptr,true);
+//	deleteSpan(HdrFtrPos,TextStartPos,NULL,true);
 }
 
 

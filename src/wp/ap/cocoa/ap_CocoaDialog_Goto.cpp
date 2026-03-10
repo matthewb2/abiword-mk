@@ -106,7 +106,7 @@ void AP_CocoaDialog_Goto::notifyActiveFrame(XAP_Frame * /*pFrame*/)
 - (id)initFromNib
 {
 	if((self = [super initWithWindowNibName:@"ap_CocoaDialog_Goto"])) {
-		_xap = nullptr;
+		_xap = NULL;
 		m_jumpTarget = AP_JUMPTARGET_PAGE;
 	}
 	return self;
@@ -114,7 +114,7 @@ void AP_CocoaDialog_Goto::notifyActiveFrame(XAP_Frame * /*pFrame*/)
 
 -(void)discardXAP
 {
-	_xap = nullptr;
+	_xap = NULL; 
 }
 
 -(void)dealloc
@@ -140,7 +140,7 @@ void AP_CocoaDialog_Goto::notifyActiveFrame(XAP_Frame * /*pFrame*/)
 		id widgets[3] = { _pageRadio, _lineRadio, _bookmarkRadio };
 
 		if (const char ** tmp2 = _xap->getJumpTargets()) {
-			for (int i = 0; tmp2[i] != nullptr && i < 3; i++) {
+			for (int i = 0; tmp2[i] != NULL && i < 3; i++) {
 				[widgets[i] setTitle:[NSString stringWithUTF8String:tmp2[i]]];
 			}
 		}

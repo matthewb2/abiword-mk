@@ -1,7 +1,6 @@
 /* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: t -*- */
 /* AbiWord
  * Copyright (C) 2002 Tomas Frydrych <tomas@frydrych.uklinux.net>
- * Copyright (C) 2021 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,17 +18,17 @@
  * 02110-1301 USA.
  */
 
-#pragma once
-
-#include <string>
+#ifndef PT_REVISION_H
+#define PT_REVISION_H
 
 #include "ut_types.h"
+#include "ut_string_class.h"
 #include "ut_vector.h"
 #include "pp_AttrProp.h"
 
 class PD_Document;
 
-ABI_EXPORT const char* UT_getAttribute(const PP_AttrProp* pAP, const char* name, const char* def = nullptr);
+ABI_EXPORT const char* UT_getAttribute( const PP_AttrProp* pAP, const char* name, const char* def = 0 );
 /**
  * Like UT_getAttribute(name,atts,def) but check for a revision attribute and
  * if found first look for the most recent value of atts in the revision.
@@ -93,8 +92,8 @@ class ABI_EXPORT PP_Revision: public PP_AttrProp
 	UT_uint32        m_iID;
 	PP_RevisionType  m_eType;
 	// these next three are a cache, therefor mutable
-	mutable std::string      m_sXMLProps;
-	mutable std::string      m_sXMLAttrs;
+	mutable UT_String        m_sXMLProps;
+	mutable UT_String        m_sXMLAttrs;
 	mutable bool             m_bDirty;
 };
 
@@ -136,7 +135,7 @@ class ABI_EXPORT PP_RevisionAttr
 {
   public:
 	PP_RevisionAttr()
-		:m_vRev(), m_sXMLstring(), m_bDirty(true), m_iSuperfluous(0), m_pLastRevision(nullptr)
+		:m_vRev(),m_sXMLstring(),m_bDirty(true),m_iSuperfluous(0),m_pLastRevision(NULL)
 		{};
 	PP_RevisionAttr(const gchar * r);
 
@@ -148,7 +147,7 @@ class ABI_EXPORT PP_RevisionAttr
 	~PP_RevisionAttr();
 
 	void                  setRevision(const gchar * r);
-	void                  setRevision(const std::string&  r);
+	void                  setRevision(std::string&  r);
 
 	void                  addRevision(UT_uint32 iId,
                                           PP_RevisionType eType,
@@ -222,10 +221,12 @@ class ABI_EXPORT PP_RevisionAttr
 
 	UT_Vector           m_vRev;
 	// these next 2 are a cache, hence mutable
-	mutable std::string         m_sXMLstring;
+	mutable UT_String           m_sXMLstring;
 	mutable bool                m_bDirty; // indicates whether m_sXMLstring corresponds
 						          // to current state of the instance
 	UT_uint32           m_iSuperfluous;
 	// also a cache
 	mutable const PP_Revision * m_pLastRevision;
 };
+
+#endif // #ifndef PT_REVISION_H

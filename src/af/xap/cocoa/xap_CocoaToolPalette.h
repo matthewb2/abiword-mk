@@ -20,7 +20,9 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+
+#ifndef XAP_COCOATOOLPALETTE_H
+#define XAP_COCOATOOLPALETTE_H
 
 #import <Cocoa/Cocoa.h>
 
@@ -57,8 +59,8 @@ public:
 
 	virtual ~XAP_CocoaToolPaletteListener();
 
-	virtual bool			notify(AV_View * pView, const AV_ChangeMask mask) override;
-	virtual AV_ListenerType		getType(void) const override;
+	virtual bool				notify(AV_View * pView, const AV_ChangeMask mask);
+    virtual AV_ListenerType		getType(void);
 
 	void						setCurrentView(AV_View * view);
 
@@ -220,3 +222,5 @@ private:
 - (void)rebuildFontFamilyPopUp;
 - (void)syncPopUpsForFont:(NSString *)requestedFontFamilyName;
 @end
+
+#endif /* ! XAP_COCOATOOLPALETTE_H */

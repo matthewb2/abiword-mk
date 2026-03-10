@@ -24,6 +24,10 @@
 #include "ut_units.h"
 #include "pp_AttrProp.h"
 
+#if _MSC_VER
+#pragma warning(disable: 4522) // multiple assignment operators specified
+#endif
+
 class UT_UTF8String;
 
 class ABI_EXPORT fp_PageSize
@@ -54,8 +58,8 @@ public:
 	fp_PageSize(Predefined preDef);
 	fp_PageSize(const char *name);
 	fp_PageSize(double w, double h, UT_Dimension u);
-	fp_PageSize(const fp_PageSize&) = default;
-	fp_PageSize& operator=(const fp_PageSize& rhs);
+	fp_PageSize&      operator=(fp_PageSize& rhs);
+	fp_PageSize&      operator=(const fp_PageSize& rhs);
 
 	bool match(double x, double y);
 	void Set(Predefined preDef, UT_Dimension u = DIM_none);

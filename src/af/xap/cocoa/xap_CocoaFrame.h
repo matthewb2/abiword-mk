@@ -1,6 +1,6 @@
 /* AbiSource Application Framework
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2001, 2009-2021 Hubert Figuière
+ * Copyright (C) 2001, 2009 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,9 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+
+#ifndef XAP_COCOAFRAME_H
+#define XAP_COCOAFRAME_H
 
 #import <Cocoa/Cocoa.h>
 
@@ -39,9 +41,8 @@ class EV_CocoaMenuPopup;
 ******************************************************************
 *****************************************************************/
 
-class GR_CocoaGraphics;
+class GR_CocoaCairoGraphics;
 class FV_View;
-class XAP_Drawable;
 
 @protocol XAP_MouseEventDelegate
 - (void)mouseDown:(NSEvent *)theEvent from:(id)sender;
@@ -53,25 +54,16 @@ class XAP_Drawable;
 // TODO should figure out if need default values
 @interface XAP_CocoaNSView : NSView
 {
-    NSString* m_name;
-	CGLayerRef m_layer;
-	bool m_layer_needs_resize;
-	NSCursor* _cursor;
-	bool _in_draw_rect;
-	XAP_Frame* m_pFrame;
-	GR_CocoaGraphics* m_pGR;
-	XAP_Drawable* m_drawable;
+	NSCursor		*_cursor;
+	XAP_Frame 		*m_pFrame;
+	GR_CocoaCairoGraphics	*m_pGR;
 	NSObject<XAP_MouseEventDelegate>	*_eventDelegate;
 }
-@property (readonly) bool in_draw_rect;
-@property XAP_Drawable* drawable;
-@property (readonly) CGLayerRef drawingLayer;
-
-- (id)initWith:(XAP_Frame*)frame andFrame:(NSRect)windowFrame andName:(NSString*)name;
+- (id)initWith:(XAP_Frame *)frame andFrame:(NSRect)windowFrame;
 - (BOOL)acceptsFirstResponder;
 - (BOOL)becomeFirstResponder;
-- (XAP_Frame*)xapFrame;
-- (void)setGraphics:(GR_CocoaGraphics*)gr;
+- (XAP_Frame *)xapFrame;
+- (void)setGraphics:(GR_CocoaCairoGraphics *)gr;
 - (void)setEventDelegate:(NSObject<XAP_MouseEventDelegate>*)delegate;
 - (NSObject<XAP_MouseEventDelegate>*)eventDelegate;
 - (void)drawRect:(NSRect)aRect;
@@ -80,3 +72,6 @@ class XAP_Drawable;
 - (void)hasBeenResized:(NSNotification*)notif;
 - (void)setCursor:(NSCursor*)cursor;
 @end
+
+
+#endif /* XAP_COCOAFRAME_H */

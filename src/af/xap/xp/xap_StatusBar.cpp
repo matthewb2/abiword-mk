@@ -1,4 +1,4 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t; -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
 
 /* AbiSource Program Utilities
  * 
@@ -30,17 +30,17 @@
  * principal status bar registers...
  * - FIXME: this can be removed, as I killed off the splash screen - MARCM
  */
-static XAP_StatusBar * s_SB1 = nullptr;
-static XAP_StatusBar * s_SB2 = nullptr;
+static XAP_StatusBar * s_SB1 = 0;
+static XAP_StatusBar * s_SB2 = 0;
 
 void XAP_StatusBar::setStatusBar (XAP_StatusBar * statusbar)
 {
-	if (s_SB1 == nullptr)
+	if (s_SB1 == 0)
 		{
 			s_SB1 = statusbar;
 			return;
 		}
-	if (s_SB2 == nullptr)
+	if (s_SB2 == 0)
 		{
 			s_SB2 = statusbar;
 			return;
@@ -50,10 +50,8 @@ void XAP_StatusBar::setStatusBar (XAP_StatusBar * statusbar)
 
 void XAP_StatusBar::unsetStatusBar (XAP_StatusBar * statusbar)
 {
-	if (s_SB1 == statusbar)
-		s_SB1 = nullptr;
-	if (s_SB2 == statusbar)
-		s_SB2 = nullptr;
+	if (s_SB1 == statusbar) s_SB1 = 0;
+	if (s_SB2 == statusbar) s_SB2 = 0;
 }
 
 void XAP_StatusBar::message (const char * pbuf, bool urgent)

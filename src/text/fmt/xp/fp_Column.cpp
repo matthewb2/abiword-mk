@@ -20,7 +20,6 @@
 
 #include <stdlib.h>
 #include <math.h>
-#include <limits>
 #include <string.h>
 
 #include "fp_Column.h"
@@ -102,14 +101,14 @@ void fp_VerticalContainer::setWidth(UT_sint32 iWidth)
 FV_View * fp_VerticalContainer::getView(void) const
 {
   fp_Page * pPage = getPage();
-  if(pPage == nullptr)
+  if(pPage == NULL)
   {
-    return nullptr;
+    return NULL;
   }
   FL_DocLayout * pDL = pPage->getDocLayout();
-  if(pDL == nullptr)
+  if(pDL == NULL)
   {
-    return nullptr;
+    return NULL;
   }
   return pDL->getView();
 }
@@ -119,6 +118,7 @@ FV_View * fp_VerticalContainer::getView(void) const
  */
 void fp_VerticalContainer::setHeight(UT_sint32 iHeight)
 {
+
 	if (iHeight == m_iHeight)
 	{
 		return;
@@ -184,7 +184,7 @@ UT_sint32 fp_VerticalContainer::getY(void) const
 	if(getSectionLayout()->getDocLayout()->getView()  && (getSectionLayout()->getDocLayout()->getView()->getViewMode() != VIEW_PRINT))
 	{
 		fl_SectionLayout * pSL = getSectionLayout();
-		fl_DocSectionLayout * pDSL = nullptr;
+		fl_DocSectionLayout * pDSL = NULL;
 		if(static_cast<fl_ContainerLayout *>(pSL)->getContainerType() == FL_CONTAINER_DOCSECTION)
 		{
 			pDSL = static_cast<fl_DocSectionLayout *>(pSL);
@@ -228,7 +228,7 @@ UT_sint32 fp_VerticalContainer::getYoffsetFromTable(const fp_Container * pT,
 //	UT_ASSERT(pTable);
 	UT_sint32 offset = 0;
 	bool bFound = false;
-	while(pTable != nullptr && !bFound)
+	while(pTable != NULL && !bFound)
 	{
 		bFound = pTable->isInBrokenTable(static_cast<const fp_CellContainer *>(pCell),
                                          static_cast<const fp_Container *>(pCon));
@@ -260,17 +260,17 @@ fp_TableContainer * fp_VerticalContainer::getCorrectBrokenTable(const fp_Contain
 	     pCell = static_cast<const fp_CellContainer *>(pCon->getContainer());
 	     if(!pCell)
 	     {
-		   return nullptr;
+		   return NULL;
 	     }
 	}
-	UT_return_val_if_fail(pCell->getContainerType() == FP_CONTAINER_CELL,nullptr);
+	UT_return_val_if_fail(pCell->getContainerType() == FP_CONTAINER_CELL,NULL);
 //
 // OK scan through the broken tables and look for the table that contains this
 //
 	fp_Container * pCur = static_cast<fp_Container *>(pCell->getContainer());
-	UT_return_val_if_fail(pCur->getContainerType() == FP_CONTAINER_TABLE,nullptr);
+	UT_return_val_if_fail(pCur->getContainerType() == FP_CONTAINER_TABLE,NULL);
 	auto pMasterTab = static_cast<fp_TableContainer *>(pCur);
-	UT_return_val_if_fail(pMasterTab && pMasterTab->getContainerType() == FP_CONTAINER_TABLE,nullptr);
+	UT_return_val_if_fail(pMasterTab && pMasterTab->getContainerType() == FP_CONTAINER_TABLE,NULL);
 	fp_TableContainer * pTab = pMasterTab->getFirstBrokenTable();
 	bFound = false;
 	UT_sint32 iCount  =0;
@@ -296,11 +296,11 @@ fp_TableContainer * fp_VerticalContainer::getCorrectBrokenTable(const fp_Contain
 		xxx_UT_DEBUGMSG(("Container y %d height %d was found in table %d ybreak %d ybottom y %d \n",pCon->getY(),pCon->getHeight(),iCount,pTab->getYBreak(),pTab->getYBottom()));
 		return  pTab;
 	}
-     
+
 	xxx_UT_DEBUGMSG(("getCorrectBroken: No table found after %d tries, Y of Con \n",iCount,pCon->getY()));
 	if(pMasterTab)
 	{
-//		UT_ASSERT(pMasterTab->getFirstBrokenTable() == nullptr);
+//		UT_ASSERT(pMasterTab->getFirstBrokenTable() == NULL);
 	}
 	return pMasterTab;
 }
@@ -318,9 +318,9 @@ fp_TOCContainer * fp_VerticalContainer::getCorrectBrokenTOC(const fp_Container *
 // OK scan through the broken TOC's and look for the TOC that contains this
 //
 	fp_Container * pCur = static_cast<fp_Container *>(pCon->getContainer());
-	UT_return_val_if_fail(pCur->getContainerType() == FP_CONTAINER_TOC,nullptr);
+	UT_return_val_if_fail(pCur->getContainerType() == FP_CONTAINER_TOC,NULL);
 	fp_TOCContainer * pMasterTOC = static_cast<fp_TOCContainer *>(pCur);
-	UT_return_val_if_fail(pMasterTOC && pMasterTOC->getContainerType() == FP_CONTAINER_TOC,nullptr);
+	UT_return_val_if_fail(pMasterTOC && pMasterTOC->getContainerType() == FP_CONTAINER_TOC,NULL);
 	fp_TOCContainer * pTOC = pMasterTOC->getFirstBrokenTOC();
 	bFound = false;
 	UT_sint32 iCount  =0;
@@ -348,7 +348,7 @@ fp_TOCContainer * fp_VerticalContainer::getCorrectBrokenTOC(const fp_Container *
 	xxx_UT_DEBUGMSG(("getCorrectBrokenTOC: NoTOC found after %d tries, Y of Con \n",iCount,pCon->getY()));
 	if(pMasterTOC)
 	{
-//		UT_ASSERT(pMasterTOC->getFirstBrokenTOC() == nullptr);
+//		UT_ASSERT(pMasterTOC->getFirstBrokenTOC() == NULL);
 	}
 	return pMasterTOC;
 }
@@ -404,16 +404,16 @@ void fp_VerticalContainer::getOffsets(const fp_ContainerObject* pContainer, UT_s
 				pContainer = static_cast<const fp_Container *>(pVCon);
 				xxx_UT_DEBUGMSG(("pContainer set to %p height %d \n",pContainer,pContainer->getHeight()));
 			}
-			else if(pVCon && (pVCon->getContainer() == nullptr))
+			else if(pVCon && (pVCon->getContainer() == NULL))
 			{
 			  //
 			  // Just bail out for now
 			  //
 			        return;
 			}
-			if(pVCon == nullptr)
+			if(pVCon == NULL)
 			{
-			        pCon = nullptr;
+			        pCon = NULL;
 				break;
 			}
 			pCon = static_cast<const fp_Container *>(pVCon);
@@ -437,8 +437,8 @@ void fp_VerticalContainer::getOffsets(const fp_ContainerObject* pContainer, UT_s
 	{
 		auto pHFSL = static_cast<const fp_HdrFtrContainer *>(pCon)->getHdrFtrSectionLayout();
 		fp_Page * pPage = getPage();
-		fl_HdrFtrShadow * pShadowL = nullptr;
-		if(pPage == nullptr)
+		fl_HdrFtrShadow * pShadowL = NULL;
+		if(pPage == NULL)
 		{
 			pShadowL = pHFSL->getFirstShadow();
 		}
@@ -446,7 +446,7 @@ void fp_VerticalContainer::getOffsets(const fp_ContainerObject* pContainer, UT_s
 		{
 			pShadowL = pHFSL->findShadow(pPage);
 		}
-		if(pShadowL == nullptr)
+		if(pShadowL == NULL)
 		{
 			return;
 		}
@@ -512,7 +512,7 @@ void fp_VerticalContainer::getOffsets(const fp_ContainerObject* pContainer, UT_s
 		       yoff -= pDSL->getTopMargin();
 		}
 	}
-	if(pCon && getPage() && (pCon->getContainerType() == FP_CONTAINER_ANNOTATION) && 
+	if(pCon && getPage() && (pCon->getContainerType() == FP_CONTAINER_ANNOTATION) &&
 	   getPage()->getDocLayout()->displayAnnotations())
 	{
 	        if(getPage() && getView() && (getView()->getViewMode() != VIEW_PRINT))
@@ -594,7 +594,7 @@ void fp_VerticalContainer::getScreenOffsets(const fp_ContainerObject* pContainer
 	UT_sint32 my_xoff =0;
 	UT_sint32 my_yoff =0;
 
-	if((getPage() == nullptr) || (pContainer == nullptr))
+	if((getPage() == NULL) || (pContainer == NULL))
 	{
 		xoff = 0;
 		yoff = 0;
@@ -610,7 +610,7 @@ void fp_VerticalContainer::getScreenOffsets(const fp_ContainerObject* pContainer
 	{
 		pCon =	static_cast<const fp_Container *>(pContainer);
 		pContainer = static_cast<const fp_CellContainer *>(pContainer)->getNthCon(0);
-		if(pContainer != nullptr)
+		if(pContainer != NULL)
 		{
 		  bCell = true;
 		  xcell = pContainer->getX();
@@ -655,7 +655,7 @@ void fp_VerticalContainer::getScreenOffsets(const fp_ContainerObject* pContainer
 //
 // Can happen during loading.
 //
-			if(pVCon == nullptr)
+			if(pVCon == NULL)
 			{
 				xoff = 0;
 				yoff = 0;
@@ -671,7 +671,7 @@ void fp_VerticalContainer::getScreenOffsets(const fp_ContainerObject* pContainer
 				}
 				pCon = static_cast<const fp_Container *>(pVCon);
 			}
-			else if(pPrev == nullptr)
+			else if(pPrev == NULL)
 			{
 			        my_yoff = 0;
 			}
@@ -812,7 +812,7 @@ void fp_VerticalContainer::removeContainer(fp_Container* pContainer,bool bClear)
 		pContainer->clearScreen();
 	}
 	xxx_UT_DEBUGMSG(("Removing Container %x from column %x \n",pContainer,this));
-	pContainer->setContainer(nullptr);
+	pContainer->setContainer(NULL);
 	deleteNthCon(ndx);
 
 	// don't delete the line here, it's deleted elsewhere.
@@ -854,7 +854,7 @@ bool fp_VerticalContainer::addContainer(fp_Container* pNewContainer)
 	UT_return_val_if_fail(pNewContainer,false);
 	UT_return_val_if_fail((pNewContainer->getContainerType() == FP_CONTAINER_ENDNOTE) || (pNewContainer->getDocSectionLayout() == getDocSectionLayout()),false);
 	UT_ASSERT(pNewContainer->getContainerType() != FP_CONTAINER_ANNOTATION);
-	if(pNewContainer->getContainer() != nullptr)
+	if(pNewContainer->getContainer() != NULL)
 	{
 		pNewContainer->clearScreen();
 	}
@@ -870,7 +870,7 @@ bool fp_VerticalContainer::addContainer(fp_Container* pNewContainer)
  \param pNewContainer   Container to be inserted
  \param pAfterContainer After this line
  \todo This function has been hacked to handle the case where
-       pAfterContainer is nullptr. That case should not happen. Bad callers
+       pAfterContainer is NULL. That case should not happen. Bad callers
        should be identified and fixed, and this function should be
        cleaned up.
  */
@@ -886,7 +886,7 @@ bool fp_VerticalContainer::insertContainerAfter(fp_Container*	pNewContainer, fp_
 	UT_ASSERT( (count > 0) || (ndx == -1) );
 
 	/*
-	  TODO this routine should not be allowing pAfterContainer to be nullptr.
+	  TODO this routine should not be allowing pAfterContainer to be NULL.
 	  Right now, we've fixed the symptom, but we really should fix
 	  the problem.  */
 	UT_ASSERT(ndx >= 0);
@@ -921,11 +921,11 @@ bool fp_VerticalContainer::insertContainerAfter(fp_Container*	pNewContainer, fp_
 */
 void fp_VerticalContainer::clearScreen(void)
 {
-	if(getPage() == nullptr)
+	if(getPage() == NULL)
 	{
 		return;
 	}
-	if(!getPage()->isOnScreen())
+	if(!getPage()->isOnScreen())  //pascal bug1
 	{
 		return;
 	}
@@ -1050,7 +1050,8 @@ void fp_VerticalContainer::draw(dg_DrawArgs* pDA)
 //	validate();
 #endif
 	const UT_Rect * pClipRect = pDA->pG->getClipRect();
-	UT_sint32 ytop = 0, ybot = std::numeric_limits<UT_sint32>::max();
+	UT_sint32 ytop = 0, ybot = (UT_sint32)(((UT_uint32)(1<<31)) - 1);
+
 
 	if(pClipRect)
 	{
@@ -1072,7 +1073,7 @@ void fp_VerticalContainer::draw(dg_DrawArgs* pDA)
 	{
 		fp_ContainerObject* pContainer = static_cast<fp_ContainerObject*>(getNthCon(i));
 		if(pContainer->getY() == INITIAL_OFFSET)
-		  continue ; // container is not yet placed 
+		  continue ; // container is not yet placed
 		bool bInTable = false;
 		bool bInTOC = false;
 
@@ -1127,7 +1128,7 @@ void fp_VerticalContainer::draw(dg_DrawArgs* pDA)
 			totDiff = da.yoff + pContainer->getHeight() - ytop;
 
 //		if(bTable || (da.yoff >= ytop && da.yoff <= ybot) || (ydiff >= ytop && ydiff <= ybot))
-		if((bInTable || bInTOC) || (totDiff < sumHeight)  || (pClipRect == nullptr))
+		if((bInTable || bInTOC) || (totDiff < sumHeight)  || (pClipRect == NULL))
 		{
 			bStartedDrawing = true;
 			pContainer->draw(&da);
@@ -1184,7 +1185,7 @@ void fp_VerticalContainer::mapXYToPosition(UT_sint32 x, UT_sint32 y, PT_DocPosit
 		return;
 	}
 
-	fp_ContainerObject* pContainer = nullptr;
+	fp_ContainerObject* pContainer = NULL;
 
 	if (getContainerType() == FP_CONTAINER_CELL)
 	{
@@ -1302,6 +1303,11 @@ void fp_VerticalContainer::mapXYToPosition(UT_sint32 x, UT_sint32 y, PT_DocPosit
 //
 // Deal with wrapped lines where more than one line can have the same Y
 //
+
+//UT_DEBUGMSG(("***** PASCAL: 0 ***** x %d y %d pos %d \n",x,y,pos));
+//pascal xxx_
+
+
 		fp_Line * pLine2 = static_cast<fp_Line *>(pContainer);
 		if(pLine2->isWrapped())
 		{
@@ -1317,6 +1323,7 @@ void fp_VerticalContainer::mapXYToPosition(UT_sint32 x, UT_sint32 y, PT_DocPosit
 						pNext->mapXYToPosition(x - pNext->getX(),
 											   y - pNext->getY() ,
 											   pos, bBOL, bEOL,isTOC);
+                        //UT_DEBUGMSG(("***** PASCAL: 1 ***** x %d y %d pos %d \n",x,y,pos));
 						return;
 					}
 					UT_sint32 xmin1 = UT_MIN(abs(pNext->getX() - x),abs(pNext->getX()+pNext->getMaxWidth() -x));
@@ -1330,6 +1337,7 @@ void fp_VerticalContainer::mapXYToPosition(UT_sint32 x, UT_sint32 y, PT_DocPosit
 				pBest->mapXYToPosition(x - pContainer->getX(),
 									   y - pContainer->getY() ,
 									   pos, bBOL, bEOL,isTOC);
+                //UT_DEBUGMSG(("***** PASCAL: 2 ***** x %d y %d pos %d \n",x,y,pos));
 				return;
 			}
 			else
@@ -1337,6 +1345,7 @@ void fp_VerticalContainer::mapXYToPosition(UT_sint32 x, UT_sint32 y, PT_DocPosit
 				pContainer->mapXYToPosition(x - pContainer->getX(),
 											y - pContainer->getY() ,
 											pos, bBOL, bEOL,isTOC);
+                //UT_DEBUGMSG(("***** PASCAL: 3 ***** x %d y %d pos %d \n",x,y,pos));
 			}
 		}
 		else if(!pLine2->canContainPoint())
@@ -1441,10 +1450,11 @@ void fp_VerticalContainer::mapXYToPosition(UT_sint32 x, UT_sint32 y, PT_DocPosit
 				}
 			}
 		}
-
+        //UT_DEBUGMSG(("***** PASCAL: 4.1 ***** x %d y %d pos %d xx %d\n",x,y,pos,x));
 		pContainer->mapXYToPosition(x - pContainer->getX(),
 								y - pContainer->getY() ,
 									pos, bBOL, bEOL,isTOC);
+        //UT_DEBUGMSG(("***** PASCAL: 4.2 ***** x %d y %d pos %d \n",x,y,pos));
 	}
 	else
 	{
@@ -1551,7 +1561,7 @@ void fp_VerticalContainer::setY(UT_sint32 iY)
 
 /*!
  Return first line in the container
- \return The first line, or nullptr if the container is empty
+ \return The first line, or NULL if the container is empty
  */
 fp_Container* fp_VerticalContainer::getFirstContainer(void) const
 {
@@ -1561,7 +1571,7 @@ fp_Container* fp_VerticalContainer::getFirstContainer(void) const
 	}
 	else
 	{
-		return nullptr;
+		return NULL;
 	}
 }
 
@@ -1597,7 +1607,7 @@ UT_sint32  fp_VerticalContainer::countWrapped(void)
 
 /*!
  Return last line in the container
- \return The last line, or nullptr if the container is empty
+ \return The last line, or NULL if the container is empty
  */
 fp_Container* fp_VerticalContainer::getLastContainer(void) const
 {
@@ -1609,22 +1619,22 @@ fp_Container* fp_VerticalContainer::getLastContainer(void) const
 	}
 	else
 	{
-		return nullptr;
+		return NULL;
 	}
 }
 
 
 /*!
   Bump Containers from this Container to the next
-  \param pLastContainerToKeep Last line to keep in this column or nullptr for none
+  \param pLastContainerToKeep Last line to keep in this column or NULL for none
 */
 void fp_VerticalContainer::bumpContainers(fp_ContainerObject* pLastContainerToKeep)
 {
-	UT_sint32 ndx = (nullptr == pLastContainerToKeep) ? 0 : (findCon(pLastContainerToKeep)+1);
+	UT_sint32 ndx = (NULL == pLastContainerToKeep) ? 0 : (findCon(pLastContainerToKeep)+1);
 	xxx_UT_DEBUGMSG(("!!!---Bump Containers LastToKeep %x Index %d \n",pLastContainerToKeep,ndx));
 	UT_ASSERT(ndx >= 0);
 	UT_sint32 i;
-	fp_TOCContainer *pTOC2 = nullptr;
+	fp_TOCContainer *pTOC2 = NULL;
 	fp_VerticalContainer* pNextContainer = static_cast<fp_VerticalContainer*>(getNext());
 	UT_return_if_fail(pNextContainer);
 	UT_return_if_fail((pNextContainer->getContainerType() == FP_CONTAINER_ENDNOTE) || (pNextContainer->getDocSectionLayout() == getDocSectionLayout()));
@@ -1635,7 +1645,7 @@ void fp_VerticalContainer::bumpContainers(fp_ContainerObject* pLastContainerToKe
 			if(i >= countCons())
 			         continue;
 			fp_Container* pContainer = static_cast<fp_Container*>(getNthCon(i));
-			if(pContainer == nullptr)
+			if(pContainer == NULL)
 			        continue;
 			pContainer->clearScreen();
 //
@@ -1673,7 +1683,7 @@ void fp_VerticalContainer::bumpContainers(fp_ContainerObject* pLastContainerToKe
 			if(i >= countCons())
 			         continue;
 			fp_Container* pContainer = static_cast<fp_Container*>(getNthCon(i));
-			if(pContainer == nullptr)
+			if(pContainer == NULL)
 			        continue;
 			xxx_UT_DEBUGMSG(("clearScreen on %x in bumpContainers \n",pContainer));
 			pContainer->clearScreen();
@@ -1701,7 +1711,7 @@ void fp_VerticalContainer::bumpContainers(fp_ContainerObject* pLastContainerToKe
 				bTOC = true;
 			}
 #endif
-			fp_Line * pLine = nullptr;
+			fp_Line * pLine = NULL;
 			UT_sint32 iOldMaxWidth = 0;
 			if(pContainer->getContainerType() == FP_CONTAINER_LINE)
 			{
@@ -1749,9 +1759,9 @@ void fp_VerticalContainer::bumpContainers(fp_ContainerObject* pLastContainerToKe
          leader would then have to be the right-most column.
 */
 fp_Column::fp_Column(fl_SectionLayout* pSectionLayout) : fp_VerticalContainer(FP_CONTAINER_COLUMN, pSectionLayout),
-  m_pLeader(nullptr),
-  m_pFollower(nullptr),
-  m_pPage(nullptr)
+  m_pLeader(NULL),
+  m_pFollower(NULL),
+  m_pPage(NULL)
 {
 }
 
@@ -1802,9 +1812,9 @@ bool fp_Column::containsPageBreak(void) const
 
 void fp_Column::setPage(fp_Page * pPage)
 {
-	if(pPage == nullptr)
+	if(pPage == NULL)
 	{
-		getFillType().setParent(nullptr);
+		getFillType().setParent(NULL);
 	}
 	else
 	{
@@ -1818,14 +1828,14 @@ UT_sint32 fp_Column::getColumnIndex(void)
 {
     fp_Page * pPage = getPage();
     fl_DocSectionLayout * pSection = getDocSectionLayout();
-    fp_Column * pCol = nullptr;
+    fp_Column * pCol = NULL;
     if (!pPage || !pSection)
     {return 0;}
     UT_sint32 kmax = static_cast<UT_sint32>(pSection->getNumColumns());
     UT_sint32 j;
     for(j=0;j<pPage->countColumnLeaders();j++)
     {
-	pCol = pPage->getNthColumnLeader(j); 
+	pCol = pPage->getNthColumnLeader(j);
 	if (pCol && (pCol->getDocSectionLayout() == pSection))
 	{
 	    UT_sint32 k = 0;
@@ -1923,9 +1933,9 @@ void fp_Column::layout(void)
 	UT_sint32 iY = 0, iPrevY2 = 0;
 	UT_sint32 iContainerMarginAfter = 0;
 	UT_GenericVector<fl_BlockLayout *> vecBlocks;
-	fp_Line * pLastLine = nullptr;
-	fp_Container *pContainer = nullptr;
-	fp_Container *pPrevContainer = nullptr;
+	fp_Line * pLastLine = NULL;
+	fp_Container *pContainer = NULL;
+	fp_Container *pPrevContainer = NULL;
 	UT_sint32 i  = 0;
 	//
 	// RedrawHeight makes sure we redraw from whereever a line
@@ -1995,8 +2005,8 @@ void fp_Column::layout(void)
 //
 // This is to speedup redraws.
 //
-		fp_TableContainer * pTab = nullptr;
-		fp_TOCContainer * pTOC = nullptr;
+		fp_TableContainer * pTab = NULL;
+		fp_TOCContainer * pTOC = NULL;
 		UT_sint32 iHeight = pContainer->getHeight();
 		if(pContainer->getContainerType() == FP_CONTAINER_TABLE)
 		{
@@ -2108,7 +2118,7 @@ void fp_Column::layout(void)
 		fl_BlockLayout * pBlock = vecBlocks.getNthItem(i);
 		if(i < count -1)
 		{
-			pBlock->setFramesOnPage(nullptr);
+			pBlock->setFramesOnPage(NULL);
 		}
 		else
 		{
@@ -2128,7 +2138,7 @@ void fp_Column::layout(void)
 	pDSL = pDSL->getNextDocSection();
 	while(pDSL)
 	{
-		pDSL->setNeedsSectionBreak(true,nullptr);
+		pDSL->setNeedsSectionBreak(true,NULL);
 		pDSL = pDSL->getNextDocSection();
 	}
 }
@@ -2182,7 +2192,7 @@ fp_ShadowContainer::fp_ShadowContainer(UT_sint32 iX,
 fp_ShadowContainer::~fp_ShadowContainer()
 {
   xxx_UT_DEBUGMSG(("Delete Shadow Container %x from shadow Layout %x \n",this,getSectionLayout()));
-  getSectionLayout()->setFirstContainer(nullptr);
+  getSectionLayout()->setFirstContainer(NULL);
 }
 
 
@@ -2208,8 +2218,8 @@ void fp_ShadowContainer::layout(bool bForceLayout)
 	for (UT_uint32 i=0; i < iCountContainers; i++)
 	{
 		fp_Container* pContainer = static_cast<fp_Container*>(getNthCon(i));
-		fp_TableContainer * pTab = nullptr;
-		fp_TOCContainer * pTOC = nullptr;
+		fp_TableContainer * pTab = NULL;
+		fp_TOCContainer * pTOC = NULL;
 		if(pContainer->getContainerType() == FP_CONTAINER_TABLE)
 		{
 			pTab = static_cast<fp_TableContainer *>(pContainer);
@@ -2222,16 +2232,16 @@ void fp_ShadowContainer::layout(bool bForceLayout)
 		}
 //
 // FIXME: Implement this one day. Tables in header/footers.
-//		if((pTab!= nullptr) && !pTab->isThisBroken())
+//		if((pTab!= NULL) && !pTab->isThisBroken())
 //		{
 //			fp_Container * pBroke = static_cast<fp_Container *>(pTab->VBreakAt(0));
 //		}
 		UT_sint32 iContainerHeight = pContainer->getHeight();
-		if(pTab != nullptr)
+		if(pTab != NULL)
 		{
 			iContainerHeight = pTab->getHeight();
 		}
-		if(pTOC != nullptr)
+		if(pTOC != NULL)
 		{
 			iContainerHeight = pTOC->getHeight();
 		}
@@ -2445,7 +2455,7 @@ void fp_ShadowContainer::clearHdrFtrBoundaries(void)
 
 /*!
  * Ok this container class is for the hdrftrSectionLayout. It never gets drawn
- * on the screen, only the shadows get drawn. The page pointer contains a nullptr.
+ * on the screen, only the shadows get drawn. The page pointer contains a NULL.
  * This makes it possible to format the hdrftrSectionLayout and to do
  * editting operations on header/footers like regular text.
 \param iwidth width of the page in pixels?? I think.
@@ -2482,7 +2492,7 @@ void fp_HdrFtrContainer::layout(void)
 	for (UT_uint32 i=0; i < iCountContainers; i++)
 	{
 		fp_Container* pContainer = static_cast<fp_Container*>(getNthCon(i));
-		fp_TableContainer * pTab = nullptr;
+		fp_TableContainer * pTab = NULL;
 		if(pContainer->getContainerType() == FP_CONTAINER_TABLE)
 		{
 			pTab = static_cast<fp_TableContainer *>(pContainer);

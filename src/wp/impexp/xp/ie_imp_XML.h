@@ -68,18 +68,18 @@ public:
 	virtual bool		pasteFromBuffer(PD_DocumentRange * pDocRange,
 										const unsigned char * pData,
 										UT_uint32 lenData,
-										const char * szEncoding = nullptr) override;
+										const char * szEncoding = 0);
 
     /* (Partial) Implementation of UT_XML::Listener
      *
      * You *must* override these next two methods:
      */
-    virtual void startElement (const gchar * name, const gchar ** atts) override;
-    virtual void endElement (const gchar * name) override;
+    virtual void startElement (const gchar * name, const gchar ** atts);
+    virtual void endElement (const gchar * name);
     /*
      * but you get this one for free:
      */
-    virtual void charData (const gchar * buffer, int length) override;
+    virtual void charData (const gchar * buffer, int length);
 
     /* If you don't wish the XML parser to use the standard/default file handler, you
      * can provide your own via an implementation of UT_XML::Reader here:
@@ -104,13 +104,13 @@ public:
 
 protected:
 
-    virtual UT_Error _loadFile(GsfInput * input) override;
+    virtual UT_Error	_loadFile(GsfInput * input);
     int             _mapNameToToken (const char * name, xmlToIdMapping * idlist, int len);
 
     const gchar* _getXMLPropValue(const gchar *name, const gchar **atts);
 
     UT_uint32		_getInlineDepth(void) const;
-    void			_pushInlineFmt(const PP_PropertyVector & atts);
+    bool			_pushInlineFmt(const PP_PropertyVector & atts);
     void			_popInlineFmt(void);
 
     typedef enum _parseState { _PS_Init,

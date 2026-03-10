@@ -21,7 +21,9 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+
+#ifndef PD_DOCUMENT_H
+#define PD_DOCUMENT_H
 
 #include <stdio.h>
 #include <string>
@@ -44,6 +46,9 @@
 #include "ut_misc.h"
 #include "px_ChangeRecord.h"
 #include "pp_Property.h"
+
+#include <gsf/gsf-input.h>
+#include <gsf/gsf-output.h>
 
 #include <list>
 #include <memory>
@@ -234,32 +239,32 @@ class ABI_EXPORT PD_Document : public AD_Document
 public:
 	PD_Document();
 
-	virtual AD_DOCUMENT_TYPE getType() const override {return ADDOCUMENT_ABIWORD;}
+	virtual AD_DOCUMENT_TYPE getType() const {return ADDOCUMENT_ABIWORD;}
 
-	virtual UT_Error		readFromFile(const char * szFilename, int ieft, const char * impProps = nullptr) override;
+	virtual UT_Error		readFromFile(const char * szFilename, int ieft, const char * impProps = NULL);
 	virtual UT_Error		importFile(const char * szFilename, int ieft, bool markClean = false, bool bImportStylesFirst = true,
-									   const char * impProps = nullptr) override;
-	UT_Error		readFromFile(GsfInput *input, int ieft, const char * impProps = nullptr);
+									   const char * impProps = NULL);
+	UT_Error		readFromFile(GsfInput *input, int ieft, const char * impProps = NULL);
 	UT_Error		importFile(GsfInput *input, int ieft, bool markClean = false, bool bImportStylesFirst = true,
-							   const char * impProps = nullptr);
+							   const char * impProps = NULL);
 	virtual UT_Error		importStyles(const char * szFilename, int ieft, bool bDocProps = false);
 	AP_StatusBar *          getStatusBar(void);
 	void                    updateStatus(void);
-	virtual UT_Error		newDocument(void) override;
+	virtual UT_Error		newDocument(void);
 
-	UT_Error  		saveAs(GsfOutput * output, int ieft, bool cpy = false, const char * expProps = nullptr);
+	UT_Error  		saveAs(GsfOutput * output, int ieft, bool cpy = false, const char * expProps = NULL);
 
 
 	UT_Error                createRawDocument(void);
 	void                    finishRawCreation(void);
 
-	virtual bool			isDirty(void) const override;
-	virtual void            forceDirty() override;
+	virtual bool			isDirty(void) const;
+	virtual void            forceDirty();
 	bool                    isConnected(void);
-	virtual bool			canDo(bool bUndo) const override;
+	virtual bool			canDo(bool bUndo) const;
 	virtual UT_uint32		undoCount(bool bUndo) const;
-	virtual bool			undoCmd(UT_uint32 repeatCount) override;
-	virtual bool			redoCmd(UT_uint32 repeatCount) override;
+	virtual bool			undoCmd(UT_uint32 repeatCount);
+	virtual bool			redoCmd(UT_uint32 repeatCount);
 	bool                    isDoingTheDo(void) const;
 
 	// Caret Methods
@@ -317,11 +322,11 @@ PT_AttrPropIndex            getAPIFromSOH(pf_Frag_Object* odh);
 	bool					insertSpan(PT_DocPosition dpos,
 									   const UT_UCSChar * p,
 									   UT_uint32 length,
-									   PP_AttrProp *p_AttrProp = nullptr,
-									   UT_uint32 * insertedSpanLength = nullptr);
+									   PP_AttrProp *p_AttrProp = NULL,
+									   UT_uint32 * insertedSpanLength = NULL);
 	bool					insertSpan(PT_DocPosition dpos,
 									   const std::string& s,
-									   PP_AttrProp *p_AttrProp = nullptr);
+									   PP_AttrProp *p_AttrProp = NULL);
 
 	bool					deleteSpan(PT_DocPosition dpos1,
 									   PT_DocPosition dpos2,
@@ -338,14 +343,14 @@ PT_AttrPropIndex            getAPIFromSOH(pf_Frag_Object* odh);
 										  const PP_PropertyVector & properties);
 
 	bool					insertStrux(PT_DocPosition dpos,
-										PTStruxType pts, pf_Frag_Strux ** ppfs_ret = nullptr);
+										PTStruxType pts, pf_Frag_Strux ** ppfs_ret = 0);
 	bool					deleteStrux(PT_DocPosition dpos,
 										PTStruxType pts,
 										bool bRecordChange);
 
 	bool                    createAndSendCR(PT_DocPosition dpos,UT_sint32 iType,bool bsave,UT_Byte iGlob);
 	// XXX PP_PropertyVector is not visible in xad_Document
-	virtual bool            createAndSendDocPropCR( const gchar ** pAtts,const gchar ** pProps ) override;
+	virtual bool            createAndSendDocPropCR( const gchar ** pAtts,const gchar ** pProps );
 	bool                    createAndSendDocPropCR(const PP_PropertyVector & pAtts,const PP_PropertyVector & pProps);
 	bool                    changeDocPropeties(const PP_PropertyVector & szAtts, const PP_PropertyVector & pProps);
 
@@ -353,7 +358,7 @@ PT_AttrPropIndex            getAPIFromSOH(pf_Frag_Object* odh);
 										PTStruxType pts,
 										const PP_PropertyVector & attributes,
 										const PP_PropertyVector & properties,
-										pf_Frag_Strux ** ppfs_ret = nullptr);
+										pf_Frag_Strux ** ppfs_ret = NULL);
 
 	void                    deleteHdrFtrStrux(pf_Frag_Strux* sdh);
 
@@ -394,7 +399,7 @@ PT_AttrPropIndex            getAPIFromSOH(pf_Frag_Object* odh);
 	// the append- and insertBeforeFrag methods are only available while importing
 	// the document.
 
-	bool					appendStrux(PTStruxType pts, const PP_PropertyVector & attributes, pf_Frag_Strux ** ppfs_ret = nullptr);
+	bool					appendStrux(PTStruxType pts, const PP_PropertyVector & attributes, pf_Frag_Strux ** ppfs_ret = 0);
 	bool					appendStruxFmt(pf_Frag_Strux * pfs, const PP_PropertyVector & attributes);
 	bool                    appendLastStruxFmt(PTStruxType pts, const PP_PropertyVector & attrs, const PP_PropertyVector & props,
 											   bool bSkipEmbededSections);
@@ -407,7 +412,7 @@ PT_AttrPropIndex            getAPIFromSOH(pf_Frag_Object* odh);
 	bool					appendStyle(const PP_PropertyVector & attributes);
 	bool                    changeStruxFormatNoUpdate(PTChangeFmt ptc, pf_Frag_Strux* sdh, const PP_PropertyVector & attributes);
 	bool					insertStruxBeforeFrag(pf_Frag * pF, PTStruxType pts,
-												  const PP_PropertyVector & attributes, pf_Frag_Strux ** ppfs_ret = nullptr);
+												  const PP_PropertyVector & attributes, pf_Frag_Strux ** ppfs_ret = 0);
 	bool					insertSpanBeforeFrag(pf_Frag * pF, const UT_UCSChar * p, UT_uint32 length);
 	bool					insertObjectBeforeFrag(pf_Frag * pF, PTObjectType pto,
 												   const PP_PropertyVector & attributes);
@@ -415,7 +420,7 @@ PT_AttrPropIndex            getAPIFromSOH(pf_Frag_Object* odh);
 	bool					insertFmtMarkBeforeFrag(pf_Frag * pF, const PP_PropertyVector & attributes);
 
 	pf_Frag *               findFragOfType(pf_Frag::PFType iType, UT_sint32 iSubtype = -1,
-										   pf_Frag * pfStart = nullptr) const;
+										   pf_Frag * pfStart = NULL) const;
 	pf_Frag *               getLastFrag() const;
 	bool                    checkForSuspect(void);
 	bool                    repairDoc(void);
@@ -423,14 +428,14 @@ PT_AttrPropIndex            getAPIFromSOH(pf_Frag_Object* odh);
 	bool					tellListener(PL_Listener * pListener);
 	bool					tellListenerSubset( PL_Listener * pListener,
                                                 PD_DocumentRange * pDocRange,
-                                                PL_ListenerCoupleCloser* closer = nullptr);
+                                                PL_ListenerCoupleCloser* closer = 0 );
 	bool					addListener(PL_Listener * pListener, PL_ListenerId * pListenerId);
 	bool					removeListener(PL_ListenerId listenerId);
 	bool					signalListeners(UT_uint32 iSignal) const;
-	bool					notifyListeners(const pf_Frag_Strux* pfs, PX_ChangeRecord* pcr) const;
-	bool					notifyListeners(const pf_Frag_Strux* pfs,
-											pf_Frag_Strux* pfsNew,
-											PX_ChangeRecord* pcr) const;
+	bool					notifyListeners(const pf_Frag_Strux * pfs, const PX_ChangeRecord * pcr) const;
+	bool					notifyListeners(const pf_Frag_Strux * pfs,
+											pf_Frag_Strux * pfsNew,
+											const PX_ChangeRecord * pcr) const;
 	void					deferNotifications(void);
 	void					processDeferredNotifications(void);
 	UT_sint32               getAdjustmentForCR(const PX_ChangeRecord * pcr) const;
@@ -441,13 +446,12 @@ PT_AttrPropIndex            getAPIFromSOH(pf_Frag_Object* odh);
 	bool					getSpanAttrProp(pf_Frag_Strux* sdh, UT_uint32 offset, bool bLeftSide,
 											const PP_AttrProp ** ppAP) const;
 
-	bool                    getAttrProp(PT_AttrPropIndex apIndx, const PP_AttrProp ** ppAP,
-										UT_Option<std::unique_ptr<PP_RevisionAttr>>& pRevisions,
+	bool                    getAttrProp(PT_AttrPropIndex apIndx, const PP_AttrProp ** ppAP, std::unique_ptr<PP_RevisionAttr>& pRevisions,
 										bool bShowRevisions, UT_uint32 iRevisionId, bool &bHiddenRevision) const;
 
 	bool                    getSpanAttrProp(pf_Frag_Strux* sdh, UT_uint32 offset, bool bLeftSide,
 											const PP_AttrProp ** ppAP,
-											UT_Option<std::unique_ptr<PP_RevisionAttr>>& pRevisions,
+											std::unique_ptr<PP_RevisionAttr>& pRevisions,
 											bool bShowRevisions, UT_uint32 iRevisionId,
 											bool &bHiddenRevision) const;
 
@@ -480,13 +484,13 @@ PT_AttrPropIndex            getAPIFromSOH(pf_Frag_Object* odh);
 	virtual bool			createDataItem(const char * szName, bool bBase64,
                                            const UT_ConstByteBufPtr & pByteBuf,
 										   const std::string & mime_type,
-                                           PD_DataItemHandle* ppHandle) override;
+                                           PD_DataItemHandle* ppHandle);
 	virtual bool            replaceDataItem(const char * szName,
-											const UT_ConstByteBufPtr & pByteBuf) override;
+											const UT_ConstByteBufPtr & pByteBuf);
 	virtual bool			getDataItemDataByName(const char * szName,
 												  UT_ConstByteBufPtr & pByteBuf,
                                                   std::string* pMimeType,
-                                                  PD_DataItemHandle* ppHandle) const override;
+                                                  PD_DataItemHandle* ppHandle) const;
 	bool					setDataItemToken(PD_DataItemHandle pHandle, void* pToken) const;
 	bool					getDataItemData(PD_DataItemHandle pHandle,
 											const char ** pszName, UT_ConstByteBufPtr & pByteBuf,
@@ -542,15 +546,15 @@ PT_AttrPropIndex            getAPIFromSOH(pf_Frag_Object* odh);
 	void                    updateAllLayoutsInDoc( pf_Frag_Strux* sdh);
 	void					clearIfAtFmtMark(PT_DocPosition dpos);
 
-	virtual UT_uint32		getLastSavedAsType() const override { return m_lastSavedAsType; }
+	virtual UT_uint32		getLastSavedAsType() const { return m_lastSavedAsType; }
 	UT_uint32				getLastOpenedType() const { return m_lastOpenedType; }
 	bool					updateFields(void);
 	bool					getField(pf_Frag_Strux* sdh,
 									 UT_uint32 offset,
                                      fd_Field * &pField);
 	po_Bookmark * 			getBookmark(pf_Frag_Strux* sdh, UT_uint32 offset);
-	pf_Frag *               findBookmark(const char * pName, bool bEnd = false, pf_Frag * pfStart = nullptr);
-	bool                    hasMath(void) const;
+	pf_Frag *               findBookmark(const char * pName, bool bEnd = false, pf_Frag * pfStart = NULL);
+	bool                    hasMath(void);
 
 	void					setDontChangeInsPoint(void);
 	void					allowChangeInsPoint(void);
@@ -559,7 +563,7 @@ PT_AttrPropIndex            getAPIFromSOH(pf_Frag_Object* odh);
 	bool                    isFootnoteAtPos(PT_DocPosition pos);
 	bool                    isEndFootnoteAtPos(PT_DocPosition pos);
 	UT_sint32               getEmbeddedOffset(pf_Frag_Strux* sdh,PT_DocPosition posOff, pf_Frag_Strux* & sdhEmbedded);
-	bool                    hasEmbedStruxOfTypeInRange(PT_DocPosition posStart, PT_DocPosition posEnd, 
+	bool                    hasEmbedStruxOfTypeInRange(PT_DocPosition posStart, PT_DocPosition posEnd,
 													   PTStruxType iType) const;
 
 	// TOC functions
@@ -634,22 +638,22 @@ PT_AttrPropIndex            getAPIFromSOH(pf_Frag_Object* odh);
 	/////////////////////////////////////////////////////////////////////////////
 	// Functions for dealing with revisions
 	//
-	virtual void            setMarkRevisions(bool bMark) override;
+	virtual void            setMarkRevisions(bool bMark);
 	// primarly for use by the PieceTable
 	void                    setMarkRevisionsNoNotify(bool bMark) {AD_Document::setMarkRevisions(bMark);}
 
 	virtual bool            acceptRejectRevision(bool bReject,
 												 UT_uint32 iStart,
 												 UT_uint32 iEnd,
-												 UT_uint32 iLevel) override;
+												 UT_uint32 iLevel);
 
-	virtual bool            rejectAllHigherRevisions(UT_uint32 iLevel) override;
-	virtual bool            acceptAllRevisions() override;
+	virtual bool            rejectAllHigherRevisions(UT_uint32 iLevel);
+	virtual bool            acceptAllRevisions();
 
 	const PP_AttrProp *     explodeRevisions(std::unique_ptr<PP_RevisionAttr>& pRevisions, const PP_AttrProp * pAP,
 											 bool bShow, UT_uint32 iId, bool &bHiddenRevision) const;
 
-	virtual void            purgeRevisionTable(bool bUnconditional = false) override;
+	virtual void            purgeRevisionTable(bool bUnconditional = false);
 
 	void					notifyPieceTableChangeStart(void);
 	void					notifyPieceTableChangeEnd(void);
@@ -672,12 +676,12 @@ PT_AttrPropIndex            getAPIFromSOH(pf_Frag_Object* odh);
 	inline bool areStylesLocked () const { return m_bLockedStyles; }    // See also lockStyles
 	void lockStyles(bool b);
 
-	virtual void setMetaDataProp (const std::string & key, const std::string & value) override;
-	virtual bool getMetaDataProp (const std::string & key, std::string & outProp) const override;
+	virtual void setMetaDataProp (const std::string & key, const std::string & value);
+	virtual bool getMetaDataProp (const std::string & key, std::string & outProp) const;
 
 	// RIVERA TODO not working and may not be needed
-	virtual void setAnnotationProp (const std::string & key, const std::string & value) override;
-	virtual bool getAnnotationProp (const std::string & key, std::string & outProp) const override;
+	virtual void setAnnotationProp (const std::string & key, const std::string & value);
+	virtual bool getAnnotationProp (const std::string & key, std::string & outProp) const;
 
 	const std::map<std::string,std::string> & getMetaData () const
 	{
@@ -749,9 +753,9 @@ PT_AttrPropIndex            getAPIFromSOH(pf_Frag_Object* odh);
 	bool      setMinUID(UT_UniqueId::idType t, UT_uint32 i) {return m_UID.setMinId(t,i);}
 	bool      isIdUnique(UT_UniqueId::idType t, UT_uint32 i) const {return m_UID.isIdUnique(t,i);}
 
-	virtual bool  areDocumentContentsEqual(const AD_Document &d, UT_uint32 &pos) const override;
-	virtual bool  areDocumentFormatsEqual(const AD_Document &d, UT_uint32 &pos) const override;
-	virtual bool  areDocumentStylesheetsEqual(const AD_Document &d) const override;
+	virtual bool  areDocumentContentsEqual(const AD_Document &d, UT_uint32 &pos) const;
+	virtual bool  areDocumentFormatsEqual(const AD_Document &d, UT_uint32 &pos) const;
+	virtual bool  areDocumentStylesheetsEqual(const AD_Document &d) const;
 
 	bool      findFirstDifferenceInContent(PT_DocPosition &pos, UT_sint32 &iOffset2,
 										   const PD_Document &d) const;
@@ -760,10 +764,10 @@ PT_AttrPropIndex            getAPIFromSOH(pf_Frag_Object* odh);
 										 UT_uint32 & iKnownLength,
 										 const PD_Document &d) const;
 
-	virtual void   setAutoRevisioning(bool autorev) override;
+	virtual void   setAutoRevisioning(bool autorev);
 
-	virtual UT_uint32 getXID() const override;
-	virtual UT_uint32 getTopXID() const override;
+	virtual UT_uint32 getXID() const;
+	virtual UT_uint32 getTopXID() const;
 	void              fixMissingXIDs();
 	UT_uint32         getFragXIDforVersion(const pf_Frag * pf, UT_uint32 iVersion) const;
 	void              removeConnections(void);
@@ -786,7 +790,7 @@ PT_AttrPropIndex            getAPIFromSOH(pf_Frag_Object* odh);
 	bool                    isVDNDinProgress() const {return m_bVDND;}
 	UT_sint32               getCRNumber() const { return m_iCRCounter; }
 	void					setCRNumber(UT_sint32 iCRCounter) { m_iCRCounter = iCRCounter; }
-	UT_sint32               getNextCRNumber(void) const;
+	UT_sint32               getNextCRNumber(void);
     std::list<AV_View*>     getAllViews() const;
     void                    getAllViews(UT_GenericVector<AV_View *> * vecViews) const;
 	void                    ignoreSignals(void)
@@ -803,10 +807,10 @@ PT_AttrPropIndex            getAPIFromSOH(pf_Frag_Object* odh);
 protected:
 	virtual ~PD_Document();
 
-	virtual UT_Error		_saveAs(const char * szFilename, int ieft, const char * expProps = nullptr) override;
-	virtual UT_Error   		_saveAs(const char * szFilename, int ieft, bool cpy, const char * expProps = nullptr) override;
+	virtual UT_Error		_saveAs(const char * szFilename, int ieft, const char * expProps = NULL);
+	virtual UT_Error   		_saveAs(const char * szFilename, int ieft, bool cpy, const char * expProps = NULL);
 	virtual UT_Error        _saveAs(GsfOutput *output, int ieft, bool cpy, const char * expProps);
-	virtual UT_Error		_save(void) override;
+	virtual UT_Error		_save(void);
 
 
 	void					_setClean(void);
@@ -818,7 +822,7 @@ protected:
 												  PP_RevisionAttr &RevAttr, pf_Frag * pf,
 												  bool & bDeleted);
 
-	virtual void            _clearUndo() override;
+	virtual void            _clearUndo();
 
 	UT_Error _importFile(const char * szFilename, int ieft,
 						 bool markClean, bool bImportStylesFirst,
@@ -887,7 +891,7 @@ private:
 	UT_GenericVector<pf_Frag *> m_vecSuspectFrags;
 
 	bool                    m_bVDND;
-    mutable UT_sint32       m_iCRCounter;
+    UT_sint32               m_iCRCounter;
 	mutable UT_sint32       m_iUpdateCount;
 	bool                    m_bIgnoreSignals;
 
@@ -904,3 +908,5 @@ private:
 public:
 	const std::string &getUserName() const { return m_sUserName; }
 };
+
+#endif /* PD_DOCUMENT_H */

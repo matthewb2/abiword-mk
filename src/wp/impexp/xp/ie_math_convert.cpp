@@ -27,13 +27,13 @@
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
 
-static xsltStylesheet * cur = nullptr;
+static xsltStylesheet * cur = NULL;
 
 bool convertMathMLtoLaTeX(const UT_UTF8String & sMathML, UT_UTF8String & sLaTeX)
 {
-    //static xsltStylesheet *cur = nullptr;
+    //static xsltStylesheet *cur = NULL;
     xmlDocPtr doc, res;
-    xmlChar * pLatex = nullptr;
+    xmlChar * pLatex = NULL;
     int len;
 
     if (sMathML.empty())
@@ -59,7 +59,7 @@ bool convertMathMLtoLaTeX(const UT_UTF8String & sMathML, UT_UTF8String & sLaTeX)
 	return false;
     }
 
-    res = xsltApplyStylesheet(cur, doc, nullptr);
+    res = xsltApplyStylesheet(cur, doc, NULL);
     if (!res)
     {
         xxx_UT_DEBUGMSG(("convertMathMLtoLaTeX: Applying stylesheet failed\n"));
@@ -123,12 +123,12 @@ bool convertLaTeXtoEqn(const UT_UTF8String & sLaTeX,UT_UTF8String & eqnLaTeX)
 
 // Function to convert OMML to MathML (for import of Math from docx)
 
-static xsltStylesheet * cur2 = nullptr;
+static xsltStylesheet * cur2 = NULL;
 
 bool convertOMMLtoMathML(const std::string & pOMML, std::string & pMathML)
 {
     xmlDocPtr doc,res;
-    xmlChar * qMathML = nullptr;
+    xmlChar * qMathML = NULL;
     int len;
 
     if(pOMML.empty())
@@ -161,7 +161,7 @@ bool convertOMMLtoMathML(const std::string & pOMML, std::string & pMathML)
         return false;
     }
 
-    res = xsltApplyStylesheet(cur2, doc, nullptr);
+    res = xsltApplyStylesheet(cur2, doc, NULL);
     if(!res)
     {
         xxx_UT_DEBUGMSG(("convertOMMLtoMathML: Applying stylesheet failed\n"));
@@ -193,12 +193,12 @@ bool convertOMMLtoMathML(const std::string & pOMML, std::string & pMathML)
 
 // Function to convert MathML to OMML (for export of Math to docx)
 
-static xsltStylesheet * cur3 = nullptr;
+static xsltStylesheet * cur3 = NULL;
 
 bool convertMathMLtoOMML(const std::string & rMathML, std::string & rOMML)
 {
     xmlDocPtr doc,res;
-    xmlChar * sOMML = nullptr;
+    xmlChar * sOMML = NULL;
     int len;
     
     if(rMathML.empty())
@@ -230,7 +230,7 @@ bool convertMathMLtoOMML(const std::string & rMathML, std::string & rOMML)
         return false;
     }
 
-    res = xsltApplyStylesheet(cur3, doc, nullptr);
+    res = xsltApplyStylesheet(cur3, doc, NULL);
     if(!res)
     {
         xxx_UT_DEBUGMSG(("convertMathMLtoOMML : Applying stylesheet failed\n"));

@@ -85,43 +85,43 @@ public:
 
 	fl_BlockLayout*		getBlock(void) const 		{ return m_pBlock; }
 	//! Return height of line as it will appear on screen
-	virtual UT_sint32	getHeight(void) const override;
+	virtual UT_sint32	getHeight(void) const;
 
-	virtual UT_sint32	getX(void) const override;
-	virtual UT_sint32	getY(void) const override;
+	virtual UT_sint32	getX(void) const;
+	virtual UT_sint32	getY(void) const;
 
 	UT_sint32		getMaxWidth(void) const ;
 	UT_sint32		getAscent(void) const;
 	UT_sint32		getDescent(void) const;
 	UT_sint32               getNumRunsInLine(void) const {return m_vecRuns.getItemCount();}
 	UT_sint32		getColumnGap(void) const;
-	virtual void	        setAssignedScreenHeight(UT_sint32) override;
+	void				        setAssignedScreenHeight(UT_sint32);
 	bool                        assertLineListIntegrity(void);
 	void				        setMaxWidth(UT_sint32);
-	virtual void				setX(UT_sint32 i, bool bDontClearIfNeeded = false) override;
-	virtual void				setY(UT_sint32) override;
+	virtual void				setX(UT_sint32 i, bool bDontClearIfNeeded = false);
+	virtual void				setY(UT_sint32);
 
-	virtual void				setContainer(fp_Container*) override;
+	virtual void				setContainer(fp_Container*);
 	void		        setBlock(fl_BlockLayout * pBlock);
 
 	fp_Container *              getColumn(void) const;
 	fp_Page *                   getPage(void) const;
 
-	virtual void        setWidth(UT_sint32 ) override {}
-	virtual void        setHeight(UT_sint32 i) override;
-	virtual UT_sint32   getWidth(void) const override { return m_iWidth;}
-	virtual UT_sint32   getDrawingWidth(void) const override;
+	virtual void        setWidth(UT_sint32 ){}
+	virtual void        setHeight(UT_sint32 i);
+	virtual UT_sint32   getWidth(void) const { return m_iWidth;}
+	virtual UT_sint32   getDrawingWidth(void) const;
 	UT_sint32           getWidthToRun(fp_Run * pLastRun);
 	UT_sint32           getFilledWidth(void) const;
-	virtual bool        isVBreakable(void) override { return false;}
-	virtual bool        isHBreakable(void) override {return true;}
-	virtual UT_sint32   wantVBreakAt(UT_sint32) override { return 0;}
-	virtual UT_sint32   wantHBreakAt(UT_sint32) override { return 0;}
-	virtual fp_ContainerObject * VBreakAt(UT_sint32) override { return nullptr;}
-	virtual fp_ContainerObject * HBreakAt(UT_sint32) override {return nullptr;}
-	virtual UT_uint32 distanceFromPoint(UT_sint32, UT_sint32) override {return 0;}
-	virtual fp_Container*	getNextContainerInSection(void) const override;
-	virtual fp_Container*	getPrevContainerInSection(void) const override;
+    virtual bool        isVBreakable(void) { return false;}
+    virtual bool        isHBreakable(void) {return true;}
+	virtual UT_sint32   wantVBreakAt(UT_sint32) { return 0;}
+	virtual UT_sint32   wantHBreakAt(UT_sint32) { return 0;}
+    virtual fp_ContainerObject * VBreakAt(UT_sint32) { return NULL;}
+    virtual fp_ContainerObject * HBreakAt(UT_sint32) {return NULL;}
+    virtual UT_uint32 distanceFromPoint(UT_sint32, UT_sint32) {return 0;}
+	virtual fp_Container*	getNextContainerInSection(void) const;
+	virtual fp_Container*	getPrevContainerInSection(void) const;
 	fp_Run *    getRunFromIndex( UT_uint32 runIndex);
 	bool		containsForcedColumnBreak(void) const;
 	bool		containsForcedPageBreak(void) const;
@@ -137,7 +137,7 @@ public:
 
 	inline	bool		isEmpty(void) const				{ return ((m_vecRuns.getItemCount()) == 0); }
 	inline	int 		countRuns(void) const			{ return m_vecRuns.getItemCount(); }
-	inline	fp_Run*     getFirstRun(void) const			{ if(countRuns() > 0)  return ((fp_Run*) m_vecRuns.getFirstItem()); else return nullptr; }
+	inline	fp_Run*     getFirstRun(void) const			{ if(countRuns() > 0)  return ((fp_Run*) m_vecRuns.getFirstItem()); else return NULL; }
 	fp_Run*     getLastRun(void) const ;
 	fp_Run*     getLastTextRun(void) const ;
 
@@ -151,16 +151,16 @@ public:
 	inline	bool 	isFirstLineInBlock(void) const;
 	bool 	isLastLineInBlock(void) const;
 
-	virtual UT_Option<UT_Rect>   getScreenRect() const override;
-	virtual void            markDirtyOverlappingRuns(const UT_Rect& recScreen) override;
+    virtual UT_Option<UT_Rect>   getScreenRect() const;
+    virtual void            markDirtyOverlappingRuns(const UT_Rect& recScreen);
 
 	void		remove(void);
-	virtual UT_sint32 getMarginBefore(void) const override;
-	virtual UT_sint32 getMarginAfter(void) const override;
-	virtual void mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool& isTOC) override;
+	UT_sint32	getMarginBefore(void) const;
+	UT_sint32	getMarginAfter(void) const;
+	virtual void		mapXYToPosition(UT_sint32 xPos, UT_sint32 yPos, PT_DocPosition& pos, bool& bBOL, bool& bEOL, bool& isTOC);
 	void		getOffsets(const fp_Run* pRun, UT_sint32& xoff, UT_sint32& yoff) const;
 	void		getScreenOffsets(const fp_Run* pRun, UT_sint32& xoff, UT_sint32& yoff) const;
-	virtual void  clearScreen(void) override;
+	virtual void  clearScreen(void);
 	void		clearScreenFromRunToEnd(UT_uint32 runIndex);
 	void		clearScreenFromRunToEnd(fp_Run * pRun);
 	bool        containsOffset(PT_DocPosition blockOffset);
@@ -169,13 +169,13 @@ public:
 	bool         isScreenCleared(void) const { return m_bIsCleared;}
 	void         setAdditionalMargin(UT_sint32 iAccum)
 	  { m_iAdditionalMarginAfter = iAccum;}
-	virtual void		draw(dg_DrawArgs*) override;
-	virtual void        draw(GR_Graphics*) override;
+	virtual void		draw(dg_DrawArgs*);
+	virtual void        draw(GR_Graphics*);
 	void		align(void);
 	void		layout(void);
 	bool		recalculateFields(UT_uint32 iUpdateCount);
-	void		recalcHeight(fp_Run * pLast = nullptr);
-	virtual void	recalcMaxWidth(bool bDontClearIfNeeded = false) override;
+	void		recalcHeight(fp_Run * pLast = NULL);
+	void		recalcMaxWidth(bool bDontClearIfNeeded = false);
 	void            setReformat(void);
 	void		coalesceRuns(void);
 

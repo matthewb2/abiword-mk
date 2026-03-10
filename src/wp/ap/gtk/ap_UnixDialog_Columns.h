@@ -1,6 +1,5 @@
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2021 Hubert Figuière
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +17,8 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef AP_UnixDialog_Columns_H
+#define AP_UnixDialog_Columns_H
 
 #include "ap_Dialog_Columns.h"
 
@@ -54,8 +54,8 @@ public:
 	AP_UnixDialog_Columns(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	virtual ~AP_UnixDialog_Columns(void);
 
-	virtual void runModal(XAP_Frame * pFrame) override;
-	virtual void enableLineBetweenControl(bool bState = true) override;
+	virtual void			runModal(XAP_Frame * pFrame);
+	virtual void			enableLineBetweenControl(bool bState = true);
 
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 
@@ -67,10 +67,7 @@ public:
 	void                            checkLineBetween(void);
 	void                            readSpin(void);
 	void                            event_Toggle( UT_uint32 icolumns);
-	// invalidate preview
-	void event_previewInvalidate(void);
-	// draw the preview
-	void event_previewDraw(void);
+	void                            event_previewExposed(void);
 	virtual void			event_OK(void);
 	virtual void			event_Cancel(void);
 
@@ -118,3 +115,11 @@ protected:
 	UT_sint32 m_iSizeHeight;
     GtkWidget * m_checkOrder;
 };
+
+#endif /* AP_UnixDialog_Columns_H */
+
+
+
+
+
+

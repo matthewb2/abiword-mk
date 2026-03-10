@@ -19,7 +19,8 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef UT_ASSERT_H
+#define UT_ASSERT_H
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -102,41 +103,48 @@ extern int ABI_EXPORT UT_Win32ThrowAssert(const char * pCondition, const char * 
 // option of disabling this assert for the rest of the session; we use the __iCount and
 // __bOnceOnly vars for this (this adds a few bytes to the code and footprint, but on
 // large scale of things, this is quite negligible for the debug build).
-#define UT_ASSERT(x) ((void)0)
+#define UT_ASSERT(x)                                                        \
+{                                                                           \
+	static bool __bOnceOnly = false;                                        \
+	static long __iCount = 0;                                               \
+	if(!__bOnceOnly && !(x))                                                \
+	{                                                                       \
+		__iCount++;                                                         \
+		int __iRet = UT_Win32ThrowAssert(#x,__FILE__, __LINE__, __iCount);  \
+        if(__iRet == 0)                                                     \
+		{                                                                   \
+		   UT_DEBUG_BREAK                                                   \
+		}                                                                   \
+		else if(__iRet < 0)                                                 \
+		{                                                                   \
+			__bOnceOnly = true;                                             \
+		}                                                                   \
+	}                                                                       \
+}
+
 #endif // ifdef NDEBUG
 
-// MacOS code.
-#elif defined(TOOLKIT_COCOA)
-#	ifdef NDEBUG
-// When NDEBUG is defined, assert() does nothing.
-// So we let the system header files take care of it.
-#		include <assert.h>
-#		define UT_ASSERT assert
-#	else
-// Please keep the "/**/" to stop MSVC dependency generator complaining.
-#		include /**/ "xap_CocoaAssert.h"
-#			define UT_ASSERT(expr)								\
-			{												\
-				static bool __bOnceOnly = false;			\
-				if (!__bOnceOnly && !(expr)) {				\
-					if (XAP_CocoaAssertMsg(#expr,			\
-						__FILE__, __LINE__)) {				\
-						__bOnceOnly = true;					\
-					}										\
-				} \
-			}
-#	endif
 #else
 
-// A Unix variant, possibly Gnome.
+	// A Unix variant, possibly Gnome.
 
 #	ifdef NDEBUG
 
 		// When NDEBUG is defined, assert() does nothing.
 		// So we let the system header files take care of it.
+#       if 0 //defined(TOOLKIT_COCOA)
+// Please keep the "/**/" to stop MSVC dependency generator complaining.
+#			include /**/ "xap_CocoaAssert.h"
+#			define UT_ASSERT(expr)								\
+			((void) ((expr) ||								\
+				(XAP_CocoaAssertMsg(#expr,					\
+								  __FILE__, __LINE__),		\
+				 0)))
 
-#		include <assert.h>
-#		define UT_ASSERT assert
+#       else
+#			include <assert.h>
+#			define UT_ASSERT assert
+#		endif
 #	else
 		// Otherwise, we want a slighly modified behavior.
 		// We'd like assert() to ask us before crashing.
@@ -190,7 +198,7 @@ extern int ABI_EXPORT UT_Win32ThrowAssert(const char * pCondition, const char * 
 /*!
  * Trigger a debug assertion, but let the normal flow of code progress
  */
-#define UT_ASSERT_HARMLESS(cond) ((void)0)
+#define UT_ASSERT_HARMLESS(cond) UT_ASSERT(cond)
 
 /*!
  * Just return from a function if this condition fails
@@ -211,3 +219,5 @@ extern int ABI_EXPORT UT_Win32ThrowAssert(const char * pCondition, const char * 
  * Continue if this condition fails
  */
 #define UT_continue_if_fail(cond) if (!(cond)) { UT_ASSERT(cond); continue; }
+
+#endif /* UT_ASSERT_H */

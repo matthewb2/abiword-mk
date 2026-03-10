@@ -32,7 +32,7 @@
  */
 void UT_gettimeofday(struct timeval *tv)
 {
-	gettimeofday(tv,nullptr);
+	gettimeofday(tv,NULL);
 }
 
 /*!

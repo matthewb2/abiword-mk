@@ -54,11 +54,11 @@ bool pt_PieceTable::insertSpan(PT_DocPosition dpos,
 {
 	if(bAddChangeRec && m_pDocument->isMarkRevisions())
 	{
-		PP_RevisionAttr Revisions(nullptr);
+		PP_RevisionAttr Revisions(NULL);
 		PP_PropertyVector ppRevAttrib;
 		PP_PropertyVector ppRevProps;
 
-		pf_Frag * pf = nullptr;
+		pf_Frag * pf = NULL;
 		PT_BlockOffset fragOffset = 0;
 		bool bFound = getFragFromPosition(dpos,&pf,&fragOffset);
 		UT_return_val_if_fail( bFound, false );
@@ -86,7 +86,7 @@ bool pt_PieceTable::insertSpan(PT_DocPosition dpos,
 			name, "",
 		};
 
-		const gchar * pRevision = nullptr;
+		const gchar * pRevision = NULL;
 
 		// first retrive the fmt we have (_realChangeSpanFmt()) is
 		// quite involved, so we want to avoid calling it, if we can)
@@ -99,25 +99,25 @@ bool pt_PieceTable::insertSpan(PT_DocPosition dpos,
 		const PP_AttrProp * pAP;
 		if(_getSpanAttrPropHelper(pf1, &pAP))
 		{
-			const gchar * szStyleNameVal = nullptr;
+			const gchar * szStyleNameVal = NULL;
 			pAP->getAttribute(PT_STYLE_ATTRIBUTE_NAME,szStyleNameVal);
 			if(!pAP->getAttribute(name, pRevision))
 			{
 				return _realInsertSpan(dpos, p, length, PP_NOPROPS, PP_NOPROPS, pField, bAddChangeRec);
 			}
-			if(szStyleNameVal != nullptr)
+			if(szStyleNameVal != NULL)
 			{
 				ppRevAttrib.push_back(PT_STYLE_ATTRIBUTE_NAME);
 				ppRevAttrib.push_back(szStyleNameVal);
 			}
-			//if(!_realChangeSpanFmt(PTC_RemoveFmt, dpos, dpos+length, ppRevAttrib,nullptr))
+			//if(!_realChangeSpanFmt(PTC_RemoveFmt, dpos, dpos+length, ppRevAttrib,NULL))
 			//	return false;
 			return _realInsertSpan(dpos, p, length, ppRevAttrib, PP_NOPROPS, pField, bAddChangeRec);
 		}
 		else
 		{
 			// no AP, this is probably OK
-			xxx_UT_DEBUGMSG(("pt_PieceTable::insertSpan: no AP\n"));
+			UT_DEBUGMSG(("pt_PieceTable::insertSpan: no AP\n"));
 			return _realInsertSpan(dpos, p, length, PP_NOPROPS, PP_NOPROPS, pField, bAddChangeRec);
 		}
 	}
@@ -138,7 +138,7 @@ bool pt_PieceTable::_insertSpan(pf_Frag * pf,
 	// update the fragment and/or the fragment list.
 	// return true if successful.
 
-	pf_Frag_Text * pft = nullptr;
+	pf_Frag_Text * pft = NULL;
 	switch (pf->getType())
 	{
 	default:
@@ -180,7 +180,7 @@ bool pt_PieceTable::_insertSpan(pf_Frag * pf,
 		return false;
 	}
 
-	if (pft&&pField==nullptr)
+	if (pft&&pField==NULL)
 	{
 		// we have a text frag containing or adjacent to the position.
 		// deal with merging/splitting/etc.
@@ -206,7 +206,7 @@ bool pt_PieceTable::_insertSpan(pf_Frag * pf,
 				// one that follows (this can happen after a delete-char followed
 				// by undo).  if so, we coalesce them.
 
-				if (pft->getNext() && (pft->getNext()->getType() == pf_Frag::PFT_Text) && (pft->getNext()->getField()==nullptr))
+				if (pft->getNext() && (pft->getNext()->getType() == pf_Frag::PFT_Text) && (pft->getNext()->getField()==NULL))
 				{
 					pf_Frag_Text * pftNext = static_cast<pf_Frag_Text *>(pft->getNext());
 					if (   (pft->getIndexAP() == pftNext->getIndexAP())
@@ -239,7 +239,7 @@ bool pt_PieceTable::_insertSpan(pf_Frag * pf,
 				// one that preceeds us (this can happen after a delete-char followed
 				// by undo).  if so, we coalesce them.
 
-				if (pft->getPrev() && (pft->getPrev()->getType() == pf_Frag::PFT_Text)&&(pft->getPrev()->getField()==nullptr))
+				if (pft->getPrev() && (pft->getPrev()->getType() == pf_Frag::PFT_Text)&&(pft->getPrev()->getField()==NULL))
 				{
 					pf_Frag_Text * pftPrev = static_cast<pf_Frag_Text *>(pft->getPrev());
 					if (   (pft->getIndexAP() == pftPrev->getIndexAP())
@@ -260,7 +260,7 @@ bool pt_PieceTable::_insertSpan(pf_Frag * pf,
 			// it, let's stick it in the previous fragment.
 
 			pf_Frag * pfPrev = pft->getPrev();
-			if (pfPrev && pfPrev->getType()==pf_Frag::PFT_Text && (pfPrev->getField()==nullptr))
+			if (pfPrev && pfPrev->getType()==pf_Frag::PFT_Text && (pfPrev->getField()==NULL))
 			{
 				pf_Frag_Text * pftPrev = static_cast<pf_Frag_Text *>(pfPrev);
 				UT_uint32 prevLength = pftPrev->getLength();
@@ -369,7 +369,7 @@ bool pt_PieceTable::_realInsertSpan(PT_DocPosition dpos,
 
 	// get the fragment at the given document position.
 
-	pf_Frag * pf = nullptr;
+	pf_Frag * pf = NULL;
 	PT_BlockOffset fragOffset = 0;
 	bool bFound = getFragFromPosition(dpos,&pf,&fragOffset);
 	UT_return_val_if_fail (bFound,false);
@@ -381,7 +381,7 @@ bool pt_PieceTable::_realInsertSpan(PT_DocPosition dpos,
 	if (!m_varset.appendBuf(p,length,&bi))
 		return false;
 
-	pf_Frag_Strux * pfs = nullptr;
+	pf_Frag_Strux * pfs = NULL;
 	bool bFoundStrux = _getStruxFromFrag(pf,&pfs);
 	UT_return_val_if_fail (bFoundStrux,false);
 	if(isEndFootnote((pf_Frag *)pfs))
@@ -485,14 +485,14 @@ bool pt_PieceTable::_realInsertSpan(PT_DocPosition dpos,
 			// try to append text to the previous rather than prepend to the current.
 			// this makes us consistent with other places in the code.
 
-			if ( (fragOffset==0) && (pf->getPrev()) && (pf->getPrev()->getType() == pf_Frag::PFT_Text) && pf->getPrev()->getField()== nullptr )
+			if ( (fragOffset==0) && (pf->getPrev()) && (pf->getPrev()->getType() == pf_Frag::PFT_Text) && pf->getPrev()->getField()== NULL )
 			{
 				// append to the end of the previous frag rather than prepend to the current one.
 				pf = pf->getPrev();
 				fragOffset = pf->getLength();
 			}
 		}
-		else if (pf->getPrev()->getType() == pf_Frag::PFT_Text && pf->getPrev()->getField()==nullptr)
+		else if (pf->getPrev()->getType() == pf_Frag::PFT_Text && pf->getPrev()->getField()==NULL)
 		{
 			pf_Frag_Text * pfPrevText = static_cast<pf_Frag_Text *>(pf->getPrev());
 			indexAP = pfPrevText->getIndexAP();
@@ -513,7 +513,7 @@ bool pt_PieceTable::_realInsertSpan(PT_DocPosition dpos,
 				"endnote-id", ""
 			};
 
-			const PP_AttrProp * pAP = nullptr;
+			const PP_AttrProp * pAP = NULL;
 
 			if (!getAttrProp(indexAP, &pAP))
 				return false;
@@ -538,7 +538,7 @@ bool pt_PieceTable::_realInsertSpan(PT_DocPosition dpos,
 		// is existing fragment a field? If so do nothing
 		// Or should we display a message to the user?
 
-		if(pf->getField() != nullptr)
+		if(pf->getField() != NULL)
 		{
 		       return false;
 		}
@@ -546,7 +546,7 @@ bool pt_PieceTable::_realInsertSpan(PT_DocPosition dpos,
 		indexAP = _chooseIndexAP(pf,fragOffset);
 	}
 	PT_BlockOffset blockOffset = _computeBlockOffset(pfs,pf) + fragOffset;
-	PX_ChangeRecord_Span * pcr = nullptr;
+	PX_ChangeRecord_Span * pcr = NULL;
 
 	if(!attributes.empty() || !properties.empty())
 	{

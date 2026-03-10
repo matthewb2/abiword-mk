@@ -20,11 +20,8 @@
 #ifndef UT_LOCALE_H
 #define UT_LOCALE_H
 
-#include <string>
-
 #include <locale.h>
-
-#include "ut_types.h"
+#include "ut_string_class.h"
 
 class ABI_EXPORT UT_LocaleTransactor
 {
@@ -40,7 +37,7 @@ class ABI_EXPORT UT_LocaleTransactor
   UT_LocaleTransactor& operator=(const UT_LocaleTransactor & rhs);
 
   int mCategory;
-  std::string mOldLocale;
+  char * mOldLocale;
 };
 
 class ABI_EXPORT UT_LocaleInfo

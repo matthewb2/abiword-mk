@@ -1,20 +1,20 @@
 /* AbiSource Application Framework
  * Copyright (C) 1998-2000 AbiSource, Inc.
  * Copyright (C) 2004 Hubert Figuiere
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
  */
 
@@ -33,7 +33,7 @@
 
 bool XAP_Win32AppImpl::openURL(const char * szURL)
 {
-	// NOTE: could get finer control over browser window via DDE 
+	// NOTE: could get finer control over browser window via DDE
 	// NOTE: may need to fallback to WinExec for old NSCP versions
 
 	UT_String sURL = szURL;
@@ -49,19 +49,21 @@ bool XAP_Win32AppImpl::openURL(const char * szURL)
 
 		if (sURL.substr(0, 1) == "/")
 			sURL = sURL.substr(1, sURL.size() - 1);
-		
+
 		// Convert all forwardslashes to backslashes
-		for (unsigned int i=0; i<sURL.length();i++)	
-			if (sURL[i]=='/')	
+		for (unsigned int i=0; i<sURL.length();i++)
+			if (sURL[i]=='/')
                 sURL[i]='\\';
 
 		// Convert from longpath to 8.3 shortpath, in case of spaces in the path
-		char* longpath = nullptr;
-		char* shortpath = nullptr;
+		char* longpath = NULL;
+		char* shortpath = NULL;
 		longpath = new char[PATH_MAX];
 		shortpath = new char[PATH_MAX];
 		strcpy(longpath, sURL.c_str());
-		DWORD retval = GetShortPathNameA(longpath, shortpath, PATH_MAX);
+		DWORD retval = GetShortPathName(longpath, shortpath, PATH_MAX);
+
+		//pascal
 		if((retval == 0) || (retval > PATH_MAX))
 		{
 			UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
@@ -70,6 +72,18 @@ bool XAP_Win32AppImpl::openURL(const char * szURL)
 			return false;
 		}
 		sURL = shortpath;
+
+
+		//if((retval == 0) || (retval > PATH_MAX))
+		//{
+		//	UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
+        //    sURL = longpath;
+		//}
+		//else
+		//sURL = shortpath;
+
+		//pascal fin
+
 		DELETEP(longpath);
 		DELETEP(shortpath);
 	}
@@ -79,16 +93,16 @@ bool XAP_Win32AppImpl::openURL(const char * szURL)
 	HKEY hKey;
 	unsigned long lType;
 	DWORD dwSize;
-	LPWSTR szValue = nullptr;
+	LPWSTR szValue = NULL;
 	UT_Win32LocaleString str,str2;
 	UT_UTF8String utf8;
 
 	if (RegOpenKeyExW(HKEY_CLASSES_ROOT, L"http\\shell\\open\\command", 0, KEY_READ, &hKey) == ERROR_SUCCESS)
 	{
-		if(RegQueryValueExW(hKey, nullptr, nullptr, &lType, nullptr, &dwSize) == ERROR_SUCCESS)
+		if(RegQueryValueExW(hKey, NULL, NULL, &lType, NULL, &dwSize) == ERROR_SUCCESS)
 		{
 			szValue = new WCHAR[dwSize + 1];
-			RegQueryValueExW(hKey, nullptr, nullptr, &lType, (LPBYTE) szValue, &dwSize);
+			RegQueryValueExW(hKey, NULL, NULL, &lType, (LPBYTE) szValue, &dwSize);
 			str.fromLocale(szValue);
 			utf8=str.utf8_str();
 			sBrowser = utf8.utf8_str();
@@ -120,7 +134,7 @@ bool XAP_Win32AppImpl::openURL(const char * szURL)
 	// Check for a %1 passed in from the registry.  If we find it,
 	// substitute our URL for %1.  Otherwise, just append sURL to params.
 	const char *pdest = strstr(sParams.c_str(), "%1");
-	if (pdest != nullptr)
+	if (pdest != NULL)
 	{
 		int i = pdest - sParams.c_str() + 1;
 		sParams = sParams.substr(0, i-1) + sURL + sParams.substr(i+1, sParams.length()-i+1);
@@ -139,7 +153,7 @@ bool XAP_Win32AppImpl::openURL(const char * szURL)
 	str2.fromUTF8(sParams.c_str());
 
 	intptr_t res = (intptr_t) ShellExecuteW(pFImp->getTopLevelWindow() /*(HWND)*/,
-								 L"open", str.c_str(), str2.c_str(), nullptr, SW_SHOW );
+								 L"open", str.c_str(), str2.c_str(), NULL, SW_SHOW );
 
 	// TODO: localized error messages
 	// added more specific error messages as documented in http://msdn.microsoft.com/library/default.asp?url=/library/en-us/debug/base/system_error_codes.asp
@@ -150,7 +164,7 @@ bool XAP_Win32AppImpl::openURL(const char * szURL)
 		{
 			case ERROR_FILE_NOT_FOUND:
 				{
-					errMsg = "Error ("; 
+					errMsg = "Error (";
 					errMsg += UT_String_sprintf("%d", res);
 					errMsg += ") displaying URL: The system cannot find the file specified.\n";
 					errMsg += " [ ";  errMsg += sURL;  errMsg += " ] ";
@@ -159,7 +173,7 @@ bool XAP_Win32AppImpl::openURL(const char * szURL)
 
 			case ERROR_PATH_NOT_FOUND:
 				{
-					errMsg = "Error ("; 
+					errMsg = "Error (";
 					errMsg += UT_String_sprintf("%d", res);
 					errMsg += ") displaying URL: The system cannot find the path specified.\n";
 					errMsg += " [ ";  errMsg += sURL;  errMsg += " ] ";
@@ -168,7 +182,7 @@ bool XAP_Win32AppImpl::openURL(const char * szURL)
 
 			case SE_ERR_ACCESSDENIED:
 				{
-					errMsg = "Error ("; 
+					errMsg = "Error (";
 					errMsg += UT_String_sprintf("%d", res);
 					errMsg += ") displaying URL: Access is denied.\n";
 					errMsg += " [ ";  errMsg += sURL;  errMsg += " ] ";
@@ -177,7 +191,7 @@ bool XAP_Win32AppImpl::openURL(const char * szURL)
 
 			default:
 				{
-					errMsg = "Error ("; 
+					errMsg = "Error (";
 					errMsg += UT_String_sprintf("%d", res);
 					errMsg += ") displaying URL: \n";
 					errMsg += " [ ";  errMsg += sURL;  errMsg += " ] ";
@@ -186,7 +200,7 @@ bool XAP_Win32AppImpl::openURL(const char * szURL)
 		} /* switch (res) */
 		if (errMsg[0]) {
 			str.fromUTF8(errMsg.c_str());
-			MessageBoxW(pFImp->getTopLevelWindow(),str.c_str(), 
+			MessageBoxW(pFImp->getTopLevelWindow(),str.c_str(),
 				L"Error displaying URL", MB_OK|MB_ICONEXCLAMATION);
 		}
 	} /* if (res <= 32) */

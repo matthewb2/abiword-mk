@@ -1,7 +1,7 @@
-/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode:t -*- */
+/* -*- mode: C++; tab-width: 4; c-basic-offset: 4; -*- */
 /* AbiWord
  * Copyright (C) 1998 AbiSource, Inc.
- * Copyright (C) 2009, 2019 Hubert Figuiere
+ * Copyright (C) 2009 Hubert Figuiere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,7 +25,6 @@
 #include <vector>
 #include <string>
 
-#include "xap_UnixDialog.h"
 #include "ap_Dialog_Lists.h"
 #include "ut_timer.h"
 #include "xap_GtkObjectHolder.h"
@@ -35,9 +34,7 @@ class GR_CairoGraphics;
 
 /*****************************************************************/
 
-class AP_UnixDialog_Lists
-    : public AP_Dialog_Lists
-    , public XAP_UnixDialog
+class AP_UnixDialog_Lists: public AP_Dialog_Lists
 {
  public:
 	AP_UnixDialog_Lists(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
@@ -45,19 +42,18 @@ class AP_UnixDialog_Lists
 
 	static XAP_Dialog *		static_constructor(XAP_DialogFactory *, XAP_Dialog_Id id);
 
-	virtual void runModeless(XAP_Frame * pFrame) override;
-	virtual void destroy(void) override;
-	virtual void activate(void) override;
-	virtual void notifyActiveFrame(XAP_Frame *pFrame) override;
-	virtual void runModal(XAP_Frame * pFrame) override;
+	virtual void			runModeless(XAP_Frame * pFrame);
+	virtual void			destroy(void);
+	virtual void			activate(void);
+	virtual void			notifyActiveFrame(XAP_Frame *pFrame);
+	virtual void            runModal(XAP_Frame * pFrame);
 	/* CALLBACKS */
 
 	void					customChanged(void);
 	void					applyClicked(void);
 	void closeClicked(void);
 	void					styleChanged( gint style);
-	void previewInvalidate(void);
-	void previewDraw(void);
+	void					previewExposed(void);
 	void                    setFoldLevel(UT_sint32 iLevel,bool bSet);
 
 	/* Just Plain Useful Functions */
@@ -70,10 +66,10 @@ class AP_UnixDialog_Lists
 	void					updateDialog(void);
 	bool                                    dontUpdate(void);
 	static void				autoupdateLists(UT_Worker * pTimer);
-	virtual bool            isPageLists(void) const override;
-	virtual void            setFoldLevelInGUI(void) override;
+    virtual bool            isPageLists(void);
+	virtual void            setFoldLevelInGUI(void);
  protected:
-	virtual GtkWidget* _constructWindow(void);
+	virtual GtkWidget *		_constructWindow(void);
 	GtkWidget *				_constructWindowContents(void);
 	void					_setRadioButtonLabels(void);
 	void					_connectSignals(void);
@@ -86,11 +82,11 @@ class AP_UnixDialog_Lists
 
 	inline GtkWidget *		_getCloseButton(void) { return m_wClose; }
 	inline GtkWidget *		_getApplyButton(void) { return m_wApply; }
-	inline GtkWidget *		_getMainWindow(void) { return m_windowMain; }
+	inline GtkWidget *		_getMainWindow(void) { return m_wMainWindow; }
 
 	inline void				_setCloseButton(GtkWidget *w) { m_wClose = w; }
 	inline void				_setApplyButton(GtkWidget *w) { m_wApply = w; }
-	inline void				_setMainWindow(GtkWidget *w) { m_windowMain = w; }
+	inline void				_setMainWindow(GtkWidget *w) { m_wMainWindow = w; }
 
  private:
 	typedef enum
@@ -110,6 +106,8 @@ class AP_UnixDialog_Lists
 	bool					m_bAutoUpdate_happening_now;
 	bool                                    m_bDontUpdate;
 	UT_Timer *				m_pAutoUpdateLists;
+
+	GtkWidget *				m_wMainWindow;
 
 	GtkWidget * m_wApply;
 	GtkWidget * m_wClose;

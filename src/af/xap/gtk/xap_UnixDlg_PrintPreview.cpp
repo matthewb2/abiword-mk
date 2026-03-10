@@ -38,8 +38,7 @@ XAP_Dialog * XAP_UnixDialog_PrintPreview::static_constructor(XAP_DialogFactory *
 }
 
 XAP_UnixDialog_PrintPreview::XAP_UnixDialog_PrintPreview(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id)
-	: XAP_Dialog_PrintPreview(pDlgFactory, id)
-	, m_pPrintGraphics(nullptr)
+	: XAP_Dialog_PrintPreview(pDlgFactory,id), m_pPrintGraphics(NULL)  
 {
 }
 

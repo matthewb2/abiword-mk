@@ -116,8 +116,6 @@ libgtk_la_SOURCES = \
 	ap_UnixPrefs.h \
 	ap_UnixPreview_Annotation.cpp \
 	ap_UnixPreview_Annotation.h \
-	ap_UnixRuler.h \
-	ap_UnixRuler.cpp \
 	ap_UnixStatusBar.h \
 	ap_UnixStockIcons.cpp \
 	ap_UnixStockIcons.h \
@@ -145,31 +143,13 @@ libgtk_la_SOURCES = \
 	ap_RDFSemanticItemFactoryGTK.cpp \
 	ap_RDFSemanticItemGTKInjected.h \
 	ap_RDFSemanticItemGTKInjected.cpp \
-	abiwidget.cpp \
+    abiwidget.cpp \
 	abiwidget.h \
 	$(NULL)
 
-# list all conditional source files here so they end up in the dist tarball
-conditional_src = \
-	$(spell_src) \
-	$(statusbar_src) \
-	$(NULL)
+uidir=$(ABIWORD_UIDIR)
 
-conditional_ui = \
-	$(spell_ui_gtk3) \
-	$(NULL)
-
-if ENABLE_SPELL
-
-libgtk_la_SOURCES += $(spell_src)
-
-endif
-
-if ENABLE_STATUSBAR
-libgtk_la_SOURCES += $(statusbar_src)
-endif
-
-EXTRA_DIST = ap_UnixDialog_Annotation.ui \
+ui_DATA = ap_UnixDialog_Annotation.ui \
 	ap_UnixDialog_Border_Shading.ui \
 	ap_UnixDialog_Break.ui \
 	ap_UnixDialog_Field.ui \
@@ -183,7 +163,7 @@ EXTRA_DIST = ap_UnixDialog_Annotation.ui \
 	ap_UnixDialog_Insert_DateTime.ui \
 	ap_UnixDialog_MailMerge.ui \
 	ap_UnixDialog_MetaData.ui \
-	ap_UnixDialog_Options.ui \
+    ap_UnixDialog_Options.ui \
 	ap_UnixDialog_Options_ColorSel.ui \
 	ap_UnixDialog_PageNumbers.ui	\
 	ap_UnixDialog_PageSetup.ui \
@@ -201,6 +181,31 @@ EXTRA_DIST = ap_UnixDialog_Annotation.ui \
 	pd_RDFEvent.ui \
 	pd_RDFLocation.ui \
 	ap_UnixDialog_SemanticStylesheets.ui \
+	$(NULL)
+
+# list all conditional source files here so they end up in the dist tarball
+conditional_src = \
+	$(spell_src) \
+	$(statusbar_src) \
+	$(NULL)
+
+conditional_ui = \
+	$(spell_ui_gtk3) \
+	$(NULL)
+
+if ENABLE_SPELL
+
+libgtk_la_SOURCES += $(spell_src)
+ui_DATA += $(spell_ui_gtk3)
+
+endif
+
+if ENABLE_STATUSBAR
+libgtk_la_SOURCES += $(statusbar_src)
+endif
+
+EXTRA_DIST = \
 	$(conditional_src) \
 	$(conditional_ui) \
 	$(NULL)
+

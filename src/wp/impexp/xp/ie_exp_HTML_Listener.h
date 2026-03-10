@@ -26,17 +26,17 @@
 #include <string>
 
 // ABiword includes
-#include "pd_Document.h"
-#include "pl_Listener.h"
-#include "px_ChangeRecord.h"
-#include "px_CR_Span.h"
-#include "px_CR_Strux.h"
-#include "px_CR_Object.h"
-#include "fd_Field.h"
-#include "fl_TOCLayout.h"
-#include "ie_Table.h"
-#include "ie_TOC.h"
-#include "ut_mbtowc.h"
+#include <pd_Document.h>
+#include <pl_Listener.h>
+#include <px_ChangeRecord.h>
+#include <px_CR_Span.h>
+#include <px_CR_Strux.h>
+#include <px_CR_Object.h>
+#include <fd_Field.h>
+#include <fl_TOCLayout.h>
+#include <ie_Table.h>
+#include <ie_TOC.h>
+#include <ut_mbtowc.h>
 
 #include "ie_exp_HTML_util.h"
 #include "ie_exp_HTML_NavigationHelper.h"
@@ -171,16 +171,16 @@ public:
             const UT_UTF8String &filename);
 
     virtual bool populate(fl_ContainerLayout* sfh,
-            const PX_ChangeRecord * pcr) override;
+            const PX_ChangeRecord * pcr);
 
     virtual bool populateStrux(pf_Frag_Strux* sdh,
             const PX_ChangeRecord * pcr,
-            fl_ContainerLayout* * psfh) override;
+            fl_ContainerLayout* * psfh);
 
     virtual bool endOfDocument();
 
     virtual bool change(fl_ContainerLayout* sfh,
-            const PX_ChangeRecord * pcr) override;
+            const PX_ChangeRecord * pcr);
 
     virtual bool insertStrux(fl_ContainerLayout* sfh,
             const PX_ChangeRecord * pcr,
@@ -188,10 +188,10 @@ public:
             PL_ListenerId lid,
             void (*pfnBindHandles) (pf_Frag_Strux* sdhNew,
             PL_ListenerId lid,
-            fl_ContainerLayout* sfhNew)) override;
+            fl_ContainerLayout* sfhNew));
     void insertLineFeed(void);
 
-    virtual bool signal(UT_uint32 iSignal) override;
+    virtual bool signal(UT_uint32 iSignal);
 
     void set_EmbedCSS(bool bEmbed = true)
 		{ m_bEmbedCss = bEmbed; }
@@ -212,7 +212,7 @@ private:
     void _closeSpan();
 
     void _openHeading(PT_AttrPropIndex api, size_t level,
-        const gchar *szStyleName = nullptr);
+        const gchar *szStyleName = NULL);
     void _closeHeading();
 
     void _openBlock(PT_AttrPropIndex api);
