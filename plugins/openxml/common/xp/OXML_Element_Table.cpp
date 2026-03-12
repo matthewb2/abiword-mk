@@ -67,7 +67,7 @@ UT_Error OXML_Element_Table::serialize(IE_Exp_OpenXML* exporter)
 UT_Error OXML_Element_Table::serializeProperties(IE_Exp_OpenXML* exporter)
 {
 	UT_Error err = UT_OK;
-	const gchar* szValue = nullptr;
+	const gchar* szValue = NULL;
 
 	if(getProperty("table-column-props", szValue) == UT_OK)
 	{
@@ -129,9 +129,9 @@ UT_Error OXML_Element_Table::serializeProperties(IE_Exp_OpenXML* exporter)
 	if(err != UT_OK)
 		return err;
 
-	const gchar* borderType = nullptr;
-	const gchar* color = nullptr;
-	const gchar* size = nullptr;
+	const gchar* borderType = NULL;
+	const gchar* color = NULL;
+	const gchar* size = NULL;
 
 	//left border
 	borderType = "single";
@@ -143,13 +143,13 @@ UT_Error OXML_Element_Table::serializeProperties(IE_Exp_OpenXML* exporter)
 		}
 	}
 
-	color = nullptr;
+	color = NULL; 
 	if(getProperty("left-color", szValue) == UT_OK)
 	{
 		color = szValue;
 	}
 
-	size = nullptr;
+	size = NULL;
 	if(getProperty("left-thickness", szValue) == UT_OK)
 	{
 		size = szValue;
@@ -169,13 +169,13 @@ UT_Error OXML_Element_Table::serializeProperties(IE_Exp_OpenXML* exporter)
 		}
 	}
 
-	color = nullptr;
+	color = NULL; 
 	if(getProperty("right-color", szValue) == UT_OK)
 	{
 		color = szValue;
 	}
 
-	size = nullptr;
+	size = NULL;
 	if(getProperty("right-thickness", szValue) == UT_OK)
 	{
 		size = szValue;
@@ -194,13 +194,13 @@ UT_Error OXML_Element_Table::serializeProperties(IE_Exp_OpenXML* exporter)
 		}
 	}
 
-	color = nullptr;
+	color = NULL; 
 	if(getProperty("top-color", szValue) == UT_OK)
 	{
 		color = szValue;
 	}
 
-	size = nullptr;
+	size = NULL;
 	if(getProperty("top-thickness", szValue) == UT_OK)
 	{
 		size = szValue;
@@ -218,14 +218,14 @@ UT_Error OXML_Element_Table::serializeProperties(IE_Exp_OpenXML* exporter)
 			 borderType = "dashed";
 		}
 	}
-
-	color = nullptr;
+	
+	color = NULL; 
 	if(getProperty("bot-color", szValue) == UT_OK)
 	{
 		color = szValue;
 	}
-
-	size = nullptr;
+	
+	size = NULL;
 	if(getProperty("bot-thickness", szValue) == UT_OK)
 	{
 		size = szValue;
@@ -283,9 +283,9 @@ UT_Error OXML_Element_Table::addToPT(PD_Document * pDocument)
 {
 	UT_Error ret = UT_OK;
 
-	const gchar * bgColor = nullptr;
+	const gchar * bgColor = NULL;
 	if(getProperty("background-color", bgColor) != UT_OK)
-		bgColor = nullptr;
+		bgColor = NULL;
 
 	//OpenXML supports bookmarks anywhere in the tables
 	//We will append children bookmarks that go inside table here

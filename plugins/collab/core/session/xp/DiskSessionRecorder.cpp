@@ -20,6 +20,7 @@
  * 02110-1301 USA.
  */
 
+#include <gsf/gsf-output-stdio.h>
 #include <account/xp/Buddy.h>
 #include <plugin/xp/AbiCollab_Plugin.h>
 #include "DiskSessionRecorder.h"
@@ -241,7 +242,7 @@ void DiskSessionRecorder::store(bool incoming, const Packet* pPacket, BuddyPtr p
 	}
 	
 	// store timestamp, make it 64-bit value always
-	UT_uint64 timestamp = UT_uint64(time(nullptr));
+	UT_uint64 timestamp = UT_uint64( time(0) );
 	os << timestamp;
 
 	// store packet class

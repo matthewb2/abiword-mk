@@ -16,12 +16,15 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef __ODC_CRYPTO__
+#define __ODC_CRYPTO__
 
 #include <string>
-
+#include "ut_compiler.h"
+ABI_W_NO_CONST_QUAL
 #include <gsf/gsf.h>
-
+#include <gsf/gsf-input.h>
+ABI_W_POP
 #include "ut_types.h"
 
 class ODc_CryptoInfo {
@@ -48,3 +51,5 @@ private:
 	static UT_Error performDecrypt(GsfInput* pStream,	unsigned char* salt, UT_uint32 salt_length, UT_uint32 iter_count,
                                    unsigned char* ivec, gsize ivec_length, const std::string& password, UT_uint32 decrypted_size, GsfInput** pDecryptedInput);
 };
+
+#endif /* __ODC_CRYPTO__ */

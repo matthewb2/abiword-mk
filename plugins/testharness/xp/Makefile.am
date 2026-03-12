@@ -12,7 +12,6 @@ libxp_la_SOURCES = \
 	AbiTest.h \
 	@top_srcdir@/src/af/util/xp/t/ut_bytebuf.t.cpp \
 	@top_srcdir@/src/af/util/xp/t/ut_misc.t.cpp \
-	@top_srcdir@/src/af/util/xp/t/ut_stack.t.cpp \
 	@top_srcdir@/src/af/util/xp/t/ut_string_class.t.cpp \
 	@top_srcdir@/src/af/util/xp/t/ut_std_string.t.cpp \
 	@top_srcdir@/src/af/util/xp/t/ut_types.t.cpp \
@@ -21,7 +20,6 @@ libxp_la_SOURCES = \
 	@top_srcdir@/src/af/util/xp/t/ut_uuid.t.cpp \
 	@top_srcdir@/src/af/util/xp/t/ut_locale.t.cpp \
 	@top_srcdir@/src/af/util/xp/t/ut_option.t.cpp \
-	@top_srcdir@/src/af/xap/xp/t/xap_Prefs.t.cpp \
 	@top_srcdir@/src/text/ptbl/xp/t/pt_PieceTable.t.cpp \
 	@top_srcdir@/src/text/ptbl/xp/t/pp_PropertyMap.t.cpp \
 	@top_srcdir@/src/text/ptbl/xp/t/pp_AttrProp.t.cpp \

@@ -24,13 +24,13 @@
 #define _OXMLI_STREAMLISTENER_H_
 
 // AbiWord includes
-#include "ut_types.h"
-#include "ut_xml.h"
+#include <ut_types.h>
+#include <ut_xml.h>
 
 // Internal includes
-#include "OXMLi_Types.h"
-#include "OXMLi_ListenerState.h"
-#include "OXMLi_Namespace_Common.h"
+#include <OXMLi_Types.h>
+#include <OXMLi_ListenerState.h>
+#include <OXMLi_Namespace_Common.h>
 
 // External includes
 #include <list>
@@ -56,9 +56,9 @@ public:
 
 	void setupStates(OXML_PartType type, const char * partId = "");
 
-	virtual void startElement (const gchar* pName, const gchar** ppAtts) override;
-	virtual void endElement (const gchar* pName) override;
-	virtual void charData (const gchar* pBuffer, int length) override;
+	virtual void startElement (const gchar* pName, const gchar** ppAtts);
+	virtual void endElement (const gchar* pName);
+	virtual void charData (const gchar* pBuffer, int length);
 
 private:
 	OXMLi_ElementStack* m_pElemStack;

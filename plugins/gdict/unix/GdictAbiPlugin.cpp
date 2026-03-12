@@ -32,7 +32,6 @@
 
 #include "xap_UnixFrameImpl.h"
 #include "xap_UnixDialogHelper.h"
-#include "xap_GtkUtils.h"
 
 #ifdef USE_FORK_AND_EXEC_METHOD
 
@@ -62,7 +61,7 @@ GDict_exec (const char * search)
       const char *args[3];
       args[0] = "--noapplet"; // definitely needed for kde users, for example
       args[1] = search;
-      args[2] = nullptr;
+      args[2] = 0;
       
       exit ( execvp ( "gnome-dictionary", (char **) args ) );
       // TODO: be smarter with warnings and such
@@ -70,7 +69,7 @@ GDict_exec (const char * search)
   else if ( pid > 0 )
     {
       // parent
-      waitpid(pid, nullptr, WNOHANG);
+      waitpid ( pid, 0, WNOHANG );
     }
   else
     {
@@ -84,9 +83,9 @@ GDict_exec (const char * search)
 #include <libgdict/gdict-defbox.h>
 
 // i hate global state, but it's so much easier here...
-static GtkWidget * gdict_dlg = nullptr;
-static GtkWidget * gdict_entry = nullptr;
-static GtkWidget * gdict_defbox = nullptr;
+static GtkWidget * gdict_dlg    = 0;
+static GtkWidget * gdict_entry  = 0;
+static GtkWidget * gdict_defbox = 0;
 
 static void
 lookup_button_cb (GtkButton *button, GtkWidget * defbox)
@@ -106,7 +105,7 @@ lookup_button_cb (GtkButton *button, GtkWidget * defbox)
 static void
 entry_activate_cb (GtkEditable *editable, GtkWidget* defbox)
 {
-  gchar *text = nullptr;
+  gchar *text = 0;
   
   text = gtk_editable_get_chars (editable, 0, -1);
   
@@ -120,14 +119,14 @@ entry_activate_cb (GtkEditable *editable, GtkWidget* defbox)
 static void
 close_cb (GtkWidget * w, gpointer data)
 {
-  gtk_container_remove(GTK_CONTAINER(gtk_widget_get_parent(gdict_defbox), gdic_defbox);
-  gdict_defbox = nullptr;
+  gtk_widget_destroy(gdict_defbox);
+  gdict_defbox = 0;
 
-  gtk_container_remove(GTK_CONTAINER(gtk_widget_get_parent(gdict_entry), gdic_entry);
-  gdict_entry = nullptr;
+  gtk_widget_destroy(gdict_entry);
+  gdict_entry  = 0;
 
-  gtk_widget_destroy(gdict_dlg); // TOPLEVEL
-  gdict_dlg = nullptr;
+  gtk_widget_destroy(gdict_dlg);
+  gdict_dlg    = 0;
 }
 
 static void
@@ -142,7 +141,7 @@ GDict_dlg_create (const char * search)
   
   // create the toplevel dialog
   gdict_dlg = gnome_dialog_new ("AbiWord Dictionary", 
-				GNOME_STOCK_BUTTON_CLOSE, nullptr);
+				GNOME_STOCK_BUTTON_CLOSE, NULL);
   gtk_window_set_modal (GTK_WINDOW(gdict_dlg), false);
   gtk_widget_set_usize (gdict_dlg, 450, 300);
 
@@ -156,18 +155,18 @@ GDict_dlg_create (const char * search)
   vbox = GNOME_DIALOG(gdict_dlg)->vbox;
   
   hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, GNOME_PAD_SMALL);	
-  XAP_gtk_widget_set_margin(hbox, GNOME_PAD_SMALL);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox), GNOME_PAD_SMALL);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
   
   button = gtk_button_new_with_label ("Look Up");
   gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 0);
   
-  gdict_entry = gnome_entry_new(nullptr);
+  gdict_entry = gnome_entry_new(NULL);
   gtk_entry = gnome_entry_gtk_entry(GNOME_ENTRY(gdict_entry));
   gtk_box_pack_start (GTK_BOX (hbox), gdict_entry, TRUE, TRUE, 0);
 
-  scrolled = gtk_scrolled_window_new (nullptr, nullptr);
-  XAP_gtk_widget_set_margin(scrolled, GNOME_PAD_SMALL);
+  scrolled = gtk_scrolled_window_new (NULL, NULL);
+  gtk_container_set_border_width (GTK_CONTAINER (scrolled), GNOME_PAD_SMALL); 
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled),
 				  GTK_POLICY_AUTOMATIC,
 				  GTK_POLICY_AUTOMATIC);
@@ -199,8 +198,8 @@ GDict_dlg_create (const char * search)
 
   g_signal_connect_after(G_OBJECT(gdict_dlg),
 			   "destroy",
-			   nullptr,
-			   nullptr);
+			   NULL,
+			   NULL);
 
   gtk_widget_show_all (gdict_dlg);
 }
@@ -216,11 +215,11 @@ GDict_exec (const char * search)
   else
     {
       // raise to the front
-      XAP_gtk_window_raise(gdict_dlg);
+      gdk_window_raise (gdict_dlg->window);
     }
 
   GtkWidget * entry = gnome_entry_gtk_entry (GNOME_ENTRY(gdict_entry));
-  XAP_gtk_entry_set_text (GTK_ENTRY(entry), search);
+  gtk_entry_set_text (GTK_ENTRY(entry), search);
   gnome_entry_prepend_history(GNOME_ENTRY(gdict_entry), false, search);
   gdict_defbox_lookup (GDICT_DEFBOX (gdict_defbox), (char*)search);
 }
@@ -249,7 +248,7 @@ GDict_invoke(AV_View* /*v*/, EV_EditMethodCallData */*d*/)
   pView->extSelTo(FV_DOCPOS_EOW_SELECT);   
   
   // We need to get the utf-8 version of the current word.
-  UT_UCS4Char *ucs4ST = nullptr;
+  UT_UCS4Char *ucs4ST = NULL;
   pView->getSelectionText(*&ucs4ST);
   if (ucs4ST) {
     UT_UTF8String search(ucs4ST);
@@ -279,8 +278,8 @@ GDict_removeFromMenus()
   int frameCount = pApp->getFrameCount();
   XAP_Menu_Factory * pFact = pApp->getMenuFactory();
 
-  pFact->removeMenuItem("Main",nullptr,GDict_MenuLabel);
-  pFact->removeMenuItem("contextText",nullptr,GDict_MenuLabel);
+  pFact->removeMenuItem("Main",NULL,GDict_MenuLabel);
+  pFact->removeMenuItem("contextText",NULL,GDict_MenuLabel);
   for(int i = 0;i < frameCount;++i)
     {
       // Get the current frame that we're iterating through.
@@ -331,13 +330,13 @@ GDict_addToMenus()
   //
   // Put it in the context menu.
   //
-  XAP_Menu_Id newID = pFact->addNewMenuAfter("contextText",nullptr,"Bullets and &Numbering",EV_MLF_Normal);
-  pFact->addNewLabel(nullptr,newID,GDict_MenuLabel, GDict_MenuTooltip);
+  XAP_Menu_Id newID = pFact->addNewMenuAfter("contextText",NULL,"Bullets and &Numbering",EV_MLF_Normal);
+  pFact->addNewLabel(NULL,newID,GDict_MenuLabel, GDict_MenuTooltip);
 
   //
   // Also put it under word Wount in the main menu,
   //
-  pFact->addNewMenuAfter("Main",nullptr,"&Word Count",EV_MLF_Normal,newID);
+  pFact->addNewMenuAfter("Main",NULL,"&Word Count",EV_MLF_Normal,newID);
   
   // Create the Action that will be called.
   EV_Menu_Action* myAction = new EV_Menu_Action(
@@ -347,8 +346,8 @@ GDict_addToMenus()
 						0,                      // no, we don't have a checkbox.
 						0,
 						"GDict_invoke",  // name of callback function to call.
-						nullptr,                   // don't know/care what this is for
-						nullptr                    // don't know/care what this is for
+						NULL,                   // don't know/care what this is for
+						NULL                    // don't know/care what this is for
 						);
   
   // Now what we need to do is add this particular action to the ActionSet
@@ -391,11 +390,11 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-    mi->name = nullptr;
-    mi->desc = nullptr;
-    mi->version = nullptr;
-    mi->author = nullptr;
-    mi->usage = nullptr;
+    mi->name = 0;
+    mi->desc = 0;
+    mi->version = 0;
+    mi->author = 0;
+    mi->usage = 0;
 
     GDict_removeFromMenus () ;
 

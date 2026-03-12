@@ -54,7 +54,7 @@ ABI_PLUGIN_DECLARE("T602")
 
 // completely generic code to allow this to be a plugin
 
-static IE_Imp_T602_Sniffer * m_sniffer = nullptr;
+static IE_Imp_T602_Sniffer * m_sniffer = 0;
 
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_register (XAP_ModuleInfo * mi)
@@ -82,17 +82,17 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-	mi->name = nullptr;
-	mi->desc = nullptr;
-	mi->version = nullptr;
-	mi->author = nullptr;
-	mi->usage = nullptr;
+	mi->name    = 0;
+	mi->desc    = 0;
+	mi->version = 0;
+	mi->author  = 0;
+	mi->usage   = 0;
 
 	UT_ASSERT (m_sniffer);
 
 	IE_Imp::unregisterImporter (m_sniffer);
 	delete m_sniffer;
-	m_sniffer = nullptr;
+	m_sniffer = 0;
 
 	return 1;
 }
@@ -154,7 +154,7 @@ bool	IE_Imp_T602_Sniffer::getDlgLabels (const char ** pszDesc,
 /****************************************************************************/
 
 IE_Imp_T602::IE_Imp_T602(PD_Document * pDocument)
-  : IE_Imp (pDocument), m_importFile(nullptr), m_charset(1), m_family("Courier"),
+  : IE_Imp (pDocument), m_importFile(NULL), m_charset(1), m_family("Courier"),
     m_basefamily("Courier"), m_softcr(1), m_basesize( 10 ), 
     m_size(10), m_lmargin ( "1.0000in" ), m_rmargin ( "1.0000in" ), 
     m_bold(0), m_italic(0), m_underline(0),
@@ -303,7 +303,7 @@ UT_uint16 IE_Imp_T602::_conv(unsigned char c)
 bool IE_Imp_T602::_getbyte(unsigned char &c)
 {
 	UT_ASSERT(m_importFile);
-	return (gsf_input_read (m_importFile, 1, &c) != nullptr);
+	return (gsf_input_read (m_importFile, 1, &c) != NULL);
 }
 
 UT_Error IE_Imp_T602::_writeheader()
@@ -332,7 +332,7 @@ UT_Error IE_Imp_T602::_writeTP()
   UT_DEBUGMSG(("T602: text-prop:\"%s\"]\n",buff.c_str()));
   pps[0]="props";
   pps[1]=buff.c_str();
-  pps[2]=nullptr;
+  pps[2]=NULL;
   X_CheckDocError(appendFmt(pps))
   return UT_OK;
 }

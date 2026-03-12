@@ -66,9 +66,9 @@ class AbiGrammar : public AV_ListenerExtra
 {
 public:
 AbiGrammar():
-	m_pView(nullptr),
-	m_pDoc(nullptr),
-	m_pBlock(nullptr)
+	m_pView(NULL),
+	m_pDoc(NULL),
+	m_pBlock(NULL)
 		{
 		}
 
@@ -80,18 +80,18 @@ void setID(AV_ListenerId id)
 			m_lid = id;
 		}
 
-virtual  AV_ListenerType getType(void) const override { return AV_LISTENER_PLUGIN_EXTRA;}
+virtual  AV_ListenerType getType(void) { return AV_LISTENER_PLUGIN_EXTRA;}
 
-AV_ListenerId	getID(void) const
+AV_ListenerId	getID(void)
 		{
 			return m_lid;
 		}
-virtual bool notify(AV_View * , const AV_ChangeMask ) override
+virtual bool notify(AV_View * , const AV_ChangeMask )
 		{
 		  return false;
 		}
 
-virtual bool notify(AV_View * pAView, const AV_ChangeMask mask, void * pPrivateData) override
+virtual bool notify(AV_View * pAView, const AV_ChangeMask mask, void * pPrivateData)
 		{
 		  if(mask != AV_CHG_BLOCKCHECK)
 		  {
@@ -120,7 +120,7 @@ private:
 
 
 static AV_ListenerId listenerID = 0; 
-static AbiGrammar * pAbiGrammar = nullptr;
+static AbiGrammar * pAbiGrammar = NULL;
 
 ABI_PLUGIN_DECLARE(AbiGrammar)
 
@@ -164,11 +164,11 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-    mi->name = nullptr;
-    mi->desc = nullptr;
-    mi->version = nullptr;
-    mi->author = nullptr;
-    mi->usage = nullptr;
+    mi->name = 0;
+    mi->desc = 0;
+    mi->version = 0;
+    mi->author = 0;
+    mi->usage = 0;
 
     XAP_App * pApp = XAP_App::getApp();
     pApp->removeListener(listenerID);

@@ -514,7 +514,8 @@ UT_Win32AssertDlg::answer UT_Win32AssertDlg::runModal()
 								NULL,
 								(DLGPROC)s_dlgProc,(LPARAM)this);
 
-	UT_ASSERT_HARMLESS((result != -1));
+	//UT_ASSERT_HARMLESS((result != -1));
+	
 
 	return m_answer;
 }

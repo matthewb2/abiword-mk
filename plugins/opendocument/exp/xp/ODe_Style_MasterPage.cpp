@@ -27,7 +27,10 @@
 #include "ODe_Style_Style.h"
 
 // AbiWord includes
-#include "pp_AttrProp.h"
+#include <pp_AttrProp.h>
+#include <gsf/gsf-output-memory.h>
+#include <gsf/gsf-input-memory.h>
+
 
 /**
  * Constructor
@@ -49,19 +52,19 @@ ODe_Style_MasterPage::ODe_Style_MasterPage (const gchar* pName,
  * Destructor
  */
 ODe_Style_MasterPage::~ODe_Style_MasterPage() {
-    if (m_pHeaderContentTemp != nullptr) {
+    if (m_pHeaderContentTemp != NULL) {
         ODe_gsf_output_close(m_pHeaderContentTemp);
     }
  
-    if (m_pHeaderEvenContentTemp != nullptr) {
+    if (m_pHeaderEvenContentTemp != NULL) {
         ODe_gsf_output_close(m_pHeaderEvenContentTemp);
     }
 
-    if (m_pFooterContentTemp != nullptr) {
+    if (m_pFooterContentTemp != NULL) {
         ODe_gsf_output_close(m_pFooterContentTemp);
     }
 
-    if (m_pFooterEvenContentTemp != nullptr) {
+    if (m_pFooterEvenContentTemp != NULL) {
         ODe_gsf_output_close(m_pFooterEvenContentTemp);
     }
 }
@@ -75,22 +78,22 @@ void ODe_Style_MasterPage::fetchAttributesFromAbiSection(const PP_AttrProp* pAP)
     bool ok;
     
     ok = pAP->getAttribute("header", pValue);
-    if (ok && pValue != nullptr) {
+    if (ok && pValue != NULL) {
         m_abiHeaderId = pValue;
     }
 
     ok = pAP->getAttribute("header-even", pValue);
-    if (ok && pValue != nullptr) {
+    if (ok && pValue != NULL) {
         m_abiHeaderEvenId = pValue;
     }
 
     ok = pAP->getAttribute("footer", pValue);
-    if (ok && pValue != nullptr) {
+    if (ok && pValue != NULL) {
         m_abiFooterId = pValue;
     }
 
     ok = pAP->getAttribute("footer-even", pValue);
-    if (ok && pValue != nullptr) {
+    if (ok && pValue != NULL) {
         m_abiFooterEvenId = pValue;
     }
 }

@@ -37,11 +37,11 @@ public:
 	IE_Imp_OPML_Sniffer(const char *name);
 	virtual ~IE_Imp_OPML_Sniffer() {}
 
-	virtual const IE_SuffixConfidence * getSuffixConfidence() override;
-	virtual const IE_MimeConfidence * getMimeConfidence() override { return nullptr; }
-	virtual	UT_Confidence_t recognizeContents(const char * szBuf, UT_uint32 iNumbytes) override;
-	virtual bool getDlgLabels(const char ** szDesc, const char ** szSuffixList, IEFileType * ft) override;
-	virtual	UT_Error constructImporter (PD_Document * pDocument, IE_Imp ** ppie) override;
+	virtual const IE_SuffixConfidence * getSuffixConfidence ();
+	virtual const IE_MimeConfidence * getMimeConfidence () { return NULL; }
+	virtual			UT_Confidence_t recognizeContents (const char * szBuf, UT_uint32 iNumbytes);
+	virtual bool	getDlgLabels (const char ** szDesc, const char ** szSuffixList, IEFileType * ft);
+	virtual			UT_Error constructImporter (PD_Document * pDocument, IE_Imp ** ppie);
 };
 
 class IE_Imp_OPML : public IE_Imp_XML
@@ -50,9 +50,9 @@ public:
 	IE_Imp_OPML(PD_Document * pDocument);
 	~IE_Imp_OPML();
 
-	virtual void startElement(const gchar *name, const gchar **atts) override;
-	virtual void endElement(const gchar *name) override;
-	virtual void charData(const gchar *s, int len) override;
+	void			startElement(const gchar *name, const gchar **atts);
+	void			endElement(const gchar *name);
+	void			charData(const gchar *s, int len);
 
 private:
 

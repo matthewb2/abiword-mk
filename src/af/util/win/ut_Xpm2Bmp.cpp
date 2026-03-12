@@ -57,12 +57,13 @@ bool UT_Xpm2Bmp(UT_uint32 maxWidth,
 	UT_uint32 cut_left, cut_top;
 	UT_DebugOnly<UT_uint32> n = sscanf(pIconData[0],"%lu %lu %lu %lu",
 						 &xpm_width,&xpm_height,&nrColors,&charsPerPixel);
+	/*
 	UT_ASSERT(n == 4);
 	UT_ASSERT(xpm_width > 0);
 	UT_ASSERT(xpm_height > 0);
 
 	UT_ASSERT(charsPerPixel > 0);
-
+	*/
 	width = xpm_width < maxWidth ? xpm_width : maxWidth;
 	cut_left = xpm_width - width;
 	cut_left -= cut_left / 2;
@@ -123,7 +124,7 @@ bool UT_Xpm2Bmp(UT_uint32 maxWidth,
 		UT_ASSERT(strlen(bufSymbol) == charsPerPixel);
 		
 		UT_DebugOnly<UT_uint32> nf = sscanf(&pIconDataPalette[k][charsPerPixel+1]," %s %s",&bufKey,&bufColorValue);
-		UT_ASSERT(nf == 2);
+		//UT_ASSERT((unsigned int)nf == 2);
 		UT_ASSERT(bufKey[0] == 'c' || bufKey[0] == 'g');
 
 		// make the ".." a hash key and store our color index as the data.

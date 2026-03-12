@@ -32,8 +32,8 @@
 #include "ODi_ListenerStateAction.h"
 
 // AbiWord includes
-#include "pd_Document.h"
-#include "ut_std_string.h"
+#include <pd_Document.h>
+#include <ut_std_string.h>
 
 
 /**
@@ -158,7 +158,7 @@ void ODi_Table_ListenerState::_parseTableStart(const gchar** ppAtts,
         } else {
             std::string props;
             const gchar* pVal;
-            const ODi_Style_Style* pStyle = nullptr;
+            const ODi_Style_Style* pStyle = NULL;
             
             pVal = UT_getAttribute("table:style-name", ppAtts);
             if (pVal) {
@@ -167,14 +167,14 @@ void ODi_Table_ListenerState::_parseTableStart(const gchar** ppAtts,
             }
             
             // Background color
-            if (pStyle != nullptr) {
+            if (pStyle != NULL) {
                 if (!pStyle->getBackgroundColor()->empty()) {
                     props += "background-color:";
                     props += pStyle->getBackgroundColor()->c_str();
                 }
             }
             // Left table pos
-            if (pStyle != nullptr) {
+            if (pStyle != NULL) {
                 if (!pStyle->getTableMarginLeft()->empty()) {
 		    if (!props.empty()) {
 		        props += "; ";
@@ -186,7 +186,7 @@ void ODi_Table_ListenerState::_parseTableStart(const gchar** ppAtts,
             }
 
             // table width
-            if (pStyle != nullptr) {
+            if (pStyle != NULL) {
                 if (!pStyle->getTableWidth()->empty()) {
 		    if (!props.empty()) {
 		        props += "; ";
@@ -199,7 +199,7 @@ void ODi_Table_ListenerState::_parseTableStart(const gchar** ppAtts,
 
 
             // table relative width 
-            if (pStyle != nullptr) {
+            if (pStyle != NULL) {
                 if (!pStyle->getTableRelWidth()->empty()) {
 		    if (!props.empty()) {
 		        props += "; ";
@@ -280,10 +280,11 @@ void ODi_Table_ListenerState::_parseRowStart (const gchar** ppAtts,
 
         std::string rowHeight = "";
 
-        if (pStyleName != nullptr) {
+        if (pStyleName != NULL) 
+        {
             pStyle = m_pStyles->getTableRowStyle(pStyleName,
                         m_onContentStream);
-            UT_ASSERT(pStyle != nullptr);
+            UT_ASSERT(pStyle != NULL);
 
             if (pStyle)
             {
@@ -331,17 +332,18 @@ void ODi_Table_ListenerState::_parseColumnStart (const gchar** ppAtts,
 {
     if (m_onFirstPass) 
     {
-        const gchar* pStyleName=nullptr;
-        const ODi_Style_Style* pStyle=nullptr;
-        const gchar* pNumberColumnsRepeated = nullptr;
+        const gchar* pStyleName=NULL;
+        const ODi_Style_Style* pStyle=NULL;
+        const gchar* pNumberColumnsRepeated = NULL;
         int nColsRepeated= 0;
         UT_sint32 i=0;
         
         pStyleName = UT_getAttribute("table:style-name", ppAtts);
-        if (pStyleName != nullptr) {
+        if (pStyleName != NULL) 
+        {
             pStyle = m_pStyles->getTableColumnStyle(pStyleName,
                                                     m_onContentStream);
-            UT_ASSERT_HARMLESS(pStyle != nullptr);
+            UT_ASSERT_HARMLESS(pStyle != NULL);
             UT_DEBUGMSG(("style-name %s pstyle = %p \n",pStyleName,pStyle));
             if (pStyle && (pStyle->getColumnWidth()->empty() && pStyle->getColumnRelWidth()->empty())) 
             {
@@ -350,7 +352,8 @@ void ODi_Table_ListenerState::_parseColumnStart (const gchar** ppAtts,
             else if (pStyle) 
             {
                 pNumberColumnsRepeated = UT_getAttribute("table:number-columns-repeated", ppAtts);
-                if (pNumberColumnsRepeated != nullptr) {
+                if (pNumberColumnsRepeated != NULL) 
+                {
                     nColsRepeated = atoi(pNumberColumnsRepeated);
                     UT_ASSERT(nColsRepeated > 0);
                 } 
@@ -401,7 +404,7 @@ void ODi_Table_ListenerState::_parseCellStart (const gchar** ppAtts,
         
         std::string props;
         const gchar* pVal;
-        const ODi_Style_Style* pStyle = nullptr;
+        const ODi_Style_Style* pStyle = NULL;
         UT_sint32 colSpan;
         UT_sint32 rowSpan;
         m_col++;

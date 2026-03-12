@@ -41,13 +41,13 @@ public:
     ODi_ListLevelStyle(const char* pStateName, ODi_ElementStack& rElementStack);
     virtual ~ODi_ListLevelStyle() {}
 
-    virtual void startElement(const gchar* pName, const gchar** ppAtts,
-                               ODi_ListenerStateAction& rAction) override;
+    virtual void startElement (const gchar* pName, const gchar** ppAtts,
+                               ODi_ListenerStateAction& rAction);
 
-    virtual void endElement(const gchar* pName,
-                             ODi_ListenerStateAction& rAction) override;
+    virtual void endElement (const gchar* pName,
+                             ODi_ListenerStateAction& rAction);
 
-    virtual void charData(const gchar* /*pBuffer*/, int /*length*/) override {}
+    virtual void charData (const gchar* /*pBuffer*/, int /*length*/) {}
 
     UT_uint32 getLevelNumber() const {return m_levelNumber;}
 
@@ -76,7 +76,7 @@ public:
      * @param rProps Will have the properties string appended.
      * @param pStyle Pointer to the paragraph style used on this list paragraph.
      */
-    void getAbiProperties(std::string& rProps, const ODi_Style_Style* pStyle = nullptr) const;
+    void getAbiProperties(std::string& rProps, const ODi_Style_Style* pStyle = NULL) const;
 
     void defineAbiList(PD_Document* pDocument);
 
@@ -150,15 +150,15 @@ public:
 
     ODi_Bullet_ListLevelStyle(ODi_ElementStack& m_rElementStack);
 
-    virtual void startElement (const gchar* pName, const gchar** ppAtts,
-                               ODi_ListenerStateAction& rAction) override;
+    void startElement (const gchar* pName, const gchar** ppAtts,
+                               ODi_ListenerStateAction& rAction);
 
     /*void endElement (const gchar* pName,
                              ODi_ListenerStateAction& rAction);
 
     void charData (const gchar* pBuffer, int length);*/
 
-    virtual void buildAbiPropsString() override;
+    void buildAbiPropsString();
 };
 
 
@@ -171,15 +171,15 @@ public:
 
     ODi_Numbered_ListLevelStyle(ODi_ElementStack& m_rElementStack);
 
-    virtual void startElement (const gchar* pName, const gchar** ppAtts,
-                               ODi_ListenerStateAction& rAction) override;
+    void startElement (const gchar* pName, const gchar** ppAtts,
+                               ODi_ListenerStateAction& rAction);
 
     /*void endElement (const gchar* pName,
                              ODi_ListenerStateAction& rAction);
 
     void charData (const gchar* pBuffer, int length);*/
 
-    virtual void buildAbiPropsString() override;
+    void buildAbiPropsString();
 
 private:
 

@@ -454,9 +454,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/af/util/xp/t/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/af/util/xp/t/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign src/af/util/xp/t/Makefile
+	  $(AUTOMAKE) --gnu src/af/util/xp/t/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \

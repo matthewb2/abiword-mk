@@ -433,7 +433,7 @@ void WordPerfect_Listener::_openBlock(PT_AttrPropIndex api)
 {
 	UT_DEBUGMSG(("WordPerfect Listener::_openBlock\n"));
 
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 	
 	if (bHaveProp && pAP)
@@ -485,7 +485,7 @@ void WordPerfect_Listener::_openSpan(PT_AttrPropIndex api)
 		return;
 	}
 
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 
 	if (bHaveProp && pAP)
@@ -546,7 +546,7 @@ void WordPerfect_Listener::_openSpan(PT_AttrPropIndex api)
 					_handleAttributeOn((char) 13);  // FIXME: use defines
 				}
 
-				q = strtok(nullptr, " ");
+				q = strtok(NULL, " ");
 			}
 
 			FREEP(p);
@@ -574,7 +574,7 @@ void WordPerfect_Listener::_openSpan(PT_AttrPropIndex api)
 					_handleAttributeOn((char) 14);  // FIXME: use defines
 				}
 
-				q = strtok(nullptr, " ");
+				q = strtok(NULL, " ");
 			}
 
 			FREEP(p);
@@ -587,10 +587,10 @@ void WordPerfect_Listener::_openSpan(PT_AttrPropIndex api)
 			|| (pAP->getProperty("bgcolor", szValue))
 			)
 		{
-			const gchar* pszColor = nullptr;
-			const gchar* pszBgColor = nullptr;
-			const gchar* pszFontSize = nullptr;
-			const gchar* pszFontFamily = nullptr;
+			const gchar* pszColor = NULL;
+			const gchar* pszBgColor = NULL;
+			const gchar* pszFontSize = NULL;
+			const gchar* pszFontFamily = NULL;
 
 			pAP->getProperty("color", pszColor);
 			pAP->getProperty("font-size", pszFontSize);
@@ -685,7 +685,7 @@ void WordPerfect_Listener::_closeSpan()
 					_handleAttributeOff((char) 13);  // FIXME: use defines
 				}
 
-				q = strtok(nullptr, " ");
+				q = strtok(NULL, " ");
 			}
 
 			FREEP(p);
@@ -713,7 +713,7 @@ void WordPerfect_Listener::_closeSpan()
 					_handleAttributeOff((char) 14);  // FIXME: use defines
 				}
 
-				q = strtok(nullptr, " ");
+				q = strtok(NULL, " ");
 			}
 
 			FREEP(p);

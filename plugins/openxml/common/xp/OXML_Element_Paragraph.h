@@ -24,13 +24,13 @@
 #define _OXML_ELEMENT_PARAGRAPH_H_
 
 // Internal includes
-#include "OXML_Element.h"
-#include "ie_exp_OpenXML.h"
+#include <OXML_Element.h>
+#include <ie_exp_OpenXML.h>
 
 // AbiWord includes
-#include "ut_types.h"
-#include "ut_string.h"
-#include "pd_Document.h"
+#include <ut_types.h>
+#include <ut_string.h>
+#include <pd_Document.h>
 
 class OXML_Element_Paragraph : public OXML_Element
 {
@@ -38,9 +38,9 @@ public:
 	OXML_Element_Paragraph(const std::string & id);
 	virtual ~OXML_Element_Paragraph();
 
-	virtual UT_Error serialize(IE_Exp_OpenXML* exporter) override;
+	virtual UT_Error serialize(IE_Exp_OpenXML* exporter);
 	virtual UT_Error serializeChildren(IE_Exp_OpenXML* exporter);
-	virtual UT_Error addToPT(PD_Document * pDocument) override;
+	virtual UT_Error addToPT(PD_Document * pDocument);
 	virtual const gchar* getListLevel();
 	virtual const gchar* getListId();
 	virtual void setPageBreak();

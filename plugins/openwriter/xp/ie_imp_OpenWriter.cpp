@@ -20,6 +20,10 @@
  * 02110-1301 USA.
  */
 
+#include <gsf/gsf-input-stdio.h>
+#include <gsf/gsf-infile.h>
+#include <gsf/gsf-infile-zip.h>
+
 #include "ut_locale.h"
 #include <math.h>
 
@@ -96,7 +100,7 @@ public:
   */
   const gchar ** getAbiPageAtts(const gchar * masterName)
   {
-    UT_return_val_if_fail(masterName != nullptr, (const gchar **)m_pageAtts);
+    UT_return_val_if_fail(masterName != NULL, (const gchar **)m_pageAtts);
 
     if (strcmp (m_name.c_str(), masterName))
     {
@@ -119,7 +123,7 @@ private:
 	
   void parse (const gchar ** props)
   {
-    const gchar * val = nullptr;
+    const gchar * val = NULL;
     int propCtr = 0;
     double width = 0;
     double height = 0;
@@ -163,7 +167,7 @@ private:
     m_pageAtts[propCtr++] = "pagetype";
     m_pageAtts[propCtr++] = ps.getPredefinedName();
 
-    m_pageAtts[propCtr] = nullptr;
+    m_pageAtts[propCtr] = 0; 
 
     // will go as props into the <section> tag
     val = UT_getAttribute ("fo:margin-left", props);
@@ -265,8 +269,8 @@ public:
 
   void parse (const gchar ** props)
   {
-    const gchar * val = nullptr;
-    const gchar * val2 = nullptr;
+    const gchar * val = NULL;
+    const gchar * val2 = NULL;
 
     val = UT_getAttribute ("fo:text-align", props);
     if (val) {
@@ -316,7 +320,7 @@ public:
 	  }
       else if (dim == DIM_PERCENT && m_pParentStyle) {
         // calculate font-size based on parent's 
-        const gchar * parentFontSize = nullptr;
+        const gchar * parentFontSize = NULL;
         double fontSize = 12;
 		if (m_pParentStyle->getProperty("font-size", parentFontSize)) {
           fontSize = atoi(parentFontSize) * atoi(val) / 100.0;
@@ -552,7 +556,7 @@ public:
 
 protected:
 
-	virtual UT_Error _loadFile(GsfInput * input) override;
+	virtual UT_Error _loadFile(GsfInput * input);
 
 private:
 
@@ -601,8 +605,8 @@ UT_Confidence_t IE_Imp_OpenWriter_Sniffer::recognizeContents (GsfInput * input)
 
 	GsfInfile * zip;
 
-	zip = gsf_infile_zip_new (input, nullptr);
-	if (zip != nullptr)
+	zip = gsf_infile_zip_new (input, NULL);
+	if (zip != NULL)
 		{
 			GsfInput* pInput = gsf_infile_child_by_name(zip, "mimetype");
 
@@ -612,7 +616,7 @@ UT_Confidence_t IE_Imp_OpenWriter_Sniffer::recognizeContents (GsfInput * input)
     
 					if (gsf_input_size (pInput) > 0) {
 						mimetype.append(
-										(const char *)gsf_input_read(pInput, gsf_input_size (pInput), nullptr),
+										(const char *)gsf_input_read(pInput, gsf_input_size (pInput), NULL),
 										gsf_input_size (pInput));
 					}
 
@@ -636,7 +640,7 @@ UT_Confidence_t IE_Imp_OpenWriter_Sniffer::recognizeContents (GsfInput * input)
 							int min = UT_MIN(size, 150);
 
 							UT_UTF8String content;
-							content.append((const char *)gsf_input_read(pInput, min, nullptr));
+							content.append((const char *)gsf_input_read(pInput, min, NULL));
 
 							if (strstr(content.utf8_str(), "<!DOCTYPE office:document-content PUBLIC"))
 								confidence = UT_CONFIDENCE_GOOD;
@@ -682,14 +686,14 @@ void IE_Imp_OpenWriter::defineSimpleStyle (const UT_UTF8String & name, const gch
   if (!name.size() || !props)
     return;
   
-  OO_Style * style = new OO_Style (props, nullptr, m_bOpenDocument);
+  OO_Style * style = new OO_Style (props, NULL, m_bOpenDocument);
   m_styleBucket.insert (name.utf8_str(), style);
 }
 
 const gchar* IE_Imp_OpenWriter::mapStyle (const gchar * name) const
 {
   OO_Style * style = m_styleBucket.pick((const char *)name);
-  if (nullptr == style)
+  if (NULL == style)
     return "";
   return style->getAbiStyle (); 
 }
@@ -697,7 +701,7 @@ const gchar* IE_Imp_OpenWriter::mapStyle (const gchar * name) const
 const OO_Style * IE_Imp_OpenWriter::mapStyleObj (const gchar * name) const
 {
   if (!name)
-    return nullptr;
+    return NULL;
   return m_styleBucket.pick((const char *)name);
 }
 
@@ -708,7 +712,7 @@ const OO_Style * IE_Imp_OpenWriter::mapStyleObj (const gchar * name) const
  * Create a new OpenWriter importer object
  */
 IE_Imp_OpenWriter::IE_Imp_OpenWriter (PD_Document * pDocument)
-  : IE_Imp(pDocument), m_pSSListener(nullptr), m_oo(nullptr), m_bOpenDocument(false)
+  : IE_Imp (pDocument), m_pSSListener(0), m_oo (0), m_bOpenDocument(false)
 {
 }
 
@@ -718,9 +722,9 @@ IE_Imp_OpenWriter::IE_Imp_OpenWriter (PD_Document * pDocument)
  */
 UT_Error IE_Imp_OpenWriter::_loadFile (GsfInput * oo_src)
 {
-  m_oo = GSF_INFILE (gsf_infile_zip_new (oo_src, nullptr));
+  m_oo = GSF_INFILE (gsf_infile_zip_new (oo_src, NULL));
 
-  if (m_oo == nullptr)
+  if (m_oo == NULL)
     return UT_ERROR;
   
   UT_Error err = UT_OK;
@@ -784,7 +788,7 @@ static UT_Error loadStream ( GsfInfile * oo,
 			     const char * stream,
 			     const UT_ByteBufPtr & buf )
 {
-  guint8 const *data = nullptr;
+  guint8 const *data = NULL;
   size_t len = 0;
   
   buf->truncate(0);
@@ -796,7 +800,7 @@ static UT_Error loadStream ( GsfInfile * oo,
   if (gsf_input_size (input) > 0) {
     while ((len = gsf_input_remaining (input)) > 0) {
       len = UT_MIN (len, BUF_SZ);
-      if (nullptr == (data = gsf_input_read (input, len, nullptr))) {
+      if (NULL == (data = gsf_input_read (input, len, NULL))) {
 	g_object_unref (G_OBJECT (input));
 	return UT_ERROR;
       }
@@ -816,7 +820,7 @@ static UT_Error parseStream ( GsfInfile * oo,
 			      const char * stream,
 			      UT_XML & parser )
 {
-  guint8 const *data = nullptr;
+  guint8 const *data = NULL;
   size_t len = 0;
 
   GsfInput * input = gsf_infile_child_by_name(oo, stream);
@@ -829,7 +833,7 @@ static UT_Error parseStream ( GsfInfile * oo,
       // FIXME: we want to pass the stream in chunks, but libXML2 finds this disagreeable.
       // we probably need to pass some magic to our XML parser? 
       // len = UT_MIN (len, BUF_SZ);
-      if (nullptr == (data = gsf_input_read (input, len, nullptr))) {
+      if (NULL == (data = gsf_input_read (input, len, NULL))) {
 	g_object_unref (G_OBJECT (input));
 	return UT_ERROR;
       }
@@ -881,7 +885,7 @@ public:
   {
   }
   
-  virtual void startElement (const gchar * name, const gchar ** atts) override
+  virtual void startElement (const gchar * name, const gchar ** atts) 
   {
     mCharData.clear ();
     mAttrib.clear ();
@@ -889,12 +893,12 @@ public:
     if (!strcmp (name, "meta:user-defined"))
 	{
 	  const gchar * attrib = UT_getAttribute ("meta:name", atts);
-	  if (attrib != nullptr)
+	  if (attrib != NULL)
 	    mAttrib = attrib;
 	}
   }
   
-  virtual void endElement (const gchar * name) override
+  virtual void endElement (const gchar * name)
   {
     if (mCharData.size()) {
       if (!strcmp (name, "dc:language"))
@@ -909,7 +913,7 @@ public:
     mAttrib.clear ();
   }
   
-  virtual void charData (const gchar * buffer, int length) override
+  virtual void charData (const gchar * buffer, int length)
   {
     if (buffer && length)      
 		mCharData += std::string (buffer, length);
@@ -938,7 +942,7 @@ UT_Error IE_Imp_OpenWriter::_handleMimetype ()
 
   UT_UTF8String mimetype;
   if (gsf_input_size (input) > 0) {
-    mimetype.append((const char *)gsf_input_read(input, gsf_input_size (input), nullptr), gsf_input_size (input));
+    mimetype.append((const char *)gsf_input_read(input, gsf_input_size (input), NULL), gsf_input_size (input));
   }
   
   if (strcmp("application/vnd.sun.xml.writer", mimetype.utf8_str()) &&
@@ -978,15 +982,15 @@ public:
   {
   }
 
-  virtual void startElement (const gchar * /*name*/, const gchar ** /*atts*/) override
+  virtual void startElement (const gchar * /*name*/, const gchar ** /*atts*/) 
   {
   }
 
-  virtual void endElement (const gchar * /*name*/) override
+  virtual void endElement (const gchar * /*name*/)
   {
   }
 
-  virtual void charData (const gchar * /*buffer*/, int /*length*/) override
+  virtual void charData (const gchar * /*buffer*/, int /*length*/)
   {
   }
 
@@ -1012,10 +1016,10 @@ class OpenWriter_StylesStream_Listener : public OpenWriter_Stream_Listener
 {
 public:
   OpenWriter_StylesStream_Listener ( IE_Imp_OpenWriter * importer, bool bOpenDocument )
-    : OpenWriter_Stream_Listener(importer), m_ooStyle(nullptr), m_bOpenDocument(bOpenDocument)
+    : OpenWriter_Stream_Listener ( importer ), m_ooStyle (0), m_bOpenDocument(bOpenDocument)
   {
   }
-
+  
   virtual ~OpenWriter_StylesStream_Listener ()
   {
     m_styleNameMap.purgeData();
@@ -1031,7 +1035,7 @@ public:
       return *name;
   }
   
-  virtual void startElement (const gchar * name, const gchar ** atts) override
+  virtual void startElement (const gchar * name, const gchar ** atts) 
   {
 	/* SXW || ODT */
     if (!strcmp (name, "style:page-master") || !strcmp (name, "style:page-layout")) {
@@ -1043,7 +1047,7 @@ public:
       getDocument()->setPageSizeFromFile(PP_std_copyProps(pageAtts));
     }
     else if (!strcmp (name, "style:style")) {
-      const gchar * attr = nullptr;
+      const gchar * attr = NULL;
 
       attr = UT_getAttribute("style:name",atts);
       if (attr)
@@ -1085,7 +1089,7 @@ public:
 	m_type = PARAGRAPH;
       }
       DELETEP(m_ooStyle);
-      m_ooStyle = nullptr;
+      m_ooStyle = NULL;
     }
     else if (/* SXW || ODT */
 	     (!strcmp (name, "style:properties") || !strcmp (name, "style:page-layout-properties")) && 
@@ -1097,7 +1101,7 @@ public:
 	     !strcmp (name, "style:text-properties") || 		/* ODT */
 	     !strcmp (name, "style:paragraph-properties")) {
       
-      if (m_ooStyle == nullptr) {
+      if (m_ooStyle == NULL) {
 	getDocument()->getStyle (m_parent.utf8_str(), &m_pParentStyle);
 	m_ooStyle = new OO_Style (atts, m_pParentStyle, m_bOpenDocument);
       }
@@ -1107,7 +1111,7 @@ public:
     }
   } 
 
-  virtual void endElement (const gchar * name) override
+  virtual void endElement (const gchar * name)
   {
     if (!strcmp (name, "style:page-master")) {
       m_pageMaster.clear();
@@ -1146,7 +1150,7 @@ public:
 	}
 
 	// must be last
-	atts[propCtr] = nullptr;
+	atts[propCtr] = 0;
 	getDocument()->appendStyle(PP_std_copyProps(atts));
       }
 
@@ -1155,11 +1159,11 @@ public:
       m_parent.clear ();
       m_next.clear ();
       DELETEP(m_ooStyle);
-      m_ooStyle = nullptr;
+      m_ooStyle = NULL;
     }
   }
   
-  virtual void charData (const gchar * /*buffer*/, int /*length*/) override
+  virtual void charData (const gchar * /*buffer*/, int /*length*/)
   {
   }  
 
@@ -1168,7 +1172,7 @@ public:
     if (!strcmp (m_ooPageStyle.getName(), "")) 
     {
       UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
-      return nullptr;
+      return NULL;
     }
     return m_ooPageStyle.getAbiSectionProps();
   }
@@ -1241,7 +1245,7 @@ public:
   {
   }
 
-  virtual void startElement (const gchar * name, const gchar ** atts) override
+  virtual void startElement (const gchar * name, const gchar ** atts) 
   {
     // if we're inside a TOC, ignore the contents since SXW/ODT include a copy of the TOC
     if (m_bInTOC)
@@ -1265,7 +1269,7 @@ public:
 	if (abi_sty) {
 	  // append an empty paragraph with this one char
 	  if (abi_sty->getColBreakBefore () || abi_sty->getPageBreakBefore ()) {
-	    _insureInBlock(nullptr);
+	    _insureInBlock(NULL);
 	    UT_UCSChar ucs = (abi_sty->getColBreakBefore () ? UCS_VTAB : UCS_FF);
 	    getDocument()->appendSpan (&ucs, 1);
 	  }
@@ -1273,7 +1277,7 @@ public:
 	  const gchar * props[3];
 	  props[0] = "props";
 	  props[1] = abi_sty->getAbiStyle ();
-	  props[2] = nullptr;
+	  props[2] = 0;
 	  
 	  _insureInBlock((const gchar **)props);
 	}
@@ -1281,12 +1285,12 @@ public:
 	  const gchar * props[3];
 	  props[0] = "style";
 	  props[1] = oo_sty.utf8_str();
-	  props[2] = nullptr;
+	  props[2] = 0;
 
 	  _insureInBlock((const gchar **)props);
 	}
 	else
-	  _insureInBlock(nullptr);
+	  _insureInBlock(NULL);
 	m_bAcceptingText = true;
       }
     else if (!strcmp(name, "text:span"))
@@ -1301,9 +1305,9 @@ public:
 	if(abi_sty && *abi_sty) {
 	  props[0] = "props";
 	  props[1] = abi_sty;
-	  props[2] = nullptr;
+	  props[2] = 0;
 	} else {
-	  props[0] = nullptr;
+	  props[0] = 0;
 	}
 	  
 	_pushInlineFmt(props);
@@ -1327,9 +1331,9 @@ public:
           "id", "0"
         };
         if (!strcmp(name, "text:ordered-list")) {
-          list_atts[1] = "Numbered List";
+          list_atts[3] = "Numbered List";
         } else {
-          list_atts[1] = "Bullet List";
+          list_atts[3] = "Bullet List";
         }
         getDocument()->appendList(list_atts);
 
@@ -1402,7 +1406,7 @@ public:
     else if (!strcmp(name, "text:table-of-content"))
     {
       _flush ();
-      _insureInBlock(nullptr);
+      _insureInBlock(NULL);
       
       getDocument()->appendStrux(PTX_SectionTOC, PP_NOPROPS);
       getDocument()->appendStrux(PTX_EndTOC, PP_NOPROPS);
@@ -1412,12 +1416,12 @@ public:
     else if (!strcmp(name, "draw:image"))
       {
 	_flush ();
-	_insureInBlock(nullptr);
+	_insureInBlock(NULL);
 	_insertImage (atts);
       }
     else if (!strcmp(name, "table:table"))
       {
-	_insureInSection(nullptr);
+	_insureInSection(NULL);
 	_openTable (atts);
       }
     else if (!strcmp(name, "table:table-column"))
@@ -1485,7 +1489,7 @@ public:
     }
   }
 
-  virtual void endElement (const gchar * name) override
+  virtual void endElement (const gchar * name)
   {
     if (!strcmp(name, "text:section" ))
       {
@@ -1548,7 +1552,7 @@ public:
     }
   }
 
-  virtual void charData (const gchar * buffer, int length) override
+  virtual void charData (const gchar * buffer, int length)
   {
     if (buffer && length && m_bAcceptingText && !m_bInTOC)
       m_charData += UT_UCS4String (buffer, length, true);
@@ -1563,7 +1567,7 @@ private:
     const gchar * height = UT_getAttribute ("svg:height", atts);
     const gchar * href   = UT_getAttribute ("xlink:href", atts);
 
-    if (width == nullptr || height == nullptr || href == nullptr)
+    if (width == NULL || height == NULL || href == NULL)
         return; //don't crash on invalid images
 
     m_imgCnt++;
@@ -1627,7 +1631,7 @@ private:
       }
 
     if (!getDocument()->createDataItem(propsName.c_str(), false,
-                                       pictData, pFG->getMimeType(), nullptr))
+                                       pictData, pFG->getMimeType(), NULL))
       {
 		  return;
       }
@@ -1639,7 +1643,7 @@ private:
     if (m_bAcceptingText)
       return;
 
-    _insureInSection(nullptr);
+    _insureInSection(NULL);
 
     if (!m_bAcceptingText) {
       getDocument()->appendStrux(PTX_Block, PP_std_copyProps(atts));
@@ -1750,15 +1754,18 @@ private:
     return getImporter ()->mapStyleObj (oo_sty.utf8_str());
   }
 
-  void _pushInlineFmt(const gchar ** atts)
+  bool _pushInlineFmt(const gchar ** atts)
   {
     UT_uint32 start = m_vecInlineFmt.size() + 1;
     UT_uint32 k;
     
-    for (k=0; (atts[k]); k++) {
-      m_vecInlineFmt.push_back(atts[k]);
-    }
-    m_stackFmtStartIndex.push(start);
+    for (k=0; (atts[k]); k++)
+      {
+          m_vecInlineFmt.push_back(atts[k]);
+      }
+    if (!m_stackFmtStartIndex.push(start))
+      return false;
+    return true;
   }
   
   void _popInlineFmt(void)

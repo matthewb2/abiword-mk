@@ -104,11 +104,11 @@ abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_FAR_CALL int
 abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-  mi->name = nullptr;
-  mi->desc = nullptr;
-  mi->version = nullptr;
-  mi->author = nullptr;
-  mi->usage = nullptr;
+  mi->name = NULL;
+  mi->desc = NULL;
+  mi->version = NULL;
+  mi->author = NULL;
+  mi->usage = NULL;
 
   AbiTest_RemoveFromMethods ();
 

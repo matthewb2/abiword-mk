@@ -47,7 +47,8 @@ struct ClsId {
  * is zero-terminated, length must include the byte for termination.
  * str must be delete[]'d, not free'd!
  * aLength, if non-null, contains the length of the string in bytes. */
-void readByteString(GsfInput* stream, char*& str, UT_uint16* aLength = nullptr);
+void readByteString(GsfInput* stream, char*& str, UT_uint16* aLength = NULL)
+    noexcept(false);
 
 /*! Reads a bytestring from a stream and converts it to UCS-4. Optionally,
  * it can also decrypt it.
@@ -55,17 +56,17 @@ void readByteString(GsfInput* stream, char*& str, UT_uint16* aLength = nullptr);
  * @param str The string where the bytestring should be stored
  * @param converter Iconv handle for charset conversion
  * @param cryptor (Optional) The cryptor used for decrypting the string */
-void readByteString(GsfInput* stream, UT_UCS4Char*& str, UT_iconv_t converter, SDWCryptor* cryptor = nullptr);
+void readByteString(GsfInput* stream, UT_UCS4Char*& str, UT_iconv_t converter, SDWCryptor* cryptor = NULL) noexcept(false);
 
 class DocHdr {
 	public:
-		DocHdr() : sBlockName(nullptr), converter(reinterpret_cast<UT_iconv_t>(-1)) {}
+		DocHdr() : sBlockName(NULL), converter(reinterpret_cast<UT_iconv_t>(-1)) {}
 		~DocHdr() { if (sBlockName) free(sBlockName); if (UT_iconv_isValid(converter)) UT_iconv_close(converter); }
 		/*! Reads the document header
 		 * \param stream The OLE Stream to load from - should be the one
 		 *               with the name "StarWriterDocument"
 		 * \throw UT_Error on failure */
-		void load(GsfInput* stream);
+		void load(GsfInput* stream) noexcept(false);
 
 		UT_uint8 cLen; // ???
 		UT_uint16 nVersion;
@@ -94,7 +95,7 @@ class DocHdr {
 
 // A text attribute record
 struct TextAttr {
-	TextAttr() : data(nullptr), isOff(false), isPara(false) {}
+	TextAttr() : data(NULL), isOff(false), isPara(false) {}
 	~TextAttr() { if (data) delete[] data; }
 	bool startSet, endSet; // true if the start/end attribute is valid
 	UT_uint16 which;
@@ -102,7 +103,7 @@ struct TextAttr {
 	UT_uint16 start;
 	UT_uint16 end;
 
-	UT_uint8* data; // possible additional data. nullptr if no data existant.
+	UT_uint8* data; // possible additional data. NULL if no data existant.
 	gsf_off_t dataLen;
 
 	std::string attrName;
@@ -165,11 +166,11 @@ class IE_Imp_StarOffice_Sniffer : public IE_ImpSniffer
 		IE_Imp_StarOffice_Sniffer();
 		virtual ~IE_Imp_StarOffice_Sniffer() {}
 
-		virtual const IE_SuffixConfidence * getSuffixConfidence() override;
-		virtual const IE_MimeConfidence * getMimeConfidence() override;
-		virtual UT_Confidence_t recognizeContents(GsfInput * input) override;
-		virtual bool getDlgLabels(const char** szDesc, const char** szSuffixList, IEFileType *ft) override;
-		virtual UT_Error constructImporter(PD_Document* pDocument, IE_Imp **ppie) override;
+		virtual const IE_SuffixConfidence * getSuffixConfidence ();
+		virtual const IE_MimeConfidence * getMimeConfidence ();
+		virtual UT_Confidence_t recognizeContents(GsfInput * input);
+		virtual bool getDlgLabels(const char** szDesc, const char** szSuffixList, IEFileType *ft);
+		virtual UT_Error constructImporter(PD_Document* pDocument, IE_Imp **ppie);
 };
 
 // Actual Importer
@@ -180,7 +181,7 @@ class IE_Imp_StarOffice : public IE_Imp
 		~IE_Imp_StarOffice();
 
 	protected:
-		virtual UT_Error _loadFile(GsfInput * input) override;
+		virtual UT_Error _loadFile(GsfInput * input);
 
 	private:
 		FILE* mFile;
@@ -197,15 +198,15 @@ class IE_Imp_StarOffice : public IE_Imp
 		 * \param aStream the stream to read from
 		 * \param aSize Reference to the size of the record
 		 * \param aEOR End of Record - file position where the record is finished*/
-		void readRecSize(GsfInput* stream, UT_uint32& aSize, gsf_off_t* aEOR = nullptr);
+		void readRecSize(GsfInput* stream, UT_uint32& aSize, gsf_off_t* aEOR = NULL) noexcept(false);
 		/*! Reads a string from the file where the first sint32 contains the length. If it
 		 * is zero-terminated, length must include the byte for termination. The string will
 		 * be converted to the charset given in mDocHdr. If the document is encrypted, the
 		 * string will be decrypted before character set conversion.
 		 * \param stream The stream to read from
 		 * \param str Reference to pointer to UT_UCS4Char, where the string is stored.
-		 * Must be free'd. Is nullptr if the function fails. */
-		void readByteString(GsfInput* stream, UT_UCS4Char*& str) {
+		 * Must be free'd. Is NULL if the function fails. */
+		void readByteString(GsfInput* stream, UT_UCS4Char*& str) noexcept(false) {
 			::readByteString(stream, str, mDocHdr.converter, mDocHdr.cryptor);
 		}
 
@@ -220,32 +221,32 @@ class IE_Imp_StarOffice : public IE_Imp
  * \param flags Flags (also contain the length in the 4 least significant bytes)
  * \param newPos (optional) Pointer to a variable where the position after the
  * flags record is stored. */
-void readFlagRec(GsfInput* stream, UT_uint8& flags, gsf_off_t* newPos = nullptr);
+void readFlagRec(GsfInput* stream, UT_uint8& flags, gsf_off_t* newPos = NULL) noexcept(false);
 
 /*! Reads one character from the given GsfInput.
  * \param aStream The OLE Stream
  * \param aChar Reference to the character
  * \throw UT_Error on failure */
-inline void readChar(GsfInput* aStream, char& aChar) {
+inline void readChar(GsfInput* aStream, char& aChar) noexcept(false) {
 	if (!gsf_input_read(aStream, 1, reinterpret_cast<guint8*>(&aChar)))
 		throw UT_IE_BOGUSDOCUMENT;
 }
 
-inline void streamRead(GsfInput* aStream, UT_uint8& aDest) {
+inline void streamRead(GsfInput* aStream, UT_uint8& aDest) noexcept(false) {
 	if (!gsf_input_read(aStream, 1, static_cast<guint8*>(&aDest)))
 		throw UT_IE_BOGUSDOCUMENT;
 }
 
-inline void streamRead(GsfInput* aStream, UT_sint8& aDest) {
+inline void streamRead(GsfInput* aStream, UT_sint8& aDest) noexcept(false) {
 	streamRead(aStream, reinterpret_cast<UT_uint8 &>(aDest));
 }
 
-inline void streamRead(GsfInput* aStream, char& aDest) {
+inline void streamRead(GsfInput* aStream, char& aDest) noexcept(false) {
 	streamRead(aStream, reinterpret_cast<UT_uint8 &>(aDest));
 }
 
 
-inline void streamRead(GsfInput* aStream, UT_uint16& aDest, bool isLittleEndian = true) {
+inline void streamRead(GsfInput* aStream, UT_uint16& aDest, bool isLittleEndian = true) noexcept(false) {
 	guint8 buf [2];
 	if (!gsf_input_read(aStream, 2, buf))
 		throw UT_IE_BOGUSDOCUMENT;
@@ -257,11 +258,11 @@ inline void streamRead(GsfInput* aStream, UT_uint16& aDest, bool isLittleEndian 
 	}
 }
 
-inline void streamRead(GsfInput* aStream, UT_sint16& aDest, bool isLittleEndian = true) {
+inline void streamRead(GsfInput* aStream, UT_sint16& aDest, bool isLittleEndian = true) noexcept(false) {
 	streamRead(aStream, reinterpret_cast<UT_uint16 &>(aDest), isLittleEndian);
 }
 
-inline void streamRead(GsfInput* aStream, UT_uint32& aDest, bool isLittleEndian = true) {
+inline void streamRead(GsfInput* aStream, UT_uint32& aDest, bool isLittleEndian = true) noexcept(false) {
 	guint8 buf [4];
 	if (!gsf_input_read(aStream, 4, buf))
 		throw UT_IE_BOGUSDOCUMENT;
@@ -273,17 +274,17 @@ inline void streamRead(GsfInput* aStream, UT_uint32& aDest, bool isLittleEndian 
 	}
 }
 
-inline void streamRead(GsfInput* aStream, UT_sint32& aDest, bool isLittleEndian = true) {
+inline void streamRead(GsfInput* aStream, UT_sint32& aDest, bool isLittleEndian = true) noexcept(false) {
 	streamRead(aStream, reinterpret_cast<UT_uint32 &>(aDest), isLittleEndian);
 }
 
 // reads the value as uint8
-inline void streamRead(GsfInput* aStream, bool& aDest) {
+inline void streamRead(GsfInput* aStream, bool& aDest) noexcept(false) {
 	streamRead(aStream, reinterpret_cast<UT_uint8&>(aDest));
 }
 
 // Class ID
-inline void streamRead(GsfInput* aStream, ClsId& aClsId) {
+inline void streamRead(GsfInput* aStream, ClsId& aClsId) noexcept(false) {
 	streamRead(aStream, aClsId.n1);
 	streamRead(aStream, aClsId.n2);
 	streamRead(aStream, aClsId.n3);
@@ -299,18 +300,18 @@ inline void streamRead(GsfInput* aStream, ClsId& aClsId) {
 #include "ut_debugmsg.h"
 
 // for completeness...
-inline void streamRead(GsfInput* aStream, char* aBuffer, UT_uint32 length) {
+inline void streamRead(GsfInput* aStream, char* aBuffer, UT_uint32 length) noexcept(false) {
 	if (!gsf_input_read(aStream, length, reinterpret_cast<guint8 *>(aBuffer)))
 		throw UT_IE_BOGUSDOCUMENT;
 }
 
-inline void streamRead(GsfInput* aStream, UT_uint8* aBuffer, UT_uint32 length) {
+inline void streamRead(GsfInput* aStream, UT_uint8* aBuffer, UT_uint32 length) noexcept(false) {
 	if (!gsf_input_read(aStream, length, static_cast<guint8*>(aBuffer)))
 		throw UT_IE_BOGUSDOCUMENT;
 }
 
 // readRecSize must have been called already. readFlagRec must not.
 // aEoa = position of the end of the attr.
-void streamRead(GsfInput* aStream, TextAttr& aAttr, gsf_off_t aEoa);
+void streamRead(GsfInput* aStream, TextAttr& aAttr, gsf_off_t aEoa) noexcept(false);
 
 #endif /* IE_IMP_STAROFFICE_H */

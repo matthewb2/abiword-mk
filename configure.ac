@@ -7,10 +7,9 @@ m4_define([abi_version], [abi_version_major.abi_version_minor.abi_version_micro]
 
 AC_INIT([abiword],[abi_version],[http://www.abisource.com/])
 AC_CANONICAL_HOST
-AC_CONFIG_HEADERS(config.h)
+AM_INIT_AUTOMAKE([1.9 tar-ustar])
 
-#AM_INIT_AUTOMAKE([1.9 tar-ustar])
-AM_INIT_AUTOMAKE([1.9 foreign subdir-objects])
+AC_CONFIG_HEADERS(config.h)
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
@@ -408,10 +407,8 @@ AC_ARG_WITH([goffice],
 GOFFICE_BUILTIN_CPPFLAGS=
 GOFFICE_BUILTIN_LIBS=
 if test "$TOOLKIT_IS_GTK2" = "yes"; then
-	GOFFICE_BUILTIN_CPPFLAGS='-I${top_srcdir}/goffice-bits2'
-	GOFFICE_BUILTIN_LIBS='${top_builddir}/goffice-bits2/libgoffice.la'
-	AC_SUBST(GOFFICE_BUILTIN_CPPFLAGS)
-	AC_SUBST(GOFFICE_BUILTIN_LIBS)
+        :
+
 elif test "$PLATFORM" = "unix" && \
    test "$abi_cv_goffice" = "yes"; then
 	opt_pkgs="$opt_pkgs $goffice_req"
@@ -526,6 +523,7 @@ fi
 AM_CONDITIONAL([WITH_LIBICAL], test "$abi_cv_libical" = "yes")
 AM_CONDITIONAL([HAVE_LIBICAL], test "$abi_cv_libical" = "yes")
 
+AM_CONDITIONAL([TOOLKIT_QT], [false])
 
 champlain_req=' champlain-gtk-0.12 '
 AC_ARG_WITH([champlain], 
@@ -710,7 +708,7 @@ SYSTEM_CFLAGS=
 if test "$TOOLKIT" = "win"; then
 	deps_pkgs="$deps_pkgs $win_pkgs"
 	# nonstandard dlls go below the blank line
-	SYSTEM_LIBS="-ladvapi32 -lcomctl32 -lcomdlg32 -lgdi32 -lkernel32 -lole32 -loleaut32 -lshell32 -luser32 -luuid -lversion -lwinspool \
+	SYSTEM_LIBS="-ladvapi32 -lcomctl32 -lcomdlg32 -lgdi32 -lkernel32 -lole32 -loleaut32 -lshell32 -luser32 -lversion -lwinspool \
 		      $PNG_LIBS -lz -ljpeg"
 	SYSTEM_CFLAGS="-mthreads"
 elif test "$TOOLKIT" = "cocoa"; then
@@ -863,7 +861,7 @@ fi
 
 if test "$TOOLKIT" = "win"; then
 	AC_DEFINE([TOOLKIT_WIN], [1], [Build win32 user interface])
-	#AC_DEFINE([_WIN32_IE], [0x0501], [minimal comctl.dll v4.70 for toolbars])
+	AC_DEFINE([_WIN32_IE], [0x0501], [minimal comctl.dll v4.70 for toolbars])
 	#AC_DEFINE([_WIN32_WINNT], [0x0500], [support collaboration plugin in Windows 2000 or higher])
 	case ${host} in 
 	  *-w64-mingw*)
@@ -1172,6 +1170,7 @@ AM_CONDITIONAL(HAVE_INTROSPECTION, test "x$found_introspection" = "xyes")
 AC_OUTPUT(
   libabiword.pc
   Makefile
+  goffice-bits/Makefile
   icons/Makefile
   po/Makefile
   src/Makefile
@@ -1213,7 +1212,7 @@ AC_OUTPUT(
   src/wp/Makefile
   src/wp/ap/Makefile
   src/wp/ap/cocoa/Makefile
-  src/wp/ap/gtk/Makefile
+  src/wp/ap/gtk/Makefile  
   src/wp/ap/win/Makefile
   src/wp/ap/xp/Makefile
   src/wp/ap/xp/ToolbarIcons/Makefile

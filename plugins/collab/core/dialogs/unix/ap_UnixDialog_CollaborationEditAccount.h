@@ -29,10 +29,10 @@ class AP_UnixDialog_CollaborationEditAccount : public AP_Dialog_CollaborationEdi
 public:
 	AP_UnixDialog_CollaborationEditAccount(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id);
 	static XAP_Dialog * static_constructor(XAP_DialogFactory * pFactory, XAP_Dialog_Id id);
-	void runModal(XAP_Frame * pFrame) override;
+	void						runModal(XAP_Frame * pFrame);
 
 protected:
-	virtual void* _getEmbeddingParent() override
+	virtual void*				_getEmbeddingParent()
 		{ return m_wEmbeddingParent; }
 
 private:

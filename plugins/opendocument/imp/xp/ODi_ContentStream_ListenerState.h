@@ -21,13 +21,19 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef _ODI_CONTENTSTREAM_LISTENERSTATE_H_
+#define _ODI_CONTENTSTREAM_LISTENERSTATE_H_
 
-#include <gsf/gsf.h>
+#include "ut_compiler.h"
 
 // Internal includes
 #include "ODi_ListenerState.h"
 #include "ODi_ElementStack.h"
+
+// External includes
+ABI_W_NO_CONST_QUAL
+#include <gsf/gsf.h>
+ABI_W_POP
 
 // Internal classes
 class ODi_FontFaceDecls;
@@ -44,6 +50,7 @@ class ODi_ContentStream_ListenerState : public ODi_ListenerState {
 public:
 
     ODi_ContentStream_ListenerState (PD_Document* pDocument,
+                                    GsfInfile* pGsfInfile,
                                     ODi_Office_Styles* pStyles,
                                     ODi_FontFaceDecls& rFontFaceDecls,
 				     ODi_ElementStack& rElementStack,
@@ -51,17 +58,20 @@ public:
 
     virtual ~ODi_ContentStream_ListenerState();
 
-    virtual void startElement(const gchar* pName, const gchar** ppAtts,
-                               ODi_ListenerStateAction& rAction) override;
+    void startElement (const gchar* pName, const gchar** ppAtts,
+                               ODi_ListenerStateAction& rAction);
 
-    virtual void endElement(const gchar* pName, ODi_ListenerStateAction& rAction) override;
+    void endElement (const gchar* pName, ODi_ListenerStateAction& rAction);
 
-    virtual void charData(const gchar* pBuffer, int length) override;
+    void charData (const gchar* pBuffer, int length);
 
 private:
 
     PD_Document* m_pAbiDocument;
+    GsfInfile* m_pGsfInfile;
     ODi_Office_Styles* m_pStyles;
     ODi_FontFaceDecls& m_rFontFaceDecls;
     ODi_Abi_Data& m_rAbiData;
 };
+
+#endif //_ODI_CONTENTSTREAM_LISTENERSTATE_H_

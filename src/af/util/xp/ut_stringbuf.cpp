@@ -26,8 +26,8 @@
 #include <algorithm>
 
 #include <libxml/uri.h>
+// ut_stringbuf.cpp 상단
 #include <libxml/parser.h>
-#include <libxml/xmlmemory.h>
 
 #include <glib.h>
 

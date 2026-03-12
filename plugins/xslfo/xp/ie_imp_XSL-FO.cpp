@@ -222,10 +222,10 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
     const gchar * buf[3];
     const gchar ** p_atts;
 	buf[0] = static_cast<const gchar *>("props");
-	buf[2] = nullptr;
+	buf[2] = NULL;
 	
 	UT_UTF8String sBuf;
-	const gchar * pVal = nullptr;
+	const gchar * pVal = NULL;
 	
 	bool used = false;
 
@@ -418,7 +418,7 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 			if(sBuf.length())
 				buf[1] = sBuf.utf8_str();
 			else
-				buf[0] = nullptr;
+				buf[0] = NULL;
 
 			xxx_UT_DEBUGMSG(("FO import: block props='%s'\n", sBuf.utf8_str()));
 
@@ -591,7 +591,7 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 				xxx_UT_DEBUGMSG(("FO import: inline props='%s'\n", sBuf.utf8_str()));
 
 				p_atts = &buf[0];
-				_pushInlineFmt(PP_std_copyProps(p_atts));
+				X_CheckError(_pushInlineFmt(PP_std_copyProps(p_atts)));
 				X_CheckError(appendFmt(m_vecInlineFmt));
 
 				pVal = static_cast<const gchar*>(_getXMLPropValue("id", atts));
@@ -617,7 +617,7 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 				break;
 			}
 
-			gchar *p_val = nullptr;
+			gchar *p_val = NULL;
 			p_val = (gchar *)_getXMLPropValue("internal-destination", atts);
 
 			if(p_val) //internal
@@ -707,7 +707,7 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 		case TT_TABLE:
 		{
 			X_CheckError((m_parseState == _PS_Sec) || (m_parseState == _PS_Block) || (m_parseState == _PS_List));
-			X_CheckError(m_TableHelperStack->tableStart(getDoc(),nullptr));
+			X_CheckError(m_TableHelperStack->tableStart(getDoc(),NULL));
 			m_iTableDepth++;
 
 			m_parseState = _PS_Table;
@@ -717,7 +717,7 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 		case TT_TABLEROW:
 		{
 			X_VerifyParseState(_PS_Table);
-			X_CheckError(m_TableHelperStack->trStart(nullptr));
+			X_CheckError(m_TableHelperStack->trStart(NULL));
 			break;
 		}
 
@@ -752,7 +752,7 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 			}
 
 
-			X_CheckError(m_TableHelperStack->tdStart(rowspan, colspan, nullptr));
+			X_CheckError(m_TableHelperStack->tdStart(rowspan, colspan, NULL));
 			break;
 		}
 
@@ -772,7 +772,7 @@ void IE_Imp_XSL_FO::startElement(const gchar *name,
 		{
 			X_CheckError((m_parseState == _PS_Block) || (m_parseState == _PS_List) || (m_parseState == _PS_Sec));
 
-			gchar *p_val = nullptr;
+			gchar *p_val = NULL;
 			p_val = (gchar *)_getXMLPropValue(static_cast<const gchar *>("src"), atts);
 
 			if(p_val)
@@ -1085,10 +1085,10 @@ void IE_Imp_XSL_FO::createImage(const char *name, const gchar **atts)
 	UT_UTF8String_sprintf (dataid, "image%u", static_cast<unsigned int>(m_iImages++));
 
 	X_CheckError (getDoc()->createDataItem (dataid.utf8_str(), false, pBB,
-                                            pfg->getMimeType(), nullptr));
+                                            pfg->getMimeType(), NULL));
 
 	UT_UTF8String props, dim;
-	const gchar *p_val = nullptr;
+	const gchar *p_val = NULL;
 
 	UT_LocaleTransactor t(LC_NUMERIC, "C");
 

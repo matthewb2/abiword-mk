@@ -24,14 +24,14 @@
 #define _OXML_ELEMENT_LIST_H_
 
 // Internal includes
-#include "OXML_Element.h"
-#include "ie_exp_OpenXML.h"
-#include "OXML_Element_Paragraph.h"
+#include <OXML_Element.h>
+#include <ie_exp_OpenXML.h>
+#include <OXML_Element_Paragraph.h>
 
 // AbiWord includes
-#include "ut_types.h"
-#include "ut_string.h"
-#include "pd_Document.h"
+#include <ut_types.h>
+#include <ut_string.h>
+#include <pd_Document.h>
 
 class OXML_Element_Paragraph;
 
@@ -41,8 +41,8 @@ public:
 	OXML_Element_List(const std::string & id, OXML_Element_Paragraph* paragraph);
 	virtual ~OXML_Element_List();
 
-	virtual UT_Error serialize(IE_Exp_OpenXML* exporter) override;
-	virtual UT_Error addToPT(PD_Document * pDocument) override;
+	virtual UT_Error serialize(IE_Exp_OpenXML* exporter);
+	virtual UT_Error addToPT(PD_Document * pDocument);
 
 private:
 	virtual UT_Error serializeProperties(IE_Exp_OpenXML* exporter);

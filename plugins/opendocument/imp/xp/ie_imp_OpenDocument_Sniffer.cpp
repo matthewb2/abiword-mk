@@ -29,6 +29,9 @@
 // Internal includes
 #include "ie_imp_OpenDocument.h"
 
+#include <gsf/gsf-infile.h>
+#include <gsf/gsf-infile-zip.h>
+
 /**
  * Constructor
  * 
@@ -80,8 +83,8 @@ UT_Confidence_t IE_Imp_OpenDocument_Sniffer::recognizeContents (GsfInput * input
 {
     UT_Confidence_t confidence = UT_CONFIDENCE_ZILCH;
 	
-	GsfInfile * zip  = gsf_infile_zip_new (input, nullptr);
-	if (zip != nullptr) {
+	GsfInfile * zip  = gsf_infile_zip_new (input, NULL);
+	if (zip != NULL) {
 		GsfInput* pInput = gsf_infile_child_by_name(zip, "mimetype");
 		
 		if (pInput) {
@@ -89,7 +92,7 @@ UT_Confidence_t IE_Imp_OpenDocument_Sniffer::recognizeContents (GsfInput * input
 			
 			gsf_off_t size = gsf_input_size (pInput);
 			if (size > 0) {
-				const char * p = (const char *)gsf_input_read(pInput, size, nullptr);
+				const char * p = (const char *)gsf_input_read(pInput, size, NULL);
 				if(p) {
 					mimetype.assign(p, size);
 				}

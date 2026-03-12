@@ -29,8 +29,8 @@
 #include "ODi_Style_Style.h"
 
 // AbiWord includes
-#include "ut_types.h"
-#include "ut_string_class.h"
+#include <ut_types.h>
+#include <ut_string_class.h>
 
 // Internal classes
 class ODi_ElementStack;
@@ -46,14 +46,14 @@ class ODi_Abi_Data;
 class ODi_Style_Style_Family {
 public:
 
-    ODi_Style_Style_Family() : m_pDefaultStyle(nullptr) {}
+    ODi_Style_Style_Family() : m_pDefaultStyle(NULL) {}
     virtual ~ODi_Style_Style_Family();
 
     ODi_Style_Style* addStyle(const gchar** ppAtts,
                              ODi_ElementStack& rElementStack,
 			     ODi_Abi_Data & rAbiData,
-                             std::string* pReplacementName = nullptr,
-                             std::string* pReplacementDisplayName = nullptr);
+                             std::string* pReplacementName = NULL,
+                             std::string* pReplacementDisplayName = NULL);
 
     ODi_Style_Style* addDefaultStyle(ODi_ElementStack& rElementStack,
 				     ODi_Abi_Data & rAbiData) {

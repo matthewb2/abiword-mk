@@ -28,8 +28,8 @@
 #include "ODe_Style_Style.h"
 
 // AbiWord includes
-#include "ut_string_class.h"
-#include "ut_vector.h"
+#include <ut_string_class.h>
+#include <ut_vector.h>
 
 // External includes
 #include <stdio.h>
@@ -46,10 +46,10 @@ class ODe_Styles;
 class ODe_Table_Cell {
 public:
 
-    ODe_Table_Cell() : m_pTextContent(nullptr) {}
+    ODe_Table_Cell() : m_pTextContent(NULL) {}
 
     ~ODe_Table_Cell() {
-        if (m_pTextContent != nullptr) {
+        if (m_pTextContent != NULL) {
             ODe_gsf_output_close(m_pTextContent);
         }
     }
@@ -98,7 +98,7 @@ public:
 
     void write(GsfOutput* pTableOutput, const UT_UTF8String& rSpacesOffset);
 
-    // A nullptr value means that this cell is covered, that it's a
+    // A NULL value means that this cell is covered, that it's a
     // <table:covered-table-cell/> element
     ODe_Table_Cell** m_ppCells;
 
@@ -125,10 +125,10 @@ public:
 
     virtual ~ODe_Table_Listener();
 
-    virtual void openTable(const PP_AttrProp* pAP, ODe_ListenerAction& rAction) override;
-    virtual void closeTable(ODe_ListenerAction& rAction) override;
+    virtual void openTable(const PP_AttrProp* pAP, ODe_ListenerAction& rAction);
+    virtual void closeTable(ODe_ListenerAction& rAction);
 
-    virtual void openCell(const PP_AttrProp* pAP, ODe_ListenerAction& rAction) override;
+    virtual void openCell(const PP_AttrProp* pAP, ODe_ListenerAction& rAction);
 
 private:
     void _buildTable();

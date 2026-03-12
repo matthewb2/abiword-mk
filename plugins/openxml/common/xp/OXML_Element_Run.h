@@ -24,12 +24,12 @@
 #define _OXML_ELEMENT_RUN_H_
 
 // Internal includes
-#include "OXML_Element.h"
-#include "ie_exp_OpenXML.h"
+#include <OXML_Element.h>
+#include <ie_exp_OpenXML.h>
 
 // AbiWord includes
-#include "ut_types.h"
-#include "pd_Document.h"
+#include <ut_types.h>
+#include <pd_Document.h>
 
 // External includes
 #include <string>
@@ -40,8 +40,8 @@ public:
 	OXML_Element_Run(const std::string & id);
 	virtual ~OXML_Element_Run();
 
-	virtual UT_Error serialize(IE_Exp_OpenXML* exporter) override;
-	virtual UT_Error addToPT(PD_Document * pDocument) override;
+	virtual UT_Error serialize(IE_Exp_OpenXML* exporter);
+	virtual UT_Error addToPT(PD_Document * pDocument);
 
 	UT_Error serializeChildren(IE_Exp_OpenXML* exporter);
 

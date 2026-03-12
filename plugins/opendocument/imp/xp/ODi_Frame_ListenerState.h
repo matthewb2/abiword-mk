@@ -22,7 +22,7 @@
 #ifndef _ODI_FRAME_LISTENERSTATE_H_
 #define _ODI_FRAME_LISTENERSTATE_H_
 
-#include "ut_std_string.h"
+#include <ut_std_string.h>
 
 // Internal includes
 #include "ODi_ListenerState.h"
@@ -50,12 +50,12 @@ public:
 
     virtual ~ODi_Frame_ListenerState() {}
 
-    virtual void startElement(const gchar* pName, const gchar** ppAtts,
-                       ODi_ListenerStateAction& rAction) override;
+    void startElement (const gchar* pName, const gchar** ppAtts,
+                       ODi_ListenerStateAction& rAction);
 
-    virtual void endElement(const gchar* pName, ODi_ListenerStateAction& rAction) override;
+    void endElement (const gchar* pName, ODi_ListenerStateAction& rAction);
 
-    virtual void charData(const gchar* pBuffer, int length) override;
+    void charData (const gchar* pBuffer, int length);
 
 private:
 

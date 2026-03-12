@@ -20,7 +20,6 @@ strings_DATA = \
 	br-FR.strings \
 	bs.strings \
 	ca-ES.strings \
-	ca@valencia.strings \
 	cgg.strings \
 	cs-CZ.strings \
 	cy-GB.strings \

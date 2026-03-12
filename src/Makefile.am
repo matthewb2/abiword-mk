@@ -1,4 +1,4 @@
-#AUTOMAKE_OPTIONS = subdir-objects
+AUTOMAKE_OPTIONS = subdir-objects
 
 SUBDIRS = af plugins text wp
 
@@ -38,6 +38,10 @@ libabiword_cpp += wp/main/gtk/libabiword.cpp
 main_cpp = wp/main/gtk/UnixMain.cpp
 endif
 
+if TOOLKIT_QT
+libabiword_cpp += wp/main/qt/libabiwordQt.cpp
+main_cpp = wp/main/qt/QtMain.cpp
+endif
 
 if TOOLKIT_WIN
 main_cpp = wp/main/win/Win32Main.cpp

@@ -170,7 +170,7 @@ ABIWORD_SERIES = 3.0
 ABIWORD_UIDIR = ${datarootdir}/abiword-3.0/ui
 ABIWORD_XSLTMLDIR = 
 ABI_SUB_SERIES = 
-ACLOCAL = aclocal
+ACLOCAL = ${SHELL} /home/user/abiword-3.0.2/missing aclocal-1.15
 AF_CPPFLAGS =  ${BASE_CPPFLAGS} -I${top_srcdir}/src/af/ev/${TOOLKIT} -I${top_srcdir}/src/af/ev/xp -I${top_srcdir}/src/af/gr/${TOOLKIT} -I${top_srcdir}/src/af/gr/xp -I${top_srcdir}/src/af/util/${PLATFORM} -I${top_srcdir}/src/af/util/xp -I${top_srcdir}/src/af/xap/${TOOLKIT} -I${top_srcdir}/src/af/xap/xp
 AF_TEST_CPPFLAGS =  ${AF_CPPFLAGS} -I${top_srcdir}/src/af/tf/xp
 AIKSAURUS_CFLAGS = 
@@ -182,9 +182,9 @@ APPLIX_CFLAGS =
 APPLIX_LIBS = 
 AR = ar
 AS = as
-AUTOCONF = autoconf
-AUTOHEADER = autoheader
-AUTOMAKE = automake
+AUTOCONF = ${SHELL} /home/user/abiword-3.0.2/missing autoconf
+AUTOHEADER = ${SHELL} /home/user/abiword-3.0.2/missing autoheader
+AUTOMAKE = ${SHELL} /home/user/abiword-3.0.2/missing automake-1.15
 AWK = gawk
 BABELFISH_CFLAGS = 
 BABELFISH_LIBS = 
@@ -285,7 +285,7 @@ LATEX_CFLAGS =
 LATEX_LIBS = 
 LD = D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe
 LDFLAGS = 
-LEX = ${SHELL} /home/user/abiword_personal/missing flex
+LEX = ${SHELL} /home/user/abiword-3.0.2/missing flex
 LEXLIB = 
 LEX_OUTPUT_ROOT = 
 LIBGCRYPT_CFLAGS = -I/mingw32/include
@@ -305,7 +305,7 @@ LOADBINDINGS_LIBS =
 LTLIBOBJS = 
 LT_SYS_LIBRARY_PATH = 
 MAINT = 
-MAKEINFO = ${SHELL} /home/user/abiword_personal/missing makeinfo
+MAKEINFO = ${SHELL} /home/user/abiword-3.0.2/missing makeinfo
 MANIFEST_TOOL = :
 MATHVIEW_CFLAGS = 
 MATHVIEW_LIBS = 
@@ -403,10 +403,10 @@ XSLFO_CFLAGS =
 XSLFO_LIBS = 
 YACC = yacc
 YFLAGS = 
-abs_builddir = /home/user/abiword_personal/src/wp/main/cocoa
-abs_srcdir = /home/user/abiword_personal/src/wp/main/cocoa
-abs_top_builddir = /home/user/abiword_personal
-abs_top_srcdir = /home/user/abiword_personal
+abs_builddir = /home/user/abiword-3.0.2/src/wp/main/cocoa
+abs_srcdir = /home/user/abiword-3.0.2/src/wp/main/cocoa
+abs_top_builddir = /home/user/abiword-3.0.2
+abs_top_srcdir = /home/user/abiword-3.0.2
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_CXX = g++
@@ -414,8 +414,8 @@ ac_ct_DUMPBIN =
 am__include = include
 am__leading_dot = .
 am__quote = 
-am__tar = $${TAR-tar} chof - "$$tardir"
-am__untar = $${TAR-tar} xf -
+am__tar = tar --format=ustar -chf - "$$tardir"
+am__untar = tar -xf -
 bindir = ${exec_prefix}/bin
 build = i686-w64-mingw32
 build_alias = i686-w64-mingw32
@@ -436,7 +436,7 @@ host_vendor = w64
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/user/abiword_personal/install-sh
+install_sh = ${SHELL} /home/user/abiword-3.0.2/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 libwmfconfig = 
@@ -488,9 +488,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(top_srcdir)/src/wp/main/cocoa/bu
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/wp/main/cocoa/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/wp/main/cocoa/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign src/wp/main/cocoa/Makefile
+	  $(AUTOMAKE) --gnu src/wp/main/cocoa/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \

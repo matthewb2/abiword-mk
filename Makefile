@@ -14,7 +14,6 @@
 
 
 
-
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
     false; \
@@ -89,6 +88,7 @@ POST_UNINSTALL = :
 build_triplet = i686-w64-mingw32
 host_triplet = i686-w64-mingw32
 subdir = .
+SUBDIRS =
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/libgcrypt.m4 \
 	$(top_srcdir)/libtool.m4 $(top_srcdir)/ltoptions.m4 \
@@ -134,39 +134,6 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
-am__install_max = 40
-am__nobase_strip_setup = \
-  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
-am__nobase_strip = \
-  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
-am__nobase_list = $(am__nobase_strip_setup); \
-  for p in $$list; do echo "$$p $$p"; done | \
-  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
-  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
-    if (++n[$$2] == $(am__install_max)) \
-      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
-    END { for (dir in files) print dir, files[dir] }'
-am__base_list = \
-  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
-  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
-am__uninstall_files_from_dir = { \
-  test -z "$$files" \
-    || { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
-    || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
-         $(am__cd) "$$dir" && rm -f $$files; }; \
-  }
-man1dir = $(mandir)/man1
-am__installdirs = "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(desktopdir)" \
-	"$(DESTDIR)$(mimedir)" "$(DESTDIR)$(pkgconfigdir)"
-NROFF = nroff
-MANS = $(dist_man1_MANS)
-DATA = $(desktop_DATA) $(mime_DATA) $(pkgconfig_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -196,8 +163,8 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
-am__DIST_COMMON = $(dist_man1_MANS) $(srcdir)/Makefile.in \
-	$(srcdir)/config.h.in $(srcdir)/libabiword.pc.in \
+am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in \
+	$(srcdir)/libabiword.pc.in \
 	$(top_srcdir)/src/wp/main/cocoa/bundle/Info.plist.in AUTHORS \
 	COPYING ChangeLog INSTALL NEWS README compile config.guess \
 	config.sub depcomp install-sh ltmain.sh missing py-compile
@@ -256,7 +223,7 @@ ABIWORD_SERIES = 3.0
 ABIWORD_UIDIR = ${datarootdir}/abiword-3.0/ui
 ABIWORD_XSLTMLDIR = 
 ABI_SUB_SERIES = 
-ACLOCAL = aclocal
+ACLOCAL = ${SHELL} /home/user/abiword-3.0.2/missing aclocal-1.15
 AF_CPPFLAGS =  ${BASE_CPPFLAGS} -I${top_srcdir}/src/af/ev/${TOOLKIT} -I${top_srcdir}/src/af/ev/xp -I${top_srcdir}/src/af/gr/${TOOLKIT} -I${top_srcdir}/src/af/gr/xp -I${top_srcdir}/src/af/util/${PLATFORM} -I${top_srcdir}/src/af/util/xp -I${top_srcdir}/src/af/xap/${TOOLKIT} -I${top_srcdir}/src/af/xap/xp
 AF_TEST_CPPFLAGS =  ${AF_CPPFLAGS} -I${top_srcdir}/src/af/tf/xp
 AIKSAURUS_CFLAGS = 
@@ -268,9 +235,9 @@ APPLIX_CFLAGS =
 APPLIX_LIBS = 
 AR = ar
 AS = as
-AUTOCONF = autoconf
-AUTOHEADER = autoheader
-AUTOMAKE = automake
+AUTOCONF = ${SHELL} /home/user/abiword-3.0.2/missing autoconf
+AUTOHEADER = ${SHELL} /home/user/abiword-3.0.2/missing autoheader
+AUTOMAKE = ${SHELL} /home/user/abiword-3.0.2/missing automake-1.15
 AWK = gawk
 BABELFISH_CFLAGS = 
 BABELFISH_LIBS = 
@@ -371,7 +338,7 @@ LATEX_CFLAGS =
 LATEX_LIBS = 
 LD = D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe
 LDFLAGS = 
-LEX = ${SHELL} /home/user/abiword_personal/missing flex
+LEX = ${SHELL} /home/user/abiword-3.0.2/missing flex
 LEXLIB = 
 LEX_OUTPUT_ROOT = 
 LIBGCRYPT_CFLAGS = -I/mingw32/include
@@ -391,7 +358,7 @@ LOADBINDINGS_LIBS =
 LTLIBOBJS = 
 LT_SYS_LIBRARY_PATH = 
 MAINT = 
-MAKEINFO = ${SHELL} /home/user/abiword_personal/missing makeinfo
+MAKEINFO = ${SHELL} /home/user/abiword-3.0.2/missing makeinfo
 MANIFEST_TOOL = :
 MATHVIEW_CFLAGS = 
 MATHVIEW_LIBS = 
@@ -489,10 +456,10 @@ XSLFO_CFLAGS =
 XSLFO_LIBS = 
 YACC = yacc
 YFLAGS = 
-abs_builddir = /home/user/abiword_personal
-abs_srcdir = /home/user/abiword_personal
-abs_top_builddir = /home/user/abiword_personal
-abs_top_srcdir = /home/user/abiword_personal
+abs_builddir = /home/user/abiword-3.0.2
+abs_srcdir = /home/user/abiword-3.0.2
+abs_top_builddir = /home/user/abiword-3.0.2
+abs_top_srcdir = /home/user/abiword-3.0.2
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_CXX = g++
@@ -500,8 +467,8 @@ ac_ct_DUMPBIN =
 am__include = include
 am__leading_dot = .
 am__quote = 
-am__tar = $${TAR-tar} chof - "$$tardir"
-am__untar = $${TAR-tar} xf -
+am__tar = tar --format=ustar -chf - "$$tardir"
+am__untar = tar -xf -
 bindir = ${exec_prefix}/bin
 build = i686-w64-mingw32
 build_alias = i686-w64-mingw32
@@ -522,7 +489,7 @@ host_vendor = w64
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/user/abiword_personal/install-sh
+install_sh = ${SHELL} /home/user/abiword-3.0.2/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 libwmfconfig = 
@@ -549,23 +516,7 @@ top_build_prefix =
 top_builddir = .
 top_srcdir = .
 ACLOCAL_AMFLAGS = -I .
-DIST_SUBDIRS = src plugins po user icons tools
-SUBDIRS = src plugins po user icons
-#desktopdir = $(datadir)/applications
-#desktop_DATA = abiword.desktop
-#mimedir = ${datarootdir}/abiword-3.0/mime-info
-#mime_DATA = abiword.keys
-#pkgconfigdir = $(libdir)/pkgconfig
-#pkgconfig_DATA = abiword-$(ABIWORD_SERIES).pc
-#dist_man1_MANS = abiword.1
-
-# we disable introspection for distcheck as it fails because of
-# installation needing sudo
-#DISTCHECK_CONFIGURE_FLAGS = \
-#	--enable-introspection=no \
-#	--with-gir-dir=\$${datadir}/gir-1.0 \
-#	--with-typelib-dir=\$${libdir}/girepository-1.0
-
+DIST_SUBDIRS = goffice-bits  src plugins po user icons tools
 EXTRA_DIST = \
 	AUTHORS \
 	BiDiReadme.txt \
@@ -600,15 +551,15 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign'; \
-	      $(am__cd) $(srcdir) && $(AUTOMAKE) --foreign \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --gnu'; \
+	      $(am__cd) $(srcdir) && $(AUTOMAKE) --gnu \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign Makefile
+	  $(AUTOMAKE) --gnu Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -655,110 +606,6 @@ clean-libtool:
 
 distclean-libtool:
 	-rm -f libtool config.lt
-install-man1: $(dist_man1_MANS)
-	@$(NORMAL_INSTALL)
-	@list1='$(dist_man1_MANS)'; \
-	list2=''; \
-	test -n "$(man1dir)" \
-	  && test -n "`echo $$list1$$list2`" \
-	  || exit 0; \
-	echo " $(MKDIR_P) '$(DESTDIR)$(man1dir)'"; \
-	$(MKDIR_P) "$(DESTDIR)$(man1dir)" || exit 1; \
-	{ for i in $$list1; do echo "$$i"; done;  \
-	if test -n "$$list2"; then \
-	  for i in $$list2; do echo "$$i"; done \
-	    | sed -n '/\.1[a-z]*$$/p'; \
-	fi; \
-	} | while read p; do \
-	  if test -f $$p; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; echo "$$p"; \
-	done | \
-	sed -e 'n;s,.*/,,;p;h;s,.*\.,,;s,^[^1][0-9a-z]*$$,1,;x' \
-	      -e 's,\.[0-9a-z]*$$,,;$(transform);G;s,\n,.,' | \
-	sed 'N;N;s,\n, ,g' | { \
-	list=; while read file base inst; do \
-	  if test "$$base" = "$$inst"; then list="$$list $$file"; else \
-	    echo " $(INSTALL_DATA) '$$file' '$(DESTDIR)$(man1dir)/$$inst'"; \
-	    $(INSTALL_DATA) "$$file" "$(DESTDIR)$(man1dir)/$$inst" || exit $$?; \
-	  fi; \
-	done; \
-	for i in $$list; do echo "$$i"; done | $(am__base_list) | \
-	while read files; do \
-	  test -z "$$files" || { \
-	    echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(man1dir)'"; \
-	    $(INSTALL_DATA) $$files "$(DESTDIR)$(man1dir)" || exit $$?; }; \
-	done; }
-
-uninstall-man1:
-	@$(NORMAL_UNINSTALL)
-	@list='$(dist_man1_MANS)'; test -n "$(man1dir)" || exit 0; \
-	files=`{ for i in $$list; do echo "$$i"; done; \
-	} | sed -e 's,.*/,,;h;s,.*\.,,;s,^[^1][0-9a-z]*$$,1,;x' \
-	      -e 's,\.[0-9a-z]*$$,,;$(transform);G;s,\n,.,'`; \
-	dir='$(DESTDIR)$(man1dir)'; $(am__uninstall_files_from_dir)
-install-desktopDATA: $(desktop_DATA)
-	@$(NORMAL_INSTALL)
-	@list='$(desktop_DATA)'; test -n "$(desktopdir)" || list=; \
-	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(desktopdir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(desktopdir)" || exit 1; \
-	fi; \
-	for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; \
-	done | $(am__base_list) | \
-	while read files; do \
-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(desktopdir)'"; \
-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(desktopdir)" || exit $$?; \
-	done
-
-uninstall-desktopDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(desktop_DATA)'; test -n "$(desktopdir)" || list=; \
-	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(desktopdir)'; $(am__uninstall_files_from_dir)
-install-mimeDATA: $(mime_DATA)
-	@$(NORMAL_INSTALL)
-	@list='$(mime_DATA)'; test -n "$(mimedir)" || list=; \
-	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(mimedir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(mimedir)" || exit 1; \
-	fi; \
-	for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; \
-	done | $(am__base_list) | \
-	while read files; do \
-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(mimedir)'"; \
-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(mimedir)" || exit $$?; \
-	done
-
-uninstall-mimeDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(mime_DATA)'; test -n "$(mimedir)" || list=; \
-	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(mimedir)'; $(am__uninstall_files_from_dir)
-install-pkgconfigDATA: $(pkgconfig_DATA)
-	@$(NORMAL_INSTALL)
-	@list='$(pkgconfig_DATA)'; test -n "$(pkgconfigdir)" || list=; \
-	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(pkgconfigdir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(pkgconfigdir)" || exit 1; \
-	fi; \
-	for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; \
-	done | $(am__base_list) | \
-	while read files; do \
-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pkgconfigdir)'"; \
-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pkgconfigdir)" || exit $$?; \
-	done
-
-uninstall-pkgconfigDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(pkgconfig_DATA)'; test -n "$(pkgconfigdir)" || list=; \
-	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(pkgconfigdir)'; $(am__uninstall_files_from_dir)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -1059,12 +906,9 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(MANS) $(DATA) config.h
+all-am: Makefile config.h
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(desktopdir)" "$(DESTDIR)$(mimedir)" "$(DESTDIR)$(pkgconfigdir)"; do \
-	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
-	done
 install: install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
@@ -1118,8 +962,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-desktopDATA install-man install-mimeDATA \
-	install-pkgconfigDATA
+install-data-am:
 
 install-dvi: install-dvi-recursive
 
@@ -1135,7 +978,7 @@ install-info: install-info-recursive
 
 install-info-am:
 
-install-man: install-man1
+install-man:
 
 install-pdf: install-pdf-recursive
 
@@ -1165,10 +1008,7 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-desktopDATA uninstall-man uninstall-mimeDATA \
-	uninstall-pkgconfigDATA
-
-uninstall-man: uninstall-man1
+uninstall-am:
 
 .MAKE: $(am__recursive_targets) all install-am install-strip
 
@@ -1180,17 +1020,14 @@ uninstall-man: uninstall-man1
 	distclean-generic distclean-hdr distclean-libtool \
 	distclean-tags distcleancheck distdir distuninstallcheck dvi \
 	dvi-am html html-am info info-am install install-am \
-	install-data install-data-am install-desktopDATA install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-man1 install-mimeDATA install-pdf install-pdf-am \
-	install-pkgconfigDATA install-ps install-ps-am install-strip \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
 	installcheck installcheck-am installdirs installdirs-am \
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-am uninstall uninstall-am uninstall-desktopDATA \
-	uninstall-man uninstall-man1 uninstall-mimeDATA \
-	uninstall-pkgconfigDATA
+	tags tags-am uninstall uninstall-am
 
 .PRECIOUS: Makefile
 

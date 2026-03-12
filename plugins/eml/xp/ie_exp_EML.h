@@ -28,16 +28,16 @@ public:
 	IE_Exp_EML(PD_Document * pDocument);
 	virtual ~IE_Exp_EML();
 protected:
-	virtual UT_Error _writeDocument(void) override;
+	virtual UT_Error _writeDocument(void);
 };
 
 class IE_Exp_EML_Sniffer : public IE_ExpSniffer
 {
 public:
 	IE_Exp_EML_Sniffer ();
-	virtual bool recognizeSuffix(const char * szSuffix) override;
-	virtual UT_Error constructExporter(PD_Document * pDocument, IE_Exp ** ppie) override;
-	virtual bool getDlgLabels(const char ** pszDesc, const char ** pszSuffixList, IEFileType * ft) override;
+	bool recognizeSuffix(const char * szSuffix);
+	UT_Error constructExporter(PD_Document * pDocument, IE_Exp ** ppie);
+	bool getDlgLabels(const char ** pszDesc, const char ** pszSuffixList, IEFileType * ft);
 };
 
 #endif

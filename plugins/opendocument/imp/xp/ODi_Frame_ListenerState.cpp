@@ -32,11 +32,11 @@
 #include "ODi_Abi_Data.h"
 
 // AbiWord includes
-#include "pt_Types.h"
-#include "pd_Document.h"
-#include "ut_locale.h"
-#include "ut_units.h"
-#include "ie_math_convert.h"
+#include <pt_Types.h>
+#include <pd_Document.h>
+#include <ut_locale.h>
+#include <ut_units.h>
+#include <ie_math_convert.h>
 
 /**
  * Constructor
@@ -213,13 +213,13 @@ void ODi_Frame_ListenerState::endElement (const gchar* pName,
    	    UT_UTF8String PMathml = (const char*)(m_pMathBB->getPointer(0));
 	    UT_UTF8String PLatex,Pitex;
 
-	    m_pAbiDocument->createDataItem(sID.c_str(), false, m_pMathBB, "", nullptr);
+	    m_pAbiDocument->createDataItem(sID.c_str(), false, m_pMathBB, "", NULL);
 
 	    if(convertMathMLtoLaTeX(PMathml, PLatex) && convertLaTeXtoEqn(PLatex,Pitex))
  	    {
 		// Conversion of MathML to LaTeX and the Equation Form suceeds
 		latexBuf->ins(0, reinterpret_cast<const UT_Byte *>(Pitex.utf8_str()), static_cast<UT_uint32>(Pitex.size()));
-		m_pAbiDocument->createDataItem(lID.c_str(), false, latexBuf, "", nullptr);
+		m_pAbiDocument->createDataItem(lID.c_str(), false, latexBuf, "", NULL);
     	    }
 
             const PP_PropertyVector atts = {
@@ -329,8 +329,8 @@ void ODi_Frame_ListenerState::_drawImage (const gchar** ppAtts,
 
 void ODi_Frame_ListenerState::_drawInlineImage (const gchar** ppAtts)
 {
-    const gchar* pWidth = nullptr;
-    const gchar* pHeight = nullptr;
+    const gchar* pWidth = NULL;
+    const gchar* pHeight = NULL;
     UT_String dataId;
 
     m_inlinedImage = true;
@@ -365,7 +365,7 @@ void ODi_Frame_ListenerState::_drawInlineImage (const gchar** ppAtts)
 void ODi_Frame_ListenerState::_drawObject (const gchar** ppAtts,
 					   ODi_ListenerStateAction& rAction)
 {
-    const gchar* pChar = nullptr;
+    const gchar* pChar = NULL;
     UT_String dataId; // id of the data item that contains the object.
     
     
@@ -493,8 +493,8 @@ static bool _convertBorderThickness(const char* szIncoming, std::string& sConver
  */
 void ODi_Frame_ListenerState::_drawTextBox (const gchar** ppAtts,
                                            ODi_ListenerStateAction& rAction) {
-    const gchar* pStyleName = nullptr;
-    const ODi_Style_Style* pGraphicStyle = nullptr;
+    const gchar* pStyleName = NULL;
+    const ODi_Style_Style* pGraphicStyle = NULL;
     std::string props;
     std::string sThickness;
     
@@ -646,7 +646,7 @@ bool ODi_Frame_ListenerState::_getFrameProperties(std::string& rProps,
     const ODi_Style_Style* pGraphicStyle;
     const std::string* pWrap;
     const std::string* pBackgroundColor;
-    const gchar* pVal = nullptr;
+    const gchar* pVal = NULL;
     
     pStyleName = m_rElementStack.getStartTag(0)->getAttributeValue("draw:style-name");
     UT_ASSERT(pStyleName);
@@ -749,9 +749,9 @@ bool ODi_Frame_ListenerState::_getFrameProperties(std::string& rProps,
     //       and svg:width/height on both <draw:frame> and <draw:text-box>
     
     pVal = UT_getAttribute("fo:min-width", ppAtts);
-    if (pVal == nullptr) {
+    if (pVal == NULL) {
         pVal = m_rElementStack.getStartTag(0)->getAttributeValue("svg:width");
-        if (pVal == nullptr) {
+        if (pVal == NULL) {
             pVal = m_rElementStack.getStartTag(0)->getAttributeValue("fo:min-width");
             if (UT_determineDimension(pVal, DIM_none) == DIM_PERCENT) {
                 // TODO: Do the conversion from percentage to a real
@@ -790,9 +790,10 @@ bool ODi_Frame_ListenerState::_getFrameProperties(std::string& rProps,
     }
 
     pVal = UT_getAttribute("fo:min-height", ppAtts);
-    if (pVal == nullptr) {
+    if (pVal == NULL) 
+    {
         pVal = m_rElementStack.getStartTag(0)->getAttributeValue("svg:height");
-        if (pVal == nullptr) {
+        if (pVal == NULL) {
             pVal = m_rElementStack.getStartTag(0)->getAttributeValue("fo:min-height");
             if (UT_determineDimension(pVal, DIM_none) == DIM_PERCENT) {
                 // TODO: Do the conversion from percentage to a real

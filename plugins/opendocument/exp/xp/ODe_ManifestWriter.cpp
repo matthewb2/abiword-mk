@@ -22,6 +22,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
  * 02110-1301 USA.
  */
+ 
+ 
+// External includes
+#include <gsf/gsf-output-stdio.h>
+#include <gsf/gsf-outfile.h>
 
 #include "ut_std_string.h"
 #include "pd_Document.h"
@@ -120,7 +125,7 @@ bool ODe_ManifestWriter::writeManifest(PD_Document* pDoc, GsfOutfile* pODT)
     
     for (UT_uint32 k = 0;
          (pDoc->enumDataItems(k,
-                              nullptr,
+                              NULL,
                               &szName,
                               pByteBuf,
                               &mimeType)); k++) {

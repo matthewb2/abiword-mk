@@ -22,22 +22,27 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef _ODI_TEXTCONTENT_LISTENERSTATE_H_
+#define _ODI_TEXTCONTENT_LISTENERSTATE_H_
+
+#include "ut_compiler.h"
 
 #include <string>
 #include <map>
 #include <set>
 
-#include <gsf/gsf.h>
-
 // Internal includes
 #include "../../common/xp/ODc_util.h"
 #include "ODi_ListenerState.h"
 
-#include "ut_types.h"
-#include "ut_stack.h"
-#include "ut_vector.h"
+// AbiWord includes
+#include <ut_types.h>
+#include <ut_stack.h>
 
+// External includes
+ABI_W_NO_CONST_QUAL
+#include <gsf/gsf.h>
+ABI_W_POP
 
 // Internal classes
 class ODi_Office_Styles;
@@ -87,28 +92,28 @@ public:
 
     virtual ~ODi_TextContent_ListenerState();
 
-    virtual void startElement(const gchar* pName, const gchar** ppAtts,
-                       ODi_ListenerStateAction& rAction) override;
+    void startElement (const gchar* pName, const gchar** ppAtts,
+                       ODi_ListenerStateAction& rAction);
 
-    virtual void endElement(const gchar* pName, ODi_ListenerStateAction& rAction) override;
+    void endElement (const gchar* pName, ODi_ListenerStateAction& rAction);
 
-    virtual void charData(const gchar* pBuffer, int length) override;
+    void charData (const gchar* pBuffer, int length);
 
 private:
 
-    void _insertBookmark (const gchar * name, const gchar * type, const gchar* xmlid = nullptr);
+    void _insertBookmark (const gchar * name, const gchar * type, const gchar* xmlid = 0 );
     void _flush ();
     void _startParagraphElement (const gchar* pName,
                                  const gchar** ppParagraphAtts,
                                  ODi_ListenerStateAction& rAction);
     void _endParagraphElement (const gchar* pName,
                                ODi_ListenerStateAction& rAction);
-    void _pushInlineFmt(const PP_PropertyVector & ppAtts);
+    bool _pushInlineFmt(const PP_PropertyVector & ppAtts);
     void _popInlineFmt(void);
     void _insureInBlock(const PP_PropertyVector & atts);
-    void _insureInSection(const std::string* pMasterPageName = nullptr);
+    void _insureInSection(const std::string* pMasterPageName = NULL);
     void _openAbiSection(const std::string& rProps,
-                         const std::string* pMasterPageName = nullptr);
+                         const std::string* pMasterPageName = NULL);
     void _defineAbiTOCHeadingStyles();
     void _flushPendingParagraphBreak();
     void _insertAnnotation(void);
@@ -217,3 +222,5 @@ private:
     UT_uint32 m_columnsCount;
     UT_uint32 m_columnIndex;
 };
+
+#endif //_ODI_TEXTCONTENT_LISTENERSTATE_H_

@@ -35,16 +35,16 @@ int write_dib_to_bmp(const char *bmpfn, LPBITMAPINFOHEADER lpdib,
 	h.bfSize=    sizeof(BITMAPFILEHEADER)+dibsize;
 	h.bfOffBits= sizeof(BITMAPFILEHEADER)+bitsoffset;
 
-	hfile=CreateFile(bmpfn,GENERIC_WRITE,FILE_SHARE_READ,nullptr,
-		CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,nullptr);
+	hfile=CreateFile(bmpfn,GENERIC_WRITE,FILE_SHARE_READ,NULL,
+		CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
 	if(hfile==INVALID_HANDLE_VALUE) return 1;
 
-	if(!WriteFile(hfile,(void*)&h,sizeof(BITMAPFILEHEADER),&written,nullptr)) {
+	if(!WriteFile(hfile,(void*)&h,sizeof(BITMAPFILEHEADER),&written,NULL)) {
 		err=GetLastError();
 		CloseHandle(hfile);
 		return 1;
 	}
-	if(!WriteFile(hfile,(void*)lpdib,dibsize,&written,nullptr)) {
+	if(!WriteFile(hfile,(void*)lpdib,dibsize,&written,NULL)) {
 		err=GetLastError();
 		CloseHandle(hfile);
 		return 1;

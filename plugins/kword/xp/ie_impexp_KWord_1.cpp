@@ -37,8 +37,8 @@ ABI_PLUGIN_DECLARE("KWord")
 #define PLUGIN_NAME "AbiKWord::KWord"
 
 // we use a reference-counted sniffer
-static IE_Imp_KWord_1_Sniffer * m_impSniffer = nullptr;
-static IE_Exp_KWord_1_Sniffer * m_expSniffer = nullptr;
+static IE_Imp_KWord_1_Sniffer * m_impSniffer = 0;
+static IE_Exp_KWord_1_Sniffer * m_expSniffer = 0;
 
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_register (XAP_ModuleInfo *mi)
@@ -67,22 +67,22 @@ int abi_plugin_register (XAP_ModuleInfo *mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister(XAP_ModuleInfo *mi)
 {
-  mi->name = nullptr;
-  mi->desc = nullptr;
-  mi->version = nullptr;
-  mi->author = nullptr;
-  mi->usage = nullptr;
+  mi->name = 0;
+  mi->desc = 0;
+  mi->version = 0;
+  mi->author = 0;
+  mi->usage = 0;
 
   UT_ASSERT(m_impSniffer);
   UT_ASSERT(m_expSniffer);
 
   IE_Imp::unregisterImporter(m_impSniffer);
   delete m_impSniffer;
-  m_impSniffer = nullptr;
+  m_impSniffer = 0;
 
   IE_Exp::unregisterExporter(m_expSniffer);
   delete m_expSniffer;
-  m_expSniffer = nullptr;
+  m_expSniffer = 0;
 
   return 1;
 }

@@ -30,10 +30,7 @@
 #define IE_IMP_WP_H
 
 #include <stdio.h>
-#include "ut_compiler.h"
-ABI_W_NO_SUGGEST_OVERRIDE
 #include <librevenge/librevenge.h>
-ABI_W_POP
 #include "ie_imp.h"
 #include "ut_string.h"
 #include "ut_string_class.h"
@@ -85,14 +82,14 @@ public:
     IE_Imp_WordPerfect_Sniffer();
     virtual ~IE_Imp_WordPerfect_Sniffer();
 
-	virtual const IE_SuffixConfidence * getSuffixConfidence() override;
-	virtual UT_Confidence_t recognizeContents(GsfInput * input) override;
-	virtual const IE_MimeConfidence * getMimeConfidence() override { return nullptr; }
-	virtual bool getDlgLabels(const char ** szDesc,
+	virtual const IE_SuffixConfidence * getSuffixConfidence ();
+    virtual UT_Confidence_t recognizeContents (GsfInput * input);
+	virtual const IE_MimeConfidence * getMimeConfidence () { return NULL; }
+    virtual bool getDlgLabels (const char ** szDesc,
 			       const char ** szSuffixList,
-			       IEFileType * ft) override;
-	virtual UT_Error constructImporter(PD_Document * pDocument,
-					IE_Imp ** ppie) override;
+			       IEFileType * ft);
+    virtual UT_Error constructImporter (PD_Document * pDocument,
+					IE_Imp ** ppie);
 };
 
 class IE_Imp_WordPerfect : public IE_Imp, public librevenge::RVNGTextInterface
@@ -101,88 +98,88 @@ public:
     IE_Imp_WordPerfect(PD_Document * pDocument);
     virtual ~IE_Imp_WordPerfect();
 
-    virtual bool pasteFromBuffer(PD_DocumentRange * pDocRange,
-				 const UT_uint8 * pData, UT_uint32 lenData, const char * szEncoding = nullptr) override;
+    virtual void pasteFromBuffer(PD_DocumentRange * pDocRange,
+				 UT_uint8 * pData, UT_uint32 lenData, const char * szEncoding = 0);
 
-	virtual void setDocumentMetaData(const librevenge::RVNGPropertyList &propList) override;
+	virtual void setDocumentMetaData(const librevenge::RVNGPropertyList &propList);
 
-	virtual void startDocument(const librevenge::RVNGPropertyList &propList) override;
-	virtual void endDocument() override;
+	virtual void startDocument(const librevenge::RVNGPropertyList &propList);
+	virtual void endDocument();
 
-	virtual void defineEmbeddedFont(const librevenge::RVNGPropertyList & /* propList */) override {}
+	virtual void defineEmbeddedFont(const librevenge::RVNGPropertyList & /* propList */) {}
 
-	virtual void definePageStyle(const librevenge::RVNGPropertyList &) override {}
-	virtual void openPageSpan(const librevenge::RVNGPropertyList &propList) override;
-	virtual void closePageSpan() override {}
-	virtual void openHeader(const librevenge::RVNGPropertyList &propList) override;
-	virtual void closeHeader() override;
-	virtual void openFooter(const librevenge::RVNGPropertyList &propList) override;
-	virtual void closeFooter() override;
+	virtual void definePageStyle(const librevenge::RVNGPropertyList &) {}
+	virtual void openPageSpan(const librevenge::RVNGPropertyList &propList);
+	virtual void closePageSpan() {}
+	virtual void openHeader(const librevenge::RVNGPropertyList &propList);
+	virtual void closeHeader();
+	virtual void openFooter(const librevenge::RVNGPropertyList &propList);
+	virtual void closeFooter();
 
-	virtual void defineSectionStyle(const librevenge::RVNGPropertyList &) override {}
-	virtual void openSection(const librevenge::RVNGPropertyList &propList) override;
-	virtual void closeSection() override {}
+	virtual void defineSectionStyle(const librevenge::RVNGPropertyList &) {}
+	virtual void openSection(const librevenge::RVNGPropertyList &propList);
+	virtual void closeSection() {}
 
-	virtual void defineParagraphStyle(const librevenge::RVNGPropertyList &) override {}
-	virtual void openParagraph(const librevenge::RVNGPropertyList &propList) override;
-	virtual void closeParagraph() override {}
+	virtual void defineParagraphStyle(const librevenge::RVNGPropertyList &) {}
+	virtual void openParagraph(const librevenge::RVNGPropertyList &propList);
+	virtual void closeParagraph() {}
 
-	virtual void defineCharacterStyle(const librevenge::RVNGPropertyList &) override {}
-	virtual void openSpan(const librevenge::RVNGPropertyList &propList) override;
-	virtual void closeSpan() override {}
+	virtual void defineCharacterStyle(const librevenge::RVNGPropertyList &) {}
+	virtual void openSpan(const librevenge::RVNGPropertyList &propList);
+	virtual void closeSpan() {}
 
-	virtual void openLink(const librevenge::RVNGPropertyList & /* propList */) override {}
-	virtual void closeLink() override {}
+	virtual void openLink(const librevenge::RVNGPropertyList & /* propList */) {}
+	virtual void closeLink() {}
 
-	virtual void insertTab() override;
-	virtual void insertText(const librevenge::RVNGString &text) override;
-	virtual void insertSpace() override;
-	virtual void insertLineBreak() override;
-	virtual void insertField(const librevenge::RVNGPropertyList & /* propList */) override {}
+	virtual void insertTab();
+	virtual void insertText(const librevenge::RVNGString &text);
+	virtual void insertSpace();
+	virtual void insertLineBreak();
+	virtual void insertField(const librevenge::RVNGPropertyList & /* propList */) {}
 
-	virtual void openOrderedListLevel(const librevenge::RVNGPropertyList &propList) override;
-	virtual void openUnorderedListLevel(const librevenge::RVNGPropertyList &propList) override;
-	virtual void closeOrderedListLevel() override;
-	virtual void closeUnorderedListLevel() override;
-	virtual void openListElement(const librevenge::RVNGPropertyList &propList) override;
-	virtual void closeListElement() override {}
+	virtual void openOrderedListLevel(const librevenge::RVNGPropertyList &propList);
+	virtual void openUnorderedListLevel(const librevenge::RVNGPropertyList &propList);
+	virtual void closeOrderedListLevel();
+	virtual void closeUnorderedListLevel();
+	virtual void openListElement(const librevenge::RVNGPropertyList &propList);
+	virtual void closeListElement() {}
 
-	virtual void openFootnote(const librevenge::RVNGPropertyList &propList) override;
-	virtual void closeFootnote() override;
-	virtual void openEndnote(const librevenge::RVNGPropertyList &propList) override;
-	virtual void closeEndnote() override;
-	virtual void openComment(const librevenge::RVNGPropertyList & /* propList */) override {}
-	virtual void closeComment() override {}
-	virtual void openTextBox(const librevenge::RVNGPropertyList & /* propList */) override {}
-	virtual void closeTextBox() override {}
+	virtual void openFootnote(const librevenge::RVNGPropertyList &propList);
+	virtual void closeFootnote();
+	virtual void openEndnote(const librevenge::RVNGPropertyList &propList);
+	virtual void closeEndnote();
+	virtual void openComment(const librevenge::RVNGPropertyList & /* propList */) {}
+	virtual void closeComment() {}
+	virtual void openTextBox(const librevenge::RVNGPropertyList & /* propList */) {}
+	virtual void closeTextBox() {}
 
-	virtual void openTable(const librevenge::RVNGPropertyList &propList) override;
-	virtual void openTableRow(const librevenge::RVNGPropertyList &propList) override;
-	virtual void closeTableRow() override {}
-	virtual void openTableCell(const librevenge::RVNGPropertyList &propList) override;
-	virtual void closeTableCell() override {}
-	virtual void insertCoveredTableCell(const librevenge::RVNGPropertyList & /* propList */) override {}
-	virtual void closeTable() override;
+	virtual void openTable(const librevenge::RVNGPropertyList &propList);
+	virtual void openTableRow(const librevenge::RVNGPropertyList &propList);
+	virtual void closeTableRow() {}
+	virtual void openTableCell(const librevenge::RVNGPropertyList &propList);
+	virtual void closeTableCell() {}
+	virtual void insertCoveredTableCell(const librevenge::RVNGPropertyList & /* propList */) {}
+	virtual void closeTable();
 
-	virtual void openFrame(const librevenge::RVNGPropertyList & /* propList */) override {}
-	virtual void closeFrame() override {}
+	virtual void openFrame(const librevenge::RVNGPropertyList & /* propList */) {}
+	virtual void closeFrame() {}
 
-	virtual void openGroup(const librevenge::RVNGPropertyList & /* propList */) override {}
-	virtual void closeGroup() override {}
+	virtual void openGroup(const librevenge::RVNGPropertyList & /* propList */) {}
+	virtual void closeGroup() {}
 
-	virtual void defineGraphicStyle(const librevenge::RVNGPropertyList & /* propList */) override {}
-	virtual void drawRectangle(const librevenge::RVNGPropertyList & /* propList */) override {}
-	virtual void drawEllipse(const librevenge::RVNGPropertyList & /* propList */) override {}
-	virtual void drawPolygon(const librevenge::RVNGPropertyList & /* propList */) override {}
-	virtual void drawPolyline(const librevenge::RVNGPropertyList & /* propList */) override {}
-	virtual void drawPath(const librevenge::RVNGPropertyList & /* propList */) override {}
-	virtual void drawConnector(const librevenge::RVNGPropertyList & /* propList */) override {}
+	virtual void defineGraphicStyle(const librevenge::RVNGPropertyList & /* propList */) {}
+	virtual void drawRectangle(const librevenge::RVNGPropertyList & /* propList */) {}
+	virtual void drawEllipse(const librevenge::RVNGPropertyList & /* propList */) {}
+	virtual void drawPolygon(const librevenge::RVNGPropertyList & /* propList */) {}
+	virtual void drawPolyline(const librevenge::RVNGPropertyList & /* propList */) {}
+	virtual void drawPath(const librevenge::RVNGPropertyList & /* propList */) {}
+	virtual void drawConnector(const librevenge::RVNGPropertyList & /* propList */) {}
 
-	virtual void insertBinaryObject(const librevenge::RVNGPropertyList & /* propList */) override {}
-	virtual void insertEquation(const librevenge::RVNGPropertyList & /* propList */) override {}
+	virtual void insertBinaryObject(const librevenge::RVNGPropertyList & /* propList */) {}
+	virtual void insertEquation(const librevenge::RVNGPropertyList & /* propList */) {}
 
 protected:
-	virtual UT_Error _loadFile(GsfInput * input) override;
+	virtual UT_Error _loadFile(GsfInput * input);
     UT_Error							_appendSection(int numColumns, const float, const float);
 //    UT_Error							_appendSpan(const guint32 textAttributeBits, const char *fontName, const float fontSize, UT_uint32 listTag = 0);
     UT_Error                            _appendListSpan(UT_uint32 listTag);
@@ -240,14 +237,14 @@ public:
     IE_Imp_MSWorks_Sniffer();
     virtual ~IE_Imp_MSWorks_Sniffer();
 
-	virtual const IE_SuffixConfidence * getSuffixConfidence() override;
-    virtual UT_Confidence_t recognizeContents(GsfInput * input) override;
-	virtual const IE_MimeConfidence * getMimeConfidence() override { return nullptr; }
+	virtual const IE_SuffixConfidence * getSuffixConfidence ();
+    virtual UT_Confidence_t recognizeContents (GsfInput * input);
+	virtual const IE_MimeConfidence * getMimeConfidence () { return NULL; }
     virtual bool getDlgLabels (const char ** szDesc,
 			       const char ** szSuffixList,
-			       IEFileType * ft) override;
+			       IEFileType * ft);
     virtual UT_Error constructImporter (PD_Document * pDocument,
-					IE_Imp ** ppie) override;
+					IE_Imp ** ppie);
 };
 
 #endif

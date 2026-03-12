@@ -17,6 +17,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(ABIWORD_ENABLE_PLUGINS "Build plugins" ON)
 option(ABIWORD_WIN32_UI "Use Win32 UI" ON)
 
+add_definitions(-DNDEBUG)
+
 #
 # Platform
 #
@@ -24,6 +26,7 @@ option(ABIWORD_WIN32_UI "Use Win32 UI" ON)
 if(WIN32)
 
 add_compile_definitions(
+    NDEBUG
     _WIN32
     WIN32
     ABIWORD_TARGET_WIN32
@@ -59,12 +62,9 @@ include_directories(
 
 find_package(PkgConfig REQUIRED)
 find_package(Boost REQUIRED)
-pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(FRIBIDI REQUIRED fribidi)
 pkg_check_modules(LIBXML2 REQUIRED libxml-2.0)
 pkg_check_modules(GSF REQUIRED libgsf-1)
-pkg_check_modules(CAIRO cairo)
-pkg_check_modules(PANGO pango)
 pkg_check_modules(ENCHANT enchant-2)
 
 #
@@ -72,17 +72,12 @@ pkg_check_modules(ENCHANT enchant-2)
 #
 
 include_directories(
-
-    ${GLIB_INCLUDE_DIRS}
-    ${FRIBIDI_INCLUDE_DIRS}
     ${LIBXML2_INCLUDE_DIRS}
     ${GSF_INCLUDE_DIRS}
-    ${CAIRO_INCLUDE_DIRS}
-    ${PANGO_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
+    ${FRIBIDI_INCLUDE_DIRS}
     ${ENCHANT_INCLUDE_DIRS}
     src
-    src/plugins      # ← 이 줄 추가
     src/af
     src/af/util
     src/af/util/xp
@@ -127,14 +122,9 @@ include_directories(
 #
 
 add_compile_options(
-
-    ${GLIB_CFLAGS_OTHER}
-    ${FRIBIDI_CFLAGS_OTHER}
     ${LIBXML2_CFLAGS_OTHER}
     ${GSF_CFLAGS_OTHER}
-    ${CAIRO_CFLAGS_OTHER}
-    ${PANGO_CFLAGS_OTHER}
-
+   
     -Wno-overloaded-virtual    
     -Wno-deprecated
     -Wno-deprecated-declarations
@@ -147,21 +137,4 @@ add_compile_options(
 #
 
 add_subdirectory(src)
-
-#
-# plugins
-#
-
-if(ABIWORD_ENABLE_PLUGINS)
-
-add_subdirectory(plugins)
-
-endif()
-
-#
-# install
-#
-
-install(TARGETS abiword
-    RUNTIME DESTINATION bin
-)
+add_subdirectory(src/wp/main/win)

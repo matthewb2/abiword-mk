@@ -21,13 +21,19 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef _ODI_STYLESSTREAM_LISTENERSTATE_H_
+#define _ODI_STYLESSTREAM_LISTENERSTATE_H_
 
-#include <gsf/gsf.h>
+#include "ut_compiler.h"
 
 // Internal includes
 #include "ODi_ListenerState.h"
 #include "ODi_ElementStack.h"
+
+// External includes
+ABI_W_NO_CONST_QUAL
+#include <gsf/gsf.h>
+ABI_W_POP
 
 // Internal classes
 class ODi_Office_Styles;
@@ -44,23 +50,27 @@ class ODi_StylesStream_ListenerState : public ODi_ListenerState {
 public:
 
     ODi_StylesStream_ListenerState (PD_Document* pAbiDocument,
+                                   GsfInfile* pGsfInfile,
                                    ODi_Office_Styles* pStyles,
                                    ODi_ElementStack& rElementStack,
                                    ODi_Abi_Data& rAbiData);
 
     virtual ~ODi_StylesStream_ListenerState ();
 
-    virtual void startElement(const gchar* pName, const gchar** ppAtts,
-                               ODi_ListenerStateAction& rAction) override;
+    void startElement (const gchar* pName, const gchar** ppAtts,
+                               ODi_ListenerStateAction& rAction);
 
-    virtual void endElement(const gchar* pName, ODi_ListenerStateAction& rAction) override;
+    void endElement (const gchar* pName, ODi_ListenerStateAction& rAction);
 
-    virtual void charData(const gchar* pBuffer, int length) override;
+    void charData (const gchar* pBuffer, int length);
 
 private:
 
     PD_Document* m_pAbiDocument;
+    GsfInfile* m_pGsfInfile;
     ODi_Office_Styles* m_pStyles;
     ODi_Abi_Data& m_rAbiData;
     bool          m_bOutlineStyle;
 };
+
+#endif //_ODI_STYLESSTREAM_LISTENERSTATE_H_

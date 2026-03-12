@@ -31,12 +31,12 @@ public:
 
     virtual ~IE_Exp_EPUB_Sniffer();
 
-    virtual bool recognizeSuffix(const char * szSuffix) override;
+    virtual bool recognizeSuffix(const char * szSuffix);
 
-    virtual UT_Error constructExporter(PD_Document * pDocument, IE_Exp ** ppie) override;
+    virtual UT_Error constructExporter(PD_Document * pDocument, IE_Exp ** ppie);
 
     virtual bool getDlgLabels(const char ** pszDesc,
-            const char ** pszSuffixList, IEFileType * ft) override;
+            const char ** pszSuffixList, IEFileType * ft);
 };
 
 #endif /* IE_EXP_EPUB_SNIFFER_H_ */

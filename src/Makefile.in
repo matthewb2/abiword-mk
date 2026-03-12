@@ -14,8 +14,6 @@
 
 @SET_MAKE@
 
-#AUTOMAKE_OPTIONS = subdir-objects
-
 
 
 
@@ -95,24 +93,25 @@ build_triplet = @build@
 host_triplet = @host@
 @HAVE_INTROSPECTION_TRUE@am__append_1 = gi-overrides
 @TOOLKIT_GTK_ALL_TRUE@am__append_2 = wp/main/gtk/libabiword.cpp
-@TOOLKIT_WIN_TRUE@am__append_3 = Win32Resources.lo
-@TOOLKIT_WIN_TRUE@am__append_4 = -mwindows -municode
-@TOOLKIT_WIN_TRUE@am__append_5 = Win32Resources.lo
-@TOOLKIT_COCOA_TRUE@am__append_6 = -headerpad_max_install_names
-@TOOLKIT_GTK_ALL_TRUE@am__append_7 = \
+@TOOLKIT_QT_TRUE@am__append_3 = wp/main/qt/libabiwordQt.cpp
+@TOOLKIT_WIN_TRUE@am__append_4 = Win32Resources.lo
+@TOOLKIT_WIN_TRUE@am__append_5 = -mwindows -municode
+@TOOLKIT_WIN_TRUE@am__append_6 = Win32Resources.lo
+@TOOLKIT_COCOA_TRUE@am__append_7 = -headerpad_max_install_names
+@TOOLKIT_GTK_ALL_TRUE@am__append_8 = \
 @TOOLKIT_GTK_ALL_TRUE@	wp/impexp/gtk/libgtk.la \
 @TOOLKIT_GTK_ALL_TRUE@	text/fmt/gtk/libgtk.la
 
-@TOOLKIT_GTK_ALL_FALSE@am__append_8 = \
+@TOOLKIT_GTK_ALL_FALSE@am__append_9 = \
 @TOOLKIT_GTK_ALL_FALSE@	wp/impexp/$(TOOLKIT)/lib$(TOOLKIT).la
 
 bin_PROGRAMS = $(am__EXEEXT_1)
 @TOOLKIT_COCOA_TRUE@macos_PROGRAMS = AbiWord$(EXEEXT)
 
 # not MacOS
-@TOOLKIT_COCOA_FALSE@am__append_9 = abiword
-@HAVE_INTROSPECTION_TRUE@am__append_10 = Abi-@ABIWORD_SERIES@.gir
-@HAVE_INTROSPECTION_TRUE@am__append_11 = $(gir_DATA) $(typelibs_DATA)
+@TOOLKIT_COCOA_FALSE@am__append_10 = abiword
+@HAVE_INTROSPECTION_TRUE@am__append_11 = Abi-@ABIWORD_SERIES@.gir
+@HAVE_INTROSPECTION_TRUE@am__append_12 = $(gir_DATA) $(typelibs_DATA)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/libgcrypt.m4 \
@@ -164,13 +163,15 @@ am__installdirs = "$(DESTDIR)$(frameworksdir)" "$(DESTDIR)$(libdir)" \
 	"$(DESTDIR)$(libabiword_@ABIWORD_SERIES@_includedir)"
 LTLIBRARIES = $(frameworks_LTLIBRARIES) $(lib_LTLIBRARIES)
 am__libabiword_@ABIWORD_SERIES@_la_SOURCES_DIST =  \
-	wp/main/xp/abi_ver.cpp wp/main/gtk/libabiword.cpp
+	wp/main/xp/abi_ver.cpp wp/main/gtk/libabiword.cpp \
+	wp/main/qt/libabiwordQt.cpp
 am__dirstamp = $(am__leading_dot)dirstamp
 @TOOLKIT_GTK_ALL_TRUE@am__objects_1 = wp/main/gtk/libabiword_@ABIWORD_SERIES@_la-libabiword.lo
-am__objects_2 = $(am__objects_1)
+@TOOLKIT_QT_TRUE@am__objects_2 = wp/main/qt/libabiword_@ABIWORD_SERIES@_la-libabiwordQt.lo
+am__objects_3 = $(am__objects_1) $(am__objects_2)
 am_libabiword_@ABIWORD_SERIES@_la_OBJECTS =  \
 	wp/main/xp/libabiword_@ABIWORD_SERIES@_la-abi_ver.lo \
-	$(am__objects_2)
+	$(am__objects_3)
 libabiword_@ABIWORD_SERIES@_la_OBJECTS =  \
 	$(am_libabiword_@ABIWORD_SERIES@_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -188,12 +189,14 @@ libabiword_@ABIWORD_SERIES@_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 @TOOLKIT_COCOA_FALSE@am__EXEEXT_1 = abiword$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS) $(macos_PROGRAMS)
 am__AbiWord_SOURCES_DIST = wp/main/cocoa/CocoaMain.cpp \
-	wp/main/gtk/UnixMain.cpp wp/main/win/Win32Main.cpp
-@TOOLKIT_COCOA_FALSE@@TOOLKIT_GTK_ALL_FALSE@@TOOLKIT_WIN_TRUE@am__objects_3 = wp/main/win/AbiWord-Win32Main.$(OBJEXT)
-@TOOLKIT_COCOA_FALSE@@TOOLKIT_GTK_ALL_TRUE@am__objects_3 = wp/main/gtk/AbiWord-UnixMain.$(OBJEXT)
-@TOOLKIT_COCOA_TRUE@am__objects_3 =  \
+	wp/main/gtk/UnixMain.cpp wp/main/qt/QtMain.cpp \
+	wp/main/win/Win32Main.cpp
+@TOOLKIT_COCOA_FALSE@@TOOLKIT_GTK_ALL_FALSE@@TOOLKIT_QT_FALSE@@TOOLKIT_WIN_TRUE@am__objects_4 = wp/main/win/AbiWord-Win32Main.$(OBJEXT)
+@TOOLKIT_COCOA_FALSE@@TOOLKIT_GTK_ALL_FALSE@@TOOLKIT_QT_TRUE@am__objects_4 = wp/main/qt/AbiWord-QtMain.$(OBJEXT)
+@TOOLKIT_COCOA_FALSE@@TOOLKIT_GTK_ALL_TRUE@am__objects_4 = wp/main/gtk/AbiWord-UnixMain.$(OBJEXT)
+@TOOLKIT_COCOA_TRUE@am__objects_4 =  \
 @TOOLKIT_COCOA_TRUE@	wp/main/cocoa/AbiWord-CocoaMain.$(OBJEXT)
-@TOOLKIT_COCOA_TRUE@am_AbiWord_OBJECTS = $(am__objects_3)
+@TOOLKIT_COCOA_TRUE@am_AbiWord_OBJECTS = $(am__objects_4)
 AbiWord_OBJECTS = $(am_AbiWord_OBJECTS)
 @TOOLKIT_COCOA_TRUE@AbiWord_DEPENDENCIES =  \
 @TOOLKIT_COCOA_TRUE@	libabiword-@ABIWORD_SERIES@.la
@@ -201,12 +204,14 @@ AbiWord_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AbiWord_LDFLAGS) $(LDFLAGS) -o $@
 am__abiword_SOURCES_DIST = wp/main/cocoa/CocoaMain.cpp \
-	wp/main/gtk/UnixMain.cpp wp/main/win/Win32Main.cpp
-@TOOLKIT_COCOA_FALSE@@TOOLKIT_GTK_ALL_FALSE@@TOOLKIT_WIN_TRUE@am__objects_4 = wp/main/win/abiword-Win32Main.$(OBJEXT)
-@TOOLKIT_COCOA_FALSE@@TOOLKIT_GTK_ALL_TRUE@am__objects_4 = wp/main/gtk/abiword-UnixMain.$(OBJEXT)
-@TOOLKIT_COCOA_TRUE@am__objects_4 =  \
+	wp/main/gtk/UnixMain.cpp wp/main/qt/QtMain.cpp \
+	wp/main/win/Win32Main.cpp
+@TOOLKIT_COCOA_FALSE@@TOOLKIT_GTK_ALL_FALSE@@TOOLKIT_QT_FALSE@@TOOLKIT_WIN_TRUE@am__objects_5 = wp/main/win/abiword-Win32Main.$(OBJEXT)
+@TOOLKIT_COCOA_FALSE@@TOOLKIT_GTK_ALL_FALSE@@TOOLKIT_QT_TRUE@am__objects_5 = wp/main/qt/abiword-QtMain.$(OBJEXT)
+@TOOLKIT_COCOA_FALSE@@TOOLKIT_GTK_ALL_TRUE@am__objects_5 = wp/main/gtk/abiword-UnixMain.$(OBJEXT)
+@TOOLKIT_COCOA_TRUE@am__objects_5 =  \
 @TOOLKIT_COCOA_TRUE@	wp/main/cocoa/abiword-CocoaMain.$(OBJEXT)
-@TOOLKIT_COCOA_FALSE@am_abiword_OBJECTS = $(am__objects_4)
+@TOOLKIT_COCOA_FALSE@am_abiword_OBJECTS = $(am__objects_5)
 abiword_OBJECTS = $(am_abiword_OBJECTS)
 abiword_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -628,12 +633,13 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+AUTOMAKE_OPTIONS = subdir-objects
 SUBDIRS = af plugins text wp $(am__append_1)
-libabiword_cpp = $(am__append_2)
-opt_libs = $(am__append_3)
-platform_ldflags = $(am__append_4)
-resources = $(am__append_5)
-INTROSPECTION_GIRS = $(am__append_10)
+libabiword_cpp = $(am__append_2) $(am__append_3)
+opt_libs = $(am__append_4)
+platform_ldflags = $(am__append_5)
+resources = $(am__append_6)
+INTROSPECTION_GIRS = $(am__append_11)
 INTROSPECTION_SCANNER_ARGS = \
 	-v --warn-all --accept-unprefixed \
 	--symbol-prefix=abi --symbol-prefix=libabiword
@@ -644,6 +650,7 @@ INTROSPECTION_COMPILER_ARGS = \
 
 @TOOLKIT_COCOA_TRUE@main_cpp = wp/main/cocoa/CocoaMain.cpp
 @TOOLKIT_GTK_ALL_TRUE@main_cpp = wp/main/gtk/UnixMain.cpp
+@TOOLKIT_QT_TRUE@main_cpp = wp/main/qt/QtMain.cpp
 @TOOLKIT_WIN_TRUE@main_cpp = wp/main/win/Win32Main.cpp
 
 # can't use $(top_builddir)/src/
@@ -663,7 +670,7 @@ libabiword_@ABIWORD_SERIES@_la_CPPFLAGS = \
 
 libabiword_@ABIWORD_SERIES@_la_LDFLAGS = $(DEPS_LIBS) \
 	$(CHAMPLAIN_LIBS) -no-undefined -avoid-version -export-dynamic \
-	$(am__append_6)
+	$(am__append_7)
 libabiword_@ABIWORD_SERIES@_la_LIBADD = plugins/libplugins.la \
 	text/fmt/xp/libxp.la text/ptbl/xp/libxp.la \
 	wp/ap/$(TOOLKIT)/lib$(TOOLKIT).la wp/ap/xp/libxp.la \
@@ -671,7 +678,7 @@ libabiword_@ABIWORD_SERIES@_la_LIBADD = plugins/libplugins.la \
 	af/xap/xp/libxp.la af/gr/$(TOOLKIT)/lib$(TOOLKIT).la \
 	af/gr/xp/libxp.la af/util/$(PLATFORM)/lib$(PLATFORM).la \
 	af/util/xp/libxp.la af/ev/$(TOOLKIT)/lib$(TOOLKIT).la \
-	af/ev/xp/libxp.la $(opt_libs) $(am__append_7) $(am__append_8)
+	af/ev/xp/libxp.la $(opt_libs) $(am__append_8) $(am__append_9)
 
 # headers are GTK only.
 @TOOLKIT_GTK_ALL_TRUE@libabiword_@ABIWORD_SERIES@_includedir = @ABIWORD_HEADERSDIR@
@@ -723,7 +730,7 @@ WINDRES_CPPFLAGS = -I$(top_srcdir)/src/af/xap/win -I$(top_srcdir)/src/af/util/wi
 @TOOLKIT_COCOA_FALSE@abiword_SOURCES = \
 @TOOLKIT_COCOA_FALSE@	$(main_cpp)
 
-CLEANFILES = abiword.dll.a $(am__append_11)
+CLEANFILES = abiword.dll.a $(am__append_12)
 @HAVE_INTROSPECTION_TRUE@Abi_@ABI_SUB_SERIES@_gir_INCLUDES = GObject-2.0 Gtk-3.0 Gsf-1
 @HAVE_INTROSPECTION_TRUE@Abi_@ABI_SUB_SERIES@_gir_CFLAGS = $(libabiword_@ABIWORD_SERIES@_la_CPPFLAGS)
 @HAVE_INTROSPECTION_TRUE@Abi_@ABI_SUB_SERIES@_gir_LIBS = libabiword-@ABIWORD_SERIES@.la
@@ -752,9 +759,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign src/Makefile
+	  $(AUTOMAKE) --gnu src/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -861,6 +868,15 @@ wp/main/gtk/$(DEPDIR)/$(am__dirstamp):
 wp/main/gtk/libabiword_@ABIWORD_SERIES@_la-libabiword.lo:  \
 	wp/main/gtk/$(am__dirstamp) \
 	wp/main/gtk/$(DEPDIR)/$(am__dirstamp)
+wp/main/qt/$(am__dirstamp):
+	@$(MKDIR_P) wp/main/qt
+	@: > wp/main/qt/$(am__dirstamp)
+wp/main/qt/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) wp/main/qt/$(DEPDIR)
+	@: > wp/main/qt/$(DEPDIR)/$(am__dirstamp)
+wp/main/qt/libabiword_@ABIWORD_SERIES@_la-libabiwordQt.lo:  \
+	wp/main/qt/$(am__dirstamp) \
+	wp/main/qt/$(DEPDIR)/$(am__dirstamp)
 
 libabiword-@ABIWORD_SERIES@.la: $(libabiword_@ABIWORD_SERIES@_la_OBJECTS) $(libabiword_@ABIWORD_SERIES@_la_DEPENDENCIES) $(EXTRA_libabiword_@ABIWORD_SERIES@_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libabiword_@ABIWORD_SERIES@_la_LINK) $(am_libabiword_@ABIWORD_SERIES@_la_rpath) $(libabiword_@ABIWORD_SERIES@_la_OBJECTS) $(libabiword_@ABIWORD_SERIES@_la_LIBADD) $(LIBS)
@@ -973,6 +989,8 @@ wp/main/cocoa/AbiWord-CocoaMain.$(OBJEXT):  \
 	wp/main/cocoa/$(DEPDIR)/$(am__dirstamp)
 wp/main/gtk/AbiWord-UnixMain.$(OBJEXT): wp/main/gtk/$(am__dirstamp) \
 	wp/main/gtk/$(DEPDIR)/$(am__dirstamp)
+wp/main/qt/AbiWord-QtMain.$(OBJEXT): wp/main/qt/$(am__dirstamp) \
+	wp/main/qt/$(DEPDIR)/$(am__dirstamp)
 wp/main/win/$(am__dirstamp):
 	@$(MKDIR_P) wp/main/win
 	@: > wp/main/win/$(am__dirstamp)
@@ -990,6 +1008,8 @@ wp/main/cocoa/abiword-CocoaMain.$(OBJEXT):  \
 	wp/main/cocoa/$(DEPDIR)/$(am__dirstamp)
 wp/main/gtk/abiword-UnixMain.$(OBJEXT): wp/main/gtk/$(am__dirstamp) \
 	wp/main/gtk/$(DEPDIR)/$(am__dirstamp)
+wp/main/qt/abiword-QtMain.$(OBJEXT): wp/main/qt/$(am__dirstamp) \
+	wp/main/qt/$(DEPDIR)/$(am__dirstamp)
 wp/main/win/abiword-Win32Main.$(OBJEXT): wp/main/win/$(am__dirstamp) \
 	wp/main/win/$(DEPDIR)/$(am__dirstamp)
 
@@ -1002,6 +1022,8 @@ mostlyclean-compile:
 	-rm -f wp/main/cocoa/*.$(OBJEXT)
 	-rm -f wp/main/gtk/*.$(OBJEXT)
 	-rm -f wp/main/gtk/*.lo
+	-rm -f wp/main/qt/*.$(OBJEXT)
+	-rm -f wp/main/qt/*.lo
 	-rm -f wp/main/win/*.$(OBJEXT)
 	-rm -f wp/main/xp/*.$(OBJEXT)
 	-rm -f wp/main/xp/*.lo
@@ -1014,6 +1036,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@wp/main/gtk/$(DEPDIR)/AbiWord-UnixMain.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@wp/main/gtk/$(DEPDIR)/abiword-UnixMain.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@wp/main/gtk/$(DEPDIR)/libabiword_@ABIWORD_SERIES@_la-libabiword.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@wp/main/qt/$(DEPDIR)/AbiWord-QtMain.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@wp/main/qt/$(DEPDIR)/abiword-QtMain.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@wp/main/qt/$(DEPDIR)/libabiword_@ABIWORD_SERIES@_la-libabiwordQt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@wp/main/win/$(DEPDIR)/AbiWord-Win32Main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@wp/main/win/$(DEPDIR)/abiword-Win32Main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@wp/main/xp/$(DEPDIR)/libabiword_@ABIWORD_SERIES@_la-abi_ver.Plo@am__quote@
@@ -1056,6 +1081,13 @@ wp/main/gtk/libabiword_@ABIWORD_SERIES@_la-libabiword.lo: wp/main/gtk/libabiword
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libabiword_@ABIWORD_SERIES@_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o wp/main/gtk/libabiword_@ABIWORD_SERIES@_la-libabiword.lo `test -f 'wp/main/gtk/libabiword.cpp' || echo '$(srcdir)/'`wp/main/gtk/libabiword.cpp
 
+wp/main/qt/libabiword_@ABIWORD_SERIES@_la-libabiwordQt.lo: wp/main/qt/libabiwordQt.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libabiword_@ABIWORD_SERIES@_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT wp/main/qt/libabiword_@ABIWORD_SERIES@_la-libabiwordQt.lo -MD -MP -MF wp/main/qt/$(DEPDIR)/libabiword_@ABIWORD_SERIES@_la-libabiwordQt.Tpo -c -o wp/main/qt/libabiword_@ABIWORD_SERIES@_la-libabiwordQt.lo `test -f 'wp/main/qt/libabiwordQt.cpp' || echo '$(srcdir)/'`wp/main/qt/libabiwordQt.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) wp/main/qt/$(DEPDIR)/libabiword_@ABIWORD_SERIES@_la-libabiwordQt.Tpo wp/main/qt/$(DEPDIR)/libabiword_@ABIWORD_SERIES@_la-libabiwordQt.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='wp/main/qt/libabiwordQt.cpp' object='wp/main/qt/libabiword_@ABIWORD_SERIES@_la-libabiwordQt.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libabiword_@ABIWORD_SERIES@_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o wp/main/qt/libabiword_@ABIWORD_SERIES@_la-libabiwordQt.lo `test -f 'wp/main/qt/libabiwordQt.cpp' || echo '$(srcdir)/'`wp/main/qt/libabiwordQt.cpp
+
 wp/main/cocoa/AbiWord-CocoaMain.o: wp/main/cocoa/CocoaMain.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AbiWord_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT wp/main/cocoa/AbiWord-CocoaMain.o -MD -MP -MF wp/main/cocoa/$(DEPDIR)/AbiWord-CocoaMain.Tpo -c -o wp/main/cocoa/AbiWord-CocoaMain.o `test -f 'wp/main/cocoa/CocoaMain.cpp' || echo '$(srcdir)/'`wp/main/cocoa/CocoaMain.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) wp/main/cocoa/$(DEPDIR)/AbiWord-CocoaMain.Tpo wp/main/cocoa/$(DEPDIR)/AbiWord-CocoaMain.Po
@@ -1083,6 +1115,20 @@ wp/main/gtk/AbiWord-UnixMain.obj: wp/main/gtk/UnixMain.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='wp/main/gtk/UnixMain.cpp' object='wp/main/gtk/AbiWord-UnixMain.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AbiWord_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o wp/main/gtk/AbiWord-UnixMain.obj `if test -f 'wp/main/gtk/UnixMain.cpp'; then $(CYGPATH_W) 'wp/main/gtk/UnixMain.cpp'; else $(CYGPATH_W) '$(srcdir)/wp/main/gtk/UnixMain.cpp'; fi`
+
+wp/main/qt/AbiWord-QtMain.o: wp/main/qt/QtMain.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AbiWord_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT wp/main/qt/AbiWord-QtMain.o -MD -MP -MF wp/main/qt/$(DEPDIR)/AbiWord-QtMain.Tpo -c -o wp/main/qt/AbiWord-QtMain.o `test -f 'wp/main/qt/QtMain.cpp' || echo '$(srcdir)/'`wp/main/qt/QtMain.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) wp/main/qt/$(DEPDIR)/AbiWord-QtMain.Tpo wp/main/qt/$(DEPDIR)/AbiWord-QtMain.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='wp/main/qt/QtMain.cpp' object='wp/main/qt/AbiWord-QtMain.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AbiWord_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o wp/main/qt/AbiWord-QtMain.o `test -f 'wp/main/qt/QtMain.cpp' || echo '$(srcdir)/'`wp/main/qt/QtMain.cpp
+
+wp/main/qt/AbiWord-QtMain.obj: wp/main/qt/QtMain.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AbiWord_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT wp/main/qt/AbiWord-QtMain.obj -MD -MP -MF wp/main/qt/$(DEPDIR)/AbiWord-QtMain.Tpo -c -o wp/main/qt/AbiWord-QtMain.obj `if test -f 'wp/main/qt/QtMain.cpp'; then $(CYGPATH_W) 'wp/main/qt/QtMain.cpp'; else $(CYGPATH_W) '$(srcdir)/wp/main/qt/QtMain.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) wp/main/qt/$(DEPDIR)/AbiWord-QtMain.Tpo wp/main/qt/$(DEPDIR)/AbiWord-QtMain.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='wp/main/qt/QtMain.cpp' object='wp/main/qt/AbiWord-QtMain.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AbiWord_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o wp/main/qt/AbiWord-QtMain.obj `if test -f 'wp/main/qt/QtMain.cpp'; then $(CYGPATH_W) 'wp/main/qt/QtMain.cpp'; else $(CYGPATH_W) '$(srcdir)/wp/main/qt/QtMain.cpp'; fi`
 
 wp/main/win/AbiWord-Win32Main.o: wp/main/win/Win32Main.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AbiWord_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT wp/main/win/AbiWord-Win32Main.o -MD -MP -MF wp/main/win/$(DEPDIR)/AbiWord-Win32Main.Tpo -c -o wp/main/win/AbiWord-Win32Main.o `test -f 'wp/main/win/Win32Main.cpp' || echo '$(srcdir)/'`wp/main/win/Win32Main.cpp
@@ -1126,6 +1172,20 @@ wp/main/gtk/abiword-UnixMain.obj: wp/main/gtk/UnixMain.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(abiword_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o wp/main/gtk/abiword-UnixMain.obj `if test -f 'wp/main/gtk/UnixMain.cpp'; then $(CYGPATH_W) 'wp/main/gtk/UnixMain.cpp'; else $(CYGPATH_W) '$(srcdir)/wp/main/gtk/UnixMain.cpp'; fi`
 
+wp/main/qt/abiword-QtMain.o: wp/main/qt/QtMain.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(abiword_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT wp/main/qt/abiword-QtMain.o -MD -MP -MF wp/main/qt/$(DEPDIR)/abiword-QtMain.Tpo -c -o wp/main/qt/abiword-QtMain.o `test -f 'wp/main/qt/QtMain.cpp' || echo '$(srcdir)/'`wp/main/qt/QtMain.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) wp/main/qt/$(DEPDIR)/abiword-QtMain.Tpo wp/main/qt/$(DEPDIR)/abiword-QtMain.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='wp/main/qt/QtMain.cpp' object='wp/main/qt/abiword-QtMain.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(abiword_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o wp/main/qt/abiword-QtMain.o `test -f 'wp/main/qt/QtMain.cpp' || echo '$(srcdir)/'`wp/main/qt/QtMain.cpp
+
+wp/main/qt/abiword-QtMain.obj: wp/main/qt/QtMain.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(abiword_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT wp/main/qt/abiword-QtMain.obj -MD -MP -MF wp/main/qt/$(DEPDIR)/abiword-QtMain.Tpo -c -o wp/main/qt/abiword-QtMain.obj `if test -f 'wp/main/qt/QtMain.cpp'; then $(CYGPATH_W) 'wp/main/qt/QtMain.cpp'; else $(CYGPATH_W) '$(srcdir)/wp/main/qt/QtMain.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) wp/main/qt/$(DEPDIR)/abiword-QtMain.Tpo wp/main/qt/$(DEPDIR)/abiword-QtMain.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='wp/main/qt/QtMain.cpp' object='wp/main/qt/abiword-QtMain.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(abiword_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o wp/main/qt/abiword-QtMain.obj `if test -f 'wp/main/qt/QtMain.cpp'; then $(CYGPATH_W) 'wp/main/qt/QtMain.cpp'; else $(CYGPATH_W) '$(srcdir)/wp/main/qt/QtMain.cpp'; fi`
+
 wp/main/win/abiword-Win32Main.o: wp/main/win/Win32Main.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(abiword_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT wp/main/win/abiword-Win32Main.o -MD -MP -MF wp/main/win/$(DEPDIR)/abiword-Win32Main.Tpo -c -o wp/main/win/abiword-Win32Main.o `test -f 'wp/main/win/Win32Main.cpp' || echo '$(srcdir)/'`wp/main/win/Win32Main.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) wp/main/win/$(DEPDIR)/abiword-Win32Main.Tpo wp/main/win/$(DEPDIR)/abiword-Win32Main.Po
@@ -1146,6 +1206,7 @@ mostlyclean-libtool:
 clean-libtool:
 	-rm -rf .libs _libs
 	-rm -rf wp/main/gtk/.libs wp/main/gtk/_libs
+	-rm -rf wp/main/qt/.libs wp/main/qt/_libs
 	-rm -rf wp/main/xp/.libs wp/main/xp/_libs
 install-girDATA: $(gir_DATA)
 	@$(NORMAL_INSTALL)
@@ -1406,6 +1467,8 @@ distclean-generic:
 	-rm -f wp/main/cocoa/$(am__dirstamp)
 	-rm -f wp/main/gtk/$(DEPDIR)/$(am__dirstamp)
 	-rm -f wp/main/gtk/$(am__dirstamp)
+	-rm -f wp/main/qt/$(DEPDIR)/$(am__dirstamp)
+	-rm -f wp/main/qt/$(am__dirstamp)
 	-rm -f wp/main/win/$(DEPDIR)/$(am__dirstamp)
 	-rm -f wp/main/win/$(am__dirstamp)
 	-rm -f wp/main/xp/$(DEPDIR)/$(am__dirstamp)
@@ -1422,7 +1485,7 @@ clean-am: clean-binPROGRAMS clean-frameworksLTLIBRARIES clean-generic \
 	mostlyclean-am
 
 distclean: distclean-recursive
-	-rm -rf wp/main/cocoa/$(DEPDIR) wp/main/gtk/$(DEPDIR) wp/main/win/$(DEPDIR) wp/main/xp/$(DEPDIR)
+	-rm -rf wp/main/cocoa/$(DEPDIR) wp/main/gtk/$(DEPDIR) wp/main/qt/$(DEPDIR) wp/main/win/$(DEPDIR) wp/main/xp/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1471,7 +1534,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
-	-rm -rf wp/main/cocoa/$(DEPDIR) wp/main/gtk/$(DEPDIR) wp/main/win/$(DEPDIR) wp/main/xp/$(DEPDIR)
+	-rm -rf wp/main/cocoa/$(DEPDIR) wp/main/gtk/$(DEPDIR) wp/main/qt/$(DEPDIR) wp/main/win/$(DEPDIR) wp/main/xp/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

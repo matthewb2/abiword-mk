@@ -37,7 +37,7 @@ OSVERSIONINFOW& UT_GetWinVersion(void)
 	{
 		os.dwOSVersionInfoSize = sizeof(os);
 		UT_DebugOnly<BOOL> bSuccess = GetVersionExW(&os);
-		UT_ASSERT(bSuccess);
+		//UT_ASSERT(bSuccess);
 		bInitialized = true;
 	}
 

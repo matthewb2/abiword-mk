@@ -23,7 +23,7 @@
 #ifndef _IE_EXP_OPENXMLSNIFFER_H_
 #define _IE_EXP_OPENXMLSNIFFER_H_
 
-#include "ie_exp.h"
+#include <ie_exp.h>
 
 class IE_Exp_OpenXML_Sniffer : public IE_ExpSniffer
 {
@@ -32,15 +32,15 @@ public:
 
   virtual ~IE_Exp_OpenXML_Sniffer ();
 
-  virtual bool recognizeSuffix (const char* szSuffix) override;
+  virtual bool recognizeSuffix (const char* szSuffix);
 
-  virtual UT_Confidence_t supportsMIME(const char * szMIME) override;
+  virtual UT_Confidence_t supportsMIME(const char * szMIME);
   virtual UT_Error constructExporter (PD_Document * pDocument,
-				      IE_Exp ** ppie) override;
+				      IE_Exp ** ppie) ;
 
   virtual bool getDlgLabels (const char ** szDesc,
 			     const char ** szSuffixList,
-			     IEFileType * ft) override;
+			     IEFileType * ft) ;
 };
 
 #endif //_IE_EXP_OPENXMLSNIFFER_H_

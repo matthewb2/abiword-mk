@@ -151,11 +151,11 @@ abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_FAR_CALL int
 abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-	mi->name = nullptr;
-	mi->desc = nullptr;
-	mi->version = nullptr;
-	mi->author = nullptr;
-	mi->usage = nullptr;
+	mi->name = 0;
+	mi->desc = 0;
+	mi->version = 0;
+	mi->author = 0;
+	mi->usage = 0;
 
 	AbiCommand_RemoveFromMethods ();
 
@@ -191,12 +191,12 @@ AbiCommand_invoke (AV_View * /*v*/, EV_EditMethodCallData * /*d*/)
 }
 
 AbiCommand::AbiCommand (void) :
-	m_pCurDoc (nullptr),
+	m_pCurDoc (NULL),
 	m_pCurFile (new UT_UTF8String),
-	m_pCurFrame (nullptr),
-	m_pCurView (nullptr),
-	m_pG (nullptr),
-	m_pLayout (nullptr),
+	m_pCurFrame (NULL),
+	m_pCurView (NULL),
+	m_pG (NULL),
+	m_pLayout (NULL),
 	m_bViewDoc (false), 
 	m_bRunAsServer (false), 
 	m_iPID (0), 
@@ -211,12 +211,12 @@ AbiCommand::AbiCommand (void) :
 
 
 AbiCommand::AbiCommand (bool bAbiCollab) :
-	m_pCurDoc (nullptr),
+	m_pCurDoc (NULL),
 	m_pCurFile (new UT_UTF8String),
-	m_pCurFrame (nullptr),
-	m_pCurView (nullptr),
-	m_pG (nullptr),
-	m_pLayout (nullptr),
+	m_pCurFrame (NULL),
+	m_pCurView (NULL),
+	m_pG (NULL),
+	m_pLayout (NULL),
 	m_bViewDoc (false), 
 	m_bRunAsServer (false), 
 	m_iPID (0), 
@@ -240,9 +240,9 @@ AbiCommand::deleteCurrentDoc (void)
 	//
 	// Delete the current view, frame and document.
 	//
-	bool bUnref = (m_pCurFrame == nullptr);
+	bool bUnref = (m_pCurFrame == NULL);
 
-	if (m_pCurFrame != nullptr)
+	if (m_pCurFrame != NULL)
 		m_pApp->forgetFrame (m_pCurFrame);
 
 	//
@@ -254,10 +254,10 @@ AbiCommand::deleteCurrentDoc (void)
 		UNREFP (m_pCurDoc);
 	}
 
-	m_pCurView = nullptr;
-	m_pG = nullptr;
-	m_pLayout = nullptr;
-	m_pCurView = nullptr;
+	m_pCurView = NULL;
+	m_pG = NULL;
+	m_pLayout = NULL;
+	m_pCurView = NULL;
 }
 
 void
@@ -289,7 +289,7 @@ AbiCommand::doCommands (void)
             {
                 std::stringstream ss;
                 ss << s << endl;
-                char *p = nullptr;
+                char *p = 0;
                 while( (p = readline ("AbiWord:> ")) )
                 {
                     s = p;
@@ -360,7 +360,7 @@ bool
 AbiCommand::tokenizeString (UT_GenericVector<const UT_UTF8String*> & tok, char *pStr)
 {
 	int _argc = 0;
-	char **_argv = nullptr;
+	char **_argv = NULL;
 
     if( pStr && *pStr )
     {
@@ -389,7 +389,7 @@ AbiCommand::tokenizeString (UT_GenericVector<const UT_UTF8String*> & tok, char *
         }
     }
     
-	if (g_shell_parse_argv (pStr, &_argc, &_argv, nullptr))
+	if (g_shell_parse_argv (pStr, &_argc, &_argv, NULL))
 	{
 		for (int i = 0; i < _argc; i++)
 		{
@@ -486,8 +486,8 @@ AbiCommand::parseTokens (UT_GenericVector<const UT_UTF8String*> * pToks)
             return -1;
         }
     }
-
-
+    
+    
 	//
 	// New document
 	//
@@ -585,9 +585,9 @@ AbiCommand::parseTokens (UT_GenericVector<const UT_UTF8String*> * pToks)
             return 0;
         }
     }
+    
 
-
-
+    
 	//
 	// delete
 	//
@@ -692,9 +692,8 @@ AbiCommand::parseTokens (UT_GenericVector<const UT_UTF8String*> * pToks)
             while( runForSeconds >= 0 )
             {
                 cerr << "runForSeconds:" << runForSeconds << endl;
-                while (g_main_context_pending(nullptr)) {
-                    g_main_context_iteration(nullptr, false);
-                }
+                while(gtk_events_pending())
+                    gtk_main_iteration ();
                 sleep( 1 );
                 --runForSeconds;
             }
@@ -703,18 +702,18 @@ AbiCommand::parseTokens (UT_GenericVector<const UT_UTF8String*> * pToks)
         {
             gtk_main ();
         }
-
+        
         return 0;
     }
     else if (strcmp (pCom0->utf8_str (), "paste") == 0)
     {
         bool bHonorFormatting = true;
-
+        
         if( pToks->getItemCount () > 1 )
 		{
             bHonorFormatting = isTrue(pToks->getNthItem (1)->utf8_str());
         }
-
+        
         if (m_pCurView)
 		{
 			m_pCurView->cmdPaste( bHonorFormatting );
@@ -722,7 +721,7 @@ AbiCommand::parseTokens (UT_GenericVector<const UT_UTF8String*> * pToks)
 		}
         return -1;
     }
-
+    
 	//
 	// findnext
 	//
@@ -1191,7 +1190,7 @@ AbiCommand::parseTokens (UT_GenericVector<const UT_UTF8String*> * pToks)
 				printf(" Filename %s \n",pCom1->utf8_str());
 				const char *suffix = rindex (pCom1->utf8_str (), '.');
 
-				if (suffix != nullptr)
+				if (suffix != NULL)
 				{
 					ieft = IE_Exp::fileTypeForSuffix (suffix);
 					printf ("Doing file export as %d for %s \n", ieft,
@@ -1529,10 +1528,10 @@ AbiCommand::invoke (const char *pszCommand)
 	const EV_EditMethod *pEM =
 		m_pApp->getEditMethodContainer ()->findEditMethodByName (pszCommand);
 
-	if (pEM == nullptr)
+	if (pEM == NULL)
 		return false;
 
-	return pEM->Fn (m_pCurView, static_cast < EV_EditMethodCallData * >(nullptr));
+	return pEM->Fn (m_pCurView, static_cast < EV_EditMethodCallData * >(NULL));
 }
 
 //
@@ -1541,7 +1540,7 @@ AbiCommand::invoke (const char *pszCommand)
 bool
 AbiCommand::viewDoc (void)
 {
-	m_bViewDoc = true;
+	m_bViewDoc = true;	
 	invoke ("newWindow");
 
 	while (m_pCurFrame && m_pCurFrame->getViewNumber () > 0)
@@ -1556,7 +1555,7 @@ AbiCommand::viewDoc (void)
 bool
 AbiCommand::movePoint (const UT_GenericVector<const UT_UTF8String*> * pToks)
 {
-	if (m_pCurView != nullptr)
+	if (m_pCurView != NULL)
 	{
 		const UT_UTF8String *pTarget = pToks->getNthItem (1);
 		FV_DocPos docpos = FV_DOCPOS_BOB;
@@ -1645,7 +1644,7 @@ AbiCommand::movePoint (const UT_GenericVector<const UT_UTF8String*> * pToks)
 bool
 AbiCommand::replaceAll (const UT_GenericVector<const UT_UTF8String*> * pToks)
 {
-	if (m_pCurView != nullptr)
+	if (m_pCurView != NULL)
 	{
 		const UT_UTF8String *pFind = pToks->getNthItem (1);
 		const UT_UTF8String *pReplace = pToks->getNthItem (2);
@@ -1676,7 +1675,7 @@ AbiCommand::replaceAll (const UT_GenericVector<const UT_UTF8String*> * pToks)
 bool
 AbiCommand::insertText (const UT_GenericVector<const UT_UTF8String*> * pToks)
 {
-	if (m_pCurView != nullptr && pToks->getItemCount () > 1)
+	if (m_pCurView != NULL && pToks->getItemCount () > 1)
 	{
         cerr << "tokens:" << pToks->getItemCount () << endl;
         
@@ -1715,7 +1714,7 @@ AbiCommand::insertText (const UT_GenericVector<const UT_UTF8String*> * pToks)
 bool
 AbiCommand::deleteText (const UT_GenericVector<const UT_UTF8String*> * pToks)
 {
-	if ((m_pCurView != nullptr) && (pToks->getItemCount() > 1))
+	if ((m_pCurView != NULL) && (pToks->getItemCount() > 1))
 	{
 		const UT_UTF8String *pCom1 = pToks->getNthItem (1);
 		UT_sint32 count = atoi (pCom1->utf8_str ());
@@ -1734,7 +1733,7 @@ AbiCommand::deleteText (const UT_GenericVector<const UT_UTF8String*> * pToks)
 bool
 AbiCommand::replaceNext (const UT_GenericVector<const UT_UTF8String*> * pToks)
 {
-	if (m_pCurView != nullptr)
+	if (m_pCurView != NULL)
 	{
 		const UT_UTF8String *pFind = pToks->getNthItem (1);
 		const UT_UTF8String *pReplace = pToks->getNthItem (2);
@@ -1781,12 +1780,12 @@ AbiCommand::printFiles (const UT_GenericVector<const UT_UTF8String*> * pToks)
 
 		if(strcmp(pPrinter->utf8_str(), "-") != 0) 
 		{
-		     pDialog->PrintDirectly(m_pCurFrame, nullptr, nullptr);
+		     pDialog->PrintDirectly(m_pCurFrame, NULL, NULL);
 
 		}
 		else
 		{
-		     pDialog->PrintDirectly(m_pCurFrame, pPrinter->utf8_str(), nullptr);
+		     pDialog->PrintDirectly(m_pCurFrame, pPrinter->utf8_str(), NULL);
 		}
 		GR_Graphics * pGraphics = pDialog->getPrinterGraphicsContext();
 		pDialog->releasePrinterGraphicsContext(pGraphics);
@@ -1802,9 +1801,8 @@ AbiCommand::nullUpdate (void)
 	{
 		UT_uint32 i = 0;
 
-		for (i = 0; i < 5; i++) {
-			g_main_context_iteration(nullptr, false);
-		}
+		for (i = 0; i < 5; i++)
+			gtk_main_iteration ();
 	}
 }
 

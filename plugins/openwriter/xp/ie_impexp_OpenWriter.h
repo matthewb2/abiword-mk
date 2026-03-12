@@ -32,18 +32,18 @@ public:
 
   virtual ~IE_Imp_OpenWriter_Sniffer ();
 
-  virtual const IE_SuffixConfidence * getSuffixConfidence() override;
+  virtual const IE_SuffixConfidence * getSuffixConfidence ();
 
-  virtual const IE_MimeConfidence * getMimeConfidence() override { return nullptr; }
+  virtual const IE_MimeConfidence * getMimeConfidence () { return NULL; }
 
-  virtual UT_Confidence_t recognizeContents(GsfInput * input) override;
+	virtual UT_Confidence_t recognizeContents (GsfInput * input);
 
   virtual UT_Error constructImporter (PD_Document * pDocument,
-				      IE_Imp ** ppie) override;
+				      IE_Imp ** ppie) ;
 
   virtual bool getDlgLabels (const char ** szDesc,
 			     const char ** szSuffixList,
-			     IEFileType * ft) override;
+			     IEFileType * ft) ;
 };
 
 class IE_Exp_OpenWriter_Sniffer : public IE_ExpSniffer
@@ -53,14 +53,14 @@ public:
 
   virtual ~IE_Exp_OpenWriter_Sniffer() ;
 
-  virtual bool recognizeSuffix(const char * szSuffix) override;
+  virtual bool recognizeSuffix(const char * szSuffix) ;
 
   virtual UT_Error constructExporter(PD_Document * pDocument,
-				     IE_Exp ** ppie) override;
+				     IE_Exp ** ppie) ;
 
   virtual bool getDlgLabels(const char ** pszDesc,
 			    const char ** pszSuffixList,
-                IEFileType * ft) override;
+			    IEFileType * ft) ;
 };
 
 #endif // IE_IMPEXP_OPENWRITER_H

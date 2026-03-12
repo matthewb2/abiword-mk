@@ -21,16 +21,16 @@
  */
 
 // Class definition include
-#include "OXMLi_ListenerState_Valid.h"
+#include <OXMLi_ListenerState_Valid.h>
 
 // Internal includes
-#include "OXML_Document.h"
-#include "OXML_FontManager.h"
-#include "OXMLi_PackageManager.h"
+#include <OXML_Document.h>
+#include <OXML_FontManager.h>
+#include <OXMLi_PackageManager.h>
 
 // AbiWord includes
-#include "ut_assert.h"
-#include "ut_misc.h"
+#include <ut_assert.h>
+#include <ut_misc.h>
 
 // External includes
 #include <string>
@@ -4703,7 +4703,7 @@ void OXMLi_ListenerState_Valid::endElement (OXMLi_EndElementRequest * rqst)
 
 void OXMLi_ListenerState_Valid::charData (OXMLi_CharDataRequest * rqst)
 {
-	rqst->valid = (rqst->buffer != nullptr);
+	rqst->valid = (rqst->buffer != NULL);
 }
 
 void OXMLi_ListenerState_Valid::populateKeywordTable()

@@ -21,12 +21,12 @@
  */
 
 // Class definition include
-#include "OXML_Element_TextBox.h"
+#include <OXML_Element_TextBox.h>
 
 // AbiWord includes
-#include "ut_types.h"
-#include "ut_misc.h"
-#include "pd_Document.h"
+#include <ut_types.h>
+#include <ut_misc.h>
+#include <pd_Document.h>
 
 // External includes
 #include <string>
@@ -76,7 +76,7 @@ UT_Error OXML_Element_TextBox::serializeProperties(IE_Exp_OpenXML* exporter)
 {
 	//TODO: Add all the property serializations here
 	UT_Error err = UT_OK;
-	const gchar* szValue = nullptr;
+	const gchar* szValue = NULL;
 
 	err = exporter->startTextBoxProperties(TARGET);
 	if(err != UT_OK)

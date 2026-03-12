@@ -107,6 +107,11 @@
 // importer/exporter includes
 #include "ie_exp.h"
 #include "ie_imp_AbiWord_1.h"
+#include <gsf/gsf-input-gzip.h>
+#include <gsf/gsf-input-memory.h>
+#include <gsf/gsf-output-memory.h>
+#include <gsf/gsf-utils.h>
+#include <gsf/gsf-output-gzip.h>
 
 // packet includes
 #include <packet/xp/AbiCollab_Packet.h>
@@ -353,7 +358,7 @@ void AbiCollabSessionManager::loadProfile()
 	if (contents)
 	{
 		xmlDocPtr reader = xmlReadMemory(reinterpret_cast<const char*>(contents), 
-							strlen(reinterpret_cast<const char*>(contents)), nullptr, "UTF-8", 0);
+							strlen(reinterpret_cast<const char*>(contents)), 0, "UTF-8", 0);
 		if (reader)
 		{
 			xmlNode* node = xmlDocGetRootElement(reader);
@@ -514,7 +519,7 @@ void AbiCollabSessionManager::storeProfile()
 			FREEP(s);
 
 			char *uri = UT_go_filename_to_uri(profile.utf8_str());
-			GError* error = nullptr;
+			GError* error = 0;
 			GsfOutput* out = UT_go_file_create (uri, &error);
 			if (out)
 			{
@@ -1573,15 +1578,14 @@ bool AbiCollabSessionManager::_nullUpdate()
 	}
 	Sleep(10);
 #elif defined(TOOLKIT_GTK_ALL)
-		for (UT_sint32 i = 0; (i < 10) && g_main_context_pending(nullptr); i++) {
-			g_main_context_iteration(nullptr, false);
-		}
+		for (UT_sint32 i = 0; (i < 10) && gtk_events_pending(); i++)
+			gtk_main_iteration ();
 		usleep(1000*10);
 #elif defined(TOOLKIT_COCOA)
 #warning _nullUpdate needs implementation for Cocoa
-#else
+#else 
 #error unknown platform
-#endif
+#endif	
 	return caughtQuit;
 }
 

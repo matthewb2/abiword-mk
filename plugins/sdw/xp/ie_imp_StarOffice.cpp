@@ -21,8 +21,14 @@
 
 #include <memory.h>
 #include "ut_compiler.h"
-
+ABI_W_NO_CONST_QUAL
 #include <gsf/gsf.h>
+ABI_W_POP
+#include <gsf/gsf-input.h>
+#include <gsf/gsf-input-stdio.h>
+#include <gsf/gsf-utils.h>
+#include <gsf/gsf-infile.h>
+#include <gsf/gsf-infile-msole.h>
 
 #include "ut_types.h"
 #include "ut_std_string.h"
@@ -179,6 +185,7 @@ static UT_uint16 lcl_sw3io__CompressWhich(UT_uint16 nWhich)
 #endif
 
 void streamRead(GsfInput* aStream, TextAttr& aAttr, gsf_off_t aEoa)
+    noexcept(false)
 {
 	UT_uint8 flags;
 	gsf_off_t newPos;
@@ -417,10 +424,11 @@ static std::string _getPassword (XAP_Frame * pFrame)
   return password;
 }
 
-void readByteString(GsfInput* stream, char*& str, UT_uint16* aLength)
+void readByteString(GsfInput* stream, char*& str, UT_uint16* aLength) 
+    noexcept(false)
 {
 	UT_uint16 length;
-	str = nullptr;
+	str = NULL;
 	streamRead(stream, length);
 	str = new char[length + 1];
 	if (length)
@@ -430,17 +438,17 @@ void readByteString(GsfInput* stream, char*& str, UT_uint16* aLength)
 		*aLength = length;
 }
 
-void readByteString(GsfInput* stream, UT_UCS4Char*& str, UT_iconv_t converter, SDWCryptor* cryptor)
+void readByteString(GsfInput* stream, UT_UCS4Char*& str, UT_iconv_t converter, SDWCryptor* cryptor) noexcept(false)
 {
 	UT_uint16 len;
 	char* rawString;
-	str = nullptr;
+	str = NULL;
 	readByteString(stream, rawString, &len);
 	// decrypt
 	if (cryptor)
 		cryptor->Decrypt(rawString, rawString, len);
 
-	str = reinterpret_cast<UT_UCS4Char*>(UT_convert_cd(rawString, len + 1, converter, nullptr, nullptr));
+	str = reinterpret_cast<UT_UCS4Char*>(UT_convert_cd(rawString, len + 1, converter, NULL, NULL));
 #ifdef DEBUG
 	if (!str) {
 		UT_DEBUGMSG(("SDW: UT_convert_cd returned %d (%s)\n", errno, strerror(errno)));
@@ -493,11 +501,11 @@ UT_Confidence_t IE_Imp_StarOffice_Sniffer::recognizeContents(GsfInput * input) {
 	GsfInfile * ole;
 	UT_Confidence_t confidence = UT_CONFIDENCE_ZILCH;
 
-	ole = gsf_infile_msole_new (input, nullptr);
+	ole = gsf_infile_msole_new (input, NULL);
 	if (ole)
 		{
 			GsfInput * starWriterDocument = gsf_infile_child_by_name (ole, "StarWriterDocument");
-			if (starWriterDocument != nullptr)
+			if (starWriterDocument != NULL)
 				{
 					confidence = UT_CONFIDENCE_PERFECT;
 					g_object_unref (G_OBJECT (starWriterDocument));
@@ -526,7 +534,7 @@ bool IE_Imp_StarOffice_Sniffer::getDlgLabels(const char** pszDesc, const char** 
 // ********************************************************************************
 // Header Class
 
-void DocHdr::load(GsfInput* stream)
+void DocHdr::load(GsfInput* stream) noexcept(false)
 {
 	UT_DEBUGMSG(("SDW: entering DocHdr::load\n"));
 	static const char sw3hdr[] = "SW3HDR";
@@ -575,7 +583,7 @@ void DocHdr::load(GsfInput* stream)
 		streamRead(stream, buf, 64);
 		UT_DEBUGMSG(("SDW: BLOCKNAME: %.64s\n", buf));
 		// XXX verify that the string is really null terminated
-		sBlockName = reinterpret_cast<UT_UCS4Char*>(UT_convert_cd(buf, strlen(buf) + 1, converter, nullptr, nullptr));
+		sBlockName = reinterpret_cast<UT_UCS4Char*>(UT_convert_cd(buf, strlen(buf) + 1, converter, NULL, NULL));
 	}
 
 	if (nRecSzPos != 0 && nVersion >= SWG_RECSIZES) {
@@ -590,7 +598,7 @@ void DocHdr::load(GsfInput* stream)
 	if (nFileFlags & SWGF_HAS_PASSWD)
 		cryptor = new SDWCryptor(nDate, nTime, cPasswd);
 	else
-		cryptor = nullptr;
+		cryptor = NULL;
 
 }
 
@@ -598,7 +606,7 @@ void DocHdr::load(GsfInput* stream)
 // Actual Importer
 
 IE_Imp_StarOffice::IE_Imp_StarOffice(PD_Document *pDocument)
-	: IE_Imp(pDocument), mOle(nullptr), mDocStream(nullptr) {
+	: IE_Imp(pDocument), mOle(NULL), mDocStream(NULL) {
 }
 
 IE_Imp_StarOffice::~IE_Imp_StarOffice() {
@@ -608,7 +616,7 @@ IE_Imp_StarOffice::~IE_Imp_StarOffice() {
 		g_object_unref(G_OBJECT(mOle));
 }
 
-void IE_Imp_StarOffice::readRecSize(GsfInput* aStream, UT_uint32& aSize, gsf_off_t* aEOR) {
+void IE_Imp_StarOffice::readRecSize(GsfInput* aStream, UT_uint32& aSize, gsf_off_t* aEOR) noexcept(false) {
 	// Yes, that's correct, only 3 bytes.
 	guint8 buf [3];
 	aSize = 0;
@@ -624,7 +632,7 @@ void IE_Imp_StarOffice::readRecSize(GsfInput* aStream, UT_uint32& aSize, gsf_off
 		*aEOR = gsf_input_tell(aStream) + aSize;
 }
 
-void readFlagRec(GsfInput* stream, UT_uint8& flags, gsf_off_t* newPos)
+void readFlagRec(GsfInput* stream, UT_uint8& flags, gsf_off_t* newPos) noexcept(false)
 {
 	streamRead(stream, flags);
 	if (newPos)
@@ -636,7 +644,7 @@ UT_Error IE_Imp_StarOffice::_loadFile(GsfInput * input)
 {
 	try {
 		UT_DEBUGMSG(("SDW: Starting import\n"));
-		mOle = GSF_INFILE (gsf_infile_msole_new(input, nullptr));
+		mOle = GSF_INFILE (gsf_infile_msole_new(input, NULL));
 		if (!mOle)
 			return UT_IE_BOGUSDOCUMENT;
 
@@ -961,7 +969,7 @@ UT_Error IE_Imp_StarOffice::_loadFile(GsfInput * input)
 						// FIXME: find a way to not have to copy and free 
 						// the result of UT_convert_cd.... --hub
 						UT_DEBUGMSG(("SDW: StringPool: found 0x%04x <-> %.*s\n", id, len, str));
-						UT_UCS4Char* convertedString = reinterpret_cast<UT_UCS4Char*>(UT_convert_cd(str, len + 1, cd, nullptr, nullptr));
+						UT_UCS4Char* convertedString = reinterpret_cast<UT_UCS4Char*>(UT_convert_cd(str, len + 1, cd, NULL, NULL));
 						mStringPool.insert(stringpool_map::value_type(id, convertedString));
 						FREEP(convertedString);
                         delete [] str;
@@ -999,7 +1007,7 @@ UT_Error IE_Imp_StarOffice::_loadFile(GsfInput * input)
 /*******************************************************/
 
 // we use a reference-counted sniffer
-static IE_Imp_StarOffice_Sniffer * m_impSniffer = nullptr;
+static IE_Imp_StarOffice_Sniffer * m_impSniffer = 0;
 
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_register (XAP_ModuleInfo * mi)
@@ -1023,17 +1031,17 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-    mi->name = nullptr;
-    mi->desc = nullptr;
-    mi->version = nullptr;
-    mi->author = nullptr;
-    mi->usage = nullptr;
+    mi->name = 0;
+    mi->desc = 0;
+    mi->version = 0;
+    mi->author = 0;
+    mi->usage = 0;
   
     UT_ASSERT (m_impSniffer);
 
     IE_Imp::unregisterImporter (m_impSniffer);
 	delete m_impSniffer;
-	m_impSniffer = nullptr;
+	m_impSniffer = 0;
 
     return 1;
 }

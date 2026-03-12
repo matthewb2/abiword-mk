@@ -25,17 +25,22 @@
 #define _IE_EXP_OPENXML_H_
 
 // AbiWord includes
-#include "ie_exp.h"
-#include "ut_debugmsg.h"
-#include "ut_types.h"
-#include "ut_misc.h"
-#include "ut_assert.h"
-#include "ut_string_class.h"
-#include "pp_Property.h"
+#include <ie_exp.h>
+#include <ut_debugmsg.h>
+#include <ut_types.h>
+#include <ut_misc.h>
+#include <ut_assert.h>
+#include <ut_string_class.h>
+#include <pp_Property.h>
 
-#include "OXML_Document.h"
-#include "ie_exp_OpenXML_Listener.h"
+#include <OXML_Document.h>
+#include <ie_exp_OpenXML_Listener.h>
 
+// External includes
+#include <gsf/gsf-outfile.h>
+#include <gsf/gsf-outfile-zip.h>
+#include <gsf/gsf-output-stdio.h>
+#include <gsf/gsf-output-memory.h>
 #include <string>
 #include <map>
 
@@ -199,7 +204,7 @@ public:
 	PD_Document* getDoc() {return m_pDoc;};
 
 protected:
-    virtual UT_Error _writeDocument(void) override;
+    virtual UT_Error _writeDocument(void);
 
 private:
 	PD_Document* m_pDoc;

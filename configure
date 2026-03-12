@@ -979,6 +979,8 @@ WITH_CHAMPLAIN_FALSE
 WITH_CHAMPLAIN_TRUE
 CHAMPLAIN_LIBS
 CHAMPLAIN_CFLAGS
+TOOLKIT_QT_FALSE
+TOOLKIT_QT_TRUE
 HAVE_LIBICAL_FALSE
 HAVE_LIBICAL_TRUE
 WITH_LIBICAL_FALSE
@@ -3348,10 +3350,6 @@ IFS=$ac_save_IFS
 case $host_os in *\ *) host_os=`echo "$host_os" | sed 's/ /-/g'`;; esac
 
 
-ac_config_headers="$ac_config_headers config.h"
-
-
-#AM_INIT_AUTOMAKE([1.9 tar-ustar])
 am__api_version='1.15'
 
 # Find a good install program.  We prefer a C program (faster),
@@ -3880,9 +3878,125 @@ AMTAR='$${TAR-tar}'
 
 
 # We'll loop over all known methods to create a tar archive until one works.
-_am_tools='gnutar  pax cpio none'
+_am_tools='gnutar plaintar pax cpio none'
 
-am__tar='$${TAR-tar} chof - "$$tardir"' am__untar='$${TAR-tar} xf -'
+# The POSIX 1988 'ustar' format is defined with fixed-size fields.
+      # There is notably a 21 bits limit for the UID and the GID.  In fact,
+      # the 'pax' utility can hang on bigger UID/GID (see automake bug#8343
+      # and bug#13588).
+      am_max_uid=2097151 # 2^21 - 1
+      am_max_gid=$am_max_uid
+      # The $UID and $GID variables are not portable, so we need to resort
+      # to the POSIX-mandated id(1) utility.  Errors in the 'id' calls
+      # below are definitely unexpected, so allow the users to see them
+      # (that is, avoid stderr redirection).
+      am_uid=`id -u || echo unknown`
+      am_gid=`id -g || echo unknown`
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether UID '$am_uid' is supported by ustar format" >&5
+$as_echo_n "checking whether UID '$am_uid' is supported by ustar format... " >&6; }
+      if test $am_uid -le $am_max_uid; then
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+      else
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+         _am_tools=none
+      fi
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether GID '$am_gid' is supported by ustar format" >&5
+$as_echo_n "checking whether GID '$am_gid' is supported by ustar format... " >&6; }
+      if test $am_gid -le $am_max_gid; then
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+        _am_tools=none
+      fi
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking how to create a ustar tar archive" >&5
+$as_echo_n "checking how to create a ustar tar archive... " >&6; }
+
+  # Go ahead even if we have the value already cached.  We do so because we
+  # need to set the values for the 'am__tar' and 'am__untar' variables.
+  _am_tools=${am_cv_prog_tar_ustar-$_am_tools}
+
+  for _am_tool in $_am_tools; do
+    case $_am_tool in
+    gnutar)
+      for _am_tar in tar gnutar gtar; do
+        { echo "$as_me:$LINENO: $_am_tar --version" >&5
+   ($_am_tar --version) >&5 2>&5
+   ac_status=$?
+   echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); } && break
+      done
+      am__tar="$_am_tar --format=ustar -chf - "'"$$tardir"'
+      am__tar_="$_am_tar --format=ustar -chf - "'"$tardir"'
+      am__untar="$_am_tar -xf -"
+      ;;
+    plaintar)
+      # Must skip GNU tar: if it does not support --format= it doesn't create
+      # ustar tarball either.
+      (tar --version) >/dev/null 2>&1 && continue
+      am__tar='tar chf - "$$tardir"'
+      am__tar_='tar chf - "$tardir"'
+      am__untar='tar xf -'
+      ;;
+    pax)
+      am__tar='pax -L -x ustar -w "$$tardir"'
+      am__tar_='pax -L -x ustar -w "$tardir"'
+      am__untar='pax -r'
+      ;;
+    cpio)
+      am__tar='find "$$tardir" -print | cpio -o -H ustar -L'
+      am__tar_='find "$tardir" -print | cpio -o -H ustar -L'
+      am__untar='cpio -i -H ustar -d'
+      ;;
+    none)
+      am__tar=false
+      am__tar_=false
+      am__untar=false
+      ;;
+    esac
+
+    # If the value was cached, stop now.  We just wanted to have am__tar
+    # and am__untar set.
+    test -n "${am_cv_prog_tar_ustar}" && break
+
+    # tar/untar a dummy directory, and stop if the command works.
+    rm -rf conftest.dir
+    mkdir conftest.dir
+    echo GrepMe > conftest.dir/file
+    { echo "$as_me:$LINENO: tardir=conftest.dir && eval $am__tar_ >conftest.tar" >&5
+   (tardir=conftest.dir && eval $am__tar_ >conftest.tar) >&5 2>&5
+   ac_status=$?
+   echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }
+    rm -rf conftest.dir
+    if test -s conftest.tar; then
+      { echo "$as_me:$LINENO: $am__untar <conftest.tar" >&5
+   ($am__untar <conftest.tar) >&5 2>&5
+   ac_status=$?
+   echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }
+      { echo "$as_me:$LINENO: cat conftest.dir/file" >&5
+   (cat conftest.dir/file) >&5 2>&5
+   ac_status=$?
+   echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }
+      grep GrepMe conftest.dir/file >/dev/null 2>&1 && break
+    fi
+  done
+  rm -rf conftest.dir
+
+  if ${am_cv_prog_tar_ustar+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  am_cv_prog_tar_ustar=$_am_tool
+fi
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $am_cv_prog_tar_ustar" >&5
+$as_echo "$am_cv_prog_tar_ustar" >&6; }
 
 
 
@@ -3930,6 +4044,9 @@ END
     as_fn_error $? "Your 'rm' program is bad, sorry." "$LINENO" 5
   fi
 fi
+
+
+ac_config_headers="$ac_config_headers config.h"
 
 
 # Check whether --enable-silent-rules was given.
@@ -19127,9 +19244,7 @@ fi
 GOFFICE_BUILTIN_CPPFLAGS=
 GOFFICE_BUILTIN_LIBS=
 if test "$TOOLKIT_IS_GTK2" = "yes"; then
-	GOFFICE_BUILTIN_CPPFLAGS='-I${top_srcdir}/goffice-bits2'
-	GOFFICE_BUILTIN_LIBS='${top_builddir}/goffice-bits2/libgoffice.la'
-
+        :
 
 elif test "$PLATFORM" = "unix" && \
    test "$abi_cv_goffice" = "yes"; then
@@ -19340,6 +19455,14 @@ else
   HAVE_LIBICAL_FALSE=
 fi
 
+
+ if false; then
+  TOOLKIT_QT_TRUE=
+  TOOLKIT_QT_FALSE='#'
+else
+  TOOLKIT_QT_TRUE='#'
+  TOOLKIT_QT_FALSE=
+fi
 
 
 champlain_req=' champlain-gtk-0.12 '
@@ -20522,7 +20645,9 @@ if test "$TOOLKIT" = "win"; then
 
 $as_echo "#define TOOLKIT_WIN 1" >>confdefs.h
 
-	#AC_DEFINE([_WIN32_IE], [0x0501], [minimal comctl.dll v4.70 for toolbars])
+
+$as_echo "#define _WIN32_IE 0x0501" >>confdefs.h
+
 	#AC_DEFINE([_WIN32_WINNT], [0x0500], [support collaboration plugin in Windows 2000 or higher])
 	case ${host} in
 	  *-w64-mingw*)
@@ -27784,7 +27909,7 @@ else
 fi
 
 
-ac_config_files="$ac_config_files libabiword.pc Makefile icons/Makefile po/Makefile src/Makefile src/af/Makefile src/af/ev/Makefile src/af/ev/cocoa/Makefile src/af/ev/gtk/Makefile src/af/ev/win/bmp/Makefile src/af/ev/win/Makefile src/af/ev/xp/Makefile src/af/gr/Makefile src/af/gr/cocoa/Makefile src/af/gr/gtk/Makefile src/af/gr/win/Makefile src/af/gr/xp/Makefile src/af/tf/Makefile src/af/tf/xp/Makefile src/af/util/Makefile src/af/util/unix/Makefile src/af/util/win/Makefile src/af/util/xp/Makefile src/af/util/xp/t/Makefile src/af/xap/Makefile src/af/xap/cocoa/Makefile src/af/xap/gtk/Makefile src/af/xap/gtk/t/Makefile src/af/xap/win/Makefile src/af/xap/xp/Makefile src/gi-overrides/Makefile src/plugins/Makefile src/text/Makefile src/text/fmt/Makefile src/text/fmt/gtk/Makefile src/text/fmt/xp/Makefile src/text/fmt/xp/t/Makefile src/text/ptbl/Makefile src/text/ptbl/xp/Makefile src/text/ptbl/xp/t/Makefile src/wp/Makefile src/wp/ap/Makefile src/wp/ap/cocoa/Makefile src/wp/ap/gtk/Makefile src/wp/ap/win/Makefile src/wp/ap/xp/Makefile src/wp/ap/xp/ToolbarIcons/Makefile src/wp/impexp/Makefile src/wp/impexp/cocoa/Makefile src/wp/impexp/gtk/Makefile src/wp/impexp/win/Makefile src/wp/impexp/xp/Makefile src/wp/test/Makefile src/wp/test/cocoa/Makefile src/wp/test/unix/Makefile src/wp/test/unix/testwrap.sh src/wp/test/win/Makefile src/wp/test/win/testwrap.sh src/wp/test/xp/Makefile src/wp/main/Makefile src/wp/main/cocoa/Makefile src/wp/main/cocoa/bundle/Info.plist src/wp/main/win/Makefile user/Makefile user/wp/Makefile user/wp/clipart/Makefile user/wp/dictionary/Makefile user/wp/templates/Makefile tools/Makefile tools/cdump/Makefile tools/cdump/xp/Makefile"
+ac_config_files="$ac_config_files libabiword.pc Makefile goffice-bits/Makefile icons/Makefile po/Makefile src/Makefile src/af/Makefile src/af/ev/Makefile src/af/ev/cocoa/Makefile src/af/ev/gtk/Makefile src/af/ev/win/bmp/Makefile src/af/ev/win/Makefile src/af/ev/xp/Makefile src/af/gr/Makefile src/af/gr/cocoa/Makefile src/af/gr/gtk/Makefile src/af/gr/win/Makefile src/af/gr/xp/Makefile src/af/tf/Makefile src/af/tf/xp/Makefile src/af/util/Makefile src/af/util/unix/Makefile src/af/util/win/Makefile src/af/util/xp/Makefile src/af/util/xp/t/Makefile src/af/xap/Makefile src/af/xap/cocoa/Makefile src/af/xap/gtk/Makefile src/af/xap/gtk/t/Makefile src/af/xap/win/Makefile src/af/xap/xp/Makefile src/gi-overrides/Makefile src/plugins/Makefile src/text/Makefile src/text/fmt/Makefile src/text/fmt/gtk/Makefile src/text/fmt/xp/Makefile src/text/fmt/xp/t/Makefile src/text/ptbl/Makefile src/text/ptbl/xp/Makefile src/text/ptbl/xp/t/Makefile src/wp/Makefile src/wp/ap/Makefile src/wp/ap/cocoa/Makefile src/wp/ap/gtk/Makefile src/wp/ap/win/Makefile src/wp/ap/xp/Makefile src/wp/ap/xp/ToolbarIcons/Makefile src/wp/impexp/Makefile src/wp/impexp/cocoa/Makefile src/wp/impexp/gtk/Makefile src/wp/impexp/win/Makefile src/wp/impexp/xp/Makefile src/wp/test/Makefile src/wp/test/cocoa/Makefile src/wp/test/unix/Makefile src/wp/test/unix/testwrap.sh src/wp/test/win/Makefile src/wp/test/win/testwrap.sh src/wp/test/xp/Makefile src/wp/main/Makefile src/wp/main/cocoa/Makefile src/wp/main/cocoa/bundle/Info.plist src/wp/main/win/Makefile user/Makefile user/wp/Makefile user/wp/clipart/Makefile user/wp/dictionary/Makefile user/wp/templates/Makefile tools/Makefile tools/cdump/Makefile tools/cdump/xp/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -27949,6 +28074,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_LIBICAL_TRUE}" && test -z "${HAVE_LIBICAL_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_LIBICAL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${TOOLKIT_QT_TRUE}" && test -z "${TOOLKIT_QT_FALSE}"; then
+  as_fn_error $? "conditional \"TOOLKIT_QT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WITH_CHAMPLAIN_TRUE}" && test -z "${WITH_CHAMPLAIN_FALSE}"; then
@@ -29281,6 +29410,7 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "libabiword.pc") CONFIG_FILES="$CONFIG_FILES libabiword.pc" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+    "goffice-bits/Makefile") CONFIG_FILES="$CONFIG_FILES goffice-bits/Makefile" ;;
     "icons/Makefile") CONFIG_FILES="$CONFIG_FILES icons/Makefile" ;;
     "po/Makefile") CONFIG_FILES="$CONFIG_FILES po/Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
@@ -30795,7 +30925,7 @@ $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
 
-ac_config_files="$ac_config_files plugins/openwriter/xp/Makefile plugins/openwriter/Makefile plugins/grammar/linkgrammarwrap/Makefile plugins/grammar/xp/Makefile plugins/grammar/Makefile plugins/wpg/xp/Makefile plugins/wpg/Makefile plugins/command/xp/Makefile plugins/command/Makefile plugins/sdw/xp/Makefile plugins/sdw/Makefile plugins/paint/win/Makefile plugins/paint/xp/Makefile plugins/paint/unix/Makefile plugins/paint/Makefile plugins/passepartout/xp/Makefile plugins/passepartout/Makefile plugins/opendocument/imp/xp/Makefile plugins/opendocument/imp/Makefile plugins/opendocument/exp/xp/Makefile plugins/opendocument/exp/Makefile plugins/opendocument/common/xp/Makefile plugins/opendocument/common/Makefile plugins/opendocument/Makefile plugins/wml/xp/Makefile plugins/wml/Makefile plugins/eml/xp/Makefile plugins/eml/Makefile plugins/mht/xp/Makefile plugins/mht/Makefile plugins/gdict/unix/Makefile plugins/gdict/Makefile plugins/s5/xp/Makefile plugins/s5/Makefile plugins/babelfish/xp/Makefile plugins/babelfish/Makefile plugins/ots/xp/Makefile plugins/ots/Makefile plugins/bmp/xp/Makefile plugins/bmp/Makefile plugins/psion/xp/Makefile plugins/psion/Makefile plugins/gda/unix/Makefile plugins/gda/Makefile plugins/opml/xp/Makefile plugins/opml/Makefile plugins/garble/xp/Makefile plugins/garble/Makefile plugins/hrtext/xp/Makefile plugins/hrtext/Makefile plugins/presentation/xp/Makefile plugins/presentation/Makefile plugins/freetranslation/xp/Makefile plugins/freetranslation/Makefile plugins/xslfo/xp/Makefile plugins/xslfo/Makefile plugins/wordperfect/xp/Makefile plugins/wordperfect/Makefile plugins/applix/xp/Makefile plugins/applix/Makefile plugins/loadbindings/xp/Makefile plugins/loadbindings/Makefile plugins/docbook/xp/Makefile plugins/docbook/Makefile plugins/mif/xp/Makefile plugins/mif/Makefile plugins/pdf/xp/Makefile plugins/pdf/Makefile plugins/google/xp/Makefile plugins/google/Makefile plugins/Makefile plugins/clarisworks/xp/Makefile plugins/clarisworks/Makefile plugins/latex/xp/Makefile plugins/latex/Makefile plugins/latex/xsltml/Makefile plugins/mswrite/xp/Makefile plugins/mswrite/Makefile plugins/iscii/xp/Makefile plugins/iscii/Makefile plugins/openxml/omml_xslt/Makefile plugins/openxml/imp/xp/Makefile plugins/openxml/imp/Makefile plugins/openxml/exp/xp/Makefile plugins/openxml/exp/Makefile plugins/openxml/common/xp/Makefile plugins/openxml/common/Makefile plugins/openxml/Makefile plugins/wikipedia/xp/Makefile plugins/wikipedia/Makefile plugins/pdb/xp/Makefile plugins/pdb/Makefile plugins/urldict/xp/Makefile plugins/urldict/Makefile plugins/wmf/xp/Makefile plugins/wmf/Makefile plugins/hancom/xp/Makefile plugins/hancom/Makefile plugins/epub/dialogs/win/Makefile plugins/epub/dialogs/xp/Makefile plugins/epub/dialogs/Makefile plugins/epub/dialogs/gtk/Makefile plugins/epub/imp/xp/Makefile plugins/epub/imp/Makefile plugins/epub/exp/xp/Makefile plugins/epub/exp/Makefile plugins/epub/common/xp/Makefile plugins/epub/common/Makefile plugins/epub/Makefile plugins/kword/xp/Makefile plugins/kword/Makefile plugins/rsvg/xp/Makefile plugins/rsvg/Makefile"
+ac_config_files="$ac_config_files plugins/openwriter/xp/Makefile plugins/openwriter/Makefile plugins/grammar/linkgrammarwrap/Makefile plugins/grammar/xp/Makefile plugins/grammar/Makefile plugins/wpg/xp/Makefile plugins/wpg/Makefile plugins/gimp/xp/Makefile plugins/gimp/Makefile plugins/aiksaurus/win/Makefile plugins/aiksaurus/xp/Makefile plugins/aiksaurus/aiksaurusgtk3/Makefile plugins/aiksaurus/Makefile plugins/command/xp/Makefile plugins/command/Makefile plugins/goffice/unix/Makefile plugins/goffice/Makefile plugins/sdw/xp/Makefile plugins/sdw/Makefile plugins/paint/win/Makefile plugins/paint/xp/Makefile plugins/paint/unix/Makefile plugins/paint/Makefile plugins/passepartout/xp/Makefile plugins/passepartout/Makefile plugins/opendocument/imp/xp/Makefile plugins/opendocument/imp/Makefile plugins/opendocument/exp/xp/Makefile plugins/opendocument/exp/Makefile plugins/opendocument/common/xp/Makefile plugins/opendocument/common/Makefile plugins/opendocument/Makefile plugins/wml/xp/Makefile plugins/wml/Makefile plugins/eml/xp/Makefile plugins/eml/Makefile plugins/mht/xp/Makefile plugins/mht/Makefile plugins/gdict/unix/Makefile plugins/gdict/Makefile plugins/s5/xp/Makefile plugins/s5/Makefile plugins/babelfish/xp/Makefile plugins/babelfish/Makefile plugins/ots/xp/Makefile plugins/ots/Makefile plugins/bmp/xp/Makefile plugins/bmp/Makefile plugins/psion/xp/Makefile plugins/psion/Makefile plugins/gda/unix/Makefile plugins/gda/Makefile plugins/opml/xp/Makefile plugins/opml/Makefile plugins/garble/xp/Makefile plugins/garble/Makefile plugins/hrtext/xp/Makefile plugins/hrtext/Makefile plugins/presentation/xp/Makefile plugins/presentation/Makefile plugins/freetranslation/xp/Makefile plugins/freetranslation/Makefile plugins/xslfo/xp/Makefile plugins/xslfo/Makefile plugins/wordperfect/xp/Makefile plugins/wordperfect/Makefile plugins/applix/xp/Makefile plugins/applix/Makefile plugins/loadbindings/xp/Makefile plugins/loadbindings/Makefile plugins/docbook/xp/Makefile plugins/docbook/Makefile plugins/mif/xp/Makefile plugins/mif/Makefile plugins/pdf/xp/Makefile plugins/pdf/Makefile plugins/google/xp/Makefile plugins/google/Makefile plugins/Makefile plugins/clarisworks/xp/Makefile plugins/clarisworks/Makefile plugins/latex/xp/Makefile plugins/latex/Makefile plugins/latex/xsltml/Makefile plugins/t602/xp/Makefile plugins/t602/Makefile plugins/mswrite/xp/Makefile plugins/mswrite/Makefile plugins/iscii/xp/Makefile plugins/iscii/Makefile plugins/openxml/omml_xslt/Makefile plugins/openxml/imp/xp/Makefile plugins/openxml/imp/Makefile plugins/openxml/exp/xp/Makefile plugins/openxml/exp/Makefile plugins/openxml/common/xp/Makefile plugins/openxml/common/Makefile plugins/openxml/Makefile plugins/wikipedia/xp/Makefile plugins/wikipedia/Makefile plugins/pdb/xp/Makefile plugins/pdb/Makefile plugins/urldict/xp/Makefile plugins/urldict/Makefile plugins/wmf/xp/Makefile plugins/wmf/Makefile plugins/hancom/xp/Makefile plugins/hancom/Makefile plugins/epub/dialogs/win/Makefile plugins/epub/dialogs/xp/Makefile plugins/epub/dialogs/Makefile plugins/epub/dialogs/gtk/Makefile plugins/epub/imp/xp/Makefile plugins/epub/imp/Makefile plugins/epub/exp/xp/Makefile plugins/epub/exp/Makefile plugins/epub/common/xp/Makefile plugins/epub/common/Makefile plugins/epub/Makefile plugins/kword/xp/Makefile plugins/kword/Makefile plugins/rsvg/xp/Makefile plugins/rsvg/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -30960,6 +31090,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_LIBICAL_TRUE}" && test -z "${HAVE_LIBICAL_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_LIBICAL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${TOOLKIT_QT_TRUE}" && test -z "${TOOLKIT_QT_FALSE}"; then
+  as_fn_error $? "conditional \"TOOLKIT_QT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WITH_CHAMPLAIN_TRUE}" && test -z "${WITH_CHAMPLAIN_FALSE}"; then
@@ -32297,6 +32431,7 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "libabiword.pc") CONFIG_FILES="$CONFIG_FILES libabiword.pc" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+    "goffice-bits/Makefile") CONFIG_FILES="$CONFIG_FILES goffice-bits/Makefile" ;;
     "icons/Makefile") CONFIG_FILES="$CONFIG_FILES icons/Makefile" ;;
     "po/Makefile") CONFIG_FILES="$CONFIG_FILES po/Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
@@ -32373,8 +32508,16 @@ do
     "plugins/grammar/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/grammar/Makefile" ;;
     "plugins/wpg/xp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/wpg/xp/Makefile" ;;
     "plugins/wpg/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/wpg/Makefile" ;;
+    "plugins/gimp/xp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/gimp/xp/Makefile" ;;
+    "plugins/gimp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/gimp/Makefile" ;;
+    "plugins/aiksaurus/win/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/aiksaurus/win/Makefile" ;;
+    "plugins/aiksaurus/xp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/aiksaurus/xp/Makefile" ;;
+    "plugins/aiksaurus/aiksaurusgtk3/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/aiksaurus/aiksaurusgtk3/Makefile" ;;
+    "plugins/aiksaurus/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/aiksaurus/Makefile" ;;
     "plugins/command/xp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/command/xp/Makefile" ;;
     "plugins/command/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/command/Makefile" ;;
+    "plugins/goffice/unix/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/goffice/unix/Makefile" ;;
+    "plugins/goffice/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/goffice/Makefile" ;;
     "plugins/sdw/xp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/sdw/xp/Makefile" ;;
     "plugins/sdw/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/sdw/Makefile" ;;
     "plugins/paint/win/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/paint/win/Makefile" ;;
@@ -32442,6 +32585,8 @@ do
     "plugins/latex/xp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/latex/xp/Makefile" ;;
     "plugins/latex/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/latex/Makefile" ;;
     "plugins/latex/xsltml/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/latex/xsltml/Makefile" ;;
+    "plugins/t602/xp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/t602/xp/Makefile" ;;
+    "plugins/t602/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/t602/Makefile" ;;
     "plugins/mswrite/xp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/mswrite/xp/Makefile" ;;
     "plugins/mswrite/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/mswrite/Makefile" ;;
     "plugins/iscii/xp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/iscii/xp/Makefile" ;;

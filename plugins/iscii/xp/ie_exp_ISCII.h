@@ -32,12 +32,12 @@ public:
 	IE_Exp_ISCII_Sniffer (const char * name);
 	virtual ~IE_Exp_ISCII_Sniffer () {}
 
-	virtual bool recognizeSuffix(const char * szSuffix) override;
+	virtual bool recognizeSuffix(const char * szSuffix);
 	virtual bool getDlgLabels(const char ** szDesc,
 							  const char ** szSuffixList,
-							  IEFileType * ft) override;
+							  IEFileType * ft);
 	virtual UT_Error constructExporter(PD_Document * pDocument,
-									   IE_Exp ** ppie) override;
+									   IE_Exp ** ppie);
 };
 
 class IE_Exp_ISCII : public IE_Exp_Text
@@ -47,7 +47,7 @@ public:
 	virtual ~IE_Exp_ISCII() {}
 
 protected:
-	virtual PL_Listener *	_constructListener(void) override;
+	virtual PL_Listener *	_constructListener(void);
 };
 
 //////////////////////////////////////////////////////////////////

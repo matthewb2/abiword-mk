@@ -23,7 +23,6 @@
 #include "ut_debugmsg.h"
 #include "ut_path.h"
 #include "ut_locale.h"
-#include "ut_std_vector.h"
 #include "pt_Types.h"
 #include "ie_impexp_XSL-FO.h"
 #include "ie_exp_XSL-FO.h"
@@ -46,7 +45,7 @@
 
 IE_Exp_XSL_FO::IE_Exp_XSL_FO(PD_Document * pDocument)
 	: IE_Exp(pDocument),
-	  m_pListener(nullptr),
+	  m_pListener(0),
 	  m_error(UT_OK)
 {
 }
@@ -254,7 +253,7 @@ void s_XSL_FO_Listener::_openRow(void)
 		UT_sint32 curHeight = 0;
 
 		UT_UTF8String tr = "table-row", buf;
-		const char* szHeight = nullptr;
+		const char* szHeight = NULL;
 		szHeight = mTableHelper.getTableProp("table-row-heights");
 
 		UT_LocaleTransactor t(LC_NUMERIC, "C");
@@ -325,7 +324,7 @@ void s_XSL_FO_Listener::_openCell(PT_AttrPropIndex /*api*/)
 UT_UTF8String s_XSL_FO_Listener::_getCellColors(void)
 {
 	UT_UTF8String tableSpec, color;
-	const char *prop = nullptr;
+	const char *prop = NULL;
 
 	UT_LocaleTransactor t(LC_NUMERIC, "C");
 
@@ -406,7 +405,7 @@ UT_UTF8String s_XSL_FO_Listener::_getCellThicknesses(void)
 {
 	UT_UTF8String tableSpec;
 	double val = 0;
-	const char *prop = nullptr;
+	const char *prop = NULL;
 
 	UT_LocaleTransactor t(LC_NUMERIC, "C");
 
@@ -449,7 +448,7 @@ UT_UTF8String s_XSL_FO_Listener::_getCellThicknesses(void)
 UT_UTF8String s_XSL_FO_Listener::_getTableColors(void)
 {
 	UT_UTF8String tableSpec, color;
-	const char *prop = nullptr;
+	const char *prop = NULL;
 
 	UT_LocaleTransactor t(LC_NUMERIC, "C");
 
@@ -509,7 +508,7 @@ UT_UTF8String s_XSL_FO_Listener::_getTableColors(void)
 void s_XSL_FO_Listener::_handleTableColumns(void)
 {
 	UT_sint32 nCols = mTableHelper.getNumCols();
-	const char *prop = nullptr;
+	const char *prop = NULL;
 	prop = mTableHelper.getTableProp("table-column-props");
 
 	UT_LocaleTransactor t(LC_NUMERIC, "C");
@@ -548,7 +547,7 @@ UT_UTF8String s_XSL_FO_Listener::_getTableThicknesses(void)
 {
 	UT_UTF8String tableSpec;
 	double val = 0;
-	const char *prop = nullptr;
+	const char *prop = NULL;
 
 	UT_LocaleTransactor t(LC_NUMERIC, "C");
 
@@ -604,7 +603,8 @@ s_XSL_FO_Listener::~s_XSL_FO_Listener()
 {
 	_closeSection();
 	_handleDataItems();
-	UT_std_vector_sparsepurgeall(m_Lists);
+	UT_VECTOR_FREEALL(char *, m_utvDataIDs);
+	UT_VECTOR_SPARSEPURGEALL(ListHelper *, m_Lists);
 
 	_tagClose(TT_DOCUMENT, "root");
 }
@@ -617,17 +617,17 @@ void s_XSL_FO_Listener::_handleLists(void)
 		if (pAutoNum->isEmpty() == true)
 			continue;
 
-		m_Lists.push_back(new ListHelper);
-		ListHelper * lh = m_Lists.back();
+		m_Lists.addItem(new ListHelper);
+		ListHelper * lh = m_Lists[m_Lists.getItemCount() - 1];
 		(*lh).addList(pAutoNum);
 	}
 }
 
 void s_XSL_FO_Listener::_handleBookmark(PT_AttrPropIndex api)
 {
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
-	const gchar* szValue = nullptr;
+	const gchar* szValue = NULL;
 
 	if(bHaveProp && pAP && pAP->getAttribute("type", szValue) && szValue)
 	{
@@ -649,17 +649,18 @@ void s_XSL_FO_Listener::_handleBookmark(PT_AttrPropIndex api)
 
 void s_XSL_FO_Listener::_handleEmbedded(PT_AttrPropIndex api)
 {
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
-	const gchar* szValue = nullptr;
+	const gchar* szValue = NULL;
 
 	UT_return_if_fail(bHaveProp && pAP && pAP->getAttribute("dataid", szValue) && szValue);
 
-	UT_UTF8String img, url;
+	UT_UTF8String buf, img, url;
 
-	std::string dataid("snapshot-png-");
-	dataid += szValue;
-	dataid = UT_escapeXML(dataid);
+	buf = "snapshot-png-";
+	buf += szValue;
+	buf.escapeXML();
+	const gchar* dataid = g_strdup(buf.utf8_str());
 	m_utvDataIDs.push_back(dataid);
 
 	url = UT_go_basename(m_pie->getFileName());
@@ -668,7 +669,7 @@ void s_XSL_FO_Listener::_handleEmbedded(PT_AttrPropIndex api)
 	img = "external-graphic src=\"url('";
 	img += url;
 	img += "_data/";
-	img += dataid;
+	img += buf;
 	img += ".png')\"";
 
 	UT_LocaleTransactor t(LC_NUMERIC, "C");
@@ -695,12 +696,12 @@ void s_XSL_FO_Listener::_handleField(const PX_ChangeRecord_Object * pcro, PT_Att
 	if(!m_iBlockDepth && !m_iListBlockDepth)
 		return;
 
-	const PP_AttrProp* pAP = nullptr;
+	const PP_AttrProp* pAP = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api, &pAP);
 	
 	if (bHaveProp && pAP)
 	{
-		const gchar* szValue = nullptr;
+		const gchar* szValue = NULL;
 		if (pAP->getAttribute("type", szValue) && szValue)
 		{
 			fd_Field * field = pcro->getField();
@@ -715,8 +716,8 @@ void s_XSL_FO_Listener::_handleField(const PX_ChangeRecord_Object * pcro, PT_Att
 				_tagOpen(TT_LISTITEMLABEL, "list-item-label end-indent=\"label-end()\"", false);
 				_tagOpen(TT_BLOCK, "block", false);
 
-				std::string label = "";
-				for (std::vector<ListHelper*>::size_type i = 0; i < m_Lists.size(); i++)
+				UT_UTF8String label = "";
+				for(UT_sint32 i = 0; i < m_Lists.getItemCount(); i++)
 				{
 					ListHelper * lh = m_Lists[i];
 					if(lh && ((*lh).retrieveID() == m_iListID))
@@ -727,7 +728,7 @@ void s_XSL_FO_Listener::_handleField(const PX_ChangeRecord_Object * pcro, PT_Att
 				}
 
 				if(label.length())
-					m_pie->write(label.c_str()); //write out the list label text
+					m_pie->write(label.utf8_str()); //write out the list label text
 
 				_tagClose(TT_BLOCK, "block", false);
 				_tagClose(TT_LISTITEMLABEL, "list-item-label");
@@ -764,9 +765,9 @@ void s_XSL_FO_Listener::_handleField(const PX_ChangeRecord_Object * pcro, PT_Att
 
 void s_XSL_FO_Listener::_handleFrame(PT_AttrPropIndex api)
 {
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
-	const gchar * szValue = nullptr;
+	const gchar * szValue = NULL;
 
 	if(pAP && bHaveProp && (pAP->getAttribute("strux-image-dataid", szValue)) && szValue)
 	{
@@ -779,9 +780,9 @@ void s_XSL_FO_Listener::_handleFrame(PT_AttrPropIndex api)
 
 void s_XSL_FO_Listener::_handleHyperlink(PT_AttrPropIndex api)
 {
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
-	const gchar* szValue = nullptr;
+	const gchar* szValue = NULL;
 
 	if(bHaveProp && pAP && pAP->getAttribute("xlink:href", szValue) && szValue)
 	{
@@ -821,13 +822,13 @@ void s_XSL_FO_Listener::_handleHyperlink(PT_AttrPropIndex api)
 
 void s_XSL_FO_Listener::_handleImage(PT_AttrPropIndex api)
 {
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
-	const gchar* szValue = nullptr;
+	const gchar* szValue = NULL;
 
 	UT_return_if_fail(bHaveProp && pAP && pAP->getAttribute("dataid", szValue) && szValue);
 
-	std::string dataid(szValue);
+	const gchar * dataid = g_strdup(szValue);
 	m_utvDataIDs.push_back(dataid);
 
 	UT_UTF8String buf, img, url;
@@ -843,7 +844,7 @@ void s_XSL_FO_Listener::_handleImage(PT_AttrPropIndex api)
 	img += buf;
 
     std::string ext;
-    if (m_pDocument->getDataItemFileExtension(dataid.c_str(), ext, true)) {
+    if(m_pDocument->getDataItemFileExtension(dataid, ext, true)) {
         img += ext;
     }
     else {
@@ -876,13 +877,13 @@ void s_XSL_FO_Listener::_handlePositionedImage(PT_AttrPropIndex api)
 {
 	//TODO: save positioning?
 
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
-	const gchar* szValue = nullptr;
+	const gchar* szValue = NULL;
 
 	UT_return_if_fail(bHaveProp && pAP && pAP->getAttribute("strux-image-dataid", szValue) && szValue);
 
-	std::string dataid(szValue);
+	const gchar * dataid = g_strdup(szValue);
 	m_utvDataIDs.push_back(dataid);
 
 	UT_UTF8String buf, img, url;
@@ -898,7 +899,7 @@ void s_XSL_FO_Listener::_handlePositionedImage(PT_AttrPropIndex api)
 	img += buf;
 
     std::string ext;
-    if (m_pDocument->getDataItemFileExtension(dataid.c_str(), ext, true)) {
+    if(m_pDocument->getDataItemFileExtension(dataid, ext, true)) {
         img += ext;
     }
     else {
@@ -929,19 +930,20 @@ void s_XSL_FO_Listener::_handlePositionedImage(PT_AttrPropIndex api)
 
 void s_XSL_FO_Listener::_handleMath(PT_AttrPropIndex api)
 {
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
-	const gchar* szValue = nullptr;
+	const gchar* szValue = NULL;
 
 	UT_return_if_fail(bHaveProp && pAP && pAP->getAttribute("dataid", szValue) && szValue);
 
 	//TODO: investigate mathml exporting
 
-	UT_UTF8String img, url;
+	UT_UTF8String buf, img, url;
 
-	std::string dataid = "snapshot-png-";
-	dataid += szValue;
-	dataid = UT_escapeXML(dataid);
+	buf = "snapshot-png-";
+	buf += szValue;
+	buf.escapeXML();
+	const gchar * dataid = g_strdup(buf.utf8_str());
 	m_utvDataIDs.push_back(dataid);
 
 	url = UT_go_basename(m_pie->getFileName());
@@ -950,24 +952,26 @@ void s_XSL_FO_Listener::_handleMath(PT_AttrPropIndex api)
 	img = "external-graphic src=\"url('";
 	img += url;
 	img += "_data/";
-	img += dataid;
+	img += buf;
 	img += ".png')\"";
+	buf.clear();
 
 	UT_LocaleTransactor t(LC_NUMERIC, "C");
 
 	if(pAP->getProperty("width", szValue) && szValue)
 	{
 		double dInch = static_cast<double>(atoi(szValue))/UT_LAYOUT_RESOLUTION;
-		std::string buf = UT_std_string_sprintf("%fin", dInch);
+		UT_UTF8String_sprintf(buf,"%fin",dInch);
 
 		img += " content-width=\"";
 		img += buf;
 		img += "\"";
+		buf.clear();
 	}
 	if(pAP->getProperty("height", szValue) && szValue)
 	{
 		double dInch = static_cast<double>(atoi(szValue))/UT_LAYOUT_RESOLUTION;
-		std::string buf = UT_std_string_sprintf("%fin", dInch);
+		UT_UTF8String_sprintf(buf,"%fin",dInch);
 
 		img += " content-height=\"";
 		img += buf;
@@ -1070,7 +1074,7 @@ bool s_XSL_FO_Listener::populateStrux(pf_Frag_Strux* sdh,
 {
 	UT_ASSERT(pcr->getType() == PX_ChangeRecord::PXT_InsertStrux);
 	const PX_ChangeRecord_Strux * pcrx = static_cast<const PX_ChangeRecord_Strux *> (pcr);
-	*psfh = nullptr;							// we don't need it.
+	*psfh = 0;							// we don't need it.
 
 	PT_AttrPropIndex api = pcr->getIndexAP();
 
@@ -1080,10 +1084,10 @@ bool s_XSL_FO_Listener::populateStrux(pf_Frag_Strux* sdh,
 	{
 		_closeSection();
 		
-		const PP_AttrProp* pAP = nullptr;
+		const PP_AttrProp* pAP = NULL;
 		if (m_pDocument->getAttrProp(api, &pAP) && pAP)
 		{
-			const gchar* pszSectionType = nullptr;
+			const gchar* pszSectionType = NULL;
 			pAP->getAttribute("type", pszSectionType);
 			if (
 				!pszSectionType
@@ -1298,7 +1302,7 @@ void s_XSL_FO_Listener::_handlePageSize(PT_AttrPropIndex api)
   // Code to write out the PageSize Definitions to disk
   // 
 
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 
 	UT_LocaleTransactor t(LC_NUMERIC, "C");
@@ -1310,10 +1314,10 @@ void s_XSL_FO_Listener::_handlePageSize(PT_AttrPropIndex api)
 	// todo - validate these and make sure they all make sense
 	if (bHaveProp && pAP)
 	{
-		const gchar * szValue = nullptr;
+		const gchar * szValue = NULL;
 
 		szValue = PP_evalProperty("page-margin-top",
-								  nullptr, nullptr, pAP, m_pDocument, true);
+								  NULL, NULL, pAP, m_pDocument, true);
 		if(szValue)
 		{
 			master += " margin-top=\"";
@@ -1322,7 +1326,7 @@ void s_XSL_FO_Listener::_handlePageSize(PT_AttrPropIndex api)
 		}
 
 		szValue = PP_evalProperty("page-margin-bottom",
-								  nullptr, nullptr, pAP, m_pDocument, true);
+								  NULL, NULL, pAP, m_pDocument, true);
 		if(szValue)
 		{
 			master += " margin-bottom=\"";
@@ -1331,7 +1335,7 @@ void s_XSL_FO_Listener::_handlePageSize(PT_AttrPropIndex api)
 		}
 
 		szValue = PP_evalProperty("page-margin-left",
-								  nullptr, nullptr, pAP, m_pDocument, true);
+								  NULL, NULL, pAP, m_pDocument, true);
 		if(szValue)
 		{
 			master += " margin-left=\"";
@@ -1340,7 +1344,7 @@ void s_XSL_FO_Listener::_handlePageSize(PT_AttrPropIndex api)
 		}
 
 		szValue = PP_evalProperty("page-margin-right",
-								  nullptr, nullptr, pAP, m_pDocument, true);
+								  NULL, NULL, pAP, m_pDocument, true);
 		if(szValue)
 		{
 			master += " margin-right=\"";
@@ -1374,16 +1378,16 @@ void s_XSL_FO_Listener::_handlePageSize(PT_AttrPropIndex api)
 
 void s_XSL_FO_Listener::_handleDataItems(void)
 {
-	const char * szName = nullptr;
+	const char * szName = NULL;
     std::string mimeType;
 	UT_ConstByteBufPtr pByteBuf;
 
-	for (UT_uint32 k=0; (m_pDocument->enumDataItems(k, nullptr, &szName, pByteBuf, &mimeType)); k++)
-	{
+	for (UT_uint32 k=0; (m_pDocument->enumDataItems(k, NULL, &szName, pByteBuf, &mimeType)); k++)
+	{	  	  
 		UT_sint32 loc = -1;
-		for (std::vector<std::string>::size_type i = 0; i < m_utvDataIDs.size(); i++)
+		for (UT_sint32 i = 0; i < m_utvDataIDs.getItemCount(); i++)
 		{
-			if (m_utvDataIDs[i] == szName)
+			if(strcmp(reinterpret_cast<const char*>(m_utvDataIDs[i]), szName) == 0)
 			{
 				loc = i;
 				break;
@@ -1392,30 +1396,30 @@ void s_XSL_FO_Listener::_handleDataItems(void)
 
 		if(loc > -1)
 		{
-			std::string fname;
+			UT_UTF8String fname;
 
-			fname = UT_std_string_sprintf("%s_data", m_pie->getFileName());
-			UT_go_directory_create(fname.c_str(), nullptr);
+			UT_UTF8String_sprintf(fname, "%s_data", m_pie->getFileName());
+			UT_go_directory_create(fname.utf8_str(), NULL);
 
 			if (mimeType == "image/svg+xml")
-				fname = UT_std_string_sprintf("%s/%d.svg", fname.c_str(), loc);
+				UT_UTF8String_sprintf(fname, "%s/%d.svg", fname.utf8_str(), loc);
 			else if (mimeType == "application/mathml+xml")
-				fname = UT_std_string_sprintf("%s/%d.mathml", fname.c_str(), loc);
+				UT_UTF8String_sprintf(fname, "%s/%d.mathml", fname.utf8_str(), loc);
 			else // raster Image
-			{
+			{  
                 const char * extension = "png";
                 if(mimeType == "image/jpeg") {
                     extension = "jpg";
                 }
 				char * temp = _stripSuffix(UT_go_basename(szName), '_');
 				char * fstripped = _stripSuffix(temp, '.');
-				fname = UT_std_string_sprintf("%s/%s.%s", fname.c_str(), fstripped, extension);
+				UT_UTF8String_sprintf(fname, "%s/%s.%s", fname.utf8_str(), fstripped, extension);
 
 				FREEP(temp);
 				FREEP(fstripped);
 			}
 	  
-			GsfOutput *fp = UT_go_file_create (fname.c_str(), nullptr);
+			GsfOutput *fp = UT_go_file_create (fname.utf8_str(), NULL);
 	  
 			if(!fp)
 				continue;
@@ -1459,9 +1463,9 @@ void s_XSL_FO_Listener::_openBlock(PT_AttrPropIndex api)
 	_closeLink();
 
 	UT_UTF8String buf;
-	const PP_AttrProp* pAP = nullptr;
+	const PP_AttrProp* pAP = 0;
 	bool bHaveProp = m_pDocument->getAttrProp(api, &pAP), bList = false;
-	const gchar* szValue = nullptr;
+	const gchar* szValue = NULL;
 
 	if(bHaveProp && pAP && pAP->getAttribute("level", szValue) && szValue)
 	{
@@ -1559,14 +1563,14 @@ void s_XSL_FO_Listener::_openSpan(PT_AttrPropIndex api)
 		_openListItem();
 	}
 
-	const PP_AttrProp* pAP = nullptr;
+	const PP_AttrProp* pAP = 0;
 	bool bHaveProp = m_pDocument->getAttrProp(api, &pAP);
 	UT_UTF8String buf = "inline";
 
 	// query and output properties
 	if (bHaveProp && pAP)
 	{
-		const gchar * szValue = nullptr;
+		const gchar * szValue = NULL;
 
 		if (pAP->getProperty("bgcolor", szValue) && szValue)
 		{

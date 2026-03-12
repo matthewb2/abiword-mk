@@ -27,6 +27,9 @@
 #ifndef _IE_EXP_OPENDOCUMENT_H_
 #define _IE_EXP_OPENDOCUMENT_H_
 
+// External includes
+#include <gsf/gsf-output.h>
+
 // AbiWord includes
 #include "ie_exp.h"
 #include "ut_bytebuf.h"
@@ -38,8 +41,8 @@ public:
     virtual ~IE_Exp_OpenDocument();
     void setGSFOutput(GsfOutput * pBuf);
 protected:
-    virtual GsfOutput* _openFile(const char *szFilename) override;
-    virtual UT_Error  _writeDocument(void) override;
+    virtual GsfOutput* _openFile(const char *szFilename);
+    virtual UT_Error  _writeDocument(void);
     virtual UT_Error copyToBuffer(PD_DocumentRange * pDocRange, const UT_ByteBufPtr & bufODT);
 
 private:

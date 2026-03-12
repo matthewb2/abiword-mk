@@ -38,15 +38,15 @@ public:
 	IE_Imp_MIF_Sniffer(const char * name);
 	virtual ~IE_Imp_MIF_Sniffer() {}
 
-	virtual const IE_SuffixConfidence * getSuffixConfidence() override;
-	virtual const IE_MimeConfidence * getMimeConfidence() override { return nullptr; }
-	virtual UT_Confidence_t recognizeContents(const char * szBuf,
-									UT_uint32 iNumbytes) override;
-	virtual bool getDlgLabels(const char ** szDesc,
+	virtual const IE_SuffixConfidence * getSuffixConfidence ();
+	virtual const IE_MimeConfidence * getMimeConfidence () { return NULL; }
+	virtual UT_Confidence_t recognizeContents (const char * szBuf,
+									UT_uint32 iNumbytes);
+	virtual bool getDlgLabels (const char ** szDesc,
 							   const char ** szSuffixList,
-							   IEFileType * ft) override;
-	virtual UT_Error constructImporter(PD_Document * pDocument,
-										IE_Imp ** ppie) override;
+							   IEFileType * ft);
+	virtual UT_Error constructImporter (PD_Document * pDocument,
+										IE_Imp ** ppie);
 
 };
 
@@ -57,7 +57,7 @@ class IE_Imp_MIF : public IE_Imp
   ~IE_Imp_MIF();
 
  protected:
-	virtual UT_Error _loadFile(GsfInput * fp) override;
+	virtual UT_Error	_loadFile(GsfInput * fp);
 
 	UT_Error			_parseFile(GsfInput * fp);
 	UT_Error			_writeHeader(GsfInput * fp);

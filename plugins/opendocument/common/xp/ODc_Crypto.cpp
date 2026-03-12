@@ -20,8 +20,8 @@
 
 #include <zlib.h>
 #include <glib.h>
-
-#include <gsf/gsf.h>
+#include <gsf/gsf-input-gzip.h>
+#include <gsf/gsf-input-memory.h>
 
 #include "sha1.h"
 #include "gc-pbkdf2-sha1.h"
@@ -80,7 +80,7 @@ UT_Error ODc_Crypto::performDecrypt(GsfInput* pStream,
 	UT_sint32 content_size = gsf_input_size(pStream); 
 	if (content_size == -1)
 		return UT_ERROR;
-	const unsigned char* content = gsf_input_read(pStream, content_size, nullptr);
+	const unsigned char* content = gsf_input_read(pStream, content_size, NULL);
 	if (!content)
 		return UT_ERROR;
 
@@ -114,11 +114,11 @@ UT_Error ODc_Crypto::performDecrypt(GsfInput* pStream,
     
 	// deflate the decrypted content
 	z_stream zs;
-	zs.zalloc = nullptr;
-	zs.zfree = nullptr;
-	zs.opaque = nullptr;
+	zs.zalloc = Z_NULL;
+	zs.zfree = Z_NULL;
+	zs.opaque = Z_NULL;
 	zs.avail_in = 0;
-	zs.next_in = nullptr;
+	zs.next_in = Z_NULL;
 
 	int err;
 	err = inflateInit2(&zs, -MAX_WBITS);

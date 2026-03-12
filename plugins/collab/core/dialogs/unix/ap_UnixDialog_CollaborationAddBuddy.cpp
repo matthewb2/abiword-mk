@@ -21,7 +21,6 @@
 #include "xap_UnixApp.h"
 #include "xap_Frame.h"
 #include "xap_UnixDialogHelper.h"
-#include "xap_GtkUtils.h"
 #include "ut_string_class.h"
 #include <xp/AbiCollabSessionManager.h>
 
@@ -151,13 +150,13 @@ void AP_UnixDialog_CollaborationAddBuddy::event_Ok()
 	GtkTreeIter iter;
 	if (gtk_combo_box_get_active_iter(GTK_COMBO_BOX(m_wAccount), &iter))
 	{
-		gpointer handler = nullptr;
+		gpointer handler = 0;
 		gtk_tree_model_get(m_model, &iter, HANDLER_COLUMN, &handler, -1);
 		
 		if (handler)
 		{
 			m_pAccount = reinterpret_cast<AccountHandler*>(handler);
-			_setName(XAP_gtk_entry_get_text(GTK_ENTRY(m_wName)));
+			_setName(gtk_entry_get_text(GTK_ENTRY(m_wName)));
 		}
 		else
 			UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);

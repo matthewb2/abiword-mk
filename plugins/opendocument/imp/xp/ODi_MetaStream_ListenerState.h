@@ -47,12 +47,12 @@ public:
 
     virtual ~ODi_MetaStream_ListenerState() {}
 
-    virtual void startElement(const gchar* pName, const gchar** ppAtts,
-                               ODi_ListenerStateAction& rAction) override;
+    void startElement (const gchar* pName, const gchar** ppAtts,
+                               ODi_ListenerStateAction& rAction);
 
-    virtual void endElement(const gchar* pName, ODi_ListenerStateAction& rAction) override;
+    void endElement (const gchar* pName, ODi_ListenerStateAction& rAction);
 
-    virtual void charData(const gchar* pBuffer, int length) override;
+    void charData (const gchar* pBuffer, int length);
 
 private:
 

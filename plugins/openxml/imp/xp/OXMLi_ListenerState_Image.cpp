@@ -21,18 +21,18 @@
  */
 
 // Class definition include
-#include "OXMLi_ListenerState_Image.h"
+#include <OXMLi_ListenerState_Image.h>
 
 // Internal includes
-#include "OXML_Document.h"
-#include "OXML_FontManager.h"
-#include "OXMLi_PackageManager.h"
+#include <OXML_Document.h>
+#include <OXML_FontManager.h>
+#include <OXMLi_PackageManager.h>
 
 // AbiWord includes
-#include "ut_assert.h"
-#include "ut_misc.h"
-#include "ie_impGraphic.h"
-#include "fg_GraphicRaster.h"
+#include <ut_assert.h>
+#include <ut_misc.h>
+#include <ie_impGraphic.h>
+#include <fg_GraphicRaster.h>
 
 // External includes
 #include <string>
@@ -420,7 +420,7 @@ void OXMLi_ListenerState_Image::charData (OXMLi_CharDataRequest * rqst)
 			contextTag = rqst->context->at(rqst->context->size() - 2);
 		int positionH = contextMatches(contextTag, NS_WP_KEY, "positionH");
 		int positionV = contextMatches(contextTag, NS_WP_KEY, "positionV");
-		if(rqst->buffer == nullptr)
+		if(rqst->buffer == NULL)
 		{
 			UT_DEBUGMSG(("SERHAT: Unexpected situation, request with a null buffer\n"));
 			return;

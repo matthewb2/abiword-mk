@@ -19,6 +19,10 @@
  * 02110-1301 USA.
  */
 
+#include <gsf/gsf-output-stdio.h>
+#include <gsf/gsf-outfile.h>
+#include <gsf/gsf-outfile-zip.h>
+
 #include <locale.h>
 
 #include "pd_Style.h"
@@ -194,7 +198,7 @@ OO_WriterImpl::OO_WriterImpl(GsfOutfile *pOutfile, OO_StylesContainer *pStylesCo
 	
 	writeUTF8String(m_pContentStream, "<office:automatic-styles>\n");
 	
-	int *styleNum = nullptr;
+	int *styleNum = NULL;
 	UT_String styleString;
 
 	// span styles
@@ -314,7 +318,7 @@ void OO_WriterImpl::openHyperlink(const PP_AttrProp* pAP)
 	UT_return_if_fail(pAP);
 
 	UT_UTF8String output = "<text:a ", escape;
-	const gchar* pValue = nullptr;
+	const gchar* pValue = NULL;
 
 	if(pAP->getAttribute("xlink:href",pValue) && pValue)
 	{
@@ -493,9 +497,9 @@ bool OO_Listener::populate(fl_ContainerLayout* /*sfh*/,
 				case PTO_Hyperlink:
 				{
 					_closeSpan();
-					const PP_AttrProp* pAP = nullptr;
+					const PP_AttrProp* pAP = NULL;
 					m_pDocument->getAttrProp(api,&pAP);
-					const gchar* pValue = nullptr;
+					const gchar* pValue = NULL;
 
 					if(pAP && pAP->getAttribute("xlink:href",pValue) && pValue) {
 						_openHyperlink(pAP);
@@ -520,7 +524,7 @@ bool OO_Listener::populateStrux(pf_Frag_Strux* /*sdh*/,
 				fl_ContainerLayout* * psfh)
 {
    const PX_ChangeRecord_Strux * pcrx = static_cast<const PX_ChangeRecord_Strux *> (pcr);
-   *psfh = nullptr;							// we don't need it.
+   *psfh = 0;							// we don't need it.
     
    switch (pcrx->getStruxType())
    {
@@ -573,7 +577,7 @@ void OO_Listener::_openBlock (PT_AttrPropIndex api)
     if (m_bInBlock)
         _closeBlock();
 
-    const PP_AttrProp * pAP = nullptr;
+    const PP_AttrProp * pAP = NULL;
     bool bHaveProp = m_pDocument->getAttrProp(api, &pAP);
     bool bIsHeading = false;
     std::string styleAtts, propAtts, font;
@@ -583,7 +587,7 @@ void OO_Listener::_openBlock (PT_AttrPropIndex api)
 		UT_UTF8String sa, pa, f, escape;
 		OO_StylesWriter::map(pAP, sa, pa, f);
 
-		const gchar * szStyle = nullptr;
+		const gchar * szStyle = NULL;
 		pAP->getAttribute("style", szStyle);
 
 		if (szStyle && pa.size())
@@ -627,7 +631,7 @@ void OO_Listener::_openSpan(PT_AttrPropIndex api)
    {
       return;
    }
-   const PP_AttrProp * pAP = nullptr;
+   const PP_AttrProp * pAP = NULL;
    bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
    
    std::string propAtts, font;
@@ -786,7 +790,7 @@ public:
     // create Pictures directory
     GsfOutput * pictures = gsf_outfile_new_child(oo, "Pictures", TRUE);
     
-    for (UT_uint32 k=0; (pDoc->enumDataItems(k, nullptr, &szName, pByteBuf, &mimeType)); k++)
+    for (UT_uint32 k=0; (pDoc->enumDataItems(k, NULL, &szName, pByteBuf, &mimeType)); k++)
     {
         const char * extension = "png";
         // create individual pictures
@@ -851,7 +855,7 @@ public:
     const char * szName;
     std::string mimeType;
     UT_ConstByteBufPtr pByteBuf;
-    for (UT_uint32 k = 0; (pDoc->enumDataItems(k, nullptr, &szName, pByteBuf, &mimeType)); k++)
+    for (UT_uint32 k = 0; (pDoc->enumDataItems(k, NULL, &szName, pByteBuf, &mimeType)); k++)
     {
         const char *extension = "png";
         if (mimeType == "image/jpeg") {
@@ -906,7 +910,7 @@ bool OO_StylesWriter::writeStyles(PD_Document * pDoc, GsfOutfile * oo, OO_Styles
     };
   
   UT_UTF8String styles;
-  const PD_Style * pStyle = nullptr;
+  const PD_Style * pStyle = NULL;
   UT_GenericVector<PD_Style *> vecStyles;
   pDoc->getAllUsedStyles(&vecStyles);
   UT_sint32 k = 0;
@@ -915,7 +919,7 @@ bool OO_StylesWriter::writeStyles(PD_Document * pDoc, GsfOutfile * oo, OO_Styles
   {
       pStyle = vecStyles.getNthItem(k);
       PT_AttrPropIndex api = pStyle->getIndexAP();
-      const PP_AttrProp * pAP = nullptr;
+      const PP_AttrProp * pAP = NULL;
       bool bHaveProp = pDoc->getAttrProp (api, &pAP);
       
       if (bHaveProp && pAP) 
@@ -1001,7 +1005,7 @@ void OO_StylesWriter::addFontDecls(UT_UTF8String & buffer, OO_StylesContainer & 
 void OO_StylesWriter::map(const PP_AttrProp * pAP, UT_UTF8String & styleAtts, UT_UTF8String & propAtts, UT_UTF8String & font) 
 {		
 	UT_UTF8String escape;
-	const gchar * szValue = nullptr;
+	const gchar * szValue = NULL;
 	styleAtts.clear();
 	propAtts.clear();
 
@@ -1172,7 +1176,7 @@ void OO_StylesWriter::map(const PP_AttrProp * pAP, UT_UTF8String & styleAtts, UT
 
 
 IE_Exp_OpenWriter::IE_Exp_OpenWriter (PD_Document * pDoc)
-  : IE_Exp (pDoc), m_oo(nullptr)
+  : IE_Exp (pDoc), m_oo(0)
 {
 }
 
@@ -1189,7 +1193,7 @@ IE_Exp_OpenWriter::~IE_Exp_OpenWriter()
 UT_Error IE_Exp_OpenWriter::_writeDocument(void)
 {
   UT_return_val_if_fail (getFp(), UT_ERROR);
-  m_oo = GSF_OUTFILE (gsf_outfile_zip_new (getFp(), nullptr));
+  m_oo = GSF_OUTFILE (gsf_outfile_zip_new (getFp(), NULL));
   UT_return_val_if_fail(m_oo, UT_ERROR);
 
   {

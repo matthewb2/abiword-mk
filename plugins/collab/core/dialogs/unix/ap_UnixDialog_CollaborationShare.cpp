@@ -259,7 +259,7 @@ AccountHandler* AP_UnixDialog_CollaborationShare::_getActiveAccountHandler()
 	{
 		gchar * str_data;
 		gpointer* ptr_data;
-		AccountHandler* pHandler = nullptr;
+		AccountHandler* pHandler = 0;
 
 		gtk_tree_model_get (m_pAccountModel, &iter, 
                           0, &str_data,
@@ -269,7 +269,7 @@ AccountHandler* AP_UnixDialog_CollaborationShare::_getActiveAccountHandler()
 		pHandler = reinterpret_cast<AccountHandler*>(ptr_data);
 		return pHandler;
 	}
-	return nullptr;
+	return 0;
 }
 
 void AP_UnixDialog_CollaborationShare::eventOk()

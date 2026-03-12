@@ -182,7 +182,7 @@ ABI_EXPORT char *UT_strptime (const char *buf, const char *format, struct tm *tm
 #endif
 
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 #define snprintf _snprintf
 
 #define _(String) (String)

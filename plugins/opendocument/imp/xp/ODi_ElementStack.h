@@ -23,8 +23,8 @@
 #define _ODI_ELEMENTSTACK_H_
 
 // AbiWord includes
-#include "ut_types.h"
-#include "ut_vector.h"
+#include <ut_types.h>
+#include <ut_vector.h>
 
 // Internal classes
 class ODi_StartTag;
@@ -79,7 +79,7 @@ public:
     UT_sint32 getElementLevel(const gchar* pName) const;
 
     /**
-     * Returns the closest parent with the given name. It returns nullptr if there
+     * Returns the closest parent with the given name. It returns NULL if there
      * is no parent with the given name.
      *
      * @param pName Element name.

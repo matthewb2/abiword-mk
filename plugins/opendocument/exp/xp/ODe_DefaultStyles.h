@@ -25,7 +25,10 @@
 #include <string>
 
 // AbiWord includes
-#include "ut_hash.h"
+#include <ut_hash.h>
+
+// External includes
+#include <gsf/gsf-output.h>
 
 class ODe_Style_Style;
 

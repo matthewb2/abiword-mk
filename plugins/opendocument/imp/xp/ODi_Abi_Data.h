@@ -19,13 +19,19 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef _ODI_ABI_DATA_H_
+#define _ODI_ABI_DATA_H_
 
-#include <gsf/gsf.h>
+#include "ut_compiler.h"
 
 #include <map>
 #include <set>
 #include <string>
+
+// External includes
+ABI_W_NO_CONST_QUAL
+#include <gsf/gsf.h>
+ABI_W_POP
 
 #include "ut_types.h"
 #include "ut_bytebuf.h"
@@ -70,3 +76,5 @@ private:
     std::set< std::string > m_openAnnotationNames;
     std::set< std::string > m_rangedAnnotationNames;
 };
+
+#endif //_ODI_ABI_DATA_H_

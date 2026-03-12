@@ -23,14 +23,18 @@
 #include "ODi_Abi_Data.h"
 
 // AbiWord includes
-#include "pd_Document.h"
-#include "pt_Types.h"
-#include "ie_impGraphic.h"
-#include "fg_GraphicRaster.h"
+#include <pd_Document.h>
+#include <pt_Types.h>
+#include <ie_impGraphic.h>
+#include <fg_GraphicRaster.h>
 #include "ie_math_convert.h"
 
 // External includes
 #include <glib-object.h>
+#include <gsf/gsf-input-stdio.h>
+#include <gsf/gsf-infile.h>
+#include <gsf/gsf-infile-zip.h>
+
 
 /**
  * Constructor
@@ -130,7 +134,7 @@ bool ODi_Abi_Data::addImageDataItem(UT_String& rDataId, const gchar** ppAtts) {
                                         false,
                                         pPictData,
                                         pFG->getMimeType(),
-                                        nullptr)) {
+                                        NULL)) {
             
         UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
         return false;
@@ -224,9 +228,9 @@ bool ODi_Abi_Data::addObjectDataItem(UT_String& rDataId, const gchar** ppAtts, i
         return false;
     }
 #endif
-	char *content_type = g_content_type_guess(nullptr, object_buf->getPointer(0),
-	                                          object_buf->getLength(), nullptr);
-	char *mime_type = nullptr;
+	char *content_type = g_content_type_guess(NULL, object_buf->getPointer(0),
+	                                          object_buf->getLength(), NULL);
+	char *mime_type = NULL;
 	if (content_type)
 	{
 		mime_type = g_content_type_get_mime_type(content_type);
@@ -242,7 +246,7 @@ bool ODi_Abi_Data::addObjectDataItem(UT_String& rDataId, const gchar** ppAtts, i
     UT_UTF8String PbMathml = (const char*)(object_buf->getPointer(0));
     UT_UTF8String PbLatex,Pbitex;
 	
-    if (!m_pAbiDocument->createDataItem(rDataId.c_str(), false, object_buf,"application/mathml+xml", nullptr))
+    if (!m_pAbiDocument->createDataItem(rDataId.c_str(), false, object_buf,"application/mathml+xml", NULL))
     {            
         UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
         return false;
@@ -253,7 +257,7 @@ bool ODi_Abi_Data::addObjectDataItem(UT_String& rDataId, const gchar** ppAtts, i
         
 	// Conversion of MathML to LaTeX and the Equation Form suceeds
 	latexBuf->ins(0, reinterpret_cast<const UT_Byte *>(Pbitex.utf8_str()), static_cast<UT_uint32>(Pbitex.size()));
-	if(!m_pAbiDocument->createDataItem(rLatexId.c_str(), false, latexBuf, "", nullptr))
+	if(!m_pAbiDocument->createDataItem(rLatexId.c_str(), false, latexBuf, "", NULL))
 	{
 	    UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
 	    return false;
@@ -272,7 +276,7 @@ UT_Error ODi_Abi_Data::_loadStream (GsfInfile* oo,
                                    const char* stream,
                                    const UT_ByteBufPtr & buf)
 {
-    guint8 const *data = nullptr;
+    guint8 const *data = NULL;
     size_t len = 0;
     static const size_t BUF_SZ = 4096;
   
@@ -286,7 +290,7 @@ UT_Error ODi_Abi_Data::_loadStream (GsfInfile* oo,
     if (gsf_input_size (input) > 0) {
         while ((len = gsf_input_remaining (input)) > 0) {
             len = UT_MIN (len, BUF_SZ);
-            if (nullptr == (data = gsf_input_read (input, len, nullptr))) {
+            if (NULL == (data = gsf_input_read (input, len, NULL))) {
                 g_object_unref (G_OBJECT (input));
                 return UT_ERROR;
             }

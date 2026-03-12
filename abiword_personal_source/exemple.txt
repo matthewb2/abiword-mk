@@ -1,0 +1,148 @@
+			 
+       typedef std::shared_ptr<UT_ByteBuf> UT_ByteBufPtr;
+       typedef std::shared_ptr<const UT_ByteBuf> UT_ConstByteBufPtr;
+      
+      UT_ConstByteBufPtr bb;
+			bFoundDataID = pFL->getDocument()->getDataItemDataByName(pszDataID, bb, &mimeType, NULL);
+                                                                                 
+      UT_ByteBufPtr m_PNGBuf;                                                                           
+      UT_ConstByteBufPtr pPNG;
+      bFound = m_pDoc->getDataItemDataByName(sName.utf8_str(), pPNG, NULL, &pHandle);
+      auto buf = UT_ByteBufPtr(new UT_ByteBuf);
+      buf->ins(0, pPNG->getPointer(0), pPNG->getLength());
+      m_PNGBuf = buf;
+      
+      
+      bool GR_VectorImage::convertToBuffer(UT_ConstByteBufPtr & pBB) const
+{
+  UT_ByteBufPtr bb(new UT_ByteBuf);
+
+  bool bCopied = bb->append(m_pBB_Image->getPointer(0), m_pBB_Image->getLength());
+  if (bCopied) {
+    pBB = std::move(bb);
+  }
+
+  return bCopied;
+}
+
+bool GR_VectorImage::convertFromBuffer(const UT_ConstByteBufPtr & pBB,
+                                       const std::string& /*mimetype*/,
+                                       UT_sint32 iDisplayWidth, UT_sint32 iDisplayHeight)
+{
+  setDisplaySize ( iDisplayWidth, iDisplayHeight );
+
+  m_pBB_Image.reset();
+  auto bb = UT_ByteBufPtr(new UT_ByteBuf);
+
+  bool bCopied = bb->append(pBB->getPointer(0), pBB->getLength());
+
+  if (bCopied) {
+    m_pBB_Image = std::move(bb);
+  }
+
+  return bCopied;
+}
+
+
+	  UT_ByteBufPtr m_pBB;
+    
+		if (!m_pBB) {
+			m_pBB = UT_ByteBufPtr(new UT_ByteBuf);
+		}
+		if (!(m_pBB->append(reinterpret_cast<const UT_Byte *>(str), static_cast<UT_uint32>(len))))
+		
+
+     	UT_ByteBufPtr mathBuf(new UT_ByteBuf);
+	UT_ByteBufPtr latexBuf(new UT_ByteBuf);
+	mathBuf->ins(0, reinterpret_cast<const UT_Byte *>(sMath.utf8_str()), static_cast<UT_uint32>(sMath.size()));
+	latexBuf->ins(0, reinterpret_cast<const UT_Byte *>(sLatex.utf8_str()), static_cast<UT_uint32>(sLatex.size()));
+	m_pDoc->createDataItem(sMathName.utf8_str(), false, mathBuf, "", NULL);
+	m_pDoc->createDataItem(sLatexName.utf8_str(), false, latexBuf, "", NULL);
+  
+  
+  
+  	UT_ByteBufPtr pNew(new UT_ByteBuf);
+
+
+		if (!pNew->ins(0,pByteBuf->getPointer(0),pByteBuf->getLength())) {
+			return false;
+		}
+	pPair = new _dataItemPair();
+  
+	if (!pPair) {
+		return false;
+	}
+
+	pPair->pBuf = pNew;
+  
+  
+  
+  UT_ByteBufPtr From(new UT_ByteBuf);
+	UT_ByteBufPtr To(new UT_ByteBuf);
+
+	From->ins(0, reinterpret_cast<const UT_Byte *>(m_sLatex.utf8_str()), static_cast<UT_uint32>(m_sLatex.size()));
+  
+  
+  
+  
+  UT_ConstByteBufPtr pByteBuf;
+
+	UT_ByteBufPtr bbEncoded(new UT_ByteBuf(1024));
+  (m_pDocument->enumDataItems(k, NULL, &szName, pByteBuf, &mimeType));
+  
+  		bbEncoded->truncate(0);
+		   bbEncoded->append(reinterpret_cast<const UT_Byte*>("<![CDATA["), 9);
+		   UT_uint32 len = pByteBuf->getLength();
+		   const UT_Byte * buf = pByteBuf->getPointer(0);
+       
+      if (buf[off] == ']' && buf[off+1] == ']' && buf[off+2] == '>') {
+			 bbEncoded->append(buf, off-1);
+			 bbEncoded->append(reinterpret_cast<const UT_Byte*>("]]&gt;"), 6);
+			 buf = pByteBuf->getPointer(off);
+       
+       bbEncoded->append(buf, len);
+		   bbEncoded->append(reinterpret_cast<const UT_Byte*>("]]>\n"), 4);
+		   status = UT_Base64Encode(bbEncoded, pByteBuf);
+       
+       	UT_ByteBufPtr RawDataBuf[3] = {           // The Font names and panose data in orig. enc.
+		UT_ByteBufPtr(new UT_ByteBuf),
+		UT_ByteBufPtr(new UT_ByteBuf),
+		UT_ByteBufPtr(new UT_ByteBuf)
+	};
+  
+  
+  
+  	UT_ByteBufPtr pictData(new UT_ByteBuf);
+    UT_Byte pic_byte = 0;
+    pictData->append(&pic_byte, 1);
+    
+     
+     
+    	UT_ByteBufPtr pBB(new UT_ByteBuf);
+
+	if (pBB == NULL)
+		return UT_IE_NOMEMORY;
+
+	if (!pBB->insertFromInput(0, input))
+		{
+			return UT_IE_FILENOTFOUND;
+		}
+    
+  
+  
+  if (GR_Image::getBufferType(pBB) == GR_Image::GRT_Vector)
+  
+  
+  
+     const char * buf = reinterpret_cast<const char*>(pBB->getPointer(0));
+   UT_uint32 len = pBB->getLength();
+   
+   
+   
+   const UT_ConstByteBufPtr & bytes
+   ft = IE_ImpGraphic::fileTypeForContents(reinterpret_cast<const char *>(bytes->getPointer(0)),
+						   bytes->getLength());
+               
+     
+     
+     

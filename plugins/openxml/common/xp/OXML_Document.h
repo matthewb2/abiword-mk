@@ -24,17 +24,17 @@
 #define _OXML_DOCUMENT_H_
 
 // Internal includes
-#include "OXML_Types.h"
-#include "OXML_ObjectWithAttrProp.h"
+#include <OXML_Types.h>
+#include <OXML_ObjectWithAttrProp.h>
 #include "OXML_Section.h"
 #include "OXML_Style.h"
 #include "OXML_Theme.h"
 #include "OXML_FontManager.h"
 
 // AbiWord includes
-#include "ut_types.h"
-#include "pd_Document.h"
-#include "ie_exp_OpenXML.h"
+#include <ut_types.h>
+#include <pd_Document.h>
+#include <ie_exp_OpenXML.h>
 
 // External includes
 #include <string>
@@ -86,7 +86,7 @@ public:
 	bool isAllDefault(const bool & header) const;
 	OXML_SharedSection getHdrFtrById(const bool & header, const std::string & id) const;
 
-	//! Returns a reference to the FIRST footer with corresponding ID OR nullptr if none found.
+	//! Returns a reference to the FIRST footer with corresponding ID OR NULL if none found.
 	OXML_SharedSection getFooter(const std::string & id) const;
 	UT_Error addFooter(const OXML_SharedSection & obj);
 	UT_Error clearFooters();

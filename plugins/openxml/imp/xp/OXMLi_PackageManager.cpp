@@ -21,22 +21,27 @@
  */
 
 // Class definition include
-#include "OXMLi_PackageManager.h"
+#include <OXMLi_PackageManager.h>
 
 // Internal includes
-#include "OXML_Types.h"
-#include "OXML_Document.h"
-#include "OXMLi_StreamListener.h"
-#include "OXMLi_ListenerState.h"
-#include "OXML_Section.h"
+#include <OXML_Types.h>
+#include <OXML_Document.h>
+#include <OXMLi_StreamListener.h>
+#include <OXMLi_ListenerState.h>
+#include <OXML_Section.h>
 
 // AbiWord includes
-#include "ut_types.h"
-#include "ut_assert.h"
-#include "ut_debugmsg.h"
-#include "ut_xml.h"
+#include <ut_types.h>
+#include <ut_assert.h>
+#include <ut_debugmsg.h>
+#include <ut_xml.h>
 
-OXMLi_PackageManager* OXMLi_PackageManager::s_pInst = nullptr;
+// External includes
+#include <gsf/gsf-input.h>
+#include <gsf/gsf-infile.h>
+#include <gsf/gsf-open-pkg-utils.h>
+
+OXMLi_PackageManager* OXMLi_PackageManager::s_pInst = NULL;
 
 OXMLi_PackageManager* OXMLi_PackageManager::getNewInstance()
 {
@@ -46,12 +51,12 @@ OXMLi_PackageManager* OXMLi_PackageManager::getNewInstance()
 
 OXMLi_PackageManager* OXMLi_PackageManager::getInstance()
 {
-	if (s_pInst == nullptr) {
+	if (s_pInst == NULL) {
 		try {
 			s_pInst = new OXMLi_PackageManager();
 		} catch(...) {
 			UT_DEBUGMSG(("Could not allocate memory!\n"));
-			return nullptr;
+			return NULL;
 		}
 	}
 	return s_pInst;
@@ -62,9 +67,9 @@ void OXMLi_PackageManager::destroyInstance()
 	DELETEP(s_pInst);
 }
 
-OXMLi_PackageManager::OXMLi_PackageManager() :
-	m_pPkg(nullptr),
-	m_pDocPart(nullptr)
+OXMLi_PackageManager::OXMLi_PackageManager() : 
+	m_pPkg(NULL), 
+	m_pDocPart(NULL)
 {
 }
 
@@ -100,7 +105,7 @@ UT_Error OXMLi_PackageManager::parseDocumentStream()
 UT_Error OXMLi_PackageManager::parseDocumentHdrFtr( const char * id )
 {
 	GsfInput * doc = _getDocumentStream();
-	UT_return_val_if_fail(doc != nullptr, UT_ERROR);
+	UT_return_val_if_fail(doc != NULL, UT_ERROR);
 	OXMLi_StreamListener listener;
 	listener.setupStates(HEADER_PART, id); //Doesn't matter whether it's header or footer
 	return parseChildById(doc, id, &listener); 
@@ -109,7 +114,7 @@ UT_Error OXMLi_PackageManager::parseDocumentHdrFtr( const char * id )
 UT_Error OXMLi_PackageManager::parseDocumentStyles()
 {
 	GsfInput * doc = _getDocumentStream();
-	UT_return_val_if_fail(doc != nullptr, UT_ERROR);
+	UT_return_val_if_fail(doc != NULL, UT_ERROR);
 	OXMLi_StreamListener listener;
 	listener.setupStates(STYLES_PART);
 	return parseChildByType(doc, STYLES_PART, &listener); 
@@ -118,7 +123,7 @@ UT_Error OXMLi_PackageManager::parseDocumentStyles()
 UT_Error OXMLi_PackageManager::parseDocumentTheme()
 {
 	GsfInput * doc = _getDocumentStream();
-	UT_return_val_if_fail(doc != nullptr, UT_ERROR);
+	UT_return_val_if_fail(doc != NULL, UT_ERROR);
 	OXMLi_StreamListener listener;
 	listener.setupStates(THEME_PART);
 	UT_Error err = parseChildByType(doc, THEME_PART, &listener); 
@@ -132,7 +137,7 @@ UT_Error OXMLi_PackageManager::parseDocumentTheme()
 UT_Error OXMLi_PackageManager::parseDocumentSettings()
 {
 	GsfInput * doc = _getDocumentStream();
-	UT_return_val_if_fail(doc != nullptr, UT_ERROR);
+	UT_return_val_if_fail(doc != NULL, UT_ERROR);
 	OXMLi_StreamListener listener;
 	listener.setupStates(DOCSETTINGS_PART);
 	return parseChildByType(doc, DOCSETTINGS_PART, &listener); 
@@ -141,7 +146,7 @@ UT_Error OXMLi_PackageManager::parseDocumentSettings()
 UT_Error OXMLi_PackageManager::parseDocumentNumbering()
 {
 	GsfInput * doc = _getDocumentStream();
-	UT_return_val_if_fail(doc != nullptr, UT_ERROR);
+	UT_return_val_if_fail(doc != NULL, UT_ERROR);
 	OXMLi_StreamListener listener;
 	listener.setupStates(NUMBERING_PART);
 	return parseChildByType(doc, NUMBERING_PART, &listener); 
@@ -150,7 +155,7 @@ UT_Error OXMLi_PackageManager::parseDocumentNumbering()
 UT_Error OXMLi_PackageManager::parseDocumentFootnotes()
 {
 	GsfInput * doc = _getDocumentStream();
-	UT_return_val_if_fail(doc != nullptr, UT_ERROR);
+	UT_return_val_if_fail(doc != NULL, UT_ERROR);
 	OXMLi_StreamListener listener;
 	listener.setupStates(FOOTNOTES_PART);
 	return parseChildByType(doc, FOOTNOTES_PART, &listener); 
@@ -159,7 +164,7 @@ UT_Error OXMLi_PackageManager::parseDocumentFootnotes()
 UT_Error OXMLi_PackageManager::parseDocumentEndnotes()
 {
 	GsfInput * doc = _getDocumentStream();
-	UT_return_val_if_fail(doc != nullptr, UT_ERROR);
+	UT_return_val_if_fail(doc != NULL, UT_ERROR);
 	OXMLi_StreamListener listener;
 	listener.setupStates(ENDNOTES_PART);
 	return parseChildByType(doc, ENDNOTES_PART, &listener); 
@@ -167,21 +172,21 @@ UT_Error OXMLi_PackageManager::parseDocumentEndnotes()
 
 GsfInput* OXMLi_PackageManager::getChildById( GsfInput * parent, const char * id )
 {
-	return gsf_open_pkg_open_rel_by_id(parent, id, nullptr);
+	return gsf_open_pkg_open_rel_by_id(parent, id, NULL);
 }
 
 GsfInput* OXMLi_PackageManager::getChildByType( GsfInput * parent, OXML_PartType type )
 {
 	const char * fulltype;
 	fulltype = _getFullType(type);
-	UT_return_val_if_fail(fulltype != nullptr, nullptr);
-	return gsf_open_pkg_open_rel_by_type(parent, fulltype, nullptr);
+	UT_return_val_if_fail(fulltype != NULL, NULL);
+	return gsf_open_pkg_open_rel_by_type(parent, fulltype, NULL);
 }
 
 UT_Error OXMLi_PackageManager::parseChildById( GsfInput * parent, const char * id, OXMLi_StreamListener * pListener)
 {
 	GsfInput * pInput = getChildById(parent, id);
-	UT_return_val_if_fail(pInput != nullptr, UT_ERROR);
+	UT_return_val_if_fail(pInput != NULL, UT_ERROR);
 	return _parseStream( pInput, pListener);
 }
 
@@ -245,23 +250,23 @@ const char * OXMLi_PackageManager::_getFullType( OXML_PartType type )
 		ret = THEME_REL_TYPE;
 		break;
 	default:
-		ret = nullptr;
+		ret = NULL;
 	}
 	return ret;
 }
 
 GsfInput * OXMLi_PackageManager::_getDocumentStream()
 {
-	UT_return_val_if_fail(m_pPkg != nullptr, nullptr);
+	UT_return_val_if_fail(m_pPkg != NULL, NULL);
 
-	if (m_pDocPart == nullptr)
+	if (m_pDocPart == NULL)
 		m_pDocPart = getChildByType ( GSF_INPUT (m_pPkg), DOCUMENT_PART );
 	return m_pDocPart;
 }
 
 UT_Error OXMLi_PackageManager::_parseStream( GsfInput * stream, OXMLi_StreamListener * pListener)
 {
-	UT_return_val_if_fail(stream != nullptr && pListener != nullptr , UT_ERROR);
+	UT_return_val_if_fail(stream != NULL && pListener != NULL , UT_ERROR);
 
 	//First, we check if this stream has already been parsed before
 	std::string part_name = gsf_input_name(stream); //TODO: determine if part names are truly unique
@@ -273,8 +278,8 @@ UT_Error OXMLi_PackageManager::_parseStream( GsfInput * stream, OXMLi_StreamList
 	}
 
 	UT_Error ret = UT_OK;
-	guint8 const *data = nullptr;
-	const char * cdata = nullptr;
+	guint8 const *data = NULL;
+	const char * cdata = NULL;
 	size_t len = 0;
 
 	UT_XML reader;
@@ -283,8 +288,8 @@ UT_Error OXMLi_PackageManager::_parseStream( GsfInput * stream, OXMLi_StreamList
 	if (gsf_input_size (stream) > 0) {
 		len = gsf_input_remaining (stream);
 		if (len > 0) {
-			data = gsf_input_read (stream, len, nullptr);
-			if (nullptr == data) {
+			data = gsf_input_read (stream, len, NULL);
+			if (NULL == data) {
 				g_object_unref (G_OBJECT (stream));
 				return UT_ERROR;
 			}
@@ -315,7 +320,7 @@ UT_ConstByteBufPtr OXMLi_PackageManager::parseImageStream(const char * id)
 	it = m_parsedParts.find(part_name);
 	if (it != m_parsedParts.end() && it->second) {
 		//this stream has already been parsed successfully
-		return nullptr;
+		return NULL;
 	}
 
 	UT_ByteBufPtr buffer(new UT_ByteBuf);

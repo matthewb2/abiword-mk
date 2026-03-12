@@ -5,8 +5,16 @@ plugins/grammar/xp/Makefile
 plugins/grammar/Makefile
 plugins/wpg/xp/Makefile
 plugins/wpg/Makefile
+plugins/gimp/xp/Makefile
+plugins/gimp/Makefile
+plugins/aiksaurus/win/Makefile
+plugins/aiksaurus/xp/Makefile
+plugins/aiksaurus/aiksaurusgtk3/Makefile
+plugins/aiksaurus/Makefile
 plugins/command/xp/Makefile
 plugins/command/Makefile
+plugins/goffice/unix/Makefile
+plugins/goffice/Makefile
 plugins/sdw/xp/Makefile
 plugins/sdw/Makefile
 plugins/paint/win/Makefile
@@ -74,6 +82,8 @@ plugins/clarisworks/Makefile
 plugins/latex/xp/Makefile
 plugins/latex/Makefile
 plugins/latex/xsltml/Makefile
+plugins/t602/xp/Makefile
+plugins/t602/Makefile
 plugins/mswrite/xp/Makefile
 plugins/mswrite/Makefile
 plugins/iscii/xp/Makefile

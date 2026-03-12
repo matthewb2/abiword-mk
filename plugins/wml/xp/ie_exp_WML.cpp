@@ -52,7 +52,7 @@ IE_Exp_WML::IE_Exp_WML(PD_Document * pDocument)
 	: IE_Exp(pDocument)
 {
 	m_error = 0;
-	m_pListener = nullptr;
+	m_pListener = NULL;
 }
 
 IE_Exp_WML::~IE_Exp_WML()
@@ -126,7 +126,7 @@ s_WML_Listener::s_WML_Listener(PD_Document * pDocument,
 	m_iCards(1),
 	m_iTableDepth(0),
 	mTableHelper(pDocument),
-	m_toc(nullptr),
+	m_toc(0),
 	m_heading_count(0)
 {
 	m_pie->write("<!DOCTYPE wml PUBLIC \"-//PHONE.COM//DTD WML 1.1//EN\"\n");
@@ -302,9 +302,9 @@ void s_WML_Listener::_closeSection(void)
 
 void s_WML_Listener::_openSection(PT_AttrPropIndex api)
 {
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
-	const gchar * szValue = nullptr;
+	const gchar * szValue = NULL;
 
 	if(pAP && bHaveProp && (pAP->getAttribute("strux-image-dataid", szValue)))
 	{
@@ -350,7 +350,7 @@ void s_WML_Listener::_closeBlock(void)
 
 bool s_WML_Listener::_styleDescendsFrom(const char * style_name, const char * base_name)
 {
-	PD_Style * style = nullptr;
+	PD_Style * style = 0;
 	m_pDocument->getStyle (style_name, &style);
 	UT_sint32 iLoop = 0;
 
@@ -370,7 +370,7 @@ void s_WML_Listener::_openParagraph(PT_AttrPropIndex api)
 {
 	xxx_UT_DEBUGMSG(("WML Export: OpenParagraph called!\n"));
 
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 
 	if(!m_bInSection)
@@ -431,10 +431,10 @@ void s_WML_Listener::_emitTOC (PT_AttrPropIndex api) {
 	int level3_depth = 0;
 	int level4_depth = 0;
 
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = 0;
 	bool bHaveProp = (api ? (m_pDocument->getAttrProp (api, &pAP)) : false);
 	bool bEmitHeading = true;
-	const gchar * szValue = nullptr;
+	const gchar * szValue = 0;
 	std::string tocHeadingUTF8;
 
 	_closeSpan();
@@ -595,7 +595,7 @@ bool s_WML_Listener::populateStrux(pf_Frag_Strux* sdh,
 {
 	UT_ASSERT_HARMLESS(pcr->getType() == PX_ChangeRecord::PXT_InsertStrux);
 	const PX_ChangeRecord_Strux * pcrx = static_cast<const PX_ChangeRecord_Strux *> (pcr);
-	*psfh = nullptr;							// we don't need it.
+	*psfh = 0;							// we don't need it.
 
 	switch (pcrx->getStruxType())
 	{
@@ -809,8 +809,8 @@ void s_WML_Listener::_handleEmbedded(PT_AttrPropIndex api)
 		return;
 	}
 
-	const gchar* szValue = nullptr;
-	const PP_AttrProp * pAP = nullptr;
+	const gchar* szValue = 0;
+	const PP_AttrProp * pAP = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 
 	UT_return_if_fail(bHaveProp && pAP && pAP->getAttribute("dataid", szValue))
@@ -868,8 +868,8 @@ void s_WML_Listener::_handleField(const PX_ChangeRecord_Object * pcro, PT_AttrPr
 		return;
 	}
 
-	const PP_AttrProp * pAP = nullptr;
-	const gchar* szValue = nullptr;
+	const PP_AttrProp * pAP = NULL;
+	const gchar* szValue = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 
 	UT_return_if_fail(bHaveProp && pAP && pAP->getAttribute("type", szValue));
@@ -903,8 +903,8 @@ void s_WML_Listener::_handleBookmark(PT_AttrPropIndex api)
 		return;
 	}
 
-	const PP_AttrProp * pAP = nullptr;
-	const gchar* szValue = nullptr;
+	const PP_AttrProp * pAP = NULL;
+	const gchar* szValue = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 	UT_UTF8String buf;
 
@@ -940,8 +940,8 @@ void s_WML_Listener::_handleHyperlink(PT_AttrPropIndex api)
 		return;
 	}
 
-	const PP_AttrProp * pAP = nullptr;
-	const gchar* szValue = nullptr;
+	const PP_AttrProp * pAP = NULL;
+	const gchar* szValue = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 	UT_UTF8String buf;
 
@@ -978,8 +978,8 @@ void s_WML_Listener::_handleMath(PT_AttrPropIndex api)
 		return;
 	}
 
-	const gchar* szValue = nullptr;
-	const PP_AttrProp * pAP = nullptr;
+	const gchar* szValue = 0;
+	const PP_AttrProp * pAP = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 
 	UT_return_if_fail(bHaveProp && pAP && pAP->getAttribute("dataid", szValue));
@@ -1019,8 +1019,8 @@ void s_WML_Listener::_handleImage(PT_AttrPropIndex api, bool bPos)
 		return;
 	}
 
-	const PP_AttrProp * pAP = nullptr;
-	const gchar* szValue = nullptr;
+	const PP_AttrProp * pAP = NULL;
+	const gchar* szValue = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 
 	if(!(bHaveProp && pAP))
@@ -1071,8 +1071,8 @@ void s_WML_Listener::_handleImage(PT_AttrPropIndex api, bool bPos)
 	m_pie->write(buf.utf8_str());
 	m_pie->write("\"");
 
-	const gchar * szWidth = nullptr;
-	const gchar * szHeight = nullptr;
+	const gchar * szWidth = 0;
+	const gchar * szHeight = 0;
 	UT_LocaleTransactor t(LC_NUMERIC, "C");
 
 	if(pAP->getProperty("width", szWidth) && szWidth && *szWidth)
@@ -1108,7 +1108,7 @@ void s_WML_Listener::_handleDataItems(void)
     std::string mimeType;
 	UT_ConstByteBufPtr pByteBuf;
 
-	for (UT_uint32 k=0; (m_pDocument->enumDataItems(k, nullptr, &szName, pByteBuf,
+	for (UT_uint32 k=0; (m_pDocument->enumDataItems(k, NULL, &szName, pByteBuf,
                                                     &mimeType)); k++)
 	{
 		UT_sint32 loc = -1;
@@ -1126,7 +1126,7 @@ void s_WML_Listener::_handleDataItems(void)
 			UT_UTF8String fname;
 			UT_UTF8String_sprintf(fname, "%s_data", m_pie->getFileName());
 
-			/* UT_sint32 result = */ UT_go_directory_create(fname.utf8_str(), nullptr);
+			/* UT_sint32 result = */ UT_go_directory_create(fname.utf8_str(), NULL);
 			if (0 /* result < 0 */)
 			{
 				UT_DEBUGMSG(("WML Export: Failed to create directory\n"));
@@ -1155,7 +1155,7 @@ void s_WML_Listener::_handleDataItems(void)
 				UT_DEBUGMSG(("WML export: Unhandled/ignored mime type: %s\n", mimeType.c_str()));
 			}
 
-			GsfOutput *fp = UT_go_file_create (fname.utf8_str(), nullptr);
+			GsfOutput *fp = UT_go_file_create (fname.utf8_str(), NULL);
 			
 			if(!fp)
 			  continue;
@@ -1177,12 +1177,12 @@ void s_WML_Listener::_openSpan(PT_AttrPropIndex api)
 		return;
 	}
 	
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 
 	if (bHaveProp && pAP)
 	{
-		const gchar * szValue = nullptr;
+		const gchar * szValue = NULL;
 
 		if ((pAP->getProperty("font-weight", szValue))
 			&& !strcmp(szValue, "bold"))
@@ -1315,7 +1315,7 @@ void s_WML_Listener::_closeSpan(void)
 	
 	if (pAP)
 	{
-		const gchar * szValue = nullptr;
+		const gchar * szValue = NULL;
 		
 		if (pAP->getProperty("text-position", szValue))
 		{
@@ -1347,7 +1347,7 @@ void s_WML_Listener::_closeSpan(void)
 		  m_pie->write("</b>");
 		}
 
-		m_pAP_Span = nullptr;
+		m_pAP_Span = NULL;
 	}
 
 	m_bInSpan = false;

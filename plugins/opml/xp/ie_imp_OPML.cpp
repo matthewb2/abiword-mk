@@ -46,7 +46,7 @@ ABI_PLUGIN_DECLARE("OPML")
 
 #define PLUGIN_NAME "AbiOPML::OPML"
 
-static IE_Imp_OPML_Sniffer * m_sniffer = nullptr;
+static IE_Imp_OPML_Sniffer * m_sniffer = 0;
 
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_register (XAP_ModuleInfo * mi)
@@ -71,17 +71,17 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-	mi->name = nullptr;
-	mi->desc = nullptr;
-	mi->version = nullptr;
-	mi->author = nullptr;
-	mi->usage = nullptr;
+	mi->name    = 0;
+	mi->desc    = 0;
+	mi->version = 0;
+	mi->author  = 0;
+	mi->usage   = 0;
 
 	UT_return_val_if_fail(m_sniffer, 0);
 
 	IE_Imp::unregisterImporter (m_sniffer);
 	delete m_sniffer;
-	m_sniffer = nullptr;
+	m_sniffer = 0;
 
 	return 1;
 }
@@ -311,7 +311,7 @@ void IE_Imp_OPML::startElement(const gchar *name, const gchar **atts)
 			m_parseState = _PS_List;
 			m_iOutlineDepth++;
 
-			const gchar *text = nullptr, *url = nullptr;
+			const gchar *text = NULL, *url = NULL;
 
 			text = static_cast<const gchar*>(_getXMLPropValue("text", atts));
 			url = static_cast<const gchar*>(_getXMLPropValue("htmlUrl", atts));

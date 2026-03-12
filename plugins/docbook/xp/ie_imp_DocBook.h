@@ -37,15 +37,15 @@ public:
 	IE_Imp_DocBook_Sniffer(const char * name);
 	virtual ~IE_Imp_DocBook_Sniffer() {}
 
-	virtual const IE_SuffixConfidence * getSuffixConfidence() override;
-	virtual UT_Confidence_t recognizeContents(const char * szBuf,
-									UT_uint32 iNumbytes) override;
-	virtual const IE_MimeConfidence * getMimeConfidence() override { return nullptr; }
+	virtual const IE_SuffixConfidence * getSuffixConfidence ();
+	virtual UT_Confidence_t recognizeContents (const char * szBuf,
+									UT_uint32 iNumbytes);
+	virtual const IE_MimeConfidence * getMimeConfidence () { return NULL; }
 	virtual bool getDlgLabels (const char ** szDesc,
 							   const char ** szSuffixList,
-							   IEFileType * ft) override;
-	virtual UT_Error constructImporter(PD_Document * pDocument,
-										IE_Imp ** ppie) override;
+							   IEFileType * ft);
+	virtual UT_Error constructImporter (PD_Document * pDocument,
+										IE_Imp ** ppie);
 
 };
 
@@ -68,11 +68,11 @@ public:
 	static bool 		SupportsFileType(IEFileType ft);
 
 
-	virtual void startElement(const gchar *name,
-					      const gchar **atts) override;
-	virtual void endElement(const gchar *name) override;
+	void			startElement(const gchar *name,
+					      const gchar **atts);
+	void			endElement(const gchar *name);
 
-	virtual void charData(const gchar *s, int len) override;
+	void charData(const gchar *s, int len);
 
 protected:
 	int m_iCurListID;

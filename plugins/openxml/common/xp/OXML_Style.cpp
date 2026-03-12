@@ -21,16 +21,16 @@
  */
 
 // Class definition include
-#include "OXML_Style.h"
+#include <OXML_Style.h>
 
 // Internal includes
-#include "OXML_Types.h"
-#include "OXML_Document.h"
+#include <OXML_Types.h>
+#include <OXML_Document.h>
 
 // AbiWord includes
-#include "ut_types.h"
-#include "ut_misc.h"
-#include "pd_Document.h"
+#include <ut_types.h>
+#include <ut_misc.h>
+#include <pd_Document.h>
 
 // External includes
 #include <string>
@@ -53,9 +53,9 @@ UT_Error OXML_Style::serialize(IE_Exp_OpenXML* exporter)
 {
 	UT_Error err = UT_OK;
 	bool b_docDefaults = false;
-	const gchar* szValue = nullptr;
-	const gchar* name = nullptr;
-	const gchar* type = nullptr;
+	const gchar* szValue = NULL;
+	const gchar* name = NULL;
+	const gchar* type = NULL;
 	getAttribute("type", type);
 	getAttribute("name", name);
 	if(name)
@@ -315,13 +315,13 @@ UT_Error OXML_Style::addToPT(PD_Document * pDocument)
 
 	//First, we change the ID reference for BASEDON and FOLLOWEDBY to a name reference.
 	OXML_Document * doc = OXML_Document::getInstance();
-	UT_return_val_if_fail( doc != nullptr, UT_ERROR );
+	UT_return_val_if_fail( doc != NULL, UT_ERROR );
 
-	const gchar * buf = nullptr;
+	const gchar * buf = NULL;
 	getAttribute(PT_BASEDON_ATTRIBUTE_NAME, buf);
-	if (buf != nullptr) {
+	if (buf != NULL) {
 		OXML_SharedStyle other = doc->getStyleById(buf);
-		if (other.get() != nullptr) {
+		if (other.get() != NULL) {
 			setAttribute(PT_BASEDON_ATTRIBUTE_NAME, other->getName().c_str());
 		} else {
 			setAttribute(PT_BASEDON_ATTRIBUTE_NAME, "Normal");
@@ -332,7 +332,7 @@ UT_Error OXML_Style::addToPT(PD_Document * pDocument)
 	}
 
 	getAttribute(PT_FOLLOWEDBY_ATTRIBUTE_NAME, buf);
-	if (buf != nullptr) {
+	if (buf != NULL) {
 		OXML_SharedStyle other = doc->getStyleById(buf);
 		if (other)
 			setAttribute(PT_FOLLOWEDBY_ATTRIBUTE_NAME, other->getName().c_str());

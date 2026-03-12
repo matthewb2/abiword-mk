@@ -27,9 +27,10 @@
 #include "ODe_Style_Style.h"
 
 // AbiWord includes
-#include "pd_Document.h"
-#include "pd_Style.h"
-#include "pp_AttrProp.h"
+#include <pd_Document.h>
+#include <ut_vector.h>
+#include <pd_Style.h>
+#include <pp_AttrProp.h>
 
 /**
  * Constructor
@@ -51,14 +52,12 @@ ODe_Styles::~ODe_Styles() {
     for (i=0; i<count; i++) {
         delete (*pStyleVector)[i];
     }
-    DELETEP(pStyleVector);
-
+    
     pStyleVector = m_paragraphStyles.enumerate();
     count = pStyleVector->getItemCount();
     for (i=0; i<count; i++) {
         delete (*pStyleVector)[i];
     }
-    DELETEP(pStyleVector);
 }
 
 
@@ -67,7 +66,7 @@ ODe_Styles::~ODe_Styles() {
  */
 bool ODe_Styles::fetchRegularStyleStyles() {
     
-    const PD_Style* pStyle = nullptr;
+    const PD_Style* pStyle = NULL;
     UT_GenericVector<PD_Style*> vecStyles;
     m_pAbiDoc->getAllUsedStyles(&vecStyles);
     const PP_AttrProp* pAP;
@@ -90,9 +89,9 @@ bool ODe_Styles::fetchRegularStyleStyles() {
 
 
 
-    UT_GenericVector<PD_Style*>* pStyles = nullptr;
+    UT_GenericVector<PD_Style*>* pStyles = NULL;
     m_pAbiDoc->enumStyles(pStyles);
-    if (pStyles == nullptr) {
+    if (pStyles == NULL) {
         return false;
     }
     UT_uint32 iStyleCount = m_pAbiDoc->getStyleCount();
@@ -101,7 +100,7 @@ bool ODe_Styles::fetchRegularStyleStyles() {
     for (UT_uint32 k=0; k < iStyleCount && ok; k++)
     {
         pStyle = pStyles->getNthItem(k);
-        if (pStyle == nullptr) {
+        if (pStyle == NULL) {
             return false;
         }
         
@@ -137,12 +136,12 @@ void ODe_Styles::addStyle(const UT_UTF8String& sStyle)
 {
     UT_return_if_fail(sStyle != "");
 
-    PD_Style* pStyle = nullptr;
+    PD_Style* pStyle = NULL;
     m_pAbiDoc->getStyle(sStyle.utf8_str(), &pStyle);
     UT_return_if_fail(pStyle);
 
     PT_AttrPropIndex api = pStyle->getIndexAP();
-    const PP_AttrProp* pAP = nullptr;
+    const PP_AttrProp* pAP = NULL;    
     if (!m_pAbiDoc->getAttrProp(api, &pAP))
         return;
 

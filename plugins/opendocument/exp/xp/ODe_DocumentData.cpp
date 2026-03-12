@@ -29,12 +29,16 @@
 #include "ODe_Style_Style.h"
 #include "ut_misc.h"
 
+// External includes
+#include <gsf/gsf-outfile.h>
+#include <gsf/gsf-output-memory.h>
+
 /**
  * Constructor
  */
 ODe_DocumentData::ODe_DocumentData(PD_Document* pAbiDoc) :
     m_styles(pAbiDoc),
-    m_pOfficeTextTemp(nullptr),
+    m_pOfficeTextTemp(NULL),
     m_pAbiDoc(pAbiDoc)
 {
 }
@@ -54,7 +58,7 @@ ODe_DocumentData::~ODe_DocumentData() {
     }    
     DELETEP(pMasterPageVector);
     
-    if (m_pOfficeTextTemp != nullptr) {
+    if (m_pOfficeTextTemp != NULL) {
         ODe_gsf_output_close(m_pOfficeTextTemp);
     }
 }
@@ -93,7 +97,7 @@ bool ODe_DocumentData::doPreListeningWork() {
     
     
     m_pOfficeTextTemp = gsf_output_memory_new();
-    if (m_pOfficeTextTemp == nullptr) {
+    if (m_pOfficeTextTemp == NULL) {
         return false;
     }
     
@@ -336,7 +340,7 @@ bool ODe_DocumentData::writeContentXML(GsfOutfile* pOdt) {
 			 gsf_output_memory_get_bytes (GSF_OUTPUT_MEMORY (m_pOfficeTextTemp)));
     
     ODe_gsf_output_close (m_pOfficeTextTemp);
-    m_pOfficeTextTemp = nullptr;
+    m_pOfficeTextTemp = NULL;
     
     ODe_writeUTF8String(pContentStream,
         "  </office:text>\n"

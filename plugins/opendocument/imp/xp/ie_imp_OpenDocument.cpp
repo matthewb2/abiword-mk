@@ -33,7 +33,7 @@
 #include "ODi_ManifestStream_ListenerState.h"
 
 // AbiWord includes
-#include "ut_types.h"
+#include <ut_types.h>
 #include "xap_App.h"
 #include "xap_Frame.h"
 #include "xap_DialogFactory.h"
@@ -42,7 +42,13 @@
 #include "ie_imp_PasteListener.h"
 #include "pd_DocumentRDF.h"
 
+// External includes
 #include <glib-object.h>
+#include <gsf/gsf-input-stdio.h>
+#include <gsf/gsf-infile.h>
+#include <gsf/gsf-infile-zip.h>
+#include <gsf/gsf-input-memory.h>
+
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -61,10 +67,10 @@
  */
 IE_Imp_OpenDocument::IE_Imp_OpenDocument (PD_Document * pDocument)
   : IE_Imp (pDocument),
-    m_pGsfInfile(nullptr),
+    m_pGsfInfile (0),
     m_sPassword (""),
-    m_pStreamListener(nullptr),
-    m_pAbiData(nullptr)
+    m_pStreamListener(NULL),
+    m_pAbiData(NULL)
 {
 }
 
@@ -130,9 +136,9 @@ bool IE_Imp_OpenDocument::pasteFromBuffer(PD_DocumentRange * pDocRange,
  */
 UT_Error IE_Imp_OpenDocument::_loadFile (GsfInput * oo_src)
 {
-    m_pGsfInfile = GSF_INFILE (gsf_infile_zip_new (oo_src, nullptr));
+    m_pGsfInfile = GSF_INFILE (gsf_infile_zip_new (oo_src, NULL));
     
-    if (m_pGsfInfile == nullptr) {
+    if (m_pGsfInfile == NULL) {
         return UT_ERROR;
     }
 
@@ -287,7 +293,7 @@ UT_Error IE_Imp_OpenDocument::_handleMimetype ()
     
     if (gsf_input_size (pInput) > 0) {
         mimetype.append(
-            (const char *)gsf_input_read(pInput, gsf_input_size (pInput), nullptr),
+            (const char *)gsf_input_read(pInput, gsf_input_size (pInput), NULL),
             gsf_input_size (pInput));
     }
 
@@ -457,7 +463,7 @@ UT_Error IE_Imp_OpenDocument::_loadRDFFromFile ( GsfInput* pInput,
             return UT_ERROR;
         }
 
-        // Note that although the API docs say you can use nullptr for base_uri
+        // Note that although the API docs say you can use NULL for base_uri
         // you will likely find it an error to try to call that way.
         librdf_uri* base_uri = librdf_new_uri( args->world,
                                                (const unsigned char*)pStream );
@@ -533,8 +539,8 @@ UT_Error IE_Imp_OpenDocument::_handleRDFStreams ()
         "  ?subj odfcommon:path ?fileName  \n"
         " } \n";
 
-    librdf_uri* base_uri = nullptr;
-    librdf_query* query = librdf_new_query(args.world, "sparql", nullptr,
+    librdf_uri*   base_uri = 0;
+    librdf_query* query = librdf_new_query( args.world, "sparql", 0,
                                             (unsigned char*)query_string,
                                             base_uri );
     librdf_query_results* results = librdf_query_execute( query, model );
@@ -678,7 +684,7 @@ UT_Error IE_Imp_OpenDocument::_handleStream ( GsfInfile* pGsfInfile,
         return UT_ERROR;
 #endif
         
-        GsfInput* pDecryptedInput = nullptr;
+        GsfInput* pDecryptedInput = NULL;
         UT_Error err = ODc_Crypto::decrypt(pInput, (*pos).second, m_sPassword.c_str(), &pDecryptedInput);
         g_object_unref (G_OBJECT (pInput));
 		
@@ -708,7 +714,7 @@ UT_Error IE_Imp_OpenDocument::_handleStream ( GsfInfile* pGsfInfile,
  */
 UT_Error IE_Imp_OpenDocument::_parseStream (GsfInput* pInput, UT_XML & parser)
 {
-    guint8 const *data = nullptr;
+    guint8 const *data = NULL;
     size_t len = 0;
     UT_Error ret = UT_OK;
 
@@ -719,7 +725,7 @@ UT_Error IE_Imp_OpenDocument::_parseStream (GsfInput* pInput, UT_XML & parser)
             // FIXME: we want to pass the stream in chunks, but libXML2 finds this disagreeable.
             // we probably need to pass some magic to our XML parser? 
             // len = UT_MIN (len, BUF_SZ);
-            if (nullptr == (data = gsf_input_read (pInput, len, nullptr))) {
+            if (NULL == (data = gsf_input_read (pInput, len, NULL))) {
                 g_object_unref (G_OBJECT (pInput));
                 return UT_ERROR;
             }

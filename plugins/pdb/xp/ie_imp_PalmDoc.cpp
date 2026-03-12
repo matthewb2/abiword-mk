@@ -68,12 +68,12 @@ const IE_SuffixConfidence * IE_Imp_PalmDoc_Sniffer::getSuffixConfidence ()
 	return IE_Imp_PalmDoc_Sniffer__SuffixConfidence;
 }
 
-const IE_MimeConfidence * IE_Imp_PalmDoc_Sniffer::getMimeConfidence()
+const IE_MimeConfidence * IE_Imp_PalmDoc_Sniffer::getMimeConfidence () 
 {
 	// mimetypes once getMimeConfidence is implemented (need to check correctness)
 	// "application/x-palm-database"
 	// "application/vnd.palm"
-	return nullptr;
+	return NULL; 
 }
 
 UT_Confidence_t IE_Imp_PalmDoc_Sniffer::recognizeContents(const char * szBuf, 
@@ -152,7 +152,7 @@ IE_Imp_PalmDoc::~IE_Imp_PalmDoc()
 IE_Imp_PalmDoc::IE_Imp_PalmDoc(PD_Document * pDocument)
 	: IE_Imp(pDocument)
 {
-	m_pdfp = nullptr;
+	m_pdfp = 0;
 	m_numRecords = 0;
 	m_fileSize = 0;
 	m_buf = new buffer;

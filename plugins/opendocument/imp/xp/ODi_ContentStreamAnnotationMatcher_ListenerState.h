@@ -18,13 +18,19 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+#ifndef _ODI_CONTENTSTREAM_ANNOTATIONMATCHER_LISTENERSTATE_H_
+#define _ODI_CONTENTSTREAM_ANNOTATIONMATCHER_LISTENERSTATE_H_
 
-#include <gsf/gsf.h>
+#include "ut_compiler.h"
 
 // Internal includes
 #include "ODi_ListenerState.h"
 #include "ODi_ElementStack.h"
+
+// External includes
+ABI_W_NO_CONST_QUAL
+#include <gsf/gsf.h>
+ABI_W_POP
 
 #include <set>
 
@@ -42,21 +48,29 @@ class ODi_ContentStreamAnnotationMatcher_ListenerState : public ODi_ListenerStat
 
 public:
 
-    ODi_ContentStreamAnnotationMatcher_ListenerState ( ODi_ElementStack& rElementStack,
+    ODi_ContentStreamAnnotationMatcher_ListenerState ( PD_Document* pDocument,
+                                                       GsfInfile* pGsfInfile,
+                                                       ODi_Office_Styles* pStyles,
+                                                       ODi_ElementStack& rElementStack,
                                                        ODi_Abi_Data & rAbiData );
 
     virtual ~ODi_ContentStreamAnnotationMatcher_ListenerState();
 
-    void startElement(const gchar* pName, const gchar** ppAtts,
-                       ODi_ListenerStateAction& rAction) override;
-    void endElement(const gchar* pName, ODi_ListenerStateAction& rAction) override;
-    void charData(const gchar* pBuffer, int length) override;
+    void startElement( const gchar* pName, const gchar** ppAtts,
+                       ODi_ListenerStateAction& rAction );
+    void endElement  ( const gchar* pName, ODi_ListenerStateAction& rAction );
+    void charData    ( const gchar* pBuffer, int length );
 
     const std::set< std::string >& getRangedAnnotationNames() const;
 
 private:
 
+    PD_Document* m_pAbiDocument;
+    GsfInfile* m_pGsfInfile;
+    ODi_Office_Styles* m_pStyles;
     ODi_Abi_Data& m_rAbiData;
 
 
 };
+
+#endif

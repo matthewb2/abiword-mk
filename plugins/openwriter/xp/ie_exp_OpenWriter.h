@@ -41,6 +41,8 @@
 #include "ut_stack.h"
 #include "ut_assert.h"
 
+#include <gsf/gsf-output.h>
+
 class IE_Exp_OpenWriter : public IE_Exp
 {
 public:
@@ -48,7 +50,7 @@ public:
   virtual ~IE_Exp_OpenWriter();
 
 protected:
-  virtual UT_Error	_writeDocument(void) override;
+  virtual UT_Error	_writeDocument(void);
 
 private:
   GsfOutfile * m_oo;
@@ -77,17 +79,17 @@ class OO_Listener : public PL_Listener
 public:
    OO_Listener(PD_Document * pDocument, OO_ListenerImpl *pListenerImpl);
 
-   virtual bool populate(fl_ContainerLayout* sfh, const PX_ChangeRecord * pcr) override;
-   virtual bool populateStrux(pf_Frag_Strux* sdh, const PX_ChangeRecord * pcr, fl_ContainerLayout* * psfh) override;
-   virtual bool change(fl_ContainerLayout* sfh, const PX_ChangeRecord * pcr) override;
+   virtual bool populate(fl_ContainerLayout* sfh, const PX_ChangeRecord * pcr);
+   virtual bool populateStrux(pf_Frag_Strux* sdh, const PX_ChangeRecord * pcr, fl_ContainerLayout* * psfh);
+   virtual bool change(fl_ContainerLayout* sfh, const PX_ChangeRecord * pcr);
    virtual bool insertStrux(fl_ContainerLayout* sfh,
 			    const PX_ChangeRecord * pcr,
 			    pf_Frag_Strux* sdh,
 			    PL_ListenerId lid,
 			    void (* pfnBindHandles)(pf_Frag_Strux* sdhNew,
 						    PL_ListenerId lid,
-						    fl_ContainerLayout* sfhNew)) override;
-   virtual bool signal(UT_uint32 iSignal) override;
+						    fl_ContainerLayout* sfhNew));
+   virtual bool signal(UT_uint32 iSignal);
 
    void endDocument();
 
@@ -141,14 +143,14 @@ class OO_AccumulatorImpl : public OO_ListenerImpl
 {
 public:
    OO_AccumulatorImpl(OO_StylesContainer *pStylesContainer) : OO_ListenerImpl() { m_pStylesContainer = pStylesContainer; }
-   virtual void insertText(const UT_UCSChar * /*data*/, UT_uint32 /*length*/) override {}
+   virtual void insertText(const UT_UCSChar * /*data*/, UT_uint32 /*length*/) {}
    virtual void openBlock(const std::string & styleAtts, const std::string & styleProps,
-                          const std::string & font, bool bIsHeading = false) override;
-   virtual void closeBlock() override {};
-   virtual void openSpan(const std::string & props, const std::string & font) override;
-   virtual void closeSpan() override {}
-   virtual void openHyperlink(const PP_AttrProp* /*pAP*/) override {}
-   virtual void closeHyperlink() override {}
+                          const std::string & font, bool bIsHeading = false);
+   virtual void closeBlock() {};
+   virtual void openSpan(const std::string & props, const std::string & font);
+   virtual void closeSpan() {}
+   virtual void openHyperlink(const PP_AttrProp* /*pAP*/) {}
+   virtual void closeHyperlink() {}
 
 private:
    OO_StylesContainer *m_pStylesContainer;
@@ -163,14 +165,14 @@ class OO_WriterImpl : public OO_ListenerImpl
 public:
    OO_WriterImpl(GsfOutfile *pOutfile, OO_StylesContainer *pStylesContainer);
    ~OO_WriterImpl();
-   virtual void insertText(const UT_UCSChar * data, UT_uint32 length) override;
+   virtual void insertText(const UT_UCSChar * data, UT_uint32 length);
    virtual void openBlock(const std::string & styleAtts, const std::string & styleProps,
-                          const std::string & font, bool bIsHeading = false) override;
-   virtual void closeBlock() override;
-   virtual void openSpan(const std::string & props, const std::string & font) override;
-   virtual void closeSpan() override;
-   virtual void openHyperlink(const PP_AttrProp* pAP) override;
-   virtual void closeHyperlink() override;
+                          const std::string & font, bool bIsHeading = false);
+   virtual void closeBlock();
+   virtual void openSpan(const std::string & props, const std::string & font);
+   virtual void closeSpan();
+   virtual void openHyperlink(const PP_AttrProp* pAP);
+   virtual void closeHyperlink();
 
 private:
    GsfOutput * m_pContentStream;

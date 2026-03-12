@@ -26,9 +26,9 @@
 #include "ODi_ListenerStateAction.h"
 
 // AbiWord includes
-#include "ut_assert.h"
-#include "ut_misc.h"
-#include "pd_Document.h"
+#include <ut_assert.h>
+#include <ut_misc.h>
+#include <pd_Document.h>
 
 
 /**
@@ -38,7 +38,7 @@ ODi_Style_MasterPage::ODi_Style_MasterPage(PD_Document* pDocument,
 										 ODi_ElementStack& rElementStack) :
                             ODi_ListenerState("StyleMasterPage", rElementStack),
                             m_pAbiDocument(pDocument),
-                            m_pPageLayoutStyle(nullptr),
+                            m_pPageLayoutStyle(NULL),
                             m_parsingState(ODI_FIRST_PASS)
 {
 }
@@ -77,25 +77,25 @@ void ODi_Style_MasterPage::startElement(const gchar* pName,
         } else {
             UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
         }
-
+        
     } else if (!strcmp("style:header", pName)) {
-
+        
         if (m_parsingState == ODI_FIRST_PASS) {
             UT_uint32 id;
             char buffer[500];
-
+            
             id = m_pAbiDocument->getUID(UT_UniqueId::HeaderFtr);
             sprintf(buffer, "%u", id);
-
+            
             if (m_AW_headerSectionID.empty()) {
                 m_AW_headerSectionID = buffer;
             } else {
                 m_AW_evenHeaderSectionID = buffer;
             }
-
+            
         } else if (m_parsingState == ODI_POSTPONED_SECOND_PASS) {
             PP_PropertyVector ppSecAttr = {
-                "id", "",
+                "id", ""
                 "type", ""
             };
 
@@ -108,14 +108,14 @@ void ODi_Style_MasterPage::startElement(const gchar* pName,
             }
 
             m_pAbiDocument->appendStrux(PTX_Section, ppSecAttr);
-
+            
             rAction.pushState("TextContent");
         } else {
             UT_ASSERT(UT_SHOULD_NOT_HAPPEN);
         }
-
+        
     } else if (!strcmp("style:footer", pName)) {
-
+        
         if (m_parsingState == ODI_FIRST_PASS) {
             UT_uint32 id;
             char buffer[500];

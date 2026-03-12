@@ -25,7 +25,10 @@
 #define _IE_IMP_OPENXML_H_
 
 // AbiWord includes
-#include "ie_imp.h"
+#include <ie_imp.h>
+
+// External includes
+#include <gsf/gsf-infile.h>
 
 /**
  * Class used to import OpenXML files
@@ -37,7 +40,7 @@ public:
 	virtual ~IE_Imp_OpenXML ();
 
 protected:
-	virtual UT_Error _loadFile(GsfInput * input) override;
+	virtual UT_Error _loadFile(GsfInput * input);
 
 private:
 	void _setDocumentProperties();

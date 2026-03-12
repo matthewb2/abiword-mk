@@ -84,7 +84,7 @@ public:
 	virtual ~IE_Exp_S5();
 	
 protected:
-	virtual UT_Error _writeDocument(void) override;
+	virtual UT_Error	_writeDocument(void);
 	void _writeHeader();
 	void _writeFooter();
 	void _writeSlide(FV_View* view, UT_uint32 pageno);
@@ -100,12 +100,12 @@ public:
 	IE_Exp_S5_Sniffer ();
 	virtual ~IE_Exp_S5_Sniffer () {}
 
-	virtual bool recognizeSuffix(const char * szSuffix) override;
-	virtual bool getDlgLabels(const char ** szDesc,
+	virtual bool recognizeSuffix (const char * szSuffix);
+	virtual bool getDlgLabels (const char ** szDesc,
 							   const char ** szSuffixList,
-							   IEFileType * ft) override;
-	virtual UT_Error constructExporter(PD_Document * pDocument,
-										IE_Exp ** ppie) override;
+							   IEFileType * ft);
+	virtual UT_Error constructExporter (PD_Document * pDocument,
+										IE_Exp ** ppie);
 };
 
 /*****************************************************************/
@@ -114,7 +114,7 @@ public:
 // completely generic code to allow this to be a plugin
 
 // we use a reference-counted sniffer
-static IE_Exp_S5_Sniffer * m_sniffer = nullptr;
+static IE_Exp_S5_Sniffer * m_sniffer = 0;
 
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_register (XAP_ModuleInfo * mi)
@@ -138,17 +138,17 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-	mi->name = nullptr;
-	mi->desc = nullptr;
-	mi->version = nullptr;
-	mi->author = nullptr;
-	mi->usage = nullptr;
+	mi->name = 0;
+	mi->desc = 0;
+	mi->version = 0;
+	mi->author = 0;
+	mi->usage = 0;
 
 	UT_return_val_if_fail (m_sniffer, 0);
 
 	IE_Exp::unregisterExporter (m_sniffer);
 	delete m_sniffer;
-	m_sniffer = nullptr;
+	m_sniffer = 0;
 
 	return 1;
 }
@@ -205,9 +205,9 @@ IE_Exp_S5::~IE_Exp_S5()
 
 UT_Error IE_Exp_S5::_writeDocument(void)
 {
-    GR_Graphics *layout_graphics = nullptr;
-    FL_DocLayout *pDocLayout = nullptr;
-    FV_View *layoutView = nullptr;
+    GR_Graphics *layout_graphics = NULL;
+    FL_DocLayout *pDocLayout = NULL;
+    FV_View *layoutView = NULL;
 
 	layout_graphics = GR_Graphics::newNullGraphics();
 	if (!layout_graphics)
@@ -215,7 +215,7 @@ UT_Error IE_Exp_S5::_writeDocument(void)
 
     // break on pages
     pDocLayout = new FL_DocLayout(getDoc(), layout_graphics);
-    layoutView = new FV_View(XAP_App::getApp(), nullptr, pDocLayout);
+    layoutView = new FV_View(XAP_App::getApp(),0,pDocLayout);
     layoutView->getLayout()->fillLayouts();
     layoutView->getLayout()->formatAll();
     layoutView->getLayout()->recalculateTOCFields();
@@ -251,7 +251,7 @@ void IE_Exp_S5::_writeHeader()
 	else
 		title = prop;
 
-	if (title.size() == 0 && getFileName() != nullptr)
+	if (title.size() == 0 && getFileName () != NULL) 
 		title = UT_basename(getFileName ());
 
 	prop = getProperty("author");

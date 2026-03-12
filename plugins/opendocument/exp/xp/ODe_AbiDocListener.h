@@ -29,9 +29,9 @@
 #include "ODe_ListenerAction.h"
 
 // Abiword includes
-#include "pl_Listener.h"
-#include "ut_vector.h"
-#include "ut_string_class.h"
+#include <pl_Listener.h>
+#include <ut_vector.h>
+#include <ut_string_class.h>
 
 // Internal classes
 class ODe_AbiDocListenerImpl;
@@ -56,12 +56,12 @@ public:
 
     virtual ~ODe_AbiDocListener();
 
-    virtual bool populate(fl_ContainerLayout* sfh, const PX_ChangeRecord * pcr) override;
+    virtual bool populate(fl_ContainerLayout* sfh, const PX_ChangeRecord * pcr);
 
     virtual bool populateStrux(pf_Frag_Strux* sdh,
-        const PX_ChangeRecord * pcr, fl_ContainerLayout* * psfh) override;
+        const PX_ChangeRecord * pcr, fl_ContainerLayout* * psfh);
 
-    virtual bool change(fl_ContainerLayout* sfh, const PX_ChangeRecord * pcr) override;
+    virtual bool change(fl_ContainerLayout* sfh, const PX_ChangeRecord * pcr);
 
     virtual bool insertStrux(fl_ContainerLayout* sfh,
                 const PX_ChangeRecord * pcr,
@@ -69,9 +69,9 @@ public:
                 PL_ListenerId lid,
                 void (* pfnBindHandles)(pf_Frag_Strux* sdhNew,
                             PL_ListenerId lid,
-                            fl_ContainerLayout* sfhNew)) override;
+                            fl_ContainerLayout* sfhNew));
 
-    virtual bool signal(UT_uint32 iSignal) override;
+    virtual bool signal(UT_uint32 iSignal);
 
     void finished();
 
@@ -162,7 +162,7 @@ private:
 
     class StackCell {
     public:
-        StackCell() {m_pListenerImpl=nullptr; m_deleteWhenPop=false;}
+        StackCell() {m_pListenerImpl=NULL; m_deleteWhenPop=false;}
         StackCell(ODe_AbiDocListenerImpl* pListenerImpl, bool deleteWhenPop) {
             m_deleteWhenPop = deleteWhenPop;
             m_pListenerImpl = pListenerImpl;
@@ -170,10 +170,10 @@ private:
         // Work around the "return 0" issue of the UT_GenericVector::getNhItem()
         StackCell(UT_uint32 /*i*/)
 			{
-				m_pListenerImpl=nullptr;
+				m_pListenerImpl=NULL;
 				m_deleteWhenPop=false;
 			}
-        StackCell(const StackCell&) = default;
+
         StackCell& operator=(const StackCell& sc) {
             this->m_deleteWhenPop = sc.m_deleteWhenPop;
             this->m_pListenerImpl = sc.m_pListenerImpl;

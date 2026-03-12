@@ -31,14 +31,14 @@
 #include "ODe_Main_Listener.h"
 
 // Abiword includes
-#include "pd_Document.h"
-#include "pd_DocumentRDF.h"
-#include "px_ChangeRecord.h"
-#include "px_CR_Span.h"
-#include "px_CR_Strux.h"
-#include "px_CR_Object.h"
-#include "ut_mbtowc.h"
-#include "ut_locale.h"
+#include <pd_Document.h>
+#include <pd_DocumentRDF.h>
+#include <px_ChangeRecord.h>
+#include <px_CR_Span.h>
+#include <px_CR_Strux.h>
+#include <px_CR_Object.h>
+#include <ut_mbtowc.h>
+#include <ut_locale.h>
 
 #include <sstream>
 
@@ -52,7 +52,7 @@ ODe_AbiDocListener::ODe_AbiDocListener (PD_Document* pDocument,
                                         ODe_AbiDocListenerImpl* pListenerImpl,
                                         bool deleteWhenPop)
     : PL_Listener (),
-      m_pCurrentField(nullptr),
+      m_pCurrentField(NULL),
       m_apiLastSpan(0),
       m_bInSpan(false),
       m_bInBlock(false),
@@ -68,7 +68,7 @@ ODe_AbiDocListener::ODe_AbiDocListener (PD_Document* pDocument,
       m_pCurrentImpl(pListenerImpl),
       m_deleteCurrentWhenPop(deleteWhenPop)
 {
-    UT_ASSERT_HARMLESS(pListenerImpl != nullptr);
+    UT_ASSERT_HARMLESS(pListenerImpl != NULL);
 }
 
 
@@ -159,9 +159,9 @@ bool ODe_AbiDocListener::populate(fl_ContainerLayout* /*sfh*/,
                     _closeSpan();
                     _closeField();
 
-                    const PP_AttrProp* pAP = nullptr;
+                    const PP_AttrProp* pAP = NULL;
                     m_pDocument->getAttrProp(api,&pAP);
-                    const gchar* pValue = nullptr;
+                    const gchar* pValue = NULL;
 
                     if(pAP && pAP->getAttribute("type",pValue) && pValue && (strcmp(pValue, "start") == 0)) {
                         _openBookmark(api);
@@ -176,9 +176,9 @@ bool ODe_AbiDocListener::populate(fl_ContainerLayout* /*sfh*/,
                 {
                     _closeSpan();
                     _closeField();
-                    const PP_AttrProp* pAP = nullptr;
+                    const PP_AttrProp* pAP = NULL;
                     m_pDocument->getAttrProp(api,&pAP);
-                    const gchar* pValue = nullptr;
+                    const gchar* pValue = NULL;
 
                     if(pAP && pAP->getAttribute("xlink:href",pValue) && pValue) {
                         _openHyperlink(api);
@@ -203,7 +203,7 @@ bool ODe_AbiDocListener::populate(fl_ContainerLayout* /*sfh*/,
                     _closeSpan();
                     _closeField();
 
-                    const PP_AttrProp* pAP = nullptr;
+                    const PP_AttrProp* pAP = NULL;
                     m_pDocument->getAttrProp(api,&pAP);
                     RDFAnchor a(pAP);
                     if( a.isEnd() )
@@ -259,11 +259,11 @@ bool ODe_AbiDocListener::populateStrux(pf_Frag_Strux* /*sdh*/,
     //     {
     //         UT_DEBUGMSG(("TESTING AAA ... have psfh\n"));
     //         PT_AttrPropIndex api = m_pDocument->getAPIFromSDH( psfh );
-    //         const PP_AttrProp * AP = nullptr;
+    //         const PP_AttrProp * AP = NULL;
     //         m_pDocument->getAttrProp(api,&AP);
     //         if( AP )
     //         {
-    //             const char * v = nullptr;
+    //             const char * v = NULL;
     //             if(AP->getAttribute("xml:id", v))
     //                 UT_DEBUGMSG(("TESTING AAA ... xmlid:%s\n",v));
     //             if(AP->getAttribute("props", v))
@@ -273,7 +273,7 @@ bool ODe_AbiDocListener::populateStrux(pf_Frag_Strux* /*sdh*/,
     //         m_pDocument->getAttrProp(api,&AP);
     //         if( AP )
     //         {
-    //             const char * v = nullptr;
+    //             const char * v = NULL;
     //             if(AP->getAttribute("xml:id", v))
     //                 UT_DEBUGMSG(("TESTING AAA2 ... xmlid:%s\n",v));
     //             if(AP->getAttribute("props", v))
@@ -283,7 +283,7 @@ bool ODe_AbiDocListener::populateStrux(pf_Frag_Strux* /*sdh*/,
     // }
     
     
-    *psfh = nullptr;                     // we don't need it.
+    *psfh = 0;                          // we don't need it.
 
     PT_AttrPropIndex api = pcr->getIndexAP();
     //const gchar* image_name =
@@ -361,7 +361,7 @@ bool ODe_AbiDocListener::populateStrux(pf_Frag_Strux* /*sdh*/,
                 ok = m_pDocument->getAttrProp (api, &pAP);
                 if (ok)
                 {
-                    const gchar* pValue = nullptr;
+                    const gchar* pValue = NULL;
                     if(pAP->getAttribute(PT_ANNOTATION_NUMBER,pValue) && pValue)
                         ss << pValue;
                 }
@@ -585,12 +585,12 @@ void ODe_AbiDocListener::_openSpan(PT_AttrPropIndex api) {
 
     m_bInSpan = true;
     m_apiLastSpan = api;
-
+    
     ok = m_pDocument->getAttrProp (api, &pAP);
     if (!ok) {
-        pAP = nullptr;
+        pAP = NULL;        
     }
-
+    
     m_pCurrentImpl->openSpan(pAP);
     return;
 }
@@ -616,15 +616,15 @@ void ODe_AbiDocListener::_closeSpan(void) {
 void ODe_AbiDocListener::_openBlock(PT_AttrPropIndex api) {
     const PP_AttrProp* pAP;
     bool ok;
-
+    
     m_bInBlock = true;
-
+    
     ok = m_pDocument->getAttrProp (api, &pAP);
     if (!ok) {
-        pAP = nullptr;
+        pAP = NULL;        
     }
 
-    m_listenerImplAction.reset();
+    m_listenerImplAction.reset();    
     m_pCurrentImpl->openBlock(pAP, m_listenerImplAction);
     
     if (m_listenerImplAction.getAction() != m_listenerImplAction.ACTION_NONE) {
@@ -633,7 +633,7 @@ void ODe_AbiDocListener::_openBlock(PT_AttrPropIndex api) {
         pPreviousImpl = m_pCurrentImpl;
         _handleListenerImplAction();
         
-        if (m_pCurrentImpl != nullptr && pPreviousImpl != m_pCurrentImpl) {
+        if (m_pCurrentImpl != NULL && pPreviousImpl != m_pCurrentImpl) {
             // The implementation has changed.
             this->_openBlock(api);
         }
@@ -664,12 +664,12 @@ void ODe_AbiDocListener::_openSection(PT_AttrPropIndex api, bool recursiveCall) 
         
         m_bInSection = true;
     }
-
+    
     ok = m_pDocument->getAttrProp (api, &pAP);
     if (!ok) {
-        pAP = nullptr;
+        pAP = NULL;        
     }
-
+    
     m_listenerImplAction.reset();
     m_pCurrentImpl->openSection(pAP, m_listenerImplAction);
     
@@ -679,7 +679,7 @@ void ODe_AbiDocListener::_openSection(PT_AttrPropIndex api, bool recursiveCall) 
         pPreviousImpl = m_pCurrentImpl;
         _handleListenerImplAction();
         
-        if (m_pCurrentImpl != nullptr && pPreviousImpl != m_pCurrentImpl) {
+        if (m_pCurrentImpl != NULL && pPreviousImpl != m_pCurrentImpl) {
             // The implementation has changed.
             this->_openSection(api, true);
         }
@@ -709,7 +709,7 @@ void ODe_AbiDocListener::_closeSection(bool recursiveCall) {
         pPreviousImpl = m_pCurrentImpl;
         _handleListenerImplAction();
         
-        if (m_pCurrentImpl != nullptr && pPreviousImpl != m_pCurrentImpl) {
+        if (m_pCurrentImpl != NULL && pPreviousImpl != m_pCurrentImpl) {
             // The implementation has changed.
             this->_closeSection(true);
         }
@@ -724,14 +724,14 @@ void ODe_AbiDocListener::_openField(const PX_ChangeRecord_Object* pcro,
                                     PT_AttrPropIndex api) {
     UT_return_if_fail(pcro);
 
-    const PP_AttrProp* pAP = nullptr;
+    const PP_AttrProp* pAP = NULL;
     m_pCurrentField = pcro->getField();
 
     UT_return_if_fail(m_pCurrentField);
     UT_return_if_fail(m_pDocument->getAttrProp (api, &pAP) && pAP);
 
     UT_UTF8String value = m_pCurrentField->getValue();
-    const gchar * szValue = nullptr;
+    const gchar * szValue = NULL;
 
     UT_return_if_fail(pAP->getAttribute ("type", szValue) && szValue);
     m_currentFieldType = szValue;
@@ -750,7 +750,7 @@ void ODe_AbiDocListener::_closeField(void) {
 
     m_pCurrentImpl->closeField(m_currentFieldType);
 
-    m_pCurrentField = nullptr;
+    m_pCurrentField = NULL;
     m_currentFieldType.clear();
 }
 
@@ -761,12 +761,12 @@ void ODe_AbiDocListener::_closeField(void) {
 void ODe_AbiDocListener::_openFootnote(PT_AttrPropIndex api) {
     const PP_AttrProp* pAP;
     bool ok;
-
+                                        
     ok = m_pDocument->getAttrProp (api, &pAP);
     if (!ok) {
-        pAP = nullptr;
+        pAP = NULL;        
     }
-
+    
     m_listenerImplAction.reset();
     m_pCurrentImpl->openFootnote(pAP, m_listenerImplAction);
     
@@ -777,7 +777,7 @@ void ODe_AbiDocListener::_openFootnote(PT_AttrPropIndex api) {
         pPreviousImpl = m_pCurrentImpl;
         _handleListenerImplAction();
         
-        if (m_pCurrentImpl != nullptr && pPreviousImpl != m_pCurrentImpl) {
+        if (m_pCurrentImpl != NULL && pPreviousImpl != m_pCurrentImpl) {
             // The implementation has changed.
             this->_openFootnote(api);
         }
@@ -800,7 +800,7 @@ void ODe_AbiDocListener::_closeFootnote() {
         pPreviousImpl = m_pCurrentImpl;
         _handleListenerImplAction();
         
-        if (m_pCurrentImpl != nullptr && pPreviousImpl != m_pCurrentImpl) {
+        if (m_pCurrentImpl != NULL && pPreviousImpl != m_pCurrentImpl) {
             // The implementation has changed.
             this->_closeFootnote();
         }
@@ -814,13 +814,13 @@ void ODe_AbiDocListener::_closeFootnote() {
 void ODe_AbiDocListener::_openEndnote(PT_AttrPropIndex api) {
     const PP_AttrProp* pAP;
     bool ok;
-
+                                        
     ok = m_pDocument->getAttrProp (api, &pAP);
     if (!ok) {
-        pAP = nullptr;
+        pAP = NULL;        
     }
 
-    m_listenerImplAction.reset();
+    m_listenerImplAction.reset();    
     m_pCurrentImpl->openEndnote(pAP, m_listenerImplAction);
     
     if (m_listenerImplAction.getAction() != m_listenerImplAction.ACTION_NONE) {
@@ -829,7 +829,7 @@ void ODe_AbiDocListener::_openEndnote(PT_AttrPropIndex api) {
         pPreviousImpl = m_pCurrentImpl;
         _handleListenerImplAction();
         
-        if (m_pCurrentImpl != nullptr && pPreviousImpl != m_pCurrentImpl) {
+        if (m_pCurrentImpl != NULL && pPreviousImpl != m_pCurrentImpl) {
             // The implementation has changed.
             this->_openEndnote(api);
         }
@@ -852,7 +852,7 @@ void ODe_AbiDocListener::_closeEndnote() {
         pPreviousImpl = m_pCurrentImpl;
         _handleListenerImplAction();
         
-        if (m_pCurrentImpl != nullptr && pPreviousImpl != m_pCurrentImpl) {
+        if (m_pCurrentImpl != NULL && pPreviousImpl != m_pCurrentImpl) {
             // The implementation has changed.
             this->_closeEndnote();
         }
@@ -870,17 +870,17 @@ void ODe_AbiDocListener::_openAnnotation(PT_AttrPropIndex api, const std::string
         return;
     }
 
-    const PP_AttrProp* pAP = nullptr;
+    const PP_AttrProp* pAP = NULL;
     bool ok = false;
 
     ok = m_pDocument->getAttrProp (api, &pAP);
     if (!ok) {
-        pAP = nullptr;
+        pAP = NULL;
     }
 
     std::string name = defaultName;
     {
-        const gchar* pValue = nullptr;
+        const gchar* pValue = NULL;
         if(pAP->getAttribute("name",pValue) && pValue)
         {
             name = pValue;
@@ -919,14 +919,14 @@ void ODe_AbiDocListener::_endAnnotation( PT_AttrPropIndex api )
     
     m_bPendingAnnotationEnd = false;
     m_currentAnnotationName = "";
-    const PP_AttrProp* pAP = nullptr;
+    const PP_AttrProp* pAP = NULL;
     bool ok = false;
 
     ok = m_pDocument->getAttrProp (api, &pAP);
     if (!ok) {
-        pAP = nullptr;
+        pAP = NULL;
     }
-    const gchar* pValue = nullptr;
+    const gchar* pValue = NULL;
     if(pAP->getAttribute("name",pValue) && pValue)
     {
         name = pValue;
@@ -950,12 +950,12 @@ void ODe_AbiDocListener::_openTable(PT_AttrPropIndex api, bool recursiveCall) {
     if (!recursiveCall) {
         m_iInTable++;
     }
-
+    
     ok = m_pDocument->getAttrProp (api, &pAP);
     if (!ok) {
-        pAP = nullptr;
+        pAP = NULL;        
     }
-
+    
     m_listenerImplAction.reset();
     m_pCurrentImpl->openTable(pAP, m_listenerImplAction);
     
@@ -965,7 +965,7 @@ void ODe_AbiDocListener::_openTable(PT_AttrPropIndex api, bool recursiveCall) {
         pPreviousImpl = m_pCurrentImpl;
         _handleListenerImplAction();
         
-        if (m_pCurrentImpl != nullptr && pPreviousImpl != m_pCurrentImpl) {
+        if (m_pCurrentImpl != NULL && pPreviousImpl != m_pCurrentImpl) {
             // The implementation has changed.
             this->_openTable(api, true);
         }
@@ -995,7 +995,7 @@ void ODe_AbiDocListener::_closeTable(bool recursiveCall) {
         pPreviousImpl = m_pCurrentImpl;
         _handleListenerImplAction();
         
-        if (m_pCurrentImpl != nullptr && pPreviousImpl != m_pCurrentImpl) {
+        if (m_pCurrentImpl != NULL && pPreviousImpl != m_pCurrentImpl) {
             // The implementation has changed.
             this->_closeTable(true);
         }
@@ -1013,10 +1013,10 @@ void ODe_AbiDocListener::_openCell(PT_AttrPropIndex api, bool recursiveCall) {
     if (!recursiveCall) {
         m_iInCell++;
     }
-
+    
     ok = m_pDocument->getAttrProp (api, &pAP);
     if (!ok) {
-        pAP = nullptr;
+        pAP = NULL;        
     }
 
     // // testing
@@ -1038,7 +1038,7 @@ void ODe_AbiDocListener::_openCell(PT_AttrPropIndex api, bool recursiveCall) {
         pPreviousImpl = m_pCurrentImpl;
         _handleListenerImplAction();
         
-        if (m_pCurrentImpl != nullptr && pPreviousImpl != m_pCurrentImpl) {
+        if (m_pCurrentImpl != NULL && pPreviousImpl != m_pCurrentImpl) {
             // The implementation has changed.
             this->_openCell(api, true);
         }
@@ -1067,7 +1067,7 @@ void ODe_AbiDocListener::_closeCell(bool recursiveCall) {
         pPreviousImpl = m_pCurrentImpl;
         _handleListenerImplAction();
         
-        if (m_pCurrentImpl != nullptr && pPreviousImpl != m_pCurrentImpl) {
+        if (m_pCurrentImpl != NULL && pPreviousImpl != m_pCurrentImpl) {
             // The implementation has changed.
             this->_closeCell(true);
         }
@@ -1081,14 +1081,15 @@ void ODe_AbiDocListener::_closeCell(bool recursiveCall) {
 void ODe_AbiDocListener::_openFrame(PT_AttrPropIndex api) {
     const PP_AttrProp* pAP;
     bool ok;
-
+                                        
     ok = m_pDocument->getAttrProp (api, &pAP);
     if (!ok) {
-        pAP = nullptr;
+        pAP = NULL;        
     }
 
     m_listenerImplAction.reset();
     m_pCurrentImpl->openFrame(pAP, m_listenerImplAction);
+    
 
     if (m_listenerImplAction.getAction() != m_listenerImplAction.ACTION_NONE) {
         ODe_AbiDocListenerImpl* pPreviousImpl;
@@ -1096,7 +1097,7 @@ void ODe_AbiDocListener::_openFrame(PT_AttrPropIndex api) {
         pPreviousImpl = m_pCurrentImpl;
         _handleListenerImplAction();
         
-        if (m_pCurrentImpl != nullptr && pPreviousImpl != m_pCurrentImpl) {
+        if (m_pCurrentImpl != NULL && pPreviousImpl != m_pCurrentImpl) {
             // The implementation has changed.
             this->_openFrame(api);
         }
@@ -1117,7 +1118,7 @@ void ODe_AbiDocListener::_closeFrame() {
         pPreviousImpl = m_pCurrentImpl;
         _handleListenerImplAction();
         
-        if (m_pCurrentImpl != nullptr && pPreviousImpl != m_pCurrentImpl) {
+        if (m_pCurrentImpl != NULL && pPreviousImpl != m_pCurrentImpl) {
             // The implementation has changed.
             this->_closeFrame();
         }
@@ -1131,12 +1132,12 @@ void ODe_AbiDocListener::_closeFrame() {
 void ODe_AbiDocListener::_openTOC(PT_AttrPropIndex api) {
     const PP_AttrProp* pAP;
     bool ok;
-
+                                        
     ok = m_pDocument->getAttrProp (api, &pAP);
     if (!ok) {
-        pAP = nullptr;
+        pAP = NULL;        
     }
-
+    
     m_pCurrentImpl->openTOC(pAP);
 }
 
@@ -1153,12 +1154,12 @@ void ODe_AbiDocListener::_closeTOC() {
  * 
  */
 void ODe_AbiDocListener::_openBookmark(PT_AttrPropIndex api) {
-    const PP_AttrProp* pAP = nullptr;
+    const PP_AttrProp* pAP = NULL;
     bool ok = false;
 
     ok = m_pDocument->getAttrProp (api, &pAP);
     if (ok && pAP) {
-        const gchar* pValue = nullptr;
+        const gchar* pValue = NULL;
         if(pAP->getAttribute("name",pValue) && pValue) {
             m_bookmarkName = pValue;
         } else {
@@ -1195,7 +1196,7 @@ void ODe_AbiDocListener::_closeBookmark(PT_AttrPropIndex api) {
 
     _closeSpan();
 
-    const PP_AttrProp* pAP = nullptr;
+    const PP_AttrProp* pAP = NULL;
     bool ok = false;
 
     ok = m_pDocument->getAttrProp (api, &pAP);
@@ -1211,7 +1212,7 @@ void ODe_AbiDocListener::_closeBookmark(PT_AttrPropIndex api) {
  * 
  */
 void ODe_AbiDocListener::_openHyperlink(PT_AttrPropIndex api) {
-    const PP_AttrProp* pAP = nullptr;
+    const PP_AttrProp* pAP = NULL;
     bool ok;
                                         
     ok = m_pDocument->getAttrProp (api, &pAP);
@@ -1240,7 +1241,7 @@ void ODe_AbiDocListener::_closeHyperlink() {
 
 void ODe_AbiDocListener::_openRDFAnchor(PT_AttrPropIndex api)
 {
-    const PP_AttrProp* pAP = nullptr;
+    const PP_AttrProp* pAP = NULL;
     bool ok;
                                         
     ok = m_pDocument->getAttrProp (api, &pAP);
@@ -1252,7 +1253,7 @@ void ODe_AbiDocListener::_openRDFAnchor(PT_AttrPropIndex api)
 void ODe_AbiDocListener::_closeRDFAnchor(PT_AttrPropIndex api)
 {
     _closeSpan();
-    const PP_AttrProp* pAP = nullptr;
+    const PP_AttrProp* pAP = NULL;
     bool ok;
                                         
     ok = m_pDocument->getAttrProp (api, &pAP);
@@ -1268,7 +1269,7 @@ void ODe_AbiDocListener::_closeRDFAnchor(PT_AttrPropIndex api)
  */
 const gchar* ODe_AbiDocListener::_getObjectKey(const PT_AttrPropIndex& api,
                                                   const gchar* key) {
-    const PP_AttrProp * pAP = nullptr;
+    const PP_AttrProp * pAP = NULL;
     bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
     if (bHaveProp && pAP)
     {
@@ -1277,7 +1278,7 @@ const gchar* ODe_AbiDocListener::_getObjectKey(const PT_AttrPropIndex& api,
             return value;
     }
 
-    return nullptr;
+    return 0;
 }
 
 
@@ -1293,7 +1294,7 @@ void ODe_AbiDocListener::_insertInlinedImage(PT_AttrPropIndex api) {
 
     ok = m_pDocument->getAttrProp (api, &pAP);
     if (!ok) {
-        pAP = nullptr;
+        pAP = NULL;        
     }
 
     pImageName = 
@@ -1310,13 +1311,13 @@ void ODe_AbiDocListener::_insertInlinedImage(PT_AttrPropIndex api) {
  */
 void ODe_AbiDocListener::_insertEmbeddedImage(PT_AttrPropIndex api) {
     UT_UTF8String snapshot = "snapshot-png-";
-    const gchar* pImageName = nullptr;
+    const gchar* pImageName = NULL;
     const PP_AttrProp* pAP;
     bool ok;
 
     ok = m_pDocument->getAttrProp (api, &pAP);
     if (!ok) {
-        pAP = nullptr;
+        pAP = NULL;        
     }
 
     pImageName = 
@@ -1334,13 +1335,13 @@ void ODe_AbiDocListener::_insertEmbeddedImage(PT_AttrPropIndex api) {
  */
 void ODe_AbiDocListener::_insertMath(PT_AttrPropIndex api) {
 
-    const gchar* szMath = nullptr;
+    const gchar* szMath = NULL;
     szMath = _getObjectKey(api, static_cast<const gchar*>("dataid"));
 
     UT_return_if_fail(szMath);
 
     UT_ConstByteBufPtr pByteBuf;
-    bool bOK = m_pDocument->getDataItemDataByName(szMath, pByteBuf, nullptr, nullptr);
+    bool bOK = m_pDocument->getDataItemDataByName(szMath, pByteBuf, NULL, NULL);
 
     UT_return_if_fail(bOK);
 
@@ -1353,7 +1354,7 @@ void ODe_AbiDocListener::_insertMath(PT_AttrPropIndex api) {
     UT_UCS4String buf = sMathML.utf8_str();
     UT_UTF8String output = "";
 
-    const PP_AttrProp * pAP = nullptr;
+    const PP_AttrProp * pAP = NULL;
     bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
     UT_LocaleTransactor t(LC_NUMERIC, "C");
     UT_UTF8String dimension;
@@ -1561,7 +1562,7 @@ void ODe_AbiDocListener::_handleListenerImplAction() {
             if (m_deleteCurrentWhenPop) {
                 DELETEP(m_pCurrentImpl);
             } else {
-                m_pCurrentImpl = nullptr;
+                m_pCurrentImpl = NULL;
             }
 
             if (m_implStack.getItemCount() > 0) {

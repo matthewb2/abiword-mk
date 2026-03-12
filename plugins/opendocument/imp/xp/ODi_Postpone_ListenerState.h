@@ -19,7 +19,9 @@
  * 02110-1301 USA.
  */
 
-#pragma once
+
+#ifndef _ODI_POSTPONE_LISTENERSTATE_H_
+#define _ODI_POSTPONE_LISTENERSTATE_H_
 
 // Internal includes
 #include "ODi_ListenerState.h"
@@ -43,16 +45,16 @@ public:
 
     virtual ~ODi_Postpone_ListenerState();
 
-    virtual void startElement(const gchar* pName, const gchar** ppAtts,
-                       ODi_ListenerStateAction& rAction) override;
+    void startElement (const gchar* pName, const gchar** ppAtts,
+                       ODi_ListenerStateAction& rAction);
 
-    virtual void endElement(const gchar* pName, ODi_ListenerStateAction& rAction) override;
+    void endElement (const gchar* pName, ODi_ListenerStateAction& rAction);
 
-    virtual void charData(const gchar* pBuffer, int length) override;
+    void charData (const gchar* pBuffer, int length);
 
-    ODi_ListenerState* getParserState()  const { return m_pParserState; }
-    bool getDeleteParserStateWhenPop() const { return m_bDeleteParserStateWhenPop; }
-    const ODi_XMLRecorder* getXMLRecorder() const { return &m_xmlRecorder; }
+    ODi_ListenerState* getParserState() {return m_pParserState;}
+    bool getDeleteParserStateWhenPop() const {return m_bDeleteParserStateWhenPop;}
+    const ODi_XMLRecorder* getXMLRecorder() const {return &m_xmlRecorder;}
 
 private:
 
@@ -65,3 +67,5 @@ private:
     // end element tag of a given element.
     UT_uint32 m_elementStackCount;
 };
+
+#endif //_ODI_POSTPONE_LISTENERSTATE_H_

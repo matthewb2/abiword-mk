@@ -92,7 +92,7 @@ bool IE_ImpGraphicWMF_Sniffer::getDlgLabels(const char ** pszDesc,
 UT_Error IE_ImpGraphicWMF_Sniffer::constructImporter(IE_ImpGraphic **ppieg)
 {
 	*ppieg = new IE_ImpGraphic_WMF();
-	if (*ppieg == nullptr)
+	if (*ppieg == 0)
 		return UT_IE_NOMEMORY;
 
 	return UT_OK;
@@ -196,16 +196,16 @@ UT_Error IE_ImpGraphic_WMF::convertGraphicToSVG(const UT_ConstByteBufPtr & pBBwm
 
 	wmf_error_t err;
 
-	wmf_svg_t* ddata = nullptr;
+	wmf_svg_t* ddata = 0;
 
-	wmfAPI* API = nullptr;
+	wmfAPI* API = 0;
 	wmfD_Rect bbox;
 
 	wmfAPI_Options api_options;
 
 	bbuf_read_info  read_info;
 
-	char *stream = nullptr;
+	char *stream = NULL;
 	unsigned long stream_len = 0;
 
 	pBB.reset();
@@ -248,7 +248,7 @@ UT_Error IE_ImpGraphic_WMF::convertGraphicToSVG(const UT_ConstByteBufPtr & pBBwm
  */
 	ddata = WMF_SVG_GetData (API);
 
-	ddata->out = wmf_stream_create(API, nullptr);
+	ddata->out = wmf_stream_create(API, NULL);
 
 	ddata->Description = (char *)Default_Description;
 
@@ -331,9 +331,9 @@ UT_Error IE_ImpGraphic_WMF::convertGraphic(const UT_ConstByteBufPtr & pBBwmf,
 {
 	wmf_error_t err;
 
-	wmf_gd_t * ddata = nullptr;
+	wmf_gd_t * ddata = 0;
 
-	wmfAPI * API = nullptr;
+	wmfAPI * API = 0;
 	wmfAPI_Options api_options;
 
 	wmfD_Rect bbox;
@@ -479,7 +479,7 @@ static int AbiWord_WMF_read (void * context)
 {
 	bbuf_read_info * info = (bbuf_read_info *) context;
 
-	const UT_Byte* pByte = nullptr;
+	const UT_Byte* pByte = 0;
 
 	if (info->pos == info->len)
 		return EOF;
@@ -535,7 +535,7 @@ static int AbiWord_WMF_function (void * context,char * buffer,int length)
 ABI_PLUGIN_DECLARE("WMF")
 
 // we use a reference-counted sniffer
-static IE_ImpGraphicWMF_Sniffer * m_impSniffer = nullptr;
+static IE_ImpGraphicWMF_Sniffer * m_impSniffer = 0;
 
 ABI_FAR_CALL
 int abi_plugin_register (XAP_ModuleInfo * mi)
@@ -559,17 +559,17 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-	mi->name = nullptr;
-	mi->desc = nullptr;
-	mi->version = nullptr;
-	mi->author = nullptr;
-	mi->usage = nullptr;
+	mi->name = 0;
+	mi->desc = 0;
+	mi->version = 0;
+	mi->author = 0;
+	mi->usage = 0;
 
 	UT_ASSERT (m_impSniffer);
 
 	IE_ImpGraphic::unregisterImporter (m_impSniffer);
 	delete m_impSniffer;
-	m_impSniffer = nullptr;
+	m_impSniffer = 0;
 
 	return 1;
 }

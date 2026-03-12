@@ -40,14 +40,14 @@ public:
 	IE_Exp_KWord_1_Sniffer (const char * name);
 	virtual ~IE_Exp_KWord_1_Sniffer () {}
 
-	virtual UT_Confidence_t supportsMIME(const char * szMIME) override;
+	UT_Confidence_t supportsMIME (const char * szMIME);
 
-	virtual bool recognizeSuffix(const char * szSuffix) override;
-	virtual bool getDlgLabels(const char ** szDesc,
+	virtual bool recognizeSuffix (const char * szSuffix);
+	virtual bool getDlgLabels (const char ** szDesc,
 							   const char ** szSuffixList,
-							   IEFileType * ft) override;
-	virtual UT_Error constructExporter(PD_Document * pDocument,
-										IE_Exp ** ppie) override;
+							   IEFileType * ft);
+	virtual UT_Error constructExporter (PD_Document * pDocument,
+										IE_Exp ** ppie);
 };
 
 class IE_Exp_KWord_1 : public IE_Exp
@@ -57,7 +57,7 @@ public:
 	virtual ~IE_Exp_KWord_1();
 
  protected:
-	virtual UT_Error _writeDocument(void) override;
+	virtual UT_Error	_writeDocument(void);
 
  private:
 	s_KWord_1_Listener *	m_pListener;

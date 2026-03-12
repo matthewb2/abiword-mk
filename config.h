@@ -196,6 +196,9 @@
    #define below would cause a syntax error. */
 /* #undef _UINT32_T */
 
+/* minimal comctl.dll v4.70 for toolbars */
+#define _WIN32_IE 0x0501
+
 /* Define to `int' if <sys/types.h> does not define. */
 /* #undef pid_t */
 

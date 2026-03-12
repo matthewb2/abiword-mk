@@ -46,7 +46,7 @@ PATH: /usr/bin/core_perl
 ## Core tests. ##
 ## ----------- ##
 
-configure:3155: loading site script /etc/config.site
+configure:3157: loading site script /etc/config.site
 | # This file is in public domain.
 | # Original author: Karlson2k (Evgeny Grin)
 | # Written for MSys2 to help running 'configure' scripts
@@ -69,46 +69,68 @@ configure:3155: loading site script /etc/config.site
 |     ${as_echo-echo} "$config_site_me:${as_lineno-$LINENO}: default prefix set to $prefix" >&5
 | fi
 config.site:13: default build_alias set to i686-w64-mingw32
-configure:3284: checking build system type
-configure:3298: result: i686-w64-mingw32
-configure:3318: checking host system type
-configure:3331: result: i686-w64-mingw32
-configure:3371: checking for a BSD-compatible install
-configure:3439: result: /usr/bin/install -c
-configure:3450: checking whether build environment is sane
-configure:3505: result: yes
-configure:3656: checking for a thread-safe mkdir -p
-configure:3695: result: /usr/bin/mkdir -p
-configure:3702: checking for gawk
-configure:3718: found /usr/bin/gawk
-configure:3729: result: gawk
-configure:3740: checking whether make sets $(MAKE)
-configure:3762: result: yes
-configure:3791: checking whether make supports nested variables
-configure:3808: result: yes
-configure:3946: checking whether make supports nested variables
-configure:3963: result: yes
-configure:3976: checking whether to enable maintainer-specific portions of Makefiles
-configure:3985: result: yes
-configure:4159: checking for pkg-config
-configure:4177: found /usr/bin/pkg-config
-configure:4189: result: /usr/bin/pkg-config
-configure:4214: checking pkg-config is at least version 0.9.0
-configure:4217: result: yes
-configure:4229: $PKG_CONFIG --exists --print-errors "cairo >= 1.10"
-configure:4232: $? = 0
-configure:4299: checking for gcc
-configure:4315: found /mingw32/bin/gcc
-configure:4326: result: gcc
-configure:4555: checking for C compiler version
-configure:4564: gcc --version >&5
+configure:3286: checking build system type
+configure:3300: result: i686-w64-mingw32
+configure:3320: checking host system type
+configure:3333: result: i686-w64-mingw32
+configure:3369: checking for a BSD-compatible install
+configure:3437: result: /usr/bin/install -c
+configure:3448: checking whether build environment is sane
+configure:3503: result: yes
+configure:3654: checking for a thread-safe mkdir -p
+configure:3693: result: /usr/bin/mkdir -p
+configure:3700: checking for gawk
+configure:3716: found /usr/bin/gawk
+configure:3727: result: gawk
+configure:3738: checking whether make sets $(MAKE)
+configure:3760: result: yes
+configure:3789: checking whether make supports nested variables
+configure:3806: result: yes
+configure:3895: checking whether UID '197608' is supported by ustar format
+configure:3898: result: yes
+configure:3905: checking whether GID '197121' is supported by ustar format
+configure:3908: result: yes
+configure:3916: checking how to create a ustar tar archive
+configure:3927: tar --version
+tar (GNU tar) 1.34
+Copyright (C) 2021 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by John Gilmore and Jay Fenlason.
+configure:3930: $? = 0
+configure:3970: tardir=conftest.dir && eval tar --format=ustar -chf - "$tardir" >conftest.tar
+configure:3973: $? = 0
+configure:3977: tar -xf - <conftest.tar
+configure:3980: $? = 0
+configure:3982: cat conftest.dir/file
+GrepMe
+configure:3985: $? = 0
+configure:3998: result: gnutar
+configure:4063: checking whether make supports nested variables
+configure:4080: result: yes
+configure:4093: checking whether to enable maintainer-specific portions of Makefiles
+configure:4102: result: yes
+configure:4276: checking for pkg-config
+configure:4294: found /usr/bin/pkg-config
+configure:4306: result: /usr/bin/pkg-config
+configure:4331: checking pkg-config is at least version 0.9.0
+configure:4334: result: yes
+configure:4346: $PKG_CONFIG --exists --print-errors "cairo >= 1.10"
+configure:4349: $? = 0
+configure:4416: checking for gcc
+configure:4432: found /mingw32/bin/gcc
+configure:4443: result: gcc
+configure:4672: checking for C compiler version
+configure:4681: gcc --version >&5
 gcc.exe (Rev13, Built by MSYS2 project) 15.2.0
 Copyright (C) 2025 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-configure:4575: $? = 0
-configure:4564: gcc -v >&5
+configure:4692: $? = 0
+configure:4681: gcc -v >&5
 Using built-in specs.
 COLLECT_GCC=D:\msys64_230318\mingw32\bin\gcc.exe
 COLLECT_LTO_WRAPPER=D:/msys64_230318/mingw32/bin/../lib/gcc/i686-w64-mingw32/15.2.0/lto-wrapper.exe
@@ -117,71 +139,71 @@ Configured with: ../gcc-15.2.0/configure --prefix=/mingw32 --with-local-prefix=/
 Thread model: posix
 Supported LTO compression algorithms: zlib zstd
 gcc version 15.2.0 (Rev13, Built by MSYS2 project) 
-configure:4575: $? = 0
-configure:4564: gcc -V >&5
+configure:4692: $? = 0
+configure:4681: gcc -V >&5
 gcc.exe: error: unrecognized command-line option '-V'
 gcc.exe: fatal error: no input files
 compilation terminated.
-configure:4575: $? = 1
-configure:4564: gcc -qversion >&5
+configure:4692: $? = 1
+configure:4681: gcc -qversion >&5
 gcc.exe: error: unrecognized command-line option '-qversion'; did you mean '--version'?
 gcc.exe: fatal error: no input files
 compilation terminated.
-configure:4575: $? = 1
-configure:4595: checking whether the C compiler works
-configure:4617: gcc    conftest.c  >&5
-configure:4621: $? = 0
-configure:4669: result: yes
-configure:4672: checking for C compiler default output file name
-configure:4674: result: a.exe
-configure:4680: checking for suffix of executables
-configure:4687: gcc -o conftest.exe    conftest.c  >&5
-configure:4691: $? = 0
-configure:4713: result: .exe
-configure:4735: checking whether we are cross compiling
-configure:4743: gcc -o conftest.exe    conftest.c  >&5
-configure:4747: $? = 0
-configure:4754: ./conftest.exe
-configure:4758: $? = 0
-configure:4773: result: no
-configure:4778: checking for suffix of object files
-configure:4800: gcc -c   conftest.c >&5
-configure:4804: $? = 0
-configure:4825: result: o
-configure:4829: checking whether we are using the GNU C compiler
-configure:4848: gcc -c   conftest.c >&5
-configure:4848: $? = 0
-configure:4857: result: yes
-configure:4866: checking whether gcc accepts -g
-configure:4886: gcc -c -g  conftest.c >&5
-configure:4886: $? = 0
-configure:4927: result: yes
-configure:4944: checking for gcc option to accept ISO C89
-configure:5005: gcc  -c -g -O2  conftest.c >&5
-configure:5005: $? = 0
-configure:5018: result: none needed
-configure:5043: checking whether gcc understands -c and -o together
-configure:5065: gcc -c conftest.c -o conftest2.o
-configure:5068: $? = 0
-configure:5065: gcc -c conftest.c -o conftest2.o
-configure:5068: $? = 0
-configure:5080: result: yes
-configure:5108: checking for style of include used by make
-configure:5136: result: GNU
-configure:5162: checking dependency style of gcc
-configure:5273: result: gcc3
-configure:5346: checking for g++
-configure:5362: found /mingw32/bin/g++
-configure:5373: result: g++
-configure:5400: checking for C++ compiler version
-configure:5409: g++ --version >&5
+configure:4692: $? = 1
+configure:4712: checking whether the C compiler works
+configure:4734: gcc    conftest.c  >&5
+configure:4738: $? = 0
+configure:4786: result: yes
+configure:4789: checking for C compiler default output file name
+configure:4791: result: a.exe
+configure:4797: checking for suffix of executables
+configure:4804: gcc -o conftest.exe    conftest.c  >&5
+configure:4808: $? = 0
+configure:4830: result: .exe
+configure:4852: checking whether we are cross compiling
+configure:4860: gcc -o conftest.exe    conftest.c  >&5
+configure:4864: $? = 0
+configure:4871: ./conftest.exe
+configure:4875: $? = 0
+configure:4890: result: no
+configure:4895: checking for suffix of object files
+configure:4917: gcc -c   conftest.c >&5
+configure:4921: $? = 0
+configure:4942: result: o
+configure:4946: checking whether we are using the GNU C compiler
+configure:4965: gcc -c   conftest.c >&5
+configure:4965: $? = 0
+configure:4974: result: yes
+configure:4983: checking whether gcc accepts -g
+configure:5003: gcc -c -g  conftest.c >&5
+configure:5003: $? = 0
+configure:5044: result: yes
+configure:5061: checking for gcc option to accept ISO C89
+configure:5122: gcc  -c -g -O2  conftest.c >&5
+configure:5122: $? = 0
+configure:5135: result: none needed
+configure:5160: checking whether gcc understands -c and -o together
+configure:5182: gcc -c conftest.c -o conftest2.o
+configure:5185: $? = 0
+configure:5182: gcc -c conftest.c -o conftest2.o
+configure:5185: $? = 0
+configure:5197: result: yes
+configure:5225: checking for style of include used by make
+configure:5253: result: GNU
+configure:5279: checking dependency style of gcc
+configure:5390: result: gcc3
+configure:5463: checking for g++
+configure:5479: found /mingw32/bin/g++
+configure:5490: result: g++
+configure:5517: checking for C++ compiler version
+configure:5526: g++ --version >&5
 g++.exe (Rev13, Built by MSYS2 project) 15.2.0
 Copyright (C) 2025 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-configure:5420: $? = 0
-configure:5409: g++ -v >&5
+configure:5537: $? = 0
+configure:5526: g++ -v >&5
 Using built-in specs.
 COLLECT_GCC=D:\msys64_230318\mingw32\bin\g++.exe
 COLLECT_LTO_WRAPPER=D:/msys64_230318/mingw32/bin/../lib/gcc/i686-w64-mingw32/15.2.0/lto-wrapper.exe
@@ -190,47 +212,47 @@ Configured with: ../gcc-15.2.0/configure --prefix=/mingw32 --with-local-prefix=/
 Thread model: posix
 Supported LTO compression algorithms: zlib zstd
 gcc version 15.2.0 (Rev13, Built by MSYS2 project) 
-configure:5420: $? = 0
-configure:5409: g++ -V >&5
+configure:5537: $? = 0
+configure:5526: g++ -V >&5
 g++.exe: error: unrecognized command-line option '-V'
 g++.exe: fatal error: no input files
 compilation terminated.
-configure:5420: $? = 1
-configure:5409: g++ -qversion >&5
+configure:5537: $? = 1
+configure:5526: g++ -qversion >&5
 g++.exe: error: unrecognized command-line option '-qversion'; did you mean '--version'?
 g++.exe: fatal error: no input files
 compilation terminated.
-configure:5420: $? = 1
-configure:5424: checking whether we are using the GNU C++ compiler
-configure:5443: g++ -c   conftest.cpp >&5
-configure:5443: $? = 0
-configure:5452: result: yes
-configure:5461: checking whether g++ accepts -g
-configure:5481: g++ -c -g  conftest.cpp >&5
-configure:5481: $? = 0
-configure:5522: result: yes
-configure:5547: checking dependency style of g++
-configure:5658: result: gcc3
-configure:5722: checking how to print strings
-configure:5749: result: printf
-configure:5770: checking for a sed that does not truncate output
-configure:5834: result: /usr/bin/sed
-configure:5852: checking for grep that handles long lines and -e
-configure:5910: result: /usr/bin/grep
-configure:5915: checking for egrep
-configure:5977: result: /usr/bin/grep -E
-configure:5982: checking for fgrep
-configure:6044: result: /usr/bin/grep -F
-configure:6079: checking for ld used by gcc
-configure:6146: result: D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe
-configure:6153: checking if the linker (D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe) is GNU ld
-configure:6168: result: yes
-configure:6180: checking for BSD- or MS-compatible name lister (nm)
-configure:6234: result: /mingw32/bin/nm -B
-configure:6364: checking the name lister (/mingw32/bin/nm -B) interface
-configure:6371: gcc -c -g -O2  conftest.c >&5
-configure:6374: /mingw32/bin/nm -B "conftest.o"
-configure:6377: output
+configure:5537: $? = 1
+configure:5541: checking whether we are using the GNU C++ compiler
+configure:5560: g++ -c   conftest.cpp >&5
+configure:5560: $? = 0
+configure:5569: result: yes
+configure:5578: checking whether g++ accepts -g
+configure:5598: g++ -c -g  conftest.cpp >&5
+configure:5598: $? = 0
+configure:5639: result: yes
+configure:5664: checking dependency style of g++
+configure:5775: result: gcc3
+configure:5839: checking how to print strings
+configure:5866: result: printf
+configure:5887: checking for a sed that does not truncate output
+configure:5951: result: /usr/bin/sed
+configure:5969: checking for grep that handles long lines and -e
+configure:6027: result: /usr/bin/grep
+configure:6032: checking for egrep
+configure:6094: result: /usr/bin/grep -E
+configure:6099: checking for fgrep
+configure:6161: result: /usr/bin/grep -F
+configure:6196: checking for ld used by gcc
+configure:6263: result: D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe
+configure:6270: checking if the linker (D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe) is GNU ld
+configure:6285: result: yes
+configure:6297: checking for BSD- or MS-compatible name lister (nm)
+configure:6351: result: /mingw32/bin/nm -B
+configure:6481: checking the name lister (/mingw32/bin/nm -B) interface
+configure:6488: gcc -c -g -O2  conftest.c >&5
+configure:6491: /mingw32/bin/nm -B "conftest.o"
+configure:6494: output
 00000000 b .bss
 00000000 d .data
 00000000 N .debug_abbrev
@@ -241,79 +263,79 @@ configure:6377: output
 00000000 r .rdata$zzz
 00000000 t .text
 00000000 B _some_variable
-configure:6384: result: BSD nm
-configure:6387: checking whether ln -s works
-configure:6394: result: no, using cp -pR
-configure:6399: checking the maximum length of command line arguments
-configure:6530: result: 8192
-configure:6578: checking how to convert i686-w64-mingw32 file names to i686-w64-mingw32 format
-configure:6618: result: func_convert_file_msys_to_w32
-configure:6625: checking how to convert i686-w64-mingw32 file names to toolchain format
-configure:6645: result: func_convert_file_msys_to_w32
-configure:6652: checking for D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe option to reload object files
-configure:6659: result: -r
-configure:6692: checking for file
-configure:6708: found /usr/bin/file
-configure:6720: result: file
-configure:6777: checking for objdump
-configure:6793: found /mingw32/bin/objdump
-configure:6804: result: objdump
-configure:6833: checking how to recognize dependent libraries
-configure:7040: result: file_magic ^x86 archive import|^x86 DLL
-configure:7125: checking for dlltool
-configure:7141: found /mingw32/bin/dlltool
-configure:7152: result: dlltool
-configure:7182: checking how to associate runtime and link libraries
-configure:7209: result: func_cygming_dll_for_implib
-configure:7264: checking for ranlib
-configure:7280: found /mingw32/bin/ranlib
-configure:7291: result: ranlib
-configure:7362: checking for ar
-configure:7378: found /mingw32/bin/ar
-configure:7389: result: ar
-configure:7442: checking for archiver @FILE support
-configure:7459: gcc -c -g -O2  conftest.c >&5
-configure:7459: $? = 0
-configure:7462: ar cr libconftest.a @conftest.lst >&5
-configure:7465: $? = 0
-configure:7470: ar cr libconftest.a @conftest.lst >&5
+configure:6501: result: BSD nm
+configure:6504: checking whether ln -s works
+configure:6511: result: no, using cp -pR
+configure:6516: checking the maximum length of command line arguments
+configure:6647: result: 8192
+configure:6695: checking how to convert i686-w64-mingw32 file names to i686-w64-mingw32 format
+configure:6735: result: func_convert_file_msys_to_w32
+configure:6742: checking how to convert i686-w64-mingw32 file names to toolchain format
+configure:6762: result: func_convert_file_msys_to_w32
+configure:6769: checking for D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe option to reload object files
+configure:6776: result: -r
+configure:6809: checking for file
+configure:6825: found /usr/bin/file
+configure:6837: result: file
+configure:6894: checking for objdump
+configure:6910: found /mingw32/bin/objdump
+configure:6921: result: objdump
+configure:6950: checking how to recognize dependent libraries
+configure:7157: result: file_magic ^x86 archive import|^x86 DLL
+configure:7242: checking for dlltool
+configure:7258: found /mingw32/bin/dlltool
+configure:7269: result: dlltool
+configure:7299: checking how to associate runtime and link libraries
+configure:7326: result: func_cygming_dll_for_implib
+configure:7381: checking for ranlib
+configure:7397: found /mingw32/bin/ranlib
+configure:7408: result: ranlib
+configure:7479: checking for ar
+configure:7495: found /mingw32/bin/ar
+configure:7506: result: ar
+configure:7559: checking for archiver @FILE support
+configure:7576: gcc -c -g -O2  conftest.c >&5
+configure:7576: $? = 0
+configure:7579: ar cr libconftest.a @conftest.lst >&5
+configure:7582: $? = 0
+configure:7587: ar cr libconftest.a @conftest.lst >&5
 D:\msys64_230318\mingw32\bin\ar.exe: conftest.o: No such file or directory
-configure:7473: $? = 1
-configure:7485: result: @
-configure:7543: checking for strip
-configure:7559: found /mingw32/bin/strip
-configure:7570: result: strip
-configure:7673: checking command to parse /mingw32/bin/nm -B output from gcc object
-configure:7826: gcc -c -g -O2  conftest.c >&5
-configure:7829: $? = 0
-configure:7833: /mingw32/bin/nm -B conftest.o | /usr/bin/sed -n -e 's/^.*[	 ]\([ABCDGIRSTW][ABCDGIRSTW]*\)[	 ][	 ]*\([_A-Za-z][_A-Za-z0-9]*\)\{0,1\}$/\1 \2 \2/p' | /usr/bin/sed '/ __gnu_lto/d' > conftest.nm
+configure:7590: $? = 1
+configure:7602: result: @
+configure:7660: checking for strip
+configure:7676: found /mingw32/bin/strip
+configure:7687: result: strip
+configure:7790: checking command to parse /mingw32/bin/nm -B output from gcc object
+configure:7943: gcc -c -g -O2  conftest.c >&5
+configure:7946: $? = 0
+configure:7950: /mingw32/bin/nm -B conftest.o | /usr/bin/sed -n -e 's/^.*[	 ]\([ABCDGIRSTW][ABCDGIRSTW]*\)[	 ][	 ]*\([_A-Za-z][_A-Za-z0-9]*\)\{0,1\}$/\1 \2 \2/p' | /usr/bin/sed '/ __gnu_lto/d' > conftest.nm
 cannot find nm_test_var in conftest.nm
-configure:7826: gcc -c -g -O2  conftest.c >&5
-configure:7829: $? = 0
-configure:7833: /mingw32/bin/nm -B conftest.o | /usr/bin/sed -n -e 's/^.*[	 ]\([ABCDGIRSTW][ABCDGIRSTW]*\)[	 ][	 ]*_\([_A-Za-z][_A-Za-z0-9]*\)\{0,1\}$/\1 _\2 \2/p' | /usr/bin/sed '/ __gnu_lto/d' > conftest.nm
-configure:7899: gcc -o conftest.exe -g -O2   conftest.c conftstm.o >&5
-configure:7902: $? = 0
-configure:7940: result: ok
-configure:7987: checking for sysroot
-configure:8019: result: no
-configure:8026: checking for a working dd
-configure:8064: result: /usr/bin/dd
-configure:8068: checking how to truncate binary pipes
-configure:8083: result: /usr/bin/dd bs=4096 count=1
-configure:8412: checking for mt
-configure:8442: result: no
-configure:8462: checking if : is a manifest tool
-configure:8468: : '-?'
-configure:8476: result: no
-configure:9202: checking how to run the C preprocessor
-configure:9233: gcc -E  conftest.c
-configure:9233: $? = 0
-configure:9247: gcc -E  conftest.c
+configure:7943: gcc -c -g -O2  conftest.c >&5
+configure:7946: $? = 0
+configure:7950: /mingw32/bin/nm -B conftest.o | /usr/bin/sed -n -e 's/^.*[	 ]\([ABCDGIRSTW][ABCDGIRSTW]*\)[	 ][	 ]*_\([_A-Za-z][_A-Za-z0-9]*\)\{0,1\}$/\1 _\2 \2/p' | /usr/bin/sed '/ __gnu_lto/d' > conftest.nm
+configure:8016: gcc -o conftest.exe -g -O2   conftest.c conftstm.o >&5
+configure:8019: $? = 0
+configure:8057: result: ok
+configure:8104: checking for sysroot
+configure:8136: result: no
+configure:8143: checking for a working dd
+configure:8181: result: /usr/bin/dd
+configure:8185: checking how to truncate binary pipes
+configure:8200: result: /usr/bin/dd bs=4096 count=1
+configure:8529: checking for mt
+configure:8559: result: no
+configure:8579: checking if : is a manifest tool
+configure:8585: : '-?'
+configure:8593: result: no
+configure:9319: checking how to run the C preprocessor
+configure:9350: gcc -E  conftest.c
+configure:9350: $? = 0
+configure:9364: gcc -E  conftest.c
 conftest.c:14:10: fatal error: ac_nonexistent.h: No such file or directory
    14 | #include <ac_nonexistent.h>
       |          ^~~~~~~~~~~~~~~~~~
 compilation terminated.
-configure:9247: $? = 1
+configure:9364: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "abiword"
@@ -329,15 +351,15 @@ configure: failed program was:
 | #define EMBEDDED_TARGET_POKY 3
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
-configure:9272: result: gcc -E
-configure:9292: gcc -E  conftest.c
-configure:9292: $? = 0
-configure:9306: gcc -E  conftest.c
+configure:9389: result: gcc -E
+configure:9409: gcc -E  conftest.c
+configure:9409: $? = 0
+configure:9423: gcc -E  conftest.c
 conftest.c:14:10: fatal error: ac_nonexistent.h: No such file or directory
    14 | #include <ac_nonexistent.h>
       |          ^~~~~~~~~~~~~~~~~~
 compilation terminated.
-configure:9306: $? = 1
+configure:9423: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "abiword"
@@ -353,57 +375,57 @@ configure: failed program was:
 | #define EMBEDDED_TARGET_POKY 3
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
-configure:9335: checking for ANSI C header files
-configure:9355: gcc -c -g -O2  conftest.c >&5
-configure:9355: $? = 0
-configure:9428: gcc -o conftest.exe -g -O2   conftest.c  >&5
-configure:9428: $? = 0
-configure:9428: ./conftest.exe
-configure:9428: $? = 0
-configure:9439: result: yes
-configure:9452: checking for sys/types.h
-configure:9452: gcc -c -g -O2  conftest.c >&5
-configure:9452: $? = 0
-configure:9452: result: yes
-configure:9452: checking for sys/stat.h
-configure:9452: gcc -c -g -O2  conftest.c >&5
-configure:9452: $? = 0
-configure:9452: result: yes
-configure:9452: checking for stdlib.h
-configure:9452: gcc -c -g -O2  conftest.c >&5
-configure:9452: $? = 0
-configure:9452: result: yes
-configure:9452: checking for string.h
-configure:9452: gcc -c -g -O2  conftest.c >&5
-configure:9452: $? = 0
-configure:9452: result: yes
-configure:9452: checking for memory.h
-configure:9452: gcc -c -g -O2  conftest.c >&5
-configure:9452: $? = 0
-configure:9452: result: yes
-configure:9452: checking for strings.h
-configure:9452: gcc -c -g -O2  conftest.c >&5
-configure:9452: $? = 0
-configure:9452: result: yes
-configure:9452: checking for inttypes.h
-configure:9452: gcc -c -g -O2  conftest.c >&5
-configure:9452: $? = 0
-configure:9452: result: yes
-configure:9452: checking for stdint.h
-configure:9452: gcc -c -g -O2  conftest.c >&5
-configure:9452: $? = 0
-configure:9452: result: yes
-configure:9452: checking for unistd.h
-configure:9452: gcc -c -g -O2  conftest.c >&5
-configure:9452: $? = 0
-configure:9452: result: yes
-configure:9466: checking for dlfcn.h
-configure:9466: gcc -c -g -O2  conftest.c >&5
+configure:9452: checking for ANSI C header files
+configure:9472: gcc -c -g -O2  conftest.c >&5
+configure:9472: $? = 0
+configure:9545: gcc -o conftest.exe -g -O2   conftest.c  >&5
+configure:9545: $? = 0
+configure:9545: ./conftest.exe
+configure:9545: $? = 0
+configure:9556: result: yes
+configure:9569: checking for sys/types.h
+configure:9569: gcc -c -g -O2  conftest.c >&5
+configure:9569: $? = 0
+configure:9569: result: yes
+configure:9569: checking for sys/stat.h
+configure:9569: gcc -c -g -O2  conftest.c >&5
+configure:9569: $? = 0
+configure:9569: result: yes
+configure:9569: checking for stdlib.h
+configure:9569: gcc -c -g -O2  conftest.c >&5
+configure:9569: $? = 0
+configure:9569: result: yes
+configure:9569: checking for string.h
+configure:9569: gcc -c -g -O2  conftest.c >&5
+configure:9569: $? = 0
+configure:9569: result: yes
+configure:9569: checking for memory.h
+configure:9569: gcc -c -g -O2  conftest.c >&5
+configure:9569: $? = 0
+configure:9569: result: yes
+configure:9569: checking for strings.h
+configure:9569: gcc -c -g -O2  conftest.c >&5
+configure:9569: $? = 0
+configure:9569: result: yes
+configure:9569: checking for inttypes.h
+configure:9569: gcc -c -g -O2  conftest.c >&5
+configure:9569: $? = 0
+configure:9569: result: yes
+configure:9569: checking for stdint.h
+configure:9569: gcc -c -g -O2  conftest.c >&5
+configure:9569: $? = 0
+configure:9569: result: yes
+configure:9569: checking for unistd.h
+configure:9569: gcc -c -g -O2  conftest.c >&5
+configure:9569: $? = 0
+configure:9569: result: yes
+configure:9583: checking for dlfcn.h
+configure:9583: gcc -c -g -O2  conftest.c >&5
 conftest.c:58:10: fatal error: dlfcn.h: No such file or directory
    58 | #include <dlfcn.h>
       |          ^~~~~~~~~
 compilation terminated.
-configure:9466: $? = 1
+configure:9583: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "abiword"
@@ -463,64 +485,64 @@ configure: failed program was:
 | #endif
 | 
 | #include <dlfcn.h>
-configure:9466: result: no
-configure:9569: checking for as
-configure:9585: found /mingw32/bin/as
-configure:9596: result: as
-configure:9661: checking for dlltool
-configure:9688: result: dlltool
-configure:9753: checking for objdump
-configure:9780: result: objdump
-configure:10064: checking for objdir
-configure:10079: result: .libs
-configure:10343: checking if gcc supports -fno-rtti -fno-exceptions
-configure:10361: gcc -c -g -O2  -fno-rtti -fno-exceptions conftest.c >&5
+configure:9583: result: no
+configure:9686: checking for as
+configure:9702: found /mingw32/bin/as
+configure:9713: result: as
+configure:9778: checking for dlltool
+configure:9805: result: dlltool
+configure:9870: checking for objdump
+configure:9897: result: objdump
+configure:10181: checking for objdir
+configure:10196: result: .libs
+configure:10460: checking if gcc supports -fno-rtti -fno-exceptions
+configure:10478: gcc -c -g -O2  -fno-rtti -fno-exceptions conftest.c >&5
 cc1.exe: warning: command-line option '-fno-rtti' is valid for C++/D/ObjC++ but not for C
-configure:10365: $? = 0
-configure:10378: result: no
-configure:10751: checking for gcc option to produce PIC
-configure:10758: result: -DDLL_EXPORT -DPIC
-configure:10766: checking if gcc PIC flag -DDLL_EXPORT -DPIC works
-configure:10784: gcc -c -g -O2  -DDLL_EXPORT -DPIC -DPIC conftest.c >&5
-configure:10788: $? = 0
-configure:10801: result: yes
-configure:10830: checking if gcc static flag -static works
-configure:10858: result: yes
-configure:10873: checking if gcc supports -c -o file.o
-configure:10894: gcc -c -g -O2  -o out/conftest2.o conftest.c >&5
-configure:10898: $? = 0
-configure:10920: result: yes
-configure:10928: checking if gcc supports -c -o file.o
+configure:10482: $? = 0
+configure:10495: result: no
+configure:10868: checking for gcc option to produce PIC
+configure:10875: result: -DDLL_EXPORT -DPIC
+configure:10883: checking if gcc PIC flag -DDLL_EXPORT -DPIC works
+configure:10901: gcc -c -g -O2  -DDLL_EXPORT -DPIC -DPIC conftest.c >&5
+configure:10905: $? = 0
+configure:10918: result: yes
+configure:10947: checking if gcc static flag -static works
 configure:10975: result: yes
-configure:11008: checking whether the gcc linker (D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe) supports shared libraries
-configure:12280: result: yes
-configure:12317: checking whether -lc should be explicitly linked in
-configure:12325: gcc -c -g -O2  conftest.c >&5
-configure:12328: $? = 0
-configure:12343: gcc -shared conftest.o  -v -o ./conftest -Wl,--enable-auto-image-base -Xlinker --out-implib -Xlinker conftest 2\>\&1 \| /usr/bin/grep  -lc  \>/dev/null 2\>\&1
-configure:12346: $? = 1
-configure:12360: result: yes
-configure:12520: checking dynamic linker characteristics
-configure:13892: result: Win32 ld.exe
-configure:14014: checking how to hardcode library paths into programs
-configure:14039: result: immediate
-configure:14587: checking whether stripping libraries is possible
-configure:14596: result: yes
-configure:14638: checking if libtool supports shared libraries
-configure:14640: result: yes
-configure:14643: checking whether to build shared libraries
-configure:14668: result: yes
-configure:14671: checking whether to build static libraries
-configure:14675: result: no
-configure:14698: checking how to run the C++ preprocessor
-configure:14725: g++ -E  conftest.cpp
-configure:14725: $? = 0
-configure:14739: g++ -E  conftest.cpp
+configure:10990: checking if gcc supports -c -o file.o
+configure:11011: gcc -c -g -O2  -o out/conftest2.o conftest.c >&5
+configure:11015: $? = 0
+configure:11037: result: yes
+configure:11045: checking if gcc supports -c -o file.o
+configure:11092: result: yes
+configure:11125: checking whether the gcc linker (D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe) supports shared libraries
+configure:12397: result: yes
+configure:12434: checking whether -lc should be explicitly linked in
+configure:12442: gcc -c -g -O2  conftest.c >&5
+configure:12445: $? = 0
+configure:12460: gcc -shared conftest.o  -v -o ./conftest -Wl,--enable-auto-image-base -Xlinker --out-implib -Xlinker conftest 2\>\&1 \| /usr/bin/grep  -lc  \>/dev/null 2\>\&1
+configure:12463: $? = 1
+configure:12477: result: yes
+configure:12637: checking dynamic linker characteristics
+configure:14009: result: Win32 ld.exe
+configure:14131: checking how to hardcode library paths into programs
+configure:14156: result: immediate
+configure:14704: checking whether stripping libraries is possible
+configure:14713: result: yes
+configure:14755: checking if libtool supports shared libraries
+configure:14757: result: yes
+configure:14760: checking whether to build shared libraries
+configure:14785: result: yes
+configure:14788: checking whether to build static libraries
+configure:14792: result: no
+configure:14815: checking how to run the C++ preprocessor
+configure:14842: g++ -E  conftest.cpp
+configure:14842: $? = 0
+configure:14856: g++ -E  conftest.cpp
 conftest.cpp:25:10: fatal error: ac_nonexistent.h: No such file or directory
    25 | #include <ac_nonexistent.h>
       |          ^~~~~~~~~~~~~~~~~~
 compilation terminated.
-configure:14739: $? = 1
+configure:14856: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "abiword"
@@ -547,15 +569,15 @@ configure: failed program was:
 | #define LT_OBJDIR ".libs/"
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
-configure:14764: result: g++ -E
-configure:14784: g++ -E  conftest.cpp
-configure:14784: $? = 0
-configure:14798: g++ -E  conftest.cpp
+configure:14881: result: g++ -E
+configure:14901: g++ -E  conftest.cpp
+configure:14901: $? = 0
+configure:14915: g++ -E  conftest.cpp
 conftest.cpp:25:10: fatal error: ac_nonexistent.h: No such file or directory
    25 | #include <ac_nonexistent.h>
       |          ^~~~~~~~~~~~~~~~~~
 compilation terminated.
-configure:14798: $? = 1
+configure:14915: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "abiword"
@@ -582,265 +604,265 @@ configure: failed program was:
 | #define LT_OBJDIR ".libs/"
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
-configure:14960: checking for ld used by g++
-configure:15027: result: D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe
-configure:15034: checking if the linker (D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe) is GNU ld
-configure:15049: result: yes
-configure:15103: checking whether the g++ linker (D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe) supports shared libraries
-configure:16185: result: yes
-configure:16221: g++ -c -g -O2  conftest.cpp >&5
-configure:16224: $? = 0
-configure:16710: checking for g++ option to produce PIC
-configure:16717: result: -DDLL_EXPORT -DPIC
-configure:16725: checking if g++ PIC flag -DDLL_EXPORT -DPIC works
-configure:16743: g++ -c -g -O2  -DDLL_EXPORT -DPIC -DPIC conftest.cpp >&5
-configure:16747: $? = 0
-configure:16760: result: yes
-configure:16783: checking if g++ static flag -static works
-configure:16811: result: yes
-configure:16823: checking if g++ supports -c -o file.o
-configure:16844: g++ -c -g -O2  -o out/conftest2.o conftest.cpp >&5
-configure:16848: $? = 0
-configure:16870: result: yes
-configure:16875: checking if g++ supports -c -o file.o
-configure:16922: result: yes
-configure:16952: checking whether the g++ linker (D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe) supports shared libraries
-configure:16992: result: yes
-configure:17133: checking dynamic linker characteristics
-configure:18415: result: Win32 ld.exe
-configure:18480: checking how to hardcode library paths into programs
-configure:18505: result: immediate
-configure:18567: checking whether ln -s works
-configure:18574: result: no, using cp -pR
-configure:18581: checking for perl
-configure:18597: found /usr/bin/perl
-configure:18609: result: yes
-configure:18623: checking for platform and toolkit
-configure:18642: result: win / win
-configure:18817: checking for localeconv
-configure:18817: gcc -o conftest.exe -g -O2   conftest.c  >&5
-configure:18817: $? = 0
-configure:18817: result: yes
-configure:18817: checking for strcspn
-configure:18817: gcc -o conftest.exe -g -O2   conftest.c  >&5
+configure:15077: checking for ld used by g++
+configure:15144: result: D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe
+configure:15151: checking if the linker (D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe) is GNU ld
+configure:15166: result: yes
+configure:15220: checking whether the g++ linker (D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe) supports shared libraries
+configure:16302: result: yes
+configure:16338: g++ -c -g -O2  conftest.cpp >&5
+configure:16341: $? = 0
+configure:16827: checking for g++ option to produce PIC
+configure:16834: result: -DDLL_EXPORT -DPIC
+configure:16842: checking if g++ PIC flag -DDLL_EXPORT -DPIC works
+configure:16860: g++ -c -g -O2  -DDLL_EXPORT -DPIC -DPIC conftest.cpp >&5
+configure:16864: $? = 0
+configure:16877: result: yes
+configure:16900: checking if g++ static flag -static works
+configure:16928: result: yes
+configure:16940: checking if g++ supports -c -o file.o
+configure:16961: g++ -c -g -O2  -o out/conftest2.o conftest.cpp >&5
+configure:16965: $? = 0
+configure:16987: result: yes
+configure:16992: checking if g++ supports -c -o file.o
+configure:17039: result: yes
+configure:17069: checking whether the g++ linker (D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe) supports shared libraries
+configure:17109: result: yes
+configure:17250: checking dynamic linker characteristics
+configure:18532: result: Win32 ld.exe
+configure:18597: checking how to hardcode library paths into programs
+configure:18622: result: immediate
+configure:18684: checking whether ln -s works
+configure:18691: result: no, using cp -pR
+configure:18698: checking for perl
+configure:18714: found /usr/bin/perl
+configure:18726: result: yes
+configure:18740: checking for platform and toolkit
+configure:18759: result: win / win
+configure:18934: checking for localeconv
+configure:18934: gcc -o conftest.exe -g -O2   conftest.c  >&5
+configure:18934: $? = 0
+configure:18934: result: yes
+configure:18934: checking for strcspn
+configure:18934: gcc -o conftest.exe -g -O2   conftest.c  >&5
 conftest.c:51:6: warning: conflicting types for built-in function 'strcspn'; expected 'unsigned int(const char *, const char *)' [-Wbuiltin-declaration-mismatch]
    51 | char strcspn (void);
       |      ^~~~~~~
 conftest.c:39:1: note: 'strcspn' is declared in header '<string.h>'
    38 | # include <limits.h>
    39 | #else
-configure:18817: $? = 0
-configure:18817: result: yes
-configure:18817: checking for strncasecmp
-configure:18817: gcc -o conftest.exe -g -O2   conftest.c  >&5
+configure:18934: $? = 0
+configure:18934: result: yes
+configure:18934: checking for strncasecmp
+configure:18934: gcc -o conftest.exe -g -O2   conftest.c  >&5
 conftest.c:52:6: warning: conflicting types for built-in function 'strncasecmp'; expected 'int(const char *, const char *, unsigned int)' [-Wbuiltin-declaration-mismatch]
    52 | char strncasecmp (void);
       |      ^~~~~~~~~~~
-configure:18817: $? = 0
-configure:18817: result: yes
-configure:18817: checking for strtoul
-configure:18817: gcc -o conftest.exe -g -O2   conftest.c  >&5
-configure:18817: $? = 0
-configure:18817: result: yes
-configure:19077: $PKG_CONFIG --exists --print-errors " $gio_req "
-configure:19080: $? = 0
-configure:19197: $PKG_CONFIG --exists --print-errors " $redland_req "
+configure:18934: $? = 0
+configure:18934: result: yes
+configure:18934: checking for strtoul
+configure:18934: gcc -o conftest.exe -g -O2   conftest.c  >&5
+configure:18934: $? = 0
+configure:18934: result: yes
+configure:19194: $PKG_CONFIG --exists --print-errors " $gio_req "
+configure:19197: $? = 0
+configure:19312: $PKG_CONFIG --exists --print-errors " $redland_req "
 Package redland was not found in the pkg-config search path.
 Perhaps you should add the directory containing `redland.pc'
 to the PKG_CONFIG_PATH environment variable
 Package 'redland' not found
 Package 'rasqal' not found
-configure:19200: $? = 1
-configure:19250: $PKG_CONFIG --exists --print-errors " $evolution_data_server_req "
+configure:19315: $? = 1
+configure:19365: $PKG_CONFIG --exists --print-errors " $evolution_data_server_req "
 Package libebook-1.2 was not found in the pkg-config search path.
 Perhaps you should add the directory containing `libebook-1.2.pc'
 to the PKG_CONFIG_PATH environment variable
 Package 'libebook-1.2' not found
 Package 'libecal-1.2' not found
-configure:19253: $? = 1
-configure:19303: $PKG_CONFIG --exists --print-errors " $libical_req "
+configure:19368: $? = 1
+configure:19418: $PKG_CONFIG --exists --print-errors " $libical_req "
 Package libical was not found in the pkg-config search path.
 Perhaps you should add the directory containing `libical.pc'
 to the PKG_CONFIG_PATH environment variable
 Package 'libical' not found
-configure:19306: $? = 1
-configure:19358: checking for   champlain-gtk-0.12  
-configure:19365: $PKG_CONFIG --exists --print-errors " $champlain_req "
+configure:19421: $? = 1
+configure:19481: checking for   champlain-gtk-0.12  
+configure:19488: $PKG_CONFIG --exists --print-errors " $champlain_req "
 Package champlain-gtk-0.12 was not found in the pkg-config search path.
 Perhaps you should add the directory containing `champlain-gtk-0.12.pc'
 to the PKG_CONFIG_PATH environment variable
 Package 'champlain-gtk-0.12' not found
-configure:19368: $? = 1
-configure:19382: $PKG_CONFIG --exists --print-errors " $champlain_req "
+configure:19491: $? = 1
+configure:19505: $PKG_CONFIG --exists --print-errors " $champlain_req "
 Package champlain-gtk-0.12 was not found in the pkg-config search path.
 Perhaps you should add the directory containing `champlain-gtk-0.12.pc'
 to the PKG_CONFIG_PATH environment variable
 Package 'champlain-gtk-0.12' not found
-configure:19385: $? = 1
-configure:19399: result: no
+configure:19508: $? = 1
+configure:19522: result: no
 Package 'champlain-gtk-0.12' not found
-configure:19599: checking whether gcc understands -Wall
-configure:19612: g++ -c -g -O2  -Wall conftest.cpp >&5
-configure:19612: $? = 0
-configure:19621: result: yes
-configure:19599: checking whether gcc understands -Wextra
-configure:19612: g++ -c -g -O2  -Wall -Wextra conftest.cpp >&5
-configure:19612: $? = 0
-configure:19621: result: yes
-configure:19599: checking whether gcc understands -Wsign-compare
-configure:19612: g++ -c -g -O2  -Wall -Wextra -Wsign-compare conftest.cpp >&5
-configure:19612: $? = 0
-configure:19621: result: yes
-configure:19599: checking whether gcc understands -Wpointer-arith
-configure:19612: g++ -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith conftest.cpp >&5
-configure:19612: $? = 0
-configure:19621: result: yes
-configure:19599: checking whether gcc understands -Wchar-subscripts
-configure:19612: g++ -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts conftest.cpp >&5
-configure:19612: $? = 0
-configure:19621: result: yes
-configure:19599: checking whether gcc understands -Wwrite-strings
-configure:19612: g++ -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings conftest.cpp >&5
-configure:19612: $? = 0
-configure:19621: result: yes
-configure:19599: checking whether gcc understands -Wmissing-noreturn
-configure:19612: g++ -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn conftest.cpp >&5
-configure:19612: $? = 0
-configure:19621: result: yes
-configure:19599: checking whether gcc understands -Wunused
-configure:19612: g++ -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused conftest.cpp >&5
-configure:19612: $? = 0
-configure:19621: result: yes
-configure:19599: checking whether gcc understands -Wpointer-arith
-configure:19612: g++ -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith conftest.cpp >&5
-configure:19612: $? = 0
-configure:19621: result: yes
-configure:19599: checking whether gcc understands -Wshadow
-configure:19612: g++ -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.cpp >&5
-configure:19612: $? = 0
-configure:19621: result: yes
-configure:19631: checking whether gcc understands -Wno-overloaded-virtual
-configure:19644: g++ -c -g -O2 -Wno-overloaded-virtual  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.cpp >&5
-configure:19644: $? = 0
-configure:19653: result: yes
-configure:19673: checking for libpng
-configure:19676: result: yes
-configure:19680: checking for libpng
-configure:19687: $PKG_CONFIG --exists --print-errors "$l"
-configure:19690: $? = 0
-configure:19704: $PKG_CONFIG --exists --print-errors "$l"
-configure:19707: $? = 0
-configure:19745: result: yes
-configure:19771: checking jpeglib.h usability
-configure:19771: gcc -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.c >&5
-configure:19771: $? = 0
-configure:19771: result: yes
-configure:19771: checking jpeglib.h presence
-configure:19771: gcc -E  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.c
-configure:19771: $? = 0
-configure:19771: result: yes
-configure:19771: checking for jpeglib.h
-configure:19771: result: yes
-configure:19774: checking for jpeg_read_header in -ljpeg
-configure:19799: gcc -o conftest.exe -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow  conftest.c -ljpeg   >&5
-configure:19799: $? = 0
-configure:19808: result: yes
-configure:19833: checking zlib.h usability
-configure:19833: gcc -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.c >&5
-configure:19833: $? = 0
-configure:19833: result: yes
-configure:19833: checking zlib.h presence
-configure:19833: gcc -E  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.c
-configure:19833: $? = 0
-configure:19833: result: yes
-configure:19833: checking for zlib.h
-configure:19833: result: yes
-configure:19892: checking for boostlib >= 1.40.0
-configure:19961: g++ -c -g -O2 -Wno-overloaded-virtual  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow  conftest.cpp >&5
-configure:19961: $? = 0
-configure:19963: result: yes
-configure:20168: checking for 
+configure:19722: checking whether gcc understands -Wall
+configure:19735: g++ -c -g -O2  -Wall conftest.cpp >&5
+configure:19735: $? = 0
+configure:19744: result: yes
+configure:19722: checking whether gcc understands -Wextra
+configure:19735: g++ -c -g -O2  -Wall -Wextra conftest.cpp >&5
+configure:19735: $? = 0
+configure:19744: result: yes
+configure:19722: checking whether gcc understands -Wsign-compare
+configure:19735: g++ -c -g -O2  -Wall -Wextra -Wsign-compare conftest.cpp >&5
+configure:19735: $? = 0
+configure:19744: result: yes
+configure:19722: checking whether gcc understands -Wpointer-arith
+configure:19735: g++ -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith conftest.cpp >&5
+configure:19735: $? = 0
+configure:19744: result: yes
+configure:19722: checking whether gcc understands -Wchar-subscripts
+configure:19735: g++ -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts conftest.cpp >&5
+configure:19735: $? = 0
+configure:19744: result: yes
+configure:19722: checking whether gcc understands -Wwrite-strings
+configure:19735: g++ -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings conftest.cpp >&5
+configure:19735: $? = 0
+configure:19744: result: yes
+configure:19722: checking whether gcc understands -Wmissing-noreturn
+configure:19735: g++ -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn conftest.cpp >&5
+configure:19735: $? = 0
+configure:19744: result: yes
+configure:19722: checking whether gcc understands -Wunused
+configure:19735: g++ -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused conftest.cpp >&5
+configure:19735: $? = 0
+configure:19744: result: yes
+configure:19722: checking whether gcc understands -Wpointer-arith
+configure:19735: g++ -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith conftest.cpp >&5
+configure:19735: $? = 0
+configure:19744: result: yes
+configure:19722: checking whether gcc understands -Wshadow
+configure:19735: g++ -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.cpp >&5
+configure:19735: $? = 0
+configure:19744: result: yes
+configure:19754: checking whether gcc understands -Wno-overloaded-virtual
+configure:19767: g++ -c -g -O2 -Wno-overloaded-virtual  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.cpp >&5
+configure:19767: $? = 0
+configure:19776: result: yes
+configure:19796: checking for libpng
+configure:19799: result: yes
+configure:19803: checking for libpng
+configure:19810: $PKG_CONFIG --exists --print-errors "$l"
+configure:19813: $? = 0
+configure:19827: $PKG_CONFIG --exists --print-errors "$l"
+configure:19830: $? = 0
+configure:19868: result: yes
+configure:19894: checking jpeglib.h usability
+configure:19894: gcc -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.c >&5
+configure:19894: $? = 0
+configure:19894: result: yes
+configure:19894: checking jpeglib.h presence
+configure:19894: gcc -E  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.c
+configure:19894: $? = 0
+configure:19894: result: yes
+configure:19894: checking for jpeglib.h
+configure:19894: result: yes
+configure:19897: checking for jpeg_read_header in -ljpeg
+configure:19922: gcc -o conftest.exe -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow  conftest.c -ljpeg   >&5
+configure:19922: $? = 0
+configure:19931: result: yes
+configure:19956: checking zlib.h usability
+configure:19956: gcc -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.c >&5
+configure:19956: $? = 0
+configure:19956: result: yes
+configure:19956: checking zlib.h presence
+configure:19956: gcc -E  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.c
+configure:19956: $? = 0
+configure:19956: result: yes
+configure:19956: checking for zlib.h
+configure:19956: result: yes
+configure:20015: checking for boostlib >= 1.40.0
+configure:20084: g++ -c -g -O2 -Wno-overloaded-virtual  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow  conftest.cpp >&5
+configure:20084: $? = 0
+configure:20086: result: yes
+configure:20291: checking for 
   fribidi >= 0.10.4
   glib-2.0 >= 2.6.0 gthread-2.0 >= 2.6.0 gobject-2.0 >= 2.6.0
   libgsf-1 >= 1.14.18
   wv-1.0 >= 1.2.0
   libxslt
   enchant >= 1.2.0 gio-2.0 enchant >= 1.2.0
-configure:20175: $PKG_CONFIG --exists --print-errors "$deps_pkgs"
-configure:20178: $? = 0
-configure:20192: $PKG_CONFIG --exists --print-errors "$deps_pkgs"
-configure:20195: $? = 0
-configure:20253: result: yes
-configure:20282: checking for libgsf-1 >= 1.14.9
-configure:20289: $PKG_CONFIG --exists --print-errors "$gsf_gio_req"
-configure:20292: $? = 0
-configure:20306: $PKG_CONFIG --exists --print-errors "$gsf_gio_req"
-configure:20309: $? = 0
-configure:20347: result: yes
-configure:20579: checking for glib-2.0 >= 2.6.0 gthread-2.0 >= 2.6.0 gobject-2.0 >= 2.6.0
-configure:20586: $PKG_CONFIG --exists --print-errors "$glib_req"
-configure:20589: $? = 0
-configure:20603: $PKG_CONFIG --exists --print-errors "$glib_req"
-configure:20606: $? = 0
-configure:20664: result: yes
-configure:20847: checking for libgcrypt-config
-configure:20865: found /mingw32/bin/libgcrypt-config
-configure:20878: result: /mingw32/bin/libgcrypt-config
-configure:20895: checking for LIBGCRYPT - version >= 1.4.5
-configure:20929: result: yes (1.12.1-unknown)
-configure:22559: $PKG_CONFIG --exists --print-errors " $opendocument_pkgs "
-configure:22562: $? = 0
-configure:22575: $PKG_CONFIG --exists --print-errors " $opendocument_optional_pkgs "
+configure:20298: $PKG_CONFIG --exists --print-errors "$deps_pkgs"
+configure:20301: $? = 0
+configure:20315: $PKG_CONFIG --exists --print-errors "$deps_pkgs"
+configure:20318: $? = 0
+configure:20376: result: yes
+configure:20405: checking for libgsf-1 >= 1.14.9
+configure:20412: $PKG_CONFIG --exists --print-errors "$gsf_gio_req"
+configure:20415: $? = 0
+configure:20429: $PKG_CONFIG --exists --print-errors "$gsf_gio_req"
+configure:20432: $? = 0
+configure:20470: result: yes
+configure:20704: checking for glib-2.0 >= 2.6.0 gthread-2.0 >= 2.6.0 gobject-2.0 >= 2.6.0
+configure:20711: $PKG_CONFIG --exists --print-errors "$glib_req"
+configure:20714: $? = 0
+configure:20728: $PKG_CONFIG --exists --print-errors "$glib_req"
+configure:20731: $? = 0
+configure:20789: result: yes
+configure:20972: checking for libgcrypt-config
+configure:20990: found /mingw32/bin/libgcrypt-config
+configure:21003: result: /mingw32/bin/libgcrypt-config
+configure:21020: checking for LIBGCRYPT - version >= 1.4.5
+configure:21054: result: yes (1.12.1-unknown)
+configure:22684: $PKG_CONFIG --exists --print-errors " $opendocument_pkgs "
+configure:22687: $? = 0
+configure:22700: $PKG_CONFIG --exists --print-errors " $opendocument_optional_pkgs "
 Package redland was not found in the pkg-config search path.
 Perhaps you should add the directory containing `redland.pc'
 to the PKG_CONFIG_PATH environment variable
 Package 'redland' not found
 Package 'rasqal' not found
-configure:22578: $? = 1
-configure:22590: checking for  libgsf-1 >= 1.14.18 
-configure:22597: $PKG_CONFIG --exists --print-errors " $opendocument_pkgs "
-configure:22600: $? = 0
-configure:22614: $PKG_CONFIG --exists --print-errors " $opendocument_pkgs "
-configure:22617: $? = 0
-configure:22675: result: yes
-configure:23411: checking for psiconv-config
-configure:23444: result: no
-configure:24664: $PKG_CONFIG --exists --print-errors " $pdf_pkgs "
-configure:24667: $? = 0
-configure:24686: checking for  libgsf-1 >= 1.14.18 
-configure:24693: $PKG_CONFIG --exists --print-errors " $pdf_pkgs "
-configure:24696: $? = 0
-configure:24710: $PKG_CONFIG --exists --print-errors " $pdf_pkgs "
-configure:24713: $? = 0
-configure:24771: result: yes
-configure:24950: $PKG_CONFIG --exists --print-errors " $libxslt_req "
-configure:24953: $? = 0
-configure:25335: checking for collab fake backend
-configure:25337: result: no
-configure:25349: $PKG_CONFIG --exists --print-errors " $collab_telepathy_req "
+configure:22703: $? = 1
+configure:22715: checking for  libgsf-1 >= 1.14.18 
+configure:22722: $PKG_CONFIG --exists --print-errors " $opendocument_pkgs "
+configure:22725: $? = 0
+configure:22739: $PKG_CONFIG --exists --print-errors " $opendocument_pkgs "
+configure:22742: $? = 0
+configure:22800: result: yes
+configure:23536: checking for psiconv-config
+configure:23569: result: no
+configure:24789: $PKG_CONFIG --exists --print-errors " $pdf_pkgs "
+configure:24792: $? = 0
+configure:24811: checking for  libgsf-1 >= 1.14.18 
+configure:24818: $PKG_CONFIG --exists --print-errors " $pdf_pkgs "
+configure:24821: $? = 0
+configure:24835: $PKG_CONFIG --exists --print-errors " $pdf_pkgs "
+configure:24838: $? = 0
+configure:24896: result: yes
+configure:25075: $PKG_CONFIG --exists --print-errors " $libxslt_req "
+configure:25078: $? = 0
+configure:25460: checking for collab fake backend
+configure:25462: result: no
+configure:25474: $PKG_CONFIG --exists --print-errors " $collab_telepathy_req "
 Package dbus-glib-1 was not found in the pkg-config search path.
 Perhaps you should add the directory containing `dbus-glib-1.pc'
 to the PKG_CONFIG_PATH environment variable
 Package 'dbus-glib-1' not found
 Package 'telepathy-glib' not found
-configure:25352: $? = 1
-configure:25366: checking for collab telepathy backend
-configure:25368: result: no
-configure:25379: $PKG_CONFIG --exists --print-errors " $collab_xmpp_req "
+configure:25477: $? = 1
+configure:25491: checking for collab telepathy backend
+configure:25493: result: no
+configure:25504: $PKG_CONFIG --exists --print-errors " $collab_xmpp_req "
 Package loudmouth-1.0 was not found in the pkg-config search path.
 Perhaps you should add the directory containing `loudmouth-1.0.pc'
 to the PKG_CONFIG_PATH environment variable
 Package 'loudmouth-1.0' not found
-configure:25382: $? = 1
-configure:25396: checking for collab xmpp backend
-configure:25398: result: no
-configure:25447: checking asio.hpp usability
-configure:25447: g++ -c -g -O2 -Wno-overloaded-virtual  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.cpp >&5
-conftest.cpp:79:10: fatal error: asio.hpp: No such file or directory
-   79 | #include <asio.hpp>
+configure:25507: $? = 1
+configure:25521: checking for collab xmpp backend
+configure:25523: result: no
+configure:25572: checking asio.hpp usability
+configure:25572: g++ -c -g -O2 -Wno-overloaded-virtual  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.cpp >&5
+conftest.cpp:80:10: fatal error: asio.hpp: No such file or directory
+   80 | #include <asio.hpp>
       |          ^~~~~~~~~~
 compilation terminated.
-configure:25447: $? = 1
+configure:25572: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "abiword"
@@ -876,6 +898,7 @@ configure: failed program was:
 | #define HAVE_GSF_GIO 1
 | #define ABIWORD_SERIES  "3.0"
 | #define TOOLKIT_WIN 1
+| #define _WIN32_IE 0x0501
 | #define UNICODE 1
 | #define ENABLE_PRINT 1
 | #define ENABLE_SPELL 1
@@ -921,14 +944,14 @@ configure: failed program was:
 | # include <unistd.h>
 | #endif
 | #include <asio.hpp>
-configure:25447: result: no
-configure:25447: checking asio.hpp presence
-configure:25447: g++ -E  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.cpp
-conftest.cpp:46:10: fatal error: asio.hpp: No such file or directory
-   46 | #include <asio.hpp>
+configure:25572: result: no
+configure:25572: checking asio.hpp presence
+configure:25572: g++ -E  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.cpp
+conftest.cpp:47:10: fatal error: asio.hpp: No such file or directory
+   47 | #include <asio.hpp>
       |          ^~~~~~~~~~
 compilation terminated.
-configure:25447: $? = 1
+configure:25572: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "abiword"
@@ -964,6 +987,7 @@ configure: failed program was:
 | #define HAVE_GSF_GIO 1
 | #define ABIWORD_SERIES  "3.0"
 | #define TOOLKIT_WIN 1
+| #define _WIN32_IE 0x0501
 | #define UNICODE 1
 | #define ENABLE_PRINT 1
 | #define ENABLE_SPELL 1
@@ -976,74 +1000,74 @@ configure: failed program was:
 | #define WITH_GIO 1
 | /* end confdefs.h.  */
 | #include <asio.hpp>
-configure:25447: result: no
-configure:25447: checking for asio.hpp
-configure:25447: result: no
-configure:25468: checking for collab tcp backend
-configure:25470: result: 
-configure:25481: $PKG_CONFIG --exists --print-errors " $collab_sugar_req "
+configure:25572: result: no
+configure:25572: checking for asio.hpp
+configure:25572: result: no
+configure:25593: checking for collab tcp backend
+configure:25595: result: 
+configure:25606: $PKG_CONFIG --exists --print-errors " $collab_sugar_req "
 Package dbus-glib-1 was not found in the pkg-config search path.
 Perhaps you should add the directory containing `dbus-glib-1.pc'
 to the PKG_CONFIG_PATH environment variable
 Package 'dbus-glib-1' not found
-configure:25484: $? = 1
-configure:25498: checking for collab sugar backend
-configure:25500: result: no
-configure:25548: checking for asio.hpp
-configure:25548: result: no
-configure:25570: checking for collab service backend
-configure:25572: result: 
-configure:25586: checking for collab sip backend
-configure:25588: result: no
-configure:25602: checking for collab always recording backend
-configure:25604: result: no
-configure:26001: $PKG_CONFIG --exists --print-errors " $openxml_pkgs "
-configure:26004: $? = 0
-configure:26026: checking for  libgsf-1 >= 1.14.4 
-configure:26033: $PKG_CONFIG --exists --print-errors " $openxml_pkgs "
-configure:26036: $? = 0
-configure:26050: $PKG_CONFIG --exists --print-errors " $openxml_pkgs "
-configure:26053: $? = 0
-configure:26111: result: yes
-configure:26295: checking hash_map usability
-configure:26295: g++ -c -g -O2 -Wno-overloaded-virtual  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.cpp >&5
+configure:25609: $? = 1
+configure:25623: checking for collab sugar backend
+configure:25625: result: no
+configure:25673: checking for asio.hpp
+configure:25673: result: no
+configure:25695: checking for collab service backend
+configure:25697: result: 
+configure:25711: checking for collab sip backend
+configure:25713: result: no
+configure:25727: checking for collab always recording backend
+configure:25729: result: no
+configure:26126: $PKG_CONFIG --exists --print-errors " $openxml_pkgs "
+configure:26129: $? = 0
+configure:26151: checking for  libgsf-1 >= 1.14.4 
+configure:26158: $PKG_CONFIG --exists --print-errors " $openxml_pkgs "
+configure:26161: $? = 0
+configure:26175: $PKG_CONFIG --exists --print-errors " $openxml_pkgs "
+configure:26178: $? = 0
+configure:26236: result: yes
+configure:26420: checking hash_map usability
+configure:26420: g++ -c -g -O2 -Wno-overloaded-virtual  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.cpp >&5
 In file included from D:/msys64_230318/mingw32/include/c++/15.2.0/backward/hash_map:60,
-                 from conftest.cpp:79:
+                 from conftest.cpp:80:
 D:/msys64_230318/mingw32/include/c++/15.2.0/backward/backward_warning.h:32:2: warning: #warning This file includes at least one deprecated or antiquated header which may be removed without further notice at a future date. Please use a non-deprecated interface with equivalent functionality instead. For a listing of replacement headers and interfaces, consult the file backward_warning.h. To disable this warning use -Wno-deprecated. [-Wcpp]
    32 | #warning \
       |  ^~~~~~~
-configure:26295: $? = 0
-configure:26295: result: yes
-configure:26295: checking hash_map presence
-configure:26295: g++ -E  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.cpp
+configure:26420: $? = 0
+configure:26420: result: yes
+configure:26420: checking hash_map presence
+configure:26420: g++ -E  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.cpp
 In file included from D:/msys64_230318/mingw32/include/c++/15.2.0/backward/hash_map:60,
-                 from conftest.cpp:46:
+                 from conftest.cpp:47:
 D:/msys64_230318/mingw32/include/c++/15.2.0/backward/backward_warning.h:32:2: warning: #warning This file includes at least one deprecated or antiquated header which may be removed without further notice at a future date. Please use a non-deprecated interface with equivalent functionality instead. For a listing of replacement headers and interfaces, consult the file backward_warning.h. To disable this warning use -Wno-deprecated. [-Wcpp]
    32 | #warning \
       |  ^~~~~~~
-configure:26295: $? = 0
-configure:26295: result: yes
-configure:26295: checking for hash_map
-configure:26295: result: yes
-configure:26461: checking for flex
-configure:26491: result: no
-configure:26461: checking for lex
-configure:26491: result: no
-configure:26623: checking for bison
-configure:26653: result: no
-configure:26623: checking for byacc
-configure:26653: result: no
-configure:26736: checking for libwmf-config
-configure:26769: result: no
-configure:27398: checking for valgrind
-configure:27428: result: no
-configure:27435: checking valgrind/memcheck.h usability
-configure:27435: gcc -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.c >&5
-conftest.c:79:10: fatal error: valgrind/memcheck.h: No such file or directory
-   79 | #include <valgrind/memcheck.h>
+configure:26420: $? = 0
+configure:26420: result: yes
+configure:26420: checking for hash_map
+configure:26420: result: yes
+configure:26586: checking for flex
+configure:26616: result: no
+configure:26586: checking for lex
+configure:26616: result: no
+configure:26748: checking for bison
+configure:26778: result: no
+configure:26748: checking for byacc
+configure:26778: result: no
+configure:26861: checking for libwmf-config
+configure:26894: result: no
+configure:27523: checking for valgrind
+configure:27553: result: no
+configure:27560: checking valgrind/memcheck.h usability
+configure:27560: gcc -c -g -O2  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.c >&5
+conftest.c:80:10: fatal error: valgrind/memcheck.h: No such file or directory
+   80 | #include <valgrind/memcheck.h>
       |          ^~~~~~~~~~~~~~~~~~~~~
 compilation terminated.
-configure:27435: $? = 1
+configure:27560: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "abiword"
@@ -1079,6 +1103,7 @@ configure: failed program was:
 | #define HAVE_GSF_GIO 1
 | #define ABIWORD_SERIES  "3.0"
 | #define TOOLKIT_WIN 1
+| #define _WIN32_IE 0x0501
 | #define UNICODE 1
 | #define ENABLE_PRINT 1
 | #define ENABLE_SPELL 1
@@ -1124,14 +1149,14 @@ configure: failed program was:
 | # include <unistd.h>
 | #endif
 | #include <valgrind/memcheck.h>
-configure:27435: result: no
-configure:27435: checking valgrind/memcheck.h presence
-configure:27435: gcc -E  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.c
-conftest.c:46:10: fatal error: valgrind/memcheck.h: No such file or directory
-   46 | #include <valgrind/memcheck.h>
+configure:27560: result: no
+configure:27560: checking valgrind/memcheck.h presence
+configure:27560: gcc -E  -Wall -Wextra -Wsign-compare -Wpointer-arith -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn -Wunused -Wpointer-arith -Wshadow conftest.c
+conftest.c:47:10: fatal error: valgrind/memcheck.h: No such file or directory
+   47 | #include <valgrind/memcheck.h>
       |          ^~~~~~~~~~~~~~~~~~~~~
 compilation terminated.
-configure:27435: $? = 1
+configure:27560: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "abiword"
@@ -1167,6 +1192,7 @@ configure: failed program was:
 | #define HAVE_GSF_GIO 1
 | #define ABIWORD_SERIES  "3.0"
 | #define TOOLKIT_WIN 1
+| #define _WIN32_IE 0x0501
 | #define UNICODE 1
 | #define ENABLE_PRINT 1
 | #define ENABLE_SPELL 1
@@ -1179,13 +1205,13 @@ configure: failed program was:
 | #define WITH_GIO 1
 | /* end confdefs.h.  */
 | #include <valgrind/memcheck.h>
-configure:27435: result: no
-configure:27435: checking for valgrind/memcheck.h
-configure:27435: result: no
-configure:27446: WARNING: Valgrind is missing. UnitTesting will run without
-configure:27890: checking that generated files are newer than configure
-configure:27896: result: done
-configure:28299: creating ./config.status
+configure:27560: result: no
+configure:27560: checking for valgrind/memcheck.h
+configure:27560: result: no
+configure:27571: WARNING: Valgrind is missing. UnitTesting will run without
+configure:28015: checking that generated files are newer than configure
+configure:28021: result: done
+configure:28428: creating ./config.status
 
 ## ---------------------- ##
 ## Running config.status. ##
@@ -1202,83 +1228,84 @@ generated by GNU Autoconf 2.69.  Invocation command line was
 
 on DESKTOP-CLQLNA8
 
-config.status:1638: creating libabiword.pc
-config.status:1638: creating Makefile
-config.status:1638: creating icons/Makefile
-config.status:1638: creating po/Makefile
-config.status:1638: creating src/Makefile
-config.status:1638: creating src/af/Makefile
-config.status:1638: creating src/af/ev/Makefile
-config.status:1638: creating src/af/ev/cocoa/Makefile
-config.status:1638: creating src/af/ev/gtk/Makefile
-config.status:1638: creating src/af/ev/win/bmp/Makefile
-config.status:1638: creating src/af/ev/win/Makefile
-config.status:1638: creating src/af/ev/xp/Makefile
-config.status:1638: creating src/af/gr/Makefile
-config.status:1638: creating src/af/gr/cocoa/Makefile
-config.status:1638: creating src/af/gr/gtk/Makefile
-config.status:1638: creating src/af/gr/win/Makefile
-config.status:1638: creating src/af/gr/xp/Makefile
-config.status:1638: creating src/af/tf/Makefile
-config.status:1638: creating src/af/tf/xp/Makefile
-config.status:1638: creating src/af/util/Makefile
-config.status:1638: creating src/af/util/unix/Makefile
-config.status:1638: creating src/af/util/win/Makefile
-config.status:1638: creating src/af/util/xp/Makefile
-config.status:1638: creating src/af/util/xp/t/Makefile
-config.status:1638: creating src/af/xap/Makefile
-config.status:1638: creating src/af/xap/cocoa/Makefile
-config.status:1638: creating src/af/xap/gtk/Makefile
-config.status:1638: creating src/af/xap/gtk/t/Makefile
-config.status:1638: creating src/af/xap/win/Makefile
-config.status:1638: creating src/af/xap/xp/Makefile
-config.status:1638: creating src/gi-overrides/Makefile
-config.status:1638: creating src/plugins/Makefile
-config.status:1638: creating src/text/Makefile
-config.status:1638: creating src/text/fmt/Makefile
-config.status:1638: creating src/text/fmt/gtk/Makefile
-config.status:1638: creating src/text/fmt/xp/Makefile
-config.status:1638: creating src/text/fmt/xp/t/Makefile
-config.status:1638: creating src/text/ptbl/Makefile
-config.status:1638: creating src/text/ptbl/xp/Makefile
-config.status:1638: creating src/text/ptbl/xp/t/Makefile
-config.status:1638: creating src/wp/Makefile
-config.status:1638: creating src/wp/ap/Makefile
-config.status:1638: creating src/wp/ap/cocoa/Makefile
-config.status:1638: creating src/wp/ap/gtk/Makefile
-config.status:1638: creating src/wp/ap/win/Makefile
-config.status:1638: creating src/wp/ap/xp/Makefile
-config.status:1638: creating src/wp/ap/xp/ToolbarIcons/Makefile
-config.status:1638: creating src/wp/impexp/Makefile
-config.status:1638: creating src/wp/impexp/cocoa/Makefile
-config.status:1638: creating src/wp/impexp/gtk/Makefile
-config.status:1638: creating src/wp/impexp/win/Makefile
-config.status:1638: creating src/wp/impexp/xp/Makefile
-config.status:1638: creating src/wp/test/Makefile
-config.status:1638: creating src/wp/test/cocoa/Makefile
-config.status:1638: creating src/wp/test/unix/Makefile
-config.status:1638: creating src/wp/test/unix/testwrap.sh
-config.status:1638: creating src/wp/test/win/Makefile
-config.status:1638: creating src/wp/test/win/testwrap.sh
-config.status:1638: creating src/wp/test/xp/Makefile
-config.status:1638: creating src/wp/main/Makefile
-config.status:1638: creating src/wp/main/cocoa/Makefile
-config.status:1638: creating src/wp/main/cocoa/bundle/Info.plist
-config.status:1638: creating src/wp/main/win/Makefile
-config.status:1638: creating user/Makefile
-config.status:1638: creating user/wp/Makefile
-config.status:1638: creating user/wp/clipart/Makefile
-config.status:1638: creating user/wp/dictionary/Makefile
-config.status:1638: creating user/wp/templates/Makefile
-config.status:1638: creating tools/Makefile
-config.status:1638: creating tools/cdump/Makefile
-config.status:1638: creating tools/cdump/xp/Makefile
-config.status:1638: creating config.h
-config.status:1867: executing depfiles commands
-config.status:1867: executing libtool commands
-configure:30893: checking that generated files are newer than configure
-configure:30899: result: done
-configure:31306: creating ./config.status
+config.status:1642: creating libabiword.pc
+config.status:1642: creating Makefile
+config.status:1642: creating goffice-bits/Makefile
+config.status:1642: creating icons/Makefile
+config.status:1642: creating po/Makefile
+config.status:1642: creating src/Makefile
+config.status:1642: creating src/af/Makefile
+config.status:1642: creating src/af/ev/Makefile
+config.status:1642: creating src/af/ev/cocoa/Makefile
+config.status:1642: creating src/af/ev/gtk/Makefile
+config.status:1642: creating src/af/ev/win/bmp/Makefile
+config.status:1642: creating src/af/ev/win/Makefile
+config.status:1642: creating src/af/ev/xp/Makefile
+config.status:1642: creating src/af/gr/Makefile
+config.status:1642: creating src/af/gr/cocoa/Makefile
+config.status:1642: creating src/af/gr/gtk/Makefile
+config.status:1642: creating src/af/gr/win/Makefile
+config.status:1642: creating src/af/gr/xp/Makefile
+config.status:1642: creating src/af/tf/Makefile
+config.status:1642: creating src/af/tf/xp/Makefile
+config.status:1642: creating src/af/util/Makefile
+config.status:1642: creating src/af/util/unix/Makefile
+config.status:1642: creating src/af/util/win/Makefile
+config.status:1642: creating src/af/util/xp/Makefile
+config.status:1642: creating src/af/util/xp/t/Makefile
+config.status:1642: creating src/af/xap/Makefile
+config.status:1642: creating src/af/xap/cocoa/Makefile
+config.status:1642: creating src/af/xap/gtk/Makefile
+config.status:1642: creating src/af/xap/gtk/t/Makefile
+config.status:1642: creating src/af/xap/win/Makefile
+config.status:1642: creating src/af/xap/xp/Makefile
+config.status:1642: creating src/gi-overrides/Makefile
+config.status:1642: creating src/plugins/Makefile
+config.status:1642: creating src/text/Makefile
+config.status:1642: creating src/text/fmt/Makefile
+config.status:1642: creating src/text/fmt/gtk/Makefile
+config.status:1642: creating src/text/fmt/xp/Makefile
+config.status:1642: creating src/text/fmt/xp/t/Makefile
+config.status:1642: creating src/text/ptbl/Makefile
+config.status:1642: creating src/text/ptbl/xp/Makefile
+config.status:1642: creating src/text/ptbl/xp/t/Makefile
+config.status:1642: creating src/wp/Makefile
+config.status:1642: creating src/wp/ap/Makefile
+config.status:1642: creating src/wp/ap/cocoa/Makefile
+config.status:1642: creating src/wp/ap/gtk/Makefile
+config.status:1642: creating src/wp/ap/win/Makefile
+config.status:1642: creating src/wp/ap/xp/Makefile
+config.status:1642: creating src/wp/ap/xp/ToolbarIcons/Makefile
+config.status:1642: creating src/wp/impexp/Makefile
+config.status:1642: creating src/wp/impexp/cocoa/Makefile
+config.status:1642: creating src/wp/impexp/gtk/Makefile
+config.status:1642: creating src/wp/impexp/win/Makefile
+config.status:1642: creating src/wp/impexp/xp/Makefile
+config.status:1642: creating src/wp/test/Makefile
+config.status:1642: creating src/wp/test/cocoa/Makefile
+config.status:1642: creating src/wp/test/unix/Makefile
+config.status:1642: creating src/wp/test/unix/testwrap.sh
+config.status:1642: creating src/wp/test/win/Makefile
+config.status:1642: creating src/wp/test/win/testwrap.sh
+config.status:1642: creating src/wp/test/xp/Makefile
+config.status:1642: creating src/wp/main/Makefile
+config.status:1642: creating src/wp/main/cocoa/Makefile
+config.status:1642: creating src/wp/main/cocoa/bundle/Info.plist
+config.status:1642: creating src/wp/main/win/Makefile
+config.status:1642: creating user/Makefile
+config.status:1642: creating user/wp/Makefile
+config.status:1642: creating user/wp/clipart/Makefile
+config.status:1642: creating user/wp/dictionary/Makefile
+config.status:1642: creating user/wp/templates/Makefile
+config.status:1642: creating tools/Makefile
+config.status:1642: creating tools/cdump/Makefile
+config.status:1642: creating tools/cdump/xp/Makefile
+config.status:1642: creating config.h
+config.status:1871: executing depfiles commands
+config.status:1871: executing libtool commands
+configure:31023: checking that generated files are newer than configure
+configure:31029: result: done
+configure:31440: creating ./config.status
 
 ## ---------------------- ##
 ## Running config.status. ##
@@ -1295,193 +1322,204 @@ generated by GNU Autoconf 2.69.  Invocation command line was
 
 on DESKTOP-CLQLNA8
 
-config.status:1752: creating libabiword.pc
-config.status:1752: creating Makefile
-config.status:1752: creating icons/Makefile
-config.status:1752: creating po/Makefile
-config.status:1752: creating src/Makefile
-config.status:1752: creating src/af/Makefile
-config.status:1752: creating src/af/ev/Makefile
-config.status:1752: creating src/af/ev/cocoa/Makefile
-config.status:1752: creating src/af/ev/gtk/Makefile
-config.status:1752: creating src/af/ev/win/bmp/Makefile
-config.status:1752: creating src/af/ev/win/Makefile
-config.status:1752: creating src/af/ev/xp/Makefile
-config.status:1752: creating src/af/gr/Makefile
-config.status:1752: creating src/af/gr/cocoa/Makefile
-config.status:1752: creating src/af/gr/gtk/Makefile
-config.status:1752: creating src/af/gr/win/Makefile
-config.status:1752: creating src/af/gr/xp/Makefile
-config.status:1752: creating src/af/tf/Makefile
-config.status:1752: creating src/af/tf/xp/Makefile
-config.status:1752: creating src/af/util/Makefile
-config.status:1752: creating src/af/util/unix/Makefile
-config.status:1752: creating src/af/util/win/Makefile
-config.status:1752: creating src/af/util/xp/Makefile
-config.status:1752: creating src/af/util/xp/t/Makefile
-config.status:1752: creating src/af/xap/Makefile
-config.status:1752: creating src/af/xap/cocoa/Makefile
-config.status:1752: creating src/af/xap/gtk/Makefile
-config.status:1752: creating src/af/xap/gtk/t/Makefile
-config.status:1752: creating src/af/xap/win/Makefile
-config.status:1752: creating src/af/xap/xp/Makefile
-config.status:1752: creating src/gi-overrides/Makefile
-config.status:1752: creating src/plugins/Makefile
-config.status:1752: creating src/text/Makefile
-config.status:1752: creating src/text/fmt/Makefile
-config.status:1752: creating src/text/fmt/gtk/Makefile
-config.status:1752: creating src/text/fmt/xp/Makefile
-config.status:1752: creating src/text/fmt/xp/t/Makefile
-config.status:1752: creating src/text/ptbl/Makefile
-config.status:1752: creating src/text/ptbl/xp/Makefile
-config.status:1752: creating src/text/ptbl/xp/t/Makefile
-config.status:1752: creating src/wp/Makefile
-config.status:1752: creating src/wp/ap/Makefile
-config.status:1752: creating src/wp/ap/cocoa/Makefile
-config.status:1752: creating src/wp/ap/gtk/Makefile
-config.status:1752: creating src/wp/ap/win/Makefile
-config.status:1752: creating src/wp/ap/xp/Makefile
-config.status:1752: creating src/wp/ap/xp/ToolbarIcons/Makefile
-config.status:1752: creating src/wp/impexp/Makefile
-config.status:1752: creating src/wp/impexp/cocoa/Makefile
-config.status:1752: creating src/wp/impexp/gtk/Makefile
-config.status:1752: creating src/wp/impexp/win/Makefile
-config.status:1752: creating src/wp/impexp/xp/Makefile
-config.status:1752: creating src/wp/test/Makefile
-config.status:1752: creating src/wp/test/cocoa/Makefile
-config.status:1752: creating src/wp/test/unix/Makefile
-config.status:1752: creating src/wp/test/unix/testwrap.sh
-config.status:1752: creating src/wp/test/win/Makefile
-config.status:1752: creating src/wp/test/win/testwrap.sh
-config.status:1752: creating src/wp/test/xp/Makefile
-config.status:1752: creating src/wp/main/Makefile
-config.status:1752: creating src/wp/main/cocoa/Makefile
-config.status:1752: creating src/wp/main/cocoa/bundle/Info.plist
-config.status:1752: creating src/wp/main/win/Makefile
-config.status:1752: creating user/Makefile
-config.status:1752: creating user/wp/Makefile
-config.status:1752: creating user/wp/clipart/Makefile
-config.status:1752: creating user/wp/dictionary/Makefile
-config.status:1752: creating user/wp/templates/Makefile
-config.status:1752: creating tools/Makefile
-config.status:1752: creating tools/cdump/Makefile
-config.status:1752: creating tools/cdump/xp/Makefile
-config.status:1752: creating plugins/openwriter/xp/Makefile
-config.status:1752: creating plugins/openwriter/Makefile
-config.status:1752: creating plugins/grammar/linkgrammarwrap/Makefile
-config.status:1752: creating plugins/grammar/xp/Makefile
-config.status:1752: creating plugins/grammar/Makefile
-config.status:1752: creating plugins/wpg/xp/Makefile
-config.status:1752: creating plugins/wpg/Makefile
-config.status:1752: creating plugins/command/xp/Makefile
-config.status:1752: creating plugins/command/Makefile
-config.status:1752: creating plugins/sdw/xp/Makefile
-config.status:1752: creating plugins/sdw/Makefile
-config.status:1752: creating plugins/paint/win/Makefile
-config.status:1752: creating plugins/paint/xp/Makefile
-config.status:1752: creating plugins/paint/unix/Makefile
-config.status:1752: creating plugins/paint/Makefile
-config.status:1752: creating plugins/passepartout/xp/Makefile
-config.status:1752: creating plugins/passepartout/Makefile
-config.status:1752: creating plugins/opendocument/imp/xp/Makefile
-config.status:1752: creating plugins/opendocument/imp/Makefile
-config.status:1752: creating plugins/opendocument/exp/xp/Makefile
-config.status:1752: creating plugins/opendocument/exp/Makefile
-config.status:1752: creating plugins/opendocument/common/xp/Makefile
-config.status:1752: creating plugins/opendocument/common/Makefile
-config.status:1752: creating plugins/opendocument/Makefile
-config.status:1752: creating plugins/wml/xp/Makefile
-config.status:1752: creating plugins/wml/Makefile
-config.status:1752: creating plugins/eml/xp/Makefile
-config.status:1752: creating plugins/eml/Makefile
-config.status:1752: creating plugins/mht/xp/Makefile
-config.status:1752: creating plugins/mht/Makefile
-config.status:1752: creating plugins/gdict/unix/Makefile
-config.status:1752: creating plugins/gdict/Makefile
-config.status:1752: creating plugins/s5/xp/Makefile
-config.status:1752: creating plugins/s5/Makefile
-config.status:1752: creating plugins/babelfish/xp/Makefile
-config.status:1752: creating plugins/babelfish/Makefile
-config.status:1752: creating plugins/ots/xp/Makefile
-config.status:1752: creating plugins/ots/Makefile
-config.status:1752: creating plugins/bmp/xp/Makefile
-config.status:1752: creating plugins/bmp/Makefile
-config.status:1752: creating plugins/psion/xp/Makefile
-config.status:1752: creating plugins/psion/Makefile
-config.status:1752: creating plugins/gda/unix/Makefile
-config.status:1752: creating plugins/gda/Makefile
-config.status:1752: creating plugins/opml/xp/Makefile
-config.status:1752: creating plugins/opml/Makefile
-config.status:1752: creating plugins/garble/xp/Makefile
-config.status:1752: creating plugins/garble/Makefile
-config.status:1752: creating plugins/hrtext/xp/Makefile
-config.status:1752: creating plugins/hrtext/Makefile
-config.status:1752: creating plugins/presentation/xp/Makefile
-config.status:1752: creating plugins/presentation/Makefile
-config.status:1752: creating plugins/freetranslation/xp/Makefile
-config.status:1752: creating plugins/freetranslation/Makefile
-config.status:1752: creating plugins/xslfo/xp/Makefile
-config.status:1752: creating plugins/xslfo/Makefile
-config.status:1752: creating plugins/wordperfect/xp/Makefile
-config.status:1752: creating plugins/wordperfect/Makefile
-config.status:1752: creating plugins/applix/xp/Makefile
-config.status:1752: creating plugins/applix/Makefile
-config.status:1752: creating plugins/loadbindings/xp/Makefile
-config.status:1752: creating plugins/loadbindings/Makefile
-config.status:1752: creating plugins/docbook/xp/Makefile
-config.status:1752: creating plugins/docbook/Makefile
-config.status:1752: creating plugins/mif/xp/Makefile
-config.status:1752: creating plugins/mif/Makefile
-config.status:1752: creating plugins/pdf/xp/Makefile
-config.status:1752: creating plugins/pdf/Makefile
-config.status:1752: creating plugins/google/xp/Makefile
-config.status:1752: creating plugins/google/Makefile
-config.status:1752: creating plugins/Makefile
-config.status:1752: creating plugins/clarisworks/xp/Makefile
-config.status:1752: creating plugins/clarisworks/Makefile
-config.status:1752: creating plugins/latex/xp/Makefile
-config.status:1752: creating plugins/latex/Makefile
-config.status:1752: creating plugins/latex/xsltml/Makefile
-config.status:1752: creating plugins/mswrite/xp/Makefile
-config.status:1752: creating plugins/mswrite/Makefile
-config.status:1752: creating plugins/iscii/xp/Makefile
-config.status:1752: creating plugins/iscii/Makefile
-config.status:1752: creating plugins/openxml/omml_xslt/Makefile
-config.status:1752: creating plugins/openxml/imp/xp/Makefile
-config.status:1752: creating plugins/openxml/imp/Makefile
-config.status:1752: creating plugins/openxml/exp/xp/Makefile
-config.status:1752: creating plugins/openxml/exp/Makefile
-config.status:1752: creating plugins/openxml/common/xp/Makefile
-config.status:1752: creating plugins/openxml/common/Makefile
-config.status:1752: creating plugins/openxml/Makefile
-config.status:1752: creating plugins/wikipedia/xp/Makefile
-config.status:1752: creating plugins/wikipedia/Makefile
-config.status:1752: creating plugins/pdb/xp/Makefile
-config.status:1752: creating plugins/pdb/Makefile
-config.status:1752: creating plugins/urldict/xp/Makefile
-config.status:1752: creating plugins/urldict/Makefile
-config.status:1752: creating plugins/wmf/xp/Makefile
-config.status:1752: creating plugins/wmf/Makefile
-config.status:1752: creating plugins/hancom/xp/Makefile
-config.status:1752: creating plugins/hancom/Makefile
-config.status:1752: creating plugins/epub/dialogs/win/Makefile
-config.status:1752: creating plugins/epub/dialogs/xp/Makefile
-config.status:1752: creating plugins/epub/dialogs/Makefile
-config.status:1752: creating plugins/epub/dialogs/gtk/Makefile
-config.status:1752: creating plugins/epub/imp/xp/Makefile
-config.status:1752: creating plugins/epub/imp/Makefile
-config.status:1752: creating plugins/epub/exp/xp/Makefile
-config.status:1752: creating plugins/epub/exp/Makefile
-config.status:1752: creating plugins/epub/common/xp/Makefile
-config.status:1752: creating plugins/epub/common/Makefile
-config.status:1752: creating plugins/epub/Makefile
-config.status:1752: creating plugins/kword/xp/Makefile
-config.status:1752: creating plugins/kword/Makefile
-config.status:1752: creating plugins/rsvg/xp/Makefile
-config.status:1752: creating plugins/rsvg/Makefile
-config.status:1752: creating config.h
-config.status:1981: executing depfiles commands
-config.status:1981: executing libtool commands
+config.status:1766: creating libabiword.pc
+config.status:1766: creating Makefile
+config.status:1766: creating goffice-bits/Makefile
+config.status:1766: creating icons/Makefile
+config.status:1766: creating po/Makefile
+config.status:1766: creating src/Makefile
+config.status:1766: creating src/af/Makefile
+config.status:1766: creating src/af/ev/Makefile
+config.status:1766: creating src/af/ev/cocoa/Makefile
+config.status:1766: creating src/af/ev/gtk/Makefile
+config.status:1766: creating src/af/ev/win/bmp/Makefile
+config.status:1766: creating src/af/ev/win/Makefile
+config.status:1766: creating src/af/ev/xp/Makefile
+config.status:1766: creating src/af/gr/Makefile
+config.status:1766: creating src/af/gr/cocoa/Makefile
+config.status:1766: creating src/af/gr/gtk/Makefile
+config.status:1766: creating src/af/gr/win/Makefile
+config.status:1766: creating src/af/gr/xp/Makefile
+config.status:1766: creating src/af/tf/Makefile
+config.status:1766: creating src/af/tf/xp/Makefile
+config.status:1766: creating src/af/util/Makefile
+config.status:1766: creating src/af/util/unix/Makefile
+config.status:1766: creating src/af/util/win/Makefile
+config.status:1766: creating src/af/util/xp/Makefile
+config.status:1766: creating src/af/util/xp/t/Makefile
+config.status:1766: creating src/af/xap/Makefile
+config.status:1766: creating src/af/xap/cocoa/Makefile
+config.status:1766: creating src/af/xap/gtk/Makefile
+config.status:1766: creating src/af/xap/gtk/t/Makefile
+config.status:1766: creating src/af/xap/win/Makefile
+config.status:1766: creating src/af/xap/xp/Makefile
+config.status:1766: creating src/gi-overrides/Makefile
+config.status:1766: creating src/plugins/Makefile
+config.status:1766: creating src/text/Makefile
+config.status:1766: creating src/text/fmt/Makefile
+config.status:1766: creating src/text/fmt/gtk/Makefile
+config.status:1766: creating src/text/fmt/xp/Makefile
+config.status:1766: creating src/text/fmt/xp/t/Makefile
+config.status:1766: creating src/text/ptbl/Makefile
+config.status:1766: creating src/text/ptbl/xp/Makefile
+config.status:1766: creating src/text/ptbl/xp/t/Makefile
+config.status:1766: creating src/wp/Makefile
+config.status:1766: creating src/wp/ap/Makefile
+config.status:1766: creating src/wp/ap/cocoa/Makefile
+config.status:1766: creating src/wp/ap/gtk/Makefile
+config.status:1766: creating src/wp/ap/win/Makefile
+config.status:1766: creating src/wp/ap/xp/Makefile
+config.status:1766: creating src/wp/ap/xp/ToolbarIcons/Makefile
+config.status:1766: creating src/wp/impexp/Makefile
+config.status:1766: creating src/wp/impexp/cocoa/Makefile
+config.status:1766: creating src/wp/impexp/gtk/Makefile
+config.status:1766: creating src/wp/impexp/win/Makefile
+config.status:1766: creating src/wp/impexp/xp/Makefile
+config.status:1766: creating src/wp/test/Makefile
+config.status:1766: creating src/wp/test/cocoa/Makefile
+config.status:1766: creating src/wp/test/unix/Makefile
+config.status:1766: creating src/wp/test/unix/testwrap.sh
+config.status:1766: creating src/wp/test/win/Makefile
+config.status:1766: creating src/wp/test/win/testwrap.sh
+config.status:1766: creating src/wp/test/xp/Makefile
+config.status:1766: creating src/wp/main/Makefile
+config.status:1766: creating src/wp/main/cocoa/Makefile
+config.status:1766: creating src/wp/main/cocoa/bundle/Info.plist
+config.status:1766: creating src/wp/main/win/Makefile
+config.status:1766: creating user/Makefile
+config.status:1766: creating user/wp/Makefile
+config.status:1766: creating user/wp/clipart/Makefile
+config.status:1766: creating user/wp/dictionary/Makefile
+config.status:1766: creating user/wp/templates/Makefile
+config.status:1766: creating tools/Makefile
+config.status:1766: creating tools/cdump/Makefile
+config.status:1766: creating tools/cdump/xp/Makefile
+config.status:1766: creating plugins/openwriter/xp/Makefile
+config.status:1766: creating plugins/openwriter/Makefile
+config.status:1766: creating plugins/grammar/linkgrammarwrap/Makefile
+config.status:1766: creating plugins/grammar/xp/Makefile
+config.status:1766: creating plugins/grammar/Makefile
+config.status:1766: creating plugins/wpg/xp/Makefile
+config.status:1766: creating plugins/wpg/Makefile
+config.status:1766: creating plugins/gimp/xp/Makefile
+config.status:1766: creating plugins/gimp/Makefile
+config.status:1766: creating plugins/aiksaurus/win/Makefile
+config.status:1766: creating plugins/aiksaurus/xp/Makefile
+config.status:1766: creating plugins/aiksaurus/aiksaurusgtk3/Makefile
+config.status:1766: creating plugins/aiksaurus/Makefile
+config.status:1766: creating plugins/command/xp/Makefile
+config.status:1766: creating plugins/command/Makefile
+config.status:1766: creating plugins/goffice/unix/Makefile
+config.status:1766: creating plugins/goffice/Makefile
+config.status:1766: creating plugins/sdw/xp/Makefile
+config.status:1766: creating plugins/sdw/Makefile
+config.status:1766: creating plugins/paint/win/Makefile
+config.status:1766: creating plugins/paint/xp/Makefile
+config.status:1766: creating plugins/paint/unix/Makefile
+config.status:1766: creating plugins/paint/Makefile
+config.status:1766: creating plugins/passepartout/xp/Makefile
+config.status:1766: creating plugins/passepartout/Makefile
+config.status:1766: creating plugins/opendocument/imp/xp/Makefile
+config.status:1766: creating plugins/opendocument/imp/Makefile
+config.status:1766: creating plugins/opendocument/exp/xp/Makefile
+config.status:1766: creating plugins/opendocument/exp/Makefile
+config.status:1766: creating plugins/opendocument/common/xp/Makefile
+config.status:1766: creating plugins/opendocument/common/Makefile
+config.status:1766: creating plugins/opendocument/Makefile
+config.status:1766: creating plugins/wml/xp/Makefile
+config.status:1766: creating plugins/wml/Makefile
+config.status:1766: creating plugins/eml/xp/Makefile
+config.status:1766: creating plugins/eml/Makefile
+config.status:1766: creating plugins/mht/xp/Makefile
+config.status:1766: creating plugins/mht/Makefile
+config.status:1766: creating plugins/gdict/unix/Makefile
+config.status:1766: creating plugins/gdict/Makefile
+config.status:1766: creating plugins/s5/xp/Makefile
+config.status:1766: creating plugins/s5/Makefile
+config.status:1766: creating plugins/babelfish/xp/Makefile
+config.status:1766: creating plugins/babelfish/Makefile
+config.status:1766: creating plugins/ots/xp/Makefile
+config.status:1766: creating plugins/ots/Makefile
+config.status:1766: creating plugins/bmp/xp/Makefile
+config.status:1766: creating plugins/bmp/Makefile
+config.status:1766: creating plugins/psion/xp/Makefile
+config.status:1766: creating plugins/psion/Makefile
+config.status:1766: creating plugins/gda/unix/Makefile
+config.status:1766: creating plugins/gda/Makefile
+config.status:1766: creating plugins/opml/xp/Makefile
+config.status:1766: creating plugins/opml/Makefile
+config.status:1766: creating plugins/garble/xp/Makefile
+config.status:1766: creating plugins/garble/Makefile
+config.status:1766: creating plugins/hrtext/xp/Makefile
+config.status:1766: creating plugins/hrtext/Makefile
+config.status:1766: creating plugins/presentation/xp/Makefile
+config.status:1766: creating plugins/presentation/Makefile
+config.status:1766: creating plugins/freetranslation/xp/Makefile
+config.status:1766: creating plugins/freetranslation/Makefile
+config.status:1766: creating plugins/xslfo/xp/Makefile
+config.status:1766: creating plugins/xslfo/Makefile
+config.status:1766: creating plugins/wordperfect/xp/Makefile
+config.status:1766: creating plugins/wordperfect/Makefile
+config.status:1766: creating plugins/applix/xp/Makefile
+config.status:1766: creating plugins/applix/Makefile
+config.status:1766: creating plugins/loadbindings/xp/Makefile
+config.status:1766: creating plugins/loadbindings/Makefile
+config.status:1766: creating plugins/docbook/xp/Makefile
+config.status:1766: creating plugins/docbook/Makefile
+config.status:1766: creating plugins/mif/xp/Makefile
+config.status:1766: creating plugins/mif/Makefile
+config.status:1766: creating plugins/pdf/xp/Makefile
+config.status:1766: creating plugins/pdf/Makefile
+config.status:1766: creating plugins/google/xp/Makefile
+config.status:1766: creating plugins/google/Makefile
+config.status:1766: creating plugins/Makefile
+config.status:1766: creating plugins/clarisworks/xp/Makefile
+config.status:1766: creating plugins/clarisworks/Makefile
+config.status:1766: creating plugins/latex/xp/Makefile
+config.status:1766: creating plugins/latex/Makefile
+config.status:1766: creating plugins/latex/xsltml/Makefile
+config.status:1766: creating plugins/t602/xp/Makefile
+config.status:1766: creating plugins/t602/Makefile
+config.status:1766: creating plugins/mswrite/xp/Makefile
+config.status:1766: creating plugins/mswrite/Makefile
+config.status:1766: creating plugins/iscii/xp/Makefile
+config.status:1766: creating plugins/iscii/Makefile
+config.status:1766: creating plugins/openxml/omml_xslt/Makefile
+config.status:1766: creating plugins/openxml/imp/xp/Makefile
+config.status:1766: creating plugins/openxml/imp/Makefile
+config.status:1766: creating plugins/openxml/exp/xp/Makefile
+config.status:1766: creating plugins/openxml/exp/Makefile
+config.status:1766: creating plugins/openxml/common/xp/Makefile
+config.status:1766: creating plugins/openxml/common/Makefile
+config.status:1766: creating plugins/openxml/Makefile
+config.status:1766: creating plugins/wikipedia/xp/Makefile
+config.status:1766: creating plugins/wikipedia/Makefile
+config.status:1766: creating plugins/pdb/xp/Makefile
+config.status:1766: creating plugins/pdb/Makefile
+config.status:1766: creating plugins/urldict/xp/Makefile
+config.status:1766: creating plugins/urldict/Makefile
+config.status:1766: creating plugins/wmf/xp/Makefile
+config.status:1766: creating plugins/wmf/Makefile
+config.status:1766: creating plugins/hancom/xp/Makefile
+config.status:1766: creating plugins/hancom/Makefile
+config.status:1766: creating plugins/epub/dialogs/win/Makefile
+config.status:1766: creating plugins/epub/dialogs/xp/Makefile
+config.status:1766: creating plugins/epub/dialogs/Makefile
+config.status:1766: creating plugins/epub/dialogs/gtk/Makefile
+config.status:1766: creating plugins/epub/imp/xp/Makefile
+config.status:1766: creating plugins/epub/imp/Makefile
+config.status:1766: creating plugins/epub/exp/xp/Makefile
+config.status:1766: creating plugins/epub/exp/Makefile
+config.status:1766: creating plugins/epub/common/xp/Makefile
+config.status:1766: creating plugins/epub/common/Makefile
+config.status:1766: creating plugins/epub/Makefile
+config.status:1766: creating plugins/kword/xp/Makefile
+config.status:1766: creating plugins/kword/Makefile
+config.status:1766: creating plugins/rsvg/xp/Makefile
+config.status:1766: creating plugins/rsvg/Makefile
+config.status:1766: creating config.h
+config.status:1995: executing depfiles commands
+config.status:1995: executing libtool commands
 
 ## ---------------- ##
 ## Cache variables. ##
@@ -1751,6 +1789,7 @@ am_cv_CC_dependencies_compiler_type=gcc3
 am_cv_CXX_dependencies_compiler_type=gcc3
 am_cv_make_support_nested_variables=yes
 am_cv_prog_cc_c_o=yes
+am_cv_prog_tar_ustar=gnutar
 lt_cv_ar_at_file=@
 lt_cv_archive_cmds_need_lc=yes
 lt_cv_deplibs_check_method='file_magic ^x86 archive import|^x86 DLL'
@@ -1824,7 +1863,7 @@ ABI_XHTML_TIDY_FALSE=''
 ABI_XHTML_TIDY_TRUE='#'
 ABI_XHTML_XML2_FALSE='#'
 ABI_XHTML_XML2_TRUE=''
-ACLOCAL='aclocal'
+ACLOCAL='${SHELL} /home/user/abiword-3.0.2/missing aclocal-1.15'
 AF_CPPFLAGS=' ${BASE_CPPFLAGS} -I${top_srcdir}/src/af/ev/${TOOLKIT} -I${top_srcdir}/src/af/ev/xp -I${top_srcdir}/src/af/gr/${TOOLKIT} -I${top_srcdir}/src/af/gr/xp -I${top_srcdir}/src/af/util/${PLATFORM} -I${top_srcdir}/src/af/util/xp -I${top_srcdir}/src/af/xap/${TOOLKIT} -I${top_srcdir}/src/af/xap/xp'
 AF_TEST_CPPFLAGS=' ${AF_CPPFLAGS} -I${top_srcdir}/src/af/tf/xp'
 AIKSAURUS_BUILTIN_FALSE=''
@@ -1846,9 +1885,9 @@ APPLIX_CFLAGS=''
 APPLIX_LIBS=''
 AR='ar'
 AS='as'
-AUTOCONF='autoconf'
-AUTOHEADER='autoheader'
-AUTOMAKE='automake'
+AUTOCONF='${SHELL} /home/user/abiword-3.0.2/missing autoconf'
+AUTOHEADER='${SHELL} /home/user/abiword-3.0.2/missing autoheader'
+AUTOMAKE='${SHELL} /home/user/abiword-3.0.2/missing automake-1.15'
 AWK='gawk'
 BABELFISH_BUILTIN_FALSE=''
 BABELFISH_BUILTIN_TRUE='#'
@@ -2044,7 +2083,7 @@ LATEX_CFLAGS=''
 LATEX_LIBS=''
 LD='D:/msys64_230318/mingw32/i686-w64-mingw32/bin/ld.exe'
 LDFLAGS=''
-LEX='${SHELL} /home/user/abiword_personal/missing flex'
+LEX='${SHELL} /home/user/abiword-3.0.2/missing flex'
 LEXLIB=''
 LEX_OUTPUT_ROOT=''
 LIBGCRYPT_CFLAGS='-I/mingw32/include'
@@ -2068,7 +2107,7 @@ LT_SYS_LIBRARY_PATH=''
 MAINT=''
 MAINTAINER_MODE_FALSE='#'
 MAINTAINER_MODE_TRUE=''
-MAKEINFO='${SHELL} /home/user/abiword_personal/missing makeinfo'
+MAKEINFO='${SHELL} /home/user/abiword-3.0.2/missing makeinfo'
 MANIFEST_TOOL=':'
 MATHVIEW_BUILTIN_FALSE=''
 MATHVIEW_BUILTIN_TRUE='#'
@@ -2192,6 +2231,8 @@ TOOLKIT_GTK_ALL_FALSE=''
 TOOLKIT_GTK_ALL_TRUE='#'
 TOOLKIT_GTK_FALSE=''
 TOOLKIT_GTK_TRUE='#'
+TOOLKIT_QT_FALSE=''
+TOOLKIT_QT_TRUE='#'
 TOOLKIT_WIN_FALSE='#'
 TOOLKIT_WIN_TRUE=''
 TYPELIBDIR=''
@@ -2257,8 +2298,8 @@ am__isrc=''
 am__leading_dot='.'
 am__nodep='_no'
 am__quote=''
-am__tar='$${TAR-tar} chof - "$$tardir"'
-am__untar='$${TAR-tar} xf -'
+am__tar='tar --format=ustar -chf - "$$tardir"'
+am__untar='tar -xf -'
 bindir='${exec_prefix}/bin'
 build='i686-w64-mingw32'
 build_alias='i686-w64-mingw32'
@@ -2278,7 +2319,7 @@ host_vendor='w64'
 htmldir='${docdir}'
 includedir='${prefix}/include'
 infodir='${datarootdir}/info'
-install_sh='${SHELL} /home/user/abiword_personal/install-sh'
+install_sh='${SHELL} /home/user/abiword-3.0.2/install-sh'
 libdir='${exec_prefix}/lib'
 libexecdir='${exec_prefix}/libexec'
 libwmfconfig=''
@@ -2339,6 +2380,7 @@ target_alias=''
 #define HAVE_GSF_GIO 1
 #define ABIWORD_SERIES  "3.0"
 #define TOOLKIT_WIN 1
+#define _WIN32_IE 0x0501
 #define UNICODE 1
 #define ENABLE_PRINT 1
 #define ENABLE_SPELL 1
@@ -2363,8 +2405,8 @@ generated by GNU Autoconf 2.69.  Invocation command line was
   CONFIG_HEADERS  = 
   CONFIG_LINKS    = 
   CONFIG_COMMANDS = 
-  $ ./config.status config.h
+  $ ./config.status Makefile
 
 on DESKTOP-CLQLNA8
 
-config.status:1752: creating config.h
+config.status:1766: creating Makefile

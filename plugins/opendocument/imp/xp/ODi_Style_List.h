@@ -52,22 +52,22 @@ public:
 
     virtual ~ODi_Style_List();
 
-    virtual void startElement (const gchar* pName, const gchar** ppAtts,
-                               ODi_ListenerStateAction& rAction) override;
+    void startElement (const gchar* pName, const gchar** ppAtts,
+                               ODi_ListenerStateAction& rAction);
 
-    virtual void endElement (const gchar* pName,
-                             ODi_ListenerStateAction& rAction) override;
+    void endElement (const gchar* pName,
+                             ODi_ListenerStateAction& rAction);
 
-    virtual void charData (const gchar* /*pBuffer*/, int /*length*/) override { };
+    void charData (const gchar* /*pBuffer*/, int /*length*/) { };
 
     void defineAbiList(PD_Document* pDocument);
     void redefine(PD_Document* pDocument, UT_uint32 iLevel);
 
     ODi_ListLevelStyle* getLevelStyle(UT_uint32 level) const
         {
-            UT_return_val_if_fail(level > 0, nullptr);
-            UT_return_val_if_fail(!m_levelStyles.empty(), nullptr);
-            UT_return_val_if_fail(level <= m_levelStyles.size(), nullptr);
+            UT_return_val_if_fail(level > 0, NULL);
+            UT_return_val_if_fail(!m_levelStyles.empty(), NULL);
+            UT_return_val_if_fail(level <= m_levelStyles.size(), NULL);
 
             // Levels starts from 1, but our vector starts from 0 (zero).
             return m_levelStyles[level-1];

@@ -47,12 +47,12 @@ void ODi_XMLRecorder::startElement (const gchar* pName,
     strcpy(pCall->m_pName, pName);
     
     count=0;
-    while (ppAtts[count] != nullptr) {
+    while (ppAtts[count] != 0) {
         count++;
     }
 
     pCall->m_ppAtts = new gchar*[count+1];
-    pCall->m_ppAtts[count] = nullptr;
+    pCall->m_ppAtts[count] = 0;
    
     for (i=0; i<count; i++) {
         pCall->m_ppAtts[i] = new gchar[strlen(ppAtts[i])+1];
@@ -110,9 +110,9 @@ void ODi_XMLRecorder::clear() {
  */
 ODi_XMLRecorder& ODi_XMLRecorder::operator=(const ODi_XMLRecorder& rXMLRecorder) {
     UT_uint32 count, i;
-    const ODi_XMLRecorder::StartElementCall* pStartCall = nullptr;
-    const ODi_XMLRecorder::EndElementCall* pEndCall = nullptr;
-    const ODi_XMLRecorder::CharDataCall* pCharDataCall = nullptr;
+    const ODi_XMLRecorder::StartElementCall* pStartCall = NULL;
+    const ODi_XMLRecorder::EndElementCall* pEndCall = NULL;
+    const ODi_XMLRecorder::CharDataCall* pCharDataCall = NULL;
 
     count = rXMLRecorder.getCallCount();
     for (i=0; i<count; i++) {

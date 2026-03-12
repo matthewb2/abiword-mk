@@ -36,9 +36,9 @@
 #include "ODi_Abi_Data.h" 
 
 // AbiWord includes
-#include "ut_misc.h"
-#include "pd_Document.h"
-#include "ut_debugmsg.h"
+#include <ut_misc.h>
+#include <pd_Document.h>
+#include <ut_debugmsg.h>
 
 
 /**
@@ -58,7 +58,7 @@ ODi_Office_Styles::~ODi_Office_Styles()
  * 
  * @param bAutomatic true if the style is an OpenDocument "automatic style".
  * 
- * @return The address of the newly created ODi_Style_Style or nullptr, if the
+ * @return The address of the newly created ODi_Style_Style or NULL, if the
  *         specified style is not currently supported (like graphic styles).
  */
 ODi_Style_Style* ODi_Office_Styles::addStyle(const gchar** ppAtts,
@@ -69,7 +69,7 @@ ODi_Style_Style* ODi_Office_Styles::addStyle(const gchar** ppAtts,
     const gchar* pFamily;
     const gchar* pName;
     const gchar* pDisplayName;
-    ODi_Style_Style* pStyle = nullptr;
+    ODi_Style_Style* pStyle = NULL;
     const ODi_Style_Style* pConstStyle;
     std::string replacementName;
     std::string replacementDisplayName;
@@ -199,7 +199,7 @@ ODi_Style_MasterPage* ODi_Office_Styles::addMasterPage(const gchar** ppAtts,
 ODi_Style_Style* ODi_Office_Styles::addDefaultStyle(const gchar** ppAtts,
 						    ODi_ElementStack& rElementStack, ODi_Abi_Data & rAbiData) {
     
-    const gchar* pAttr = nullptr;
+    const gchar* pAttr = NULL;
     
     pAttr = UT_getAttribute("style:family", ppAtts);
 
@@ -213,7 +213,7 @@ ODi_Style_Style* ODi_Office_Styles::addDefaultStyle(const gchar** ppAtts,
 
     } else {
         // Not currently supported
-        return nullptr;
+        return NULL;
     }
 }
 
@@ -442,8 +442,8 @@ const ODi_Style_Style* ODi_Office_Styles::getTableCellStyle(
 ODi_Style_List* ODi_Office_Styles::addList(const gchar** ppAtts,
                                          ODi_ElementStack& rElementStack)
 {
-    const gchar* pAttrValue = nullptr;
-    ODi_Style_List* pStyle = nullptr;
+    const gchar* pAttrValue = NULL;
+    ODi_Style_List* pStyle = NULL;
 
     pStyle = new ODi_Style_List(rElementStack);
     pAttrValue = UT_getAttribute("style:name", ppAtts);
@@ -461,8 +461,8 @@ ODi_NotesConfiguration* ODi_Office_Styles::addNotesConfiguration(
                                                const gchar** ppAtts,
                                                ODi_ElementStack& rElementStack) 
 {
-    const gchar* pAttrValue = nullptr;
-    ODi_NotesConfiguration* pNotesConfig = nullptr;
+    const gchar* pAttrValue = NULL;
+    ODi_NotesConfiguration* pNotesConfig = NULL;
 
     pNotesConfig = new ODi_NotesConfiguration(rElementStack);
     pAttrValue = UT_getAttribute("text:note-class", ppAtts);

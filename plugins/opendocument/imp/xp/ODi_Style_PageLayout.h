@@ -27,7 +27,7 @@
 #include "ODi_ListenerState.h"
 
 // AbiWord includes
-#include "ut_string_class.h"
+#include <ut_string_class.h>
 
 // Internal classes
 class ODi_Abi_Data;
@@ -47,12 +47,12 @@ public:
 
     virtual ~ODi_Style_PageLayout() {}
 
-    virtual void startElement(const gchar* pName, const gchar** ppAtts,
-                      ODi_ListenerStateAction& rAction) override;
+    void startElement(const gchar* pName, const gchar** ppAtts,
+                      ODi_ListenerStateAction& rAction);
 
-    virtual void endElement(const gchar* pName, ODi_ListenerStateAction& rAction) override;
+    void endElement(const gchar* pName, ODi_ListenerStateAction& rAction);
 
-    virtual void charData (const gchar* /*pBuffer*/, int /*length*/) override {}
+    void charData (const gchar* /*pBuffer*/, int /*length*/) {}
 
     void definePageSizeTag(PD_Document* pDocument) const;
 

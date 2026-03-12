@@ -67,7 +67,7 @@ ABI_PLUGIN_DECLARE("HRText")
 // completely generic code to allow this to be a plugin
 
 // we use a reference-counted sniffer
-static IE_Exp_HRText_Sniffer * m_sniffer = nullptr;
+static IE_Exp_HRText_Sniffer * m_sniffer = 0;
 
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_register (XAP_ModuleInfo * mi)
@@ -91,17 +91,17 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-	mi->name = nullptr;
-	mi->desc = nullptr;
-	mi->version = nullptr;
-	mi->author = nullptr;
-	mi->usage = nullptr;
+	mi->name = 0;
+	mi->desc = 0;
+	mi->version = 0;
+	mi->author = 0;
+	mi->usage = 0;
 
 	UT_ASSERT (m_sniffer);
 
 	IE_Exp::unregisterExporter (m_sniffer);
 	delete m_sniffer;
-	m_sniffer = nullptr;
+	m_sniffer = 0;
 
 	return 1;
 }
@@ -149,7 +149,7 @@ bool IE_Exp_HRText_Sniffer::getDlgLabels(const char ** pszDesc,
 /*****************************************************************/
 
 IE_Exp_HRText::IE_Exp_HRText(PD_Document * pDocument)
-	: IE_Exp(pDocument), m_pListener(nullptr)
+	: IE_Exp(pDocument), m_pListener(0)
 {
   m_error = UT_OK;
 }
@@ -178,14 +178,14 @@ public:
 	virtual ~s_HRText_Listener();
 
 	virtual bool		populate(fl_ContainerLayout* sfh,
-								 const PX_ChangeRecord * pcr) override;
+								 const PX_ChangeRecord * pcr);
 
 	virtual bool		populateStrux(pf_Frag_Strux* sdh,
 									  const PX_ChangeRecord * pcr,
-									  fl_ContainerLayout* * psfh) override;
+									  fl_ContainerLayout* * psfh);
 
 	virtual bool		change(fl_ContainerLayout* sfh,
-							   const PX_ChangeRecord * pcr) override;
+							   const PX_ChangeRecord * pcr);
 
 	virtual bool		insertStrux(fl_ContainerLayout* sfh,
 									const PX_ChangeRecord * pcr,
@@ -193,9 +193,9 @@ public:
 									PL_ListenerId lid,
 									void (* pfnBindHandles)(pf_Frag_Strux* sdhNew,
 															PL_ListenerId lid,
-															fl_ContainerLayout* sfhNew)) override;
+															fl_ContainerLayout* sfhNew));
 
-	virtual bool		signal(UT_uint32 iSignal) override;
+	virtual bool		signal(UT_uint32 iSignal);
 
 protected:
 	void				_closeSection(void);
@@ -263,7 +263,7 @@ void s_HRText_Listener::_openTag(PT_AttrPropIndex api)
 		return;
 	}
 	
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 	UT_uint16 * piVal;
 	
@@ -341,7 +341,7 @@ void s_HRText_Listener::_openSpan(PT_AttrPropIndex api)
 		return;
 	}
 	
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 	bool bHaveProp = m_pDocument->getAttrProp(api,&pAP);
 
 	if (bHaveProp && pAP)
@@ -388,7 +388,7 @@ void s_HRText_Listener::_openSpan(PT_AttrPropIndex api)
 					  m_pie->write(UNDERLINE_DELIM);
 				  }
 
-				  q = strtok(nullptr, " ");
+				  q = strtok(NULL, " ");
 		    }
 
 		    FREEP(p);
@@ -448,7 +448,7 @@ void s_HRText_Listener::_closeSpan(void)
 		  m_pie->write(BOLD_DELIM);
 		}
 
-		m_pAP_Span = nullptr;
+		m_pAP_Span = NULL;
 	}
 
 	m_bInSpan = false;
@@ -566,7 +566,7 @@ bool s_HRText_Listener::populateStrux(pf_Frag_Strux* /*sdh*/,
 {
 	UT_ASSERT(pcr->getType() == PX_ChangeRecord::PXT_InsertStrux);
 	const PX_ChangeRecord_Strux * pcrx = static_cast<const PX_ChangeRecord_Strux *> (pcr);
-	*psfh = nullptr;						// we don't need it.
+	*psfh = 0;							// we don't need it.
 
 	switch (pcrx->getStruxType())
 	{
@@ -579,10 +579,10 @@ bool s_HRText_Listener::populateStrux(pf_Frag_Strux* /*sdh*/,
 		_closeSection();
 
 		PT_AttrPropIndex indexAP = pcr->getIndexAP();
-		const PP_AttrProp* pAP = nullptr;
+		const PP_AttrProp* pAP = NULL;
 		if (m_pDocument->getAttrProp(indexAP, &pAP) && pAP)
 		{
-			const gchar* pszSectionType = nullptr;
+			const gchar* pszSectionType = NULL;
 			pAP->getAttribute("type", pszSectionType);
 			if (
 				!pszSectionType
@@ -669,7 +669,7 @@ UT_Error IE_Exp_HRText::_writeDocument(void)
 		return UT_ERROR;
 
 	delete m_pListener;
-	m_pListener = nullptr;
+	m_pListener = NULL;
 	
 	return ((m_error) ? UT_IE_COULDNOTWRITE : UT_OK);
 }

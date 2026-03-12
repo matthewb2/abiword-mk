@@ -21,30 +21,30 @@
  */
 
 // Class definition include
-#include "OXMLi_StreamListener.h"
+#include <OXMLi_StreamListener.h>
 
 // Internal includes
-#include "OXMLi_Types.h"
-#include "OXMLi_ListenerState.h"
-#include "OXMLi_ListenerState_Common.h"
-#include "OXMLi_ListenerState_MainDocument.h"
-#include "OXMLi_ListenerState_Styles.h"
-#include "OXMLi_ListenerState_HdrFtr.h"
-#include "OXMLi_ListenerState_Theme.h"
-#include "OXMLi_ListenerState_DocSettings.h"
-#include "OXMLi_ListenerState_Numbering.h"
-#include "OXMLi_ListenerState_Table.h"
-#include "OXMLi_ListenerState_Field.h"
-#include "OXMLi_ListenerState_Footnote.h"
-#include "OXMLi_ListenerState_Endnote.h"
-#include "OXMLi_ListenerState_Image.h"
-#include "OXMLi_ListenerState_Textbox.h"
-#include "OXMLi_ListenerState_Valid.h"
-#include "OXMLi_ListenerState_Math.h"
+#include <OXMLi_Types.h>
+#include <OXMLi_ListenerState.h>
+#include <OXMLi_ListenerState_Common.h>
+#include <OXMLi_ListenerState_MainDocument.h>
+#include <OXMLi_ListenerState_Styles.h>
+#include <OXMLi_ListenerState_HdrFtr.h>
+#include <OXMLi_ListenerState_Theme.h>
+#include <OXMLi_ListenerState_DocSettings.h>
+#include <OXMLi_ListenerState_Numbering.h>
+#include <OXMLi_ListenerState_Table.h>
+#include <OXMLi_ListenerState_Field.h>
+#include <OXMLi_ListenerState_Footnote.h>
+#include <OXMLi_ListenerState_Endnote.h>
+#include <OXMLi_ListenerState_Image.h>
+#include <OXMLi_ListenerState_Textbox.h>
+#include <OXMLi_ListenerState_Valid.h>
+#include <OXMLi_ListenerState_Math.h>
 
 // AbiWord includes
-#include "ut_types.h"
-#include "ut_assert.h"
+#include <ut_types.h>
+#include <ut_assert.h>
 
 OXMLi_StreamListener::OXMLi_StreamListener() : 
 	m_pElemStack(new OXMLi_ElementStack()), 
@@ -67,7 +67,7 @@ OXMLi_StreamListener::~OXMLi_StreamListener()
 
 void OXMLi_StreamListener::setupStates(OXML_PartType type, const char * partId)
 {
-	OXMLi_ListenerState * state = nullptr;
+	OXMLi_ListenerState * state = NULL;
 	m_namespaces->reset();
 
 	//this has to be the first pushed state since it checks the validity of the input
@@ -144,7 +144,7 @@ void OXMLi_StreamListener::setupStates(OXML_PartType type, const char * partId)
 
 void OXMLi_StreamListener::pushState(OXMLi_ListenerState* s)
 {
-	UT_return_if_fail(s != nullptr);
+	UT_return_if_fail(s != NULL);
 	s->setListener(this);
 	m_states.push_back(s);
 }

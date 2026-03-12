@@ -88,7 +88,7 @@ bool IE_Exp_EML_Sniffer::getDlgLabels(const char ** pszDesc,
 /*****************************************************************/
 
 // we use a reference-counted sniffer
-static IE_Exp_EML_Sniffer * m_sniffer = nullptr;
+static IE_Exp_EML_Sniffer * m_sniffer = 0;
 
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_register (XAP_ModuleInfo * mi)
@@ -112,17 +112,17 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-	mi->name = nullptr;
-	mi->desc = nullptr;
-	mi->version = nullptr;
-	mi->author = nullptr;
-	mi->usage = nullptr;
+	mi->name = 0;
+	mi->desc = 0;
+	mi->version = 0;
+	mi->author = 0;
+	mi->usage = 0;
 
 	UT_ASSERT (m_sniffer);
 
 	IE_Exp::unregisterExporter (m_sniffer);
 	delete m_sniffer;
-	m_sniffer = nullptr;
+	m_sniffer = 0;
 
 	return 1;
 }

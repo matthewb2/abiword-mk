@@ -29,7 +29,7 @@
 
 AP_Dialog_CollaborationAddAccount::AP_Dialog_CollaborationAddAccount(XAP_DialogFactory * pDlgFactory, XAP_Dialog_Id id)
 	: XAP_Dialog_NonPersistent(pDlgFactory, id, "interface/dialogcollaborationaddaccount"),
-	m_pHandler(nullptr)
+	m_pHandler(0)
 {
 }
 

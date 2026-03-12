@@ -43,25 +43,25 @@ public:
 		       IE_Exp_MIF * pie);
 	virtual ~s_MIF_Listener();
 
-	virtual bool populate(fl_ContainerLayout* sfh,
-								 const PX_ChangeRecord * pcr) override;
+	virtual bool		populate(fl_ContainerLayout* sfh,
+								 const PX_ChangeRecord * pcr);
 
-	virtual bool populateStrux(pf_Frag_Strux* sdh,
+	virtual bool		populateStrux(pf_Frag_Strux* sdh,
 									  const PX_ChangeRecord * pcr,
-									  fl_ContainerLayout* * psfh) override;
+									  fl_ContainerLayout* * psfh);
 
-	virtual bool change(fl_ContainerLayout* sfh,
-							   const PX_ChangeRecord * pcr) override;
+	virtual bool		change(fl_ContainerLayout* sfh,
+							   const PX_ChangeRecord * pcr);
 
-	virtual bool insertStrux(fl_ContainerLayout* sfh,
+	virtual bool		insertStrux(fl_ContainerLayout* sfh,
 									const PX_ChangeRecord * pcr,
 									pf_Frag_Strux* sdh,
 									PL_ListenerId lid,
 									void (* pfnBindHandles)(pf_Frag_Strux* sdhNew,
 															PL_ListenerId lid,
-															fl_ContainerLayout* sfhNew)) override;
+															fl_ContainerLayout* sfhNew));
 
-	virtual bool signal(UT_uint32 iSignal) override;
+	virtual bool		signal(UT_uint32 iSignal);
 
 protected:
 	void				_closeBlock(void);
@@ -80,7 +80,7 @@ IE_Exp_MIF::IE_Exp_MIF(PD_Document * pDocument)
 	: IE_Exp(pDocument)
 {
 	m_error = 0;
-	m_pListener = nullptr;
+	m_pListener = NULL;
 }
 
 IE_Exp_MIF::~IE_Exp_MIF()
@@ -229,7 +229,7 @@ bool s_MIF_Listener::populateStrux(pf_Frag_Strux* /*sdh*/,
 {
 	UT_ASSERT(pcr->getType() == PX_ChangeRecord::PXT_InsertStrux);
 	const PX_ChangeRecord_Strux * pcrx = static_cast<const PX_ChangeRecord_Strux *> (pcr);
-	*psfh = nullptr;							// we don't need it.
+	*psfh = 0;							// we don't need it.
 
 	switch (pcrx->getStruxType())
 	{

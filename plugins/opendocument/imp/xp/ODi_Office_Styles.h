@@ -132,7 +132,7 @@ public:
             if(iter != m_pageLayoutStyles.end()) {
                 return iter->second;
             }
-            return nullptr;
+            return NULL;
         }
 
     const ODi_Style_MasterPage* getMasterPageStyle(
@@ -143,7 +143,7 @@ public:
             if(iter != m_masterPageStyles.end()) {
                 return iter->second;
             }
-            return nullptr;
+            return NULL;
         }
 
     ODi_Style_List* getList(const gchar* pStyleName) const
@@ -153,7 +153,7 @@ public:
             if(iter != m_listStyles.end()) {
                 return iter->second;
             }
-            return nullptr;
+            return NULL;
         }
 
     const ODi_NotesConfiguration* getNotesConfiguration(
@@ -164,7 +164,7 @@ public:
             if(iter != m_notesConfigurations.end()) {
                 return iter->second;
             }
-            return nullptr;
+            return NULL;
         }
 
 private:

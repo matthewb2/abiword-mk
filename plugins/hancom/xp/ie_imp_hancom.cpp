@@ -19,6 +19,10 @@
  * 02110-1301 USA.
  */
 
+#include <gsf/gsf-input-stdio.h>
+#include <gsf/gsf-infile.h>
+#include <gsf/gsf-infile-msole.h>
+
 #include <memory.h>
 #include "xap_Module.h"
 #include "ie_imp.h"
@@ -49,12 +53,12 @@ public:
   virtual ~IE_Imp_Hancom();
   
 protected:
-	virtual UT_Error _loadFile(GsfInput * input) override;
+	virtual UT_Error _loadFile(GsfInput * input);
 private:
   GsfInfile *mDoc;
 };
 
-IE_Imp_Hancom::IE_Imp_Hancom(PD_Document* pDoc) : IE_Imp(pDoc), mDoc(nullptr) {
+IE_Imp_Hancom::IE_Imp_Hancom(PD_Document* pDoc) : IE_Imp(pDoc), mDoc(NULL) {
 }
 
 IE_Imp_Hancom::~IE_Imp_Hancom() {
@@ -64,7 +68,7 @@ IE_Imp_Hancom::~IE_Imp_Hancom() {
 }
 
 UT_Error IE_Imp_Hancom::_loadFile(GsfInput * input) {
-  mDoc = GSF_INFILE(gsf_infile_msole_new (input, nullptr));
+  mDoc = GSF_INFILE(gsf_infile_msole_new (input, NULL));
 
   if (!mDoc)
     return UT_IE_BOGUSDOCUMENT;
@@ -88,7 +92,7 @@ UT_Error IE_Imp_Hancom::_loadFile(GsfInput * input) {
 
   UT_uint32 length;
   UT_UCS4Char* text = reinterpret_cast<UT_UCS4Char*>(UT_convert((const char *)buf, len, "UCS-2LE", 
-								UCS_INTERNAL, nullptr, &length));
+								UCS_INTERNAL, NULL, &length));
   delete[] buf;
   if (!text)
     return UT_IE_NOMEMORY;
@@ -132,24 +136,24 @@ class IE_Imp_Hancom_Sniffer : public IE_ImpSniffer {
 		}
 		virtual ~IE_Imp_Hancom_Sniffer() {}
 
-		const IE_SuffixConfidence * getSuffixConfidence() override
+		const IE_SuffixConfidence * getSuffixConfidence ()
 		{
 			return IE_Imp_Hancom_Sniffer__SuffixConfidence;
 		}
 
-		virtual const IE_MimeConfidence * getMimeConfidence() override
+		virtual const IE_MimeConfidence * getMimeConfidence ()
 		{
-			return nullptr;
+			return NULL;
 		}
 
-		virtual UT_Confidence_t recognizeContents(const char* szBuf, UT_uint32 iNumBytes) override {
+		virtual UT_Confidence_t recognizeContents(const char* szBuf, UT_uint32 iNumBytes) {
 			if (iNumBytes >= sizeof(hwpSignature))
 				return (memcmp(szBuf, hwpSignature, sizeof(hwpSignature)) == 0) ? UT_CONFIDENCE_GOOD : UT_CONFIDENCE_ZILCH;
 			return UT_CONFIDENCE_ZILCH;
 
 		}
 
-		virtual bool getDlgLabels(const char** szDesc, const char** szSuffixList, IEFileType *ft) override {
+		virtual bool getDlgLabels(const char** szDesc, const char** szSuffixList, IEFileType *ft) {
 			*szDesc = "Hancom Word (*.hwp)";
 			*szSuffixList = "*.hwp";
 			*ft = getFileType();
@@ -157,7 +161,7 @@ class IE_Imp_Hancom_Sniffer : public IE_ImpSniffer {
 
 		}
 
-		virtual UT_Error constructImporter(PD_Document* pDocument, IE_Imp **ppie) override {
+		virtual UT_Error constructImporter(PD_Document* pDocument, IE_Imp **ppie) {
 			*ppie = new IE_Imp_Hancom(pDocument);
 			if (!ppie)
 				return UT_OUTOFMEM;
@@ -170,7 +174,7 @@ class IE_Imp_Hancom_Sniffer : public IE_ImpSniffer {
 // Plugin Code
 
 // we use a reference-counted sniffer
-static IE_Imp_Hancom_Sniffer * m_impSniffer = nullptr;
+static IE_Imp_Hancom_Sniffer * m_impSniffer = 0;
 
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_register (XAP_ModuleInfo * mi)
@@ -193,17 +197,17 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-    mi->name = nullptr;
-    mi->desc = nullptr;
-    mi->version = nullptr;
-    mi->author = nullptr;
-    mi->usage = nullptr;
+    mi->name = 0;
+    mi->desc = 0;
+    mi->version = 0;
+    mi->author = 0;
+    mi->usage = 0;
   
     UT_ASSERT (m_impSniffer);
 
     IE_Imp::unregisterImporter (m_impSniffer);
 	delete m_impSniffer;
-	m_impSniffer = nullptr;
+	m_impSniffer = 0;
 
     return 1;
 }

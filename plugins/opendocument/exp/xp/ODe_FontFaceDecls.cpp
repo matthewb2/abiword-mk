@@ -47,7 +47,7 @@ ODe_FontFaceDecls::~ODe_FontFaceDecls() {
  */
 void ODe_FontFaceDecls::addFont(const UT_UTF8String& rFontName) {
     
-    UT_UTF8String* pFontDecl = nullptr;
+    UT_UTF8String* pFontDecl = NULL;
     
     if ( !rFontName.empty() &&
          !m_fontDecls.contains(rFontName.utf8_str(), pFontDecl) ) {

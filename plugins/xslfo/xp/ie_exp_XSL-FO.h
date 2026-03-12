@@ -20,7 +20,6 @@
 #ifndef IE_EXP_XSL_FO_H
 #define IE_EXP_XSL_FO_H
 
-#include "ut_std_string.h"
 #include "ie_exp.h"
 #include "ie_Table.h"
 #include "pl_Listener.h"
@@ -39,12 +38,12 @@ public:
 	IE_Exp_XSL_FO_Sniffer (const char * name);
 	virtual ~IE_Exp_XSL_FO_Sniffer () {}
 
-	virtual bool recognizeSuffix(const char * szSuffix) override;
-	virtual bool getDlgLabels(const char ** szDesc,
+	virtual bool recognizeSuffix (const char * szSuffix);
+	virtual bool getDlgLabels (const char ** szDesc,
 							   const char ** szSuffixList,
-							   IEFileType * ft) override;
-	virtual UT_Error constructExporter(PD_Document * pDocument,
-										IE_Exp ** ppie) override;
+							   IEFileType * ft);
+	virtual UT_Error constructExporter (PD_Document * pDocument,
+										IE_Exp ** ppie);
 };
 
 class IE_Exp_XSL_FO : public IE_Exp
@@ -54,7 +53,7 @@ public:
 	virtual ~IE_Exp_XSL_FO();
 
 protected:
-	virtual UT_Error _writeDocument() override;
+	virtual UT_Error	_writeDocument();
 
 private:
 	s_XSL_FO_Listener *	m_pListener;
@@ -67,7 +66,7 @@ class ListHelper
 {
 public:
 	explicit ListHelper()
-		: m_pan(nullptr),
+		: m_pan(NULL),
 		  m_iInc(-1),
 		  m_iCount(0),
 		  m_iStart(0)
@@ -92,7 +91,7 @@ public:
 		return m_pan->getID();
 	}
 
-	std::string getNextLabel()
+	UT_UTF8String getNextLabel()
 	{
 		UT_return_val_if_fail(m_pan,"");
 
@@ -100,7 +99,7 @@ public:
 		{
 			UT_uint32 val = m_iStart + (m_iInc * m_iCount);
 			m_iCount++;
-			return UT_std_string_sprintf("%s%d%s", m_sPreText.utf8_str(), val, m_sPostText.utf8_str());
+			return UT_UTF8String_sprintf("%s%d%s", m_sPreText.utf8_str(), val, m_sPostText.utf8_str());
 		}
 		else
 		{
@@ -197,7 +196,7 @@ public:
 				}
 			}
 
-			return bullet.utf8_str();
+			return bullet;
 		}
 	}
 
@@ -250,25 +249,25 @@ public:
 					  IE_Exp_XSL_FO * pie);
 	virtual ~s_XSL_FO_Listener();
 
-	virtual bool populate(fl_ContainerLayout* sfh,
-								 const PX_ChangeRecord * pcr) override;
+	virtual bool		populate(fl_ContainerLayout* sfh,
+								 const PX_ChangeRecord * pcr);
 
-	virtual bool populateStrux(pf_Frag_Strux* sdh,
+	virtual bool		populateStrux(pf_Frag_Strux* sdh,
 									  const PX_ChangeRecord * pcr,
-									  fl_ContainerLayout* * psfh) override;
+									  fl_ContainerLayout* * psfh);
 
-	virtual bool change(fl_ContainerLayout* sfh,
-							   const PX_ChangeRecord * pcr) override;
+	virtual bool		change(fl_ContainerLayout* sfh,
+							   const PX_ChangeRecord * pcr);
 
-	virtual bool insertStrux(fl_ContainerLayout* sfh,
+	virtual bool		insertStrux(fl_ContainerLayout* sfh,
 									const PX_ChangeRecord * pcr,
 									pf_Frag_Strux* sdh,
 									PL_ListenerId lid,
 									void (* pfnBindHandles)(pf_Frag_Strux* sdhNew,
 															PL_ListenerId lid,
-															fl_ContainerLayout* sfhNew)) override;
+															fl_ContainerLayout* sfhNew));
 
-	virtual bool signal(UT_uint32 iSignal) override;
+	virtual bool		signal(UT_uint32 iSignal);
 
 protected:
 
@@ -331,9 +330,9 @@ private:
 	UT_uint32			m_iListID;
 
 	ie_Table			mTableHelper;
-	std::vector<std::string> m_utvDataIDs;
+	UT_Vector			m_utvDataIDs;
 	UT_NumberStack		m_utnsTagStack;
-	std::vector<ListHelper *> m_Lists;
+	UT_GenericVector<ListHelper *> m_Lists;
 };
 
 #endif /* IE_EXP_XSL_FO_H */

@@ -33,13 +33,13 @@
 IE_Exp_OpenXML_Listener::IE_Exp_OpenXML_Listener(PD_Document* doc)
   : pdoc(doc),
 	tableHelper(doc),
-	document(nullptr),
-	section(nullptr),
-	savedSection(nullptr),
-	paragraph(nullptr),
-	savedParagraph(nullptr),
-	hyperlink(nullptr),
-	textbox(nullptr),
+	document(NULL),
+	section(NULL),
+	savedSection(NULL),
+	paragraph(NULL),
+	savedParagraph(NULL),
+	hyperlink(NULL),
+	textbox(NULL),
 	bInPositionedImage(false),
 	bInHyperlink(false),
 	bInTextbox(false),
@@ -48,7 +48,7 @@ IE_Exp_OpenXML_Listener::IE_Exp_OpenXML_Listener(PD_Document* doc)
 	document = OXML_Document::getNewInstance();
 
 	if(!pdoc->tellListener(static_cast<PL_Listener *>(this)))
-		document = nullptr;
+		document = NULL;
 
 	if(setPageSize() != UT_OK)
 	{
@@ -57,24 +57,24 @@ IE_Exp_OpenXML_Listener::IE_Exp_OpenXML_Listener(PD_Document* doc)
 	if(addDocumentStyles() != UT_OK)
 	{
 		UT_DEBUGMSG(("FRT: ERROR, Adding Document Styles Failed\n"));
-		document = nullptr;
+		document = NULL;
 	}
 	if(addLists() != UT_OK)
 	{
 		UT_DEBUGMSG(("FRT: ERROR, Adding Lists Failed\n"));
-		document = nullptr;
+		document = NULL;
 	}
 	if(addImages() != UT_OK)
 	{
 		UT_DEBUGMSG(("FRT: ERROR, Adding Images Failed\n"));
-		document = nullptr;
+		document = NULL;
 	}
 }
 
 IE_Exp_OpenXML_Listener::~IE_Exp_OpenXML_Listener()
 {
 	OXML_Document::destroyInstance();
-	document = nullptr;
+	document = NULL;
 }
 
 bool IE_Exp_OpenXML_Listener::populate(fl_ContainerLayout* /* sfh */, const PX_ChangeRecord* pcr)
@@ -102,7 +102,7 @@ bool IE_Exp_OpenXML_Listener::populate(fl_ContainerLayout* /* sfh */, const PX_C
 
 			// add run properties
 			PT_AttrPropIndex api = pcr->getIndexAP();
-			const PP_AttrProp* pAP = nullptr;
+			const PP_AttrProp* pAP = NULL;
 			bool bHaveProp = pdoc->getAttrProp(api,&pAP);
 
 			if(bHaveProp && pAP)
@@ -156,7 +156,7 @@ bool IE_Exp_OpenXML_Listener::populate(fl_ContainerLayout* /* sfh */, const PX_C
 		{
 			const PX_ChangeRecord_Object * pcro = static_cast<const PX_ChangeRecord_Object *> (pcr);
 			PT_AttrPropIndex api = pcr->getIndexAP();
-			const PP_AttrProp* pAP = nullptr;
+			const PP_AttrProp* pAP = NULL;
 			bool bHaveProp = pdoc->getAttrProp(api,&pAP);
 
 			const gchar* szValue;
@@ -211,7 +211,7 @@ bool IE_Exp_OpenXML_Listener::populate(fl_ContainerLayout* /* sfh */, const PX_C
 
 						default:
 						{
-							UT_UTF8String value = field->getValue(); // getValue() can return nullptr
+							UT_UTF8String value = field->getValue(); // getValue() can return NULL
 							OXML_Element_Field* element_field = new OXML_Element_Field(getNextId(), field->getFieldType(), value.utf8_str());
 							OXML_SharedElement shared_element_field(static_cast<OXML_Element*>(element_field));
 
@@ -349,7 +349,7 @@ bool IE_Exp_OpenXML_Listener::populate(fl_ContainerLayout* /* sfh */, const PX_C
 						}
 
 						UT_ConstByteBufPtr pByteBuf;
-						bool bOK = pdoc->getDataItemDataByName(szValue, pByteBuf, nullptr, nullptr);
+						bool bOK = pdoc->getDataItemDataByName(szValue, pByteBuf, NULL, NULL);
 						if(!bOK)
 							return bOK;
 
@@ -417,7 +417,7 @@ bool IE_Exp_OpenXML_Listener::populate(fl_ContainerLayout* /* sfh */, const PX_C
 									return false;
 							}
 						}
-						const gchar* pImageName = nullptr;
+						const gchar* pImageName = NULL;
 						std::string snapshot = "snapshot-png-";
 						element_image->getAttribute("dataid", pImageName);
 						if(pImageName)
@@ -519,7 +519,7 @@ bool IE_Exp_OpenXML_Listener::populateStrux(pf_Frag_Strux* sdh, const PX_ChangeR
 	const PX_ChangeRecord_Strux* pcrx = static_cast<const PX_ChangeRecord_Strux *> (pcr);
 
 	PT_AttrPropIndex api = pcr->getIndexAP();
-	const PP_AttrProp* pAP = nullptr;
+	const PP_AttrProp* pAP = NULL;
 	bool bHaveProp = pdoc->getAttrProp(api,&pAP);
 
 	switch (pcrx->getStruxType())
@@ -803,7 +803,7 @@ bool IE_Exp_OpenXML_Listener::populateStrux(pf_Frag_Strux* sdh, const PX_ChangeR
 		}
 		case PTX_SectionCell:
 		{
-			OXML_Element_Table* table = nullptr;
+			OXML_Element_Table* table = NULL;
 			if(!m_tableStack.empty())
 				table = m_tableStack.top();
 
@@ -813,7 +813,7 @@ bool IE_Exp_OpenXML_Listener::populateStrux(pf_Frag_Strux* sdh, const PX_ChangeR
 				return false;
 			}
 
-			OXML_Element_Row* row = nullptr;
+			OXML_Element_Row* row = NULL;
 			if(!m_rowStack.empty())
 				row = m_rowStack.top();
 
@@ -916,7 +916,7 @@ bool IE_Exp_OpenXML_Listener::populateStrux(pf_Frag_Strux* sdh, const PX_ChangeR
 		}
 		case PTX_SectionFrame:
         {
-			const gchar* frameType = nullptr;
+			const gchar* frameType = NULL;
 
 			if(!(bHaveProp && pAP))
 				return true;
@@ -1104,19 +1104,19 @@ UT_Error IE_Exp_OpenXML_Listener::addDocumentStyles()
 {
 	UT_Error err = UT_OK;
 
-	const PP_AttrProp * pAP = nullptr;
-	const gchar* styleName = nullptr;
-	const gchar* basedOn = nullptr;
-	const gchar* followedBy = nullptr;
-	const gchar* propertyName = nullptr;
-	const gchar* propertyValue = nullptr;
+	const PP_AttrProp * pAP = NULL;
+	const gchar* styleName = NULL;
+	const gchar* basedOn = NULL;
+	const gchar* followedBy = NULL;
+	const gchar* propertyName = NULL;
+	const gchar* propertyValue = NULL;
 	PT_AttrPropIndex api = pdoc->getAttrPropIndex();
 	bool bHaveProp = pdoc->getAttrProp(api, &pAP);
 
 	if(!bHaveProp || !pAP)
 		return UT_OK;
 
-	const PD_Style* pStyle = nullptr;
+	const PD_Style* pStyle = NULL;
 
 	size_t styleCount = pdoc->getStyleCount();
 	size_t k;
@@ -1193,7 +1193,7 @@ UT_Error IE_Exp_OpenXML_Listener::addLists()
 {
 	UT_Error err = UT_OK;
 
-	const PP_AttrProp * pAP = nullptr;
+	const PP_AttrProp * pAP = NULL;
 
 	PT_AttrPropIndex api = pdoc->getAttrPropIndex();
 	bool bHaveProp = pdoc->getAttrProp(api, &pAP);
@@ -1236,18 +1236,18 @@ UT_Error IE_Exp_OpenXML_Listener::addImages()
 {
 	UT_Error err = UT_OK;
 
-	const char* szName = nullptr;
+	const char* szName = NULL;
     std::string mimeType;
 	UT_ConstByteBufPtr pByteBuf;
 
 	UT_uint32 k = 0;
-	while (pdoc->enumDataItems(k, nullptr, &szName, pByteBuf, &mimeType))
+	while (pdoc->enumDataItems (k, 0, &szName, pByteBuf, &mimeType))
 	{
 		k++;
 
 		if(!(szName && *szName && !mimeType.empty() && pByteBuf && pByteBuf->getLength()))
 		{
-			szName = nullptr;
+			szName = NULL;
 			mimeType.clear();
 			pByteBuf.reset();
 			continue;
@@ -1260,7 +1260,7 @@ UT_Error IE_Exp_OpenXML_Listener::addImages()
 			UT_DEBUGMSG(("OpenXML export: unhandled/ignored mime type: %s\n",
                          mimeType.c_str()));
 
-			szName = nullptr;
+			szName = NULL;
 			mimeType.clear();
 			pByteBuf.reset();
 			continue;
@@ -1277,7 +1277,7 @@ UT_Error IE_Exp_OpenXML_Listener::addImages()
 		if(err != UT_OK)
 			return err;
 
-		szName = nullptr;
+		szName = NULL;
 		mimeType.clear();
 		pByteBuf.reset();
 	}

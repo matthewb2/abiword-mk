@@ -54,7 +54,7 @@ ABI_PLUGIN_DECLARE ("Wikipedia")
 inline static char*
 _ucsToAscii(const UT_UCSChar* text)
 {
-  UT_return_val_if_fail(text, nullptr);
+  UT_return_val_if_fail(text,0);
 
   // calculate length of text so that we can create a character
   // buffer of equal size.
@@ -141,8 +141,8 @@ Wikipedia_removeFromMenus()
   int frameCount = pApp->getFrameCount();
   XAP_Menu_Factory * pFact = pApp->getMenuFactory();
 
-  pFact->removeMenuItem("Main",nullptr,Wikipedia_MenuLabel);
-  pFact->removeMenuItem("contextText",nullptr,Wikipedia_MenuLabel);
+  pFact->removeMenuItem("Main",NULL,Wikipedia_MenuLabel);
+  pFact->removeMenuItem("contextText",NULL,Wikipedia_MenuLabel);
   for(int i = 0;i < frameCount;++i)
     {
       // Get the current frame that we're iterating through.
@@ -193,13 +193,13 @@ Wikipedia_addToMenus()
   //
   // Put it in the context menu.
   //
-  XAP_Menu_Id newID = pFact->addNewMenuAfter("contextText",nullptr,"Bullets and &Numbering",EV_MLF_Normal);
-  pFact->addNewLabel(nullptr,newID,Wikipedia_MenuLabel, Wikipedia_MenuTooltip);
+  XAP_Menu_Id newID = pFact->addNewMenuAfter("contextText",NULL,"Bullets and &Numbering",EV_MLF_Normal);
+  pFact->addNewLabel(NULL,newID,Wikipedia_MenuLabel, Wikipedia_MenuTooltip);
 
   //
   // Also put it under word Wount in the main menu,
   //
-  pFact->addNewMenuAfter("Main",nullptr,"&Word Count",EV_MLF_Normal,newID);
+  pFact->addNewMenuAfter("Main",NULL,"&Word Count",EV_MLF_Normal,newID);
   
   // Create the Action that will be called.
   EV_Menu_Action* myAction = new EV_Menu_Action(
@@ -209,8 +209,8 @@ Wikipedia_addToMenus()
 						0,                      // no, we don't have a checkbox.
 						0,
 						"Wikipedia_invoke",  // name of callback function to call.
-						nullptr,                   // don't know/care what this is for
-						nullptr                    // don't know/care what this is for
+						NULL,                   // don't know/care what this is for
+						NULL                    // don't know/care what this is for
 						);
   
   // Now what we need to do is add this particular action to the ActionSet
@@ -253,11 +253,11 @@ int abi_plugin_register (XAP_ModuleInfo * mi)
 ABI_BUILTIN_FAR_CALL
 int abi_plugin_unregister (XAP_ModuleInfo * mi)
 {
-    mi->name = nullptr;
-    mi->desc = nullptr;
-    mi->version = nullptr;
-    mi->author = nullptr;
-    mi->usage = nullptr;
+    mi->name = 0;
+    mi->desc = 0;
+    mi->version = 0;
+    mi->author = 0;
+    mi->usage = 0;
 
     Wikipedia_removeFromMenus();
 

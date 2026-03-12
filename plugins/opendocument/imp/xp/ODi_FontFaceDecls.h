@@ -42,11 +42,11 @@ public:
     ODi_FontFaceDecls(ODi_ElementStack& rElementStack);
 
     void startElement (const gchar* pName, const gchar** ppAtts,
-                       ODi_ListenerStateAction& rAction) override;
+                       ODi_ListenerStateAction& rAction);
 
-    void endElement (const gchar* pName, ODi_ListenerStateAction& rAction) override;
+    void endElement (const gchar* pName, ODi_ListenerStateAction& rAction);
 
-    void charData (const gchar* /*pBuffer*/, int /*length*/) override {}
+    void charData (const gchar* /*pBuffer*/, int /*length*/) {}
 
     const std::string & getFontFamily(const std::string& rStyleName);
 

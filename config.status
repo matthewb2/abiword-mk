@@ -393,7 +393,7 @@ on `(hostname || uname -n) 2>/dev/null | sed 1q`
 "
 
 # Files that config.status was made for.
-config_files=" libabiword.pc Makefile icons/Makefile po/Makefile src/Makefile src/af/Makefile src/af/ev/Makefile src/af/ev/cocoa/Makefile src/af/ev/gtk/Makefile src/af/ev/win/bmp/Makefile src/af/ev/win/Makefile src/af/ev/xp/Makefile src/af/gr/Makefile src/af/gr/cocoa/Makefile src/af/gr/gtk/Makefile src/af/gr/win/Makefile src/af/gr/xp/Makefile src/af/tf/Makefile src/af/tf/xp/Makefile src/af/util/Makefile src/af/util/unix/Makefile src/af/util/win/Makefile src/af/util/xp/Makefile src/af/util/xp/t/Makefile src/af/xap/Makefile src/af/xap/cocoa/Makefile src/af/xap/gtk/Makefile src/af/xap/gtk/t/Makefile src/af/xap/win/Makefile src/af/xap/xp/Makefile src/gi-overrides/Makefile src/plugins/Makefile src/text/Makefile src/text/fmt/Makefile src/text/fmt/gtk/Makefile src/text/fmt/xp/Makefile src/text/fmt/xp/t/Makefile src/text/ptbl/Makefile src/text/ptbl/xp/Makefile src/text/ptbl/xp/t/Makefile src/wp/Makefile src/wp/ap/Makefile src/wp/ap/cocoa/Makefile src/wp/ap/gtk/Makefile src/wp/ap/win/Makefile src/wp/ap/xp/Makefile src/wp/ap/xp/ToolbarIcons/Makefile src/wp/impexp/Makefile src/wp/impexp/cocoa/Makefile src/wp/impexp/gtk/Makefile src/wp/impexp/win/Makefile src/wp/impexp/xp/Makefile src/wp/test/Makefile src/wp/test/cocoa/Makefile src/wp/test/unix/Makefile src/wp/test/unix/testwrap.sh src/wp/test/win/Makefile src/wp/test/win/testwrap.sh src/wp/test/xp/Makefile src/wp/main/Makefile src/wp/main/cocoa/Makefile src/wp/main/cocoa/bundle/Info.plist src/wp/main/win/Makefile user/Makefile user/wp/Makefile user/wp/clipart/Makefile user/wp/dictionary/Makefile user/wp/templates/Makefile tools/Makefile tools/cdump/Makefile tools/cdump/xp/Makefile plugins/openwriter/xp/Makefile plugins/openwriter/Makefile plugins/grammar/linkgrammarwrap/Makefile plugins/grammar/xp/Makefile plugins/grammar/Makefile plugins/wpg/xp/Makefile plugins/wpg/Makefile plugins/command/xp/Makefile plugins/command/Makefile plugins/sdw/xp/Makefile plugins/sdw/Makefile plugins/paint/win/Makefile plugins/paint/xp/Makefile plugins/paint/unix/Makefile plugins/paint/Makefile plugins/passepartout/xp/Makefile plugins/passepartout/Makefile plugins/opendocument/imp/xp/Makefile plugins/opendocument/imp/Makefile plugins/opendocument/exp/xp/Makefile plugins/opendocument/exp/Makefile plugins/opendocument/common/xp/Makefile plugins/opendocument/common/Makefile plugins/opendocument/Makefile plugins/wml/xp/Makefile plugins/wml/Makefile plugins/eml/xp/Makefile plugins/eml/Makefile plugins/mht/xp/Makefile plugins/mht/Makefile plugins/gdict/unix/Makefile plugins/gdict/Makefile plugins/s5/xp/Makefile plugins/s5/Makefile plugins/babelfish/xp/Makefile plugins/babelfish/Makefile plugins/ots/xp/Makefile plugins/ots/Makefile plugins/bmp/xp/Makefile plugins/bmp/Makefile plugins/psion/xp/Makefile plugins/psion/Makefile plugins/gda/unix/Makefile plugins/gda/Makefile plugins/opml/xp/Makefile plugins/opml/Makefile plugins/garble/xp/Makefile plugins/garble/Makefile plugins/hrtext/xp/Makefile plugins/hrtext/Makefile plugins/presentation/xp/Makefile plugins/presentation/Makefile plugins/freetranslation/xp/Makefile plugins/freetranslation/Makefile plugins/xslfo/xp/Makefile plugins/xslfo/Makefile plugins/wordperfect/xp/Makefile plugins/wordperfect/Makefile plugins/applix/xp/Makefile plugins/applix/Makefile plugins/loadbindings/xp/Makefile plugins/loadbindings/Makefile plugins/docbook/xp/Makefile plugins/docbook/Makefile plugins/mif/xp/Makefile plugins/mif/Makefile plugins/pdf/xp/Makefile plugins/pdf/Makefile plugins/google/xp/Makefile plugins/google/Makefile plugins/Makefile plugins/clarisworks/xp/Makefile plugins/clarisworks/Makefile plugins/latex/xp/Makefile plugins/latex/Makefile plugins/latex/xsltml/Makefile plugins/mswrite/xp/Makefile plugins/mswrite/Makefile plugins/iscii/xp/Makefile plugins/iscii/Makefile plugins/openxml/omml_xslt/Makefile plugins/openxml/imp/xp/Makefile plugins/openxml/imp/Makefile plugins/openxml/exp/xp/Makefile plugins/openxml/exp/Makefile plugins/openxml/common/xp/Makefile plugins/openxml/common/Makefile plugins/openxml/Makefile plugins/wikipedia/xp/Makefile plugins/wikipedia/Makefile plugins/pdb/xp/Makefile plugins/pdb/Makefile plugins/urldict/xp/Makefile plugins/urldict/Makefile plugins/wmf/xp/Makefile plugins/wmf/Makefile plugins/hancom/xp/Makefile plugins/hancom/Makefile plugins/epub/dialogs/win/Makefile plugins/epub/dialogs/xp/Makefile plugins/epub/dialogs/Makefile plugins/epub/dialogs/gtk/Makefile plugins/epub/imp/xp/Makefile plugins/epub/imp/Makefile plugins/epub/exp/xp/Makefile plugins/epub/exp/Makefile plugins/epub/common/xp/Makefile plugins/epub/common/Makefile plugins/epub/Makefile plugins/kword/xp/Makefile plugins/kword/Makefile plugins/rsvg/xp/Makefile plugins/rsvg/Makefile"
+config_files=" libabiword.pc Makefile goffice-bits/Makefile icons/Makefile po/Makefile src/Makefile src/af/Makefile src/af/ev/Makefile src/af/ev/cocoa/Makefile src/af/ev/gtk/Makefile src/af/ev/win/bmp/Makefile src/af/ev/win/Makefile src/af/ev/xp/Makefile src/af/gr/Makefile src/af/gr/cocoa/Makefile src/af/gr/gtk/Makefile src/af/gr/win/Makefile src/af/gr/xp/Makefile src/af/tf/Makefile src/af/tf/xp/Makefile src/af/util/Makefile src/af/util/unix/Makefile src/af/util/win/Makefile src/af/util/xp/Makefile src/af/util/xp/t/Makefile src/af/xap/Makefile src/af/xap/cocoa/Makefile src/af/xap/gtk/Makefile src/af/xap/gtk/t/Makefile src/af/xap/win/Makefile src/af/xap/xp/Makefile src/gi-overrides/Makefile src/plugins/Makefile src/text/Makefile src/text/fmt/Makefile src/text/fmt/gtk/Makefile src/text/fmt/xp/Makefile src/text/fmt/xp/t/Makefile src/text/ptbl/Makefile src/text/ptbl/xp/Makefile src/text/ptbl/xp/t/Makefile src/wp/Makefile src/wp/ap/Makefile src/wp/ap/cocoa/Makefile src/wp/ap/gtk/Makefile src/wp/ap/win/Makefile src/wp/ap/xp/Makefile src/wp/ap/xp/ToolbarIcons/Makefile src/wp/impexp/Makefile src/wp/impexp/cocoa/Makefile src/wp/impexp/gtk/Makefile src/wp/impexp/win/Makefile src/wp/impexp/xp/Makefile src/wp/test/Makefile src/wp/test/cocoa/Makefile src/wp/test/unix/Makefile src/wp/test/unix/testwrap.sh src/wp/test/win/Makefile src/wp/test/win/testwrap.sh src/wp/test/xp/Makefile src/wp/main/Makefile src/wp/main/cocoa/Makefile src/wp/main/cocoa/bundle/Info.plist src/wp/main/win/Makefile user/Makefile user/wp/Makefile user/wp/clipart/Makefile user/wp/dictionary/Makefile user/wp/templates/Makefile tools/Makefile tools/cdump/Makefile tools/cdump/xp/Makefile plugins/openwriter/xp/Makefile plugins/openwriter/Makefile plugins/grammar/linkgrammarwrap/Makefile plugins/grammar/xp/Makefile plugins/grammar/Makefile plugins/wpg/xp/Makefile plugins/wpg/Makefile plugins/gimp/xp/Makefile plugins/gimp/Makefile plugins/aiksaurus/win/Makefile plugins/aiksaurus/xp/Makefile plugins/aiksaurus/aiksaurusgtk3/Makefile plugins/aiksaurus/Makefile plugins/command/xp/Makefile plugins/command/Makefile plugins/goffice/unix/Makefile plugins/goffice/Makefile plugins/sdw/xp/Makefile plugins/sdw/Makefile plugins/paint/win/Makefile plugins/paint/xp/Makefile plugins/paint/unix/Makefile plugins/paint/Makefile plugins/passepartout/xp/Makefile plugins/passepartout/Makefile plugins/opendocument/imp/xp/Makefile plugins/opendocument/imp/Makefile plugins/opendocument/exp/xp/Makefile plugins/opendocument/exp/Makefile plugins/opendocument/common/xp/Makefile plugins/opendocument/common/Makefile plugins/opendocument/Makefile plugins/wml/xp/Makefile plugins/wml/Makefile plugins/eml/xp/Makefile plugins/eml/Makefile plugins/mht/xp/Makefile plugins/mht/Makefile plugins/gdict/unix/Makefile plugins/gdict/Makefile plugins/s5/xp/Makefile plugins/s5/Makefile plugins/babelfish/xp/Makefile plugins/babelfish/Makefile plugins/ots/xp/Makefile plugins/ots/Makefile plugins/bmp/xp/Makefile plugins/bmp/Makefile plugins/psion/xp/Makefile plugins/psion/Makefile plugins/gda/unix/Makefile plugins/gda/Makefile plugins/opml/xp/Makefile plugins/opml/Makefile plugins/garble/xp/Makefile plugins/garble/Makefile plugins/hrtext/xp/Makefile plugins/hrtext/Makefile plugins/presentation/xp/Makefile plugins/presentation/Makefile plugins/freetranslation/xp/Makefile plugins/freetranslation/Makefile plugins/xslfo/xp/Makefile plugins/xslfo/Makefile plugins/wordperfect/xp/Makefile plugins/wordperfect/Makefile plugins/applix/xp/Makefile plugins/applix/Makefile plugins/loadbindings/xp/Makefile plugins/loadbindings/Makefile plugins/docbook/xp/Makefile plugins/docbook/Makefile plugins/mif/xp/Makefile plugins/mif/Makefile plugins/pdf/xp/Makefile plugins/pdf/Makefile plugins/google/xp/Makefile plugins/google/Makefile plugins/Makefile plugins/clarisworks/xp/Makefile plugins/clarisworks/Makefile plugins/latex/xp/Makefile plugins/latex/Makefile plugins/latex/xsltml/Makefile plugins/t602/xp/Makefile plugins/t602/Makefile plugins/mswrite/xp/Makefile plugins/mswrite/Makefile plugins/iscii/xp/Makefile plugins/iscii/Makefile plugins/openxml/omml_xslt/Makefile plugins/openxml/imp/xp/Makefile plugins/openxml/imp/Makefile plugins/openxml/exp/xp/Makefile plugins/openxml/exp/Makefile plugins/openxml/common/xp/Makefile plugins/openxml/common/Makefile plugins/openxml/Makefile plugins/wikipedia/xp/Makefile plugins/wikipedia/Makefile plugins/pdb/xp/Makefile plugins/pdb/Makefile plugins/urldict/xp/Makefile plugins/urldict/Makefile plugins/wmf/xp/Makefile plugins/wmf/Makefile plugins/hancom/xp/Makefile plugins/hancom/Makefile plugins/epub/dialogs/win/Makefile plugins/epub/dialogs/xp/Makefile plugins/epub/dialogs/Makefile plugins/epub/dialogs/gtk/Makefile plugins/epub/imp/xp/Makefile plugins/epub/imp/Makefile plugins/epub/exp/xp/Makefile plugins/epub/exp/Makefile plugins/epub/common/xp/Makefile plugins/epub/common/Makefile plugins/epub/Makefile plugins/kword/xp/Makefile plugins/kword/Makefile plugins/rsvg/xp/Makefile plugins/rsvg/Makefile"
 config_headers=" config.h"
 config_commands=" depfiles libtool"
 
@@ -437,7 +437,7 @@ Copyright (C) 2012 Free Software Foundation, Inc.
 This config.status script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it."
 
-ac_pwd='/home/user/abiword_personal'
+ac_pwd='/home/user/abiword-3.0.2'
 srcdir='.'
 INSTALL='/usr/bin/install -c'
 MKDIR_P='/usr/bin/mkdir -p'
@@ -830,6 +830,7 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "libabiword.pc") CONFIG_FILES="$CONFIG_FILES libabiword.pc" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+    "goffice-bits/Makefile") CONFIG_FILES="$CONFIG_FILES goffice-bits/Makefile" ;;
     "icons/Makefile") CONFIG_FILES="$CONFIG_FILES icons/Makefile" ;;
     "po/Makefile") CONFIG_FILES="$CONFIG_FILES po/Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
@@ -906,8 +907,16 @@ do
     "plugins/grammar/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/grammar/Makefile" ;;
     "plugins/wpg/xp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/wpg/xp/Makefile" ;;
     "plugins/wpg/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/wpg/Makefile" ;;
+    "plugins/gimp/xp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/gimp/xp/Makefile" ;;
+    "plugins/gimp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/gimp/Makefile" ;;
+    "plugins/aiksaurus/win/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/aiksaurus/win/Makefile" ;;
+    "plugins/aiksaurus/xp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/aiksaurus/xp/Makefile" ;;
+    "plugins/aiksaurus/aiksaurusgtk3/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/aiksaurus/aiksaurusgtk3/Makefile" ;;
+    "plugins/aiksaurus/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/aiksaurus/Makefile" ;;
     "plugins/command/xp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/command/xp/Makefile" ;;
     "plugins/command/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/command/Makefile" ;;
+    "plugins/goffice/unix/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/goffice/unix/Makefile" ;;
+    "plugins/goffice/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/goffice/Makefile" ;;
     "plugins/sdw/xp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/sdw/xp/Makefile" ;;
     "plugins/sdw/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/sdw/Makefile" ;;
     "plugins/paint/win/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/paint/win/Makefile" ;;
@@ -975,6 +984,8 @@ do
     "plugins/latex/xp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/latex/xp/Makefile" ;;
     "plugins/latex/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/latex/Makefile" ;;
     "plugins/latex/xsltml/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/latex/xsltml/Makefile" ;;
+    "plugins/t602/xp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/t602/xp/Makefile" ;;
+    "plugins/t602/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/t602/Makefile" ;;
     "plugins/mswrite/xp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/mswrite/xp/Makefile" ;;
     "plugins/mswrite/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/mswrite/Makefile" ;;
     "plugins/iscii/xp/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/iscii/xp/Makefile" ;;
@@ -1125,7 +1136,7 @@ S["YFLAGS"]=""
 S["YACC"]="yacc"
 S["LEXLIB"]=""
 S["LEX_OUTPUT_ROOT"]=""
-S["LEX"]="${SHELL} /home/user/abiword_personal/missing flex"
+S["LEX"]="${SHELL} /home/user/abiword-3.0.2/missing flex"
 S["MATHVIEW_LIBS"]=""
 S["MATHVIEW_CFLAGS"]=""
 S["PDB_LIBS"]=""
@@ -1431,6 +1442,8 @@ S["WITH_CHAMPLAIN_FALSE"]=""
 S["WITH_CHAMPLAIN_TRUE"]="#"
 S["CHAMPLAIN_LIBS"]=""
 S["CHAMPLAIN_CFLAGS"]=""
+S["TOOLKIT_QT_FALSE"]=""
+S["TOOLKIT_QT_TRUE"]="#"
 S["HAVE_LIBICAL_FALSE"]=""
 S["HAVE_LIBICAL_TRUE"]="#"
 S["WITH_LIBICAL_FALSE"]=""
@@ -1509,8 +1522,8 @@ S["AM_BACKSLASH"]="\\"
 S["AM_DEFAULT_VERBOSITY"]="0"
 S["AM_DEFAULT_V"]="$(AM_DEFAULT_VERBOSITY)"
 S["AM_V"]="$(V)"
-S["am__untar"]="$${TAR-tar} xf -"
-S["am__tar"]="$${TAR-tar} chof - \"$$tardir\""
+S["am__untar"]="tar -xf -"
+S["am__tar"]="tar --format=ustar -chf - \"$$tardir\""
 S["AMTAR"]="$${TAR-tar}"
 S["am__leading_dot"]="."
 S["SET_MAKE"]=""
@@ -1519,12 +1532,12 @@ S["mkdir_p"]="$(MKDIR_P)"
 S["MKDIR_P"]="/usr/bin/mkdir -p"
 S["INSTALL_STRIP_PROGRAM"]="$(install_sh) -c -s"
 S["STRIP"]="strip"
-S["install_sh"]="${SHELL} /home/user/abiword_personal/install-sh"
-S["MAKEINFO"]="${SHELL} /home/user/abiword_personal/missing makeinfo"
-S["AUTOHEADER"]="autoheader"
-S["AUTOMAKE"]="automake"
-S["AUTOCONF"]="autoconf"
-S["ACLOCAL"]="aclocal"
+S["install_sh"]="${SHELL} /home/user/abiword-3.0.2/install-sh"
+S["MAKEINFO"]="${SHELL} /home/user/abiword-3.0.2/missing makeinfo"
+S["AUTOHEADER"]="${SHELL} /home/user/abiword-3.0.2/missing autoheader"
+S["AUTOMAKE"]="${SHELL} /home/user/abiword-3.0.2/missing automake-1.15"
+S["AUTOCONF"]="${SHELL} /home/user/abiword-3.0.2/missing autoconf"
+S["ACLOCAL"]="${SHELL} /home/user/abiword-3.0.2/missing aclocal-1.15"
 S["VERSION"]="3.0.2"
 S["PACKAGE"]="abiword"
 S["CYGPATH_W"]="cygpath -w"
@@ -1652,6 +1665,7 @@ D["HAVE_BOOST"]=" /**/"
 D["HAVE_GSF_GIO"]=" 1"
 D["ABIWORD_SERIES"]=" \"3.0\""
 D["TOOLKIT_WIN"]=" 1"
+D["_WIN32_IE"]=" 0x0501"
 D["UNICODE"]=" 1"
 D["ENABLE_PRINT"]=" 1"
 D["ENABLE_SPELL"]=" 1"

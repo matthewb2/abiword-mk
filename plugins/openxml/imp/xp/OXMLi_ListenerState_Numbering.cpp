@@ -21,24 +21,24 @@
  */
 
 // Class definition include
-#include "OXMLi_ListenerState_Numbering.h"
+#include <OXMLi_ListenerState_Numbering.h>
 
 // Internal includes
-#include "OXML_Document.h"
-#include "OXML_FontManager.h"
-#include "OXML_Types.h"
-#include "OXML_List.h"
+#include <OXML_Document.h>
+#include <OXML_FontManager.h>
+#include <OXML_Types.h>
+#include <OXML_List.h>
 
 // AbiWord includes
-#include "ut_assert.h"
-#include "ut_misc.h"
+#include <ut_assert.h>
+#include <ut_misc.h>
 
 // External includes
 #include <string>
 
 OXMLi_ListenerState_Numbering::OXMLi_ListenerState_Numbering():
 	OXMLi_ListenerState(),
-	m_currentList(nullptr),
+	m_currentList(NULL),
 	m_currentNumId(""),
 	m_parentListId("")
 {
@@ -186,7 +186,7 @@ void OXMLi_ListenerState_Numbering::endElement (OXMLi_EndElementRequest * rqst)
 		}			
 		OXML_SharedList sharedList(m_currentList);
 		doc->addList(sharedList);
-		m_currentList = nullptr;
+		m_currentList = NULL;
 		rqst->handled = true;
 	}
 	else if(nameMatches(rqst->pName, NS_W_KEY, "num"))

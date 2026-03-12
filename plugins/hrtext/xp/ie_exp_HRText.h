@@ -36,12 +36,12 @@ public:
 	IE_Exp_HRText_Sniffer ();
 	virtual ~IE_Exp_HRText_Sniffer () {}
 
-	virtual bool recognizeSuffix (const char * szSuffix) override;
+	virtual bool recognizeSuffix (const char * szSuffix);
 	virtual bool getDlgLabels (const char ** szDesc,
 							   const char ** szSuffixList,
-							   IEFileType * ft) override;
+							   IEFileType * ft);
 	virtual UT_Error constructExporter (PD_Document * pDocument,
-										IE_Exp ** ppie) override;
+										IE_Exp ** ppie);
 };
 
 
@@ -52,7 +52,7 @@ public:
 	virtual ~IE_Exp_HRText();
 
 protected:
-	virtual UT_Error	_writeDocument(void) override;
+	virtual UT_Error	_writeDocument(void);
 
  private:
 	s_HRText_Listener *	m_pListener;

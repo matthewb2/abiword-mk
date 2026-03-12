@@ -1,11 +1,11 @@
 
-SUBDIRS = gtk
+SUBDIRS = unix
 
 plugindir = $(ABIWORD_PLUGINSDIR)
 plugin_LTLIBRARIES = goffice.la
 
 goffice_la_LIBADD = \
-	gtk/libgtk.la \
+	unix/libunix.la \
 	$(GOFFICE_LIBS)
 
 goffice_la_LDFLAGS = \
