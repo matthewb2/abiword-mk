@@ -176,7 +176,7 @@ void AP_Win32Dialog_Spell::_showMisspelledWord(void)
 
 	UT_Win32LocaleString str;
 
-    p = m_pWordIterator->getPreWord(iLength);
+    //p = m_pWordIterator->getPreWord(iLength);
 	if (0 < iLength)
 	{
 // FIXME: this is broken - should take iLength characters from p
@@ -204,7 +204,7 @@ void AP_Win32Dialog_Spell::_showMisspelledWord(void)
 	cf.crTextColor = RGB(255,0,0);
 	SendMessageW(m_hwndSentence, EM_SETCHARFORMAT, (WPARAM) SCF_SELECTION, (LPARAM) &cf);
 
-    p = m_pWordIterator->getCurrentWord(iLength);
+    //p = m_pWordIterator->getCurrentWord(iLength);
 	if (0 < iLength)
 	{
 // FIXME: this is broken - should take iLength characters from p
@@ -234,7 +234,7 @@ void AP_Win32Dialog_Spell::_showMisspelledWord(void)
 	cf.dwEffects = CFE_AUTOCOLOR | CFE_PROTECTED;
 	SendMessageW(m_hwndSentence, EM_SETCHARFORMAT, (WPARAM) SCF_SELECTION, (LPARAM) &cf);
 
-    p = m_pWordIterator->getPostWord(iLength);
+    //p = m_pWordIterator->getPostWord(iLength);
 	if (0 < iLength)
 	{
 // FIXME: this is broken - should take iLength characters from p

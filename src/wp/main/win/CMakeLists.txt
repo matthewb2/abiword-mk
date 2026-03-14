@@ -5,6 +5,7 @@ add_executable(abiword_app
 
 target_link_libraries(abiword_app
     libabiword
+    ${GLIB_LIBRARIES}
 )
 
 set_target_properties(abiword_app PROPERTIES

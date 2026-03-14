@@ -78,7 +78,8 @@ TFTEST_MAIN("XAP_PrefsScheme")
 	int int_value3 = 0;
 	TFPASS(scheme->getValue("key1", value1));
 	TFPASS(value1 == "value1");
-	TFPASS(scheme->getValueBool("key5-bool", bool_value2));
+	//TFPASS(scheme->getValueBool("key5-bool", bool_value2));
+	TFPASS(scheme->getValueBool("key5-bool", &bool_value2));
 	TFPASS(bool_value2 == true);
 	TFPASS(scheme->getValueInt("key7-int", int_value3));
 	TFPASS(int_value3 == 32);
@@ -100,7 +101,8 @@ TFTEST_MAIN("XAP_Prefs")
 		TFPASS(default_scheme->getSchemeName() == pref.getBuiltinSchemeName());
 
 		// Test the prefs have a default value.
-		std::string value2;
+		//std::string value2;
+		UT_String value2;                // lvalue 변수
 		TFPASS(pref.getPrefsValue("key1", value2));
 		TFPASS(value2 == "value1");
 
@@ -136,12 +138,12 @@ TFTEST_MAIN("XAP_Prefs")
 
 		// Test the _builtin_ scheme has values.
 		{
-			std::string value1;
+			UT_String value1;
 			bool bool_value2 = false;
 			int int_value3 = 0;
 			TFPASS(pref.getPrefsValue("key1", value1));
 			TFPASS(value1 == "value1");
-			TFPASS(pref.getPrefsValueBool("key5-bool", bool_value2));
+			TFPASS(pref.getPrefsValueBool("key5-bool", &bool_value2));
 			TFPASS(bool_value2 == true);
 			TFPASS(pref.getPrefsValueInt("key7-int", int_value3));
 			TFPASS(int_value3 == 32);
@@ -150,23 +152,24 @@ TFTEST_MAIN("XAP_Prefs")
 		TFPASS(pref.setCurrentScheme("_TEST_"));
 		// Test the _TEST_ scheme has values when allowing built-in
 		{
-			std::string value1;
+			UT_String value1;
 			bool bool_value2 = false;
 			int int_value3 = 0;
 			TFPASS(pref.getPrefsValue("key1", value1));
 			TFPASS(value1 == "value1");
-			TFPASS(pref.getPrefsValueBool("key5-bool", bool_value2));
+			TFPASS(pref.getPrefsValueBool("key5-bool", &bool_value2));
 			TFPASS(bool_value2 == true);
 			TFPASS(pref.getPrefsValueInt("key7-int", int_value3));
 			TFPASS(int_value3 == 32);
 		}
 		// Test the _TEST_ scheme does not have values when disallowing built-in
 		{
-			std::string value1;
+			UT_String value1;
 			bool bool_value2 = false;
 			int int_value3 = 0;
 			TFPASS(!pref.getPrefsValue("key1", value1, false));
-			TFPASS(!pref.getPrefsValueBool("key5-bool", bool_value2, false));
+			//TFPASS(!pref.getPrefsValueBool("key5-bool", bool_value2, false));
+			TFPASS(!pref.getPrefsValueBool("key5-bool", &bool_value2, false));
 			TFPASS(!pref.getPrefsValueInt("key7-int", int_value3, false));
 		}
 	}

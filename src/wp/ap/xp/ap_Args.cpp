@@ -24,6 +24,15 @@
 #include "config.h"
 #endif
 
+
+#ifndef PACKAGE_VERSION
+#define PACKAGE_VERSION "3.0.2"
+#endif
+
+#ifndef LPACKAGE_VERSION
+#define LPACKAGE_VERSION L"3.0.2"
+#endif
+
 #include "ap_Features.h"
 #include "xap_Strings.h"
 #include "ap_Strings.h"
