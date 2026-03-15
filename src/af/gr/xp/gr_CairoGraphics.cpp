@@ -2745,6 +2745,7 @@ static const FieldMap *find_field(const FieldMap *fma, size_t n, const char *ele
 	return NULL;
 }
 
+#if 0
 /* Static 'virtual' function declared in gr_Graphics.h */
 const char* GR_Graphics::findNearestFont(const char* pszFontFamily,
 										 const char* pszFontStyle,
@@ -2812,6 +2813,7 @@ const char* GR_Graphics::findNearestFont(const char* pszFontFamily,
 	return s.utf8_str();
 }
 
+#endif
 
 GR_Font* GR_CairoGraphics::_findFont(const char* pszFontFamily,
 										 const char* pszFontStyle,

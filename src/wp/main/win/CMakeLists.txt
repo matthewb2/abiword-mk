@@ -4,7 +4,7 @@ add_executable(abiword_app
 )
 
 target_link_libraries(abiword_app
-    libabiword
+    abiword
     ${GLIB_LIBRARIES}
 )
 
