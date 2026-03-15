@@ -1,1 +1,0 @@
-aiksaurus applix bmp clarisworks collab command docbook eml epub garble gda gdict gimp goffice google grammar hancom hrtext iscii kword latex loadbindings mathview mht mif mswrite opendocument openwriter openxml opml ots paint passepartout pdb pdf presentation psion rsvg s5 sdw t602 testharness urldict wikipedia wmf wml wordperfect wpg xslfo
