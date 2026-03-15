@@ -81,6 +81,9 @@ pkg_check_modules(PANGO pango)
 pkg_check_modules(ZLIB REQUIRED zlib)
 pkg_check_modules(JPEG REQUIRED libjpeg)
 pkg_check_modules(PNG REQUIRED libpng)
+pkg_check_modules(XSLT REQUIRED libxslt)
+pkg_check_modules(WV REQUIRED wv-1.0)
+
 
 # -----------------------------
 # AbiWord source
@@ -126,13 +129,15 @@ list(FILTER ABIWORD_SRC EXCLUDE REGEX "copy")
 
 
 file(GLOB FV_VIEW_SRC
-src/text/fmt/xp/fv_View*.cpp
+    src/text/fmt/xp/fv_View*.cpp
 )
 list(FILTER FV_VIEW_SRC EXCLUDE REGEX "spell")
 list(FILTER FV_VIEW_SRC EXCLUDE REGEX "protected")
 
-
-
+file(GLOB IMPEXP_SRC
+    src/wp/impexp/xp/*.cpp
+    src/wp/impexp/win/*.cpp
+)
 
 # spell 기능 끄기
 set(ENABLE_SPELL OFF CACHE BOOL "Disable spell support")
@@ -175,6 +180,7 @@ add_compile_definitions(
 add_library(abiword SHARED 
     ${ABIWORD_SRC}
     ${FV_VIEW_SRC}
+    ${IMPEXP_SRC}  
     )
 
 target_include_directories(abiword PUBLIC
@@ -207,6 +213,8 @@ target_include_directories(abiword PUBLIC
     ${PANGO_INCLUDE_DIRS}
     ${FRIBIDI_INCLUDE_DIRS}
     ${ENCHANT_INCLUDE_DIRS}
+    ${XSLT_INCLUDE_DIRS}
+    ${WV_INCLUDE_DIRS}
     
 )
 
@@ -231,6 +239,8 @@ target_link_libraries(abiword
     ${ZLIB_LIBRARIES}
     ${JPEG_LIBRARIES}
     ${PNG_LIBRARIES}
+    ${XSLT_LIBRARIES}
+    ${WV_LIBRARIES}
 )
 
 target_compile_definitions(abiword PRIVATE ABI_BUILD)
