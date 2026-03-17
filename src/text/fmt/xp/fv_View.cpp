@@ -14266,4 +14266,3 @@ void FV_View::swapSelectionOrientation(void)
 	_setPoint(m_Selection.getSelectionAnchor());
 	m_Selection.setSelectionAnchor(curPos);
 }
-

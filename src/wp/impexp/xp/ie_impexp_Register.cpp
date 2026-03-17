@@ -67,7 +67,7 @@ void IE_ImpExp_RegisterXP ()
   /* now text-file types */
 
 	IE_Imp::registerImporter(new IE_Imp_AbiWord_1_Sniffer ());
-	IE_Imp::registerImporter(new IE_Imp_MsWord_97_Sniffer ());
+	//IE_Imp::registerImporter(new IE_Imp_MsWord_97_Sniffer ());
 	IE_Imp::registerImporter(new IE_Imp_RTF_Sniffer ());
 	IE_Imp::registerImporter(new IE_Imp_Text_Sniffer ());
 	IE_Imp::registerImporter(new IE_Imp_EncodedText_Sniffer ());

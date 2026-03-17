@@ -1,1 +1,0 @@
-openwriter grammar wpg gimp aiksaurus command goffice sdw paint passepartout opendocument wml eml mht gdict s5 babelfish ots bmp psion gda opml garble hrtext presentation freetranslation xslfo wordperfect applix loadbindings docbook mif pdf google clarisworks latex t602 collab mswrite iscii openxml wikipedia pdb mathview urldict wmf hancom epub kword rsvg

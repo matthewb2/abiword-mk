@@ -1722,3 +1722,7 @@ void XAP_App::signalWrapper(int sig_num)
     pApp->catchSignals(sig_num);
 }
 
+// src/af/xap/xp/xap_App.cpp
+const char* XAP_App::s_szBuild_Version = "3.0.2";
+const char* XAP_App::s_szBuild_Options = "";
+

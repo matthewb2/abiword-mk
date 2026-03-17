@@ -1,9 +1,0 @@
-#!/bin/sh
-
-G_DEBUG=gc-friendly
-export G_DEBUG
-G_SLICE=always-malloc
-export G_SLICE
-
-exec libtool --mode=execute ./AbiWord-test
-

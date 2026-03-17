@@ -80,8 +80,7 @@ class ABI_EXPORT AP_Dialog_Spell : public XAP_Dialog_NonPersistent
    // these variables keep track of the current
    // location/state of the search through the
    // document for misspelled words
-   //fl_BlockSpellIterator* m_pWordIterator;
-   void* m_pWordIterator;
+   fl_BlockSpellIterator* m_pWordIterator;
    UT_sint32 m_iWordOffset;
    UT_sint32 m_iWordLength;
    const UT_UCSChar* m_pWord;

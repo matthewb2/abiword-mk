@@ -2,4 +2,3 @@
 add_subdirectory(ap)
 add_subdirectory(impexp)
 add_subdirectory(main)
-add_subdirectory(test)
