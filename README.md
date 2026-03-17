@@ -1,7 +1,9 @@
-# abiword-mk
+# Abiword-MK
 abiword mk edition
+MSYS2 MINGW32/64
+windows flatform only
 
-# following libraries required
+# Following libraries required
 
-# compile
+# Compile
 cmake -B build -G "MinGW Makefiles" -DPKG_CONFIG_EXECUTABLE=/mingw32/bin/pkg-config -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-DNDEBUG"
