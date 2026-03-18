@@ -30,18 +30,25 @@ file(GLOB_RECURSE CORE_SRC
     src/af/ev/xp/*.cpp
     src/text/ptbl/xp/*.cpp
     src/text/fmt/xp/*.cpp
-    src/text/layout/xp/*.cpp
     src/wp/ap/xp/*.cpp
     src/wp/impexp/xp/*.cpp
+    src/af/util/win/*.cpp        
 )
 
 list(FILTER CORE_SRC EXCLUDE REGEX "fl_Squiggles.cpp")
-list(FILTER CORE_SRC EXCLUDE REGEX "ap_Dialog_Spell.cpp")
 list(FILTER CORE_SRC EXCLUDE REGEX "ap_Dialog_")
 list(FILTER CORE_SRC EXCLUDE REGEX "ap_Menu_")
+list(FILTER CORE_SRC EXCLUDE REGEX "ev_Menu")
 list(FILTER CORE_SRC EXCLUDE REGEX "ap_Toolbar_")
+list(FILTER CORE_SRC EXCLUDE REGEX "ev_Toolbar_")
 list(FILTER CORE_SRC EXCLUDE REGEX "ap_StatusBar_")
-
+list(FILTER CORE_SRC EXCLUDE REGEX "ap_Preview_")
+list(FILTER CORE_SRC EXCLUDE REGEX "ev_Mouse")
+list(FILTER CORE_SRC EXCLUDE REGEX "ev_Keyboard")
+list(FILTER CORE_SRC EXCLUDE REGEX "ev_Edit")
+list(FILTER CORE_SRC EXCLUDE REGEX "ie_exp_MsWord_97.cpp")
+# MSXML (MSVC 전용)
+list(FILTER CORE_SRC EXCLUDE REGEX "ut_xml_msxml.cpp")
 
 # DLL
 add_library(abiword_core SHARED ${CORE_SRC})
