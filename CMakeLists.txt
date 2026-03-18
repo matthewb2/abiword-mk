@@ -19,110 +19,73 @@ pkg_check_modules(XSLT     REQUIRED IMPORTED_TARGET libxslt)
 pkg_check_modules(WV       REQUIRED IMPORTED_TARGET wv-1.0)
 pkg_check_modules(ENCHANT  REQUIRED IMPORTED_TARGET enchant-2)
 
+
 # ========================================
-# AbiWord Sources
+# XP Core Sources (플랫폼 독립)
 # ========================================
-file(GLOB_RECURSE XAP_SRC src/af/xap/*.cpp)
-file(GLOB_RECURSE UTIL_SRC src/af/util/*.cpp)
-
-file(GLOB_RECURSE AP_SRC src/wp/ap/**/*.cpp)
-file(GLOB_RECURSE IMPEXP_SRC src/wp/impexp/**/*.cpp)
-
-file(GLOB_RECURSE FMT_SRC src/text/fmt/xp/*.cpp)
-file(GLOB_RECURSE PTBL_SRC src/text/ptbl/xp/*.cpp)
-
-
-#file(GLOB_RECURSE EV_SRC src/af/ev/*.cpp)
-#file(GLOB_RECURSE GR_SRC src/af/gr/*.cpp)
-#file(GLOB_RECURSE TF_SRC src/af/tf/*.cpp)
-
-set(ABIWORD_SRC
-    ${XAP_SRC}    
-    ${UTIL_SRC}
-    ${AP_SRC}    
-    ${IMPEXP_SRC}
- #   ${EV_SRC}
- #   ${GR_SRC}
- #   ${TF_SRC}    
-    ${FMT_SRC}
-    ${PTBL_SRC}    
+file(GLOB_RECURSE CORE_SRC
+    src/af/util/xp/*.cpp        
+    src/af/xap/xp/*.cpp
+    src/af/gr/xp/*.cpp
+    src/af/ev/xp/*.cpp
+    src/text/ptbl/xp/*.cpp
+    src/text/fmt/xp/*.cpp
+    src/text/layout/xp/*.cpp
+    src/wp/ap/xp/*.cpp
+    src/wp/impexp/xp/*.cpp
 )
 
-# 테스트/불필요 파일 제외
-list(FILTER ABIWORD_SRC EXCLUDE REGEX "Grammar")
-list(FILTER ABIWORD_SRC EXCLUDE REGEX "MsWord_97")
-list(FILTER ABIWORD_SRC EXCLUDE REGEX "CairoGraphics")
-list(FILTER ABIWORD_SRC EXCLUDE REGEX "msxml")
-list(FILTER ABIWORD_SRC EXCLUDE REGEX "fl_Squiggles")
-list(FILTER ABIWORD_SRC EXCLUDE REGEX "ap_Dialog_Spell")
+add_library(abiword_core SHARED ${CORE_SRC})
 
-set(ABIWORD_INCLUDE_DIRS
-    ${CMAKE_SOURCE_DIR}    
-    src
-    src/af/util/xp
-    src/af/util/win
-    src/af/xap/xp
-    src/af/xap/win
-    src/af/gr/xp
-    src/af/gr/win
-    src/af/ev/xp
-    src/af/ev/win
-    src/text/ptbl/xp
-    src/text/fmt/xp
-    src/text/layout/xp
-    src/wp/ap/xp
-    ${CMAKE_SOURCE_DIR}/src/wp/ap/win    
-    src/wp/impexp/xp
-    ${GLIB_INCLUDE_DIRS}
+target_compile_definitions(abiword_core PRIVATE 
+    ABIWORD_CORE_BUILD
+    ABI_BUILD
+    WITH_ENCHANT
+)
+
+target_include_directories(abiword_core PRIVATE
+    ${CAIRO_INCLUDE_DIRS}
+    ${PANGO_INCLUDE_DIRS}
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/af/util/xp   # ⭐ 핵심
+    ${CMAKE_SOURCE_DIR}/src/af/xap/xp   # ⭐ 추가
+    ${CMAKE_SOURCE_DIR}/src/af/gr/xp
+    ${CMAKE_SOURCE_DIR}/src/af/ev/xp
+    ${CMAKE_SOURCE_DIR}/src/af/util/win   # ut_sleep.h 위치
     
+        
 )
 
-   
-# ========================================
-# libabiword.dll
-# ========================================
-add_library(abiword SHARED
-    ${ABIWORD_SRC}    
+target_compile_definitions(abiword_core PRIVATE 
+    ABIWORD_CORE_BUILD
+    ABI_BUILD
+    WITH_ENCHANT
 )
 
-target_compile_definitions(abiword PRIVATE 
-        ABIWORD_DLL_BUILD
-        ABIWORD_DLL_EXPORTS
-        ABI_BUILD
-        _WIN32
-        XP_WIN
-        TOOLKIT_WIN
-        WITH_ENCHANT
-)
-target_include_directories(abiword PRIVATE ${ABIWORD_INCLUDE_DIRS})
-
-target_link_libraries(abiword PRIVATE    
-        gdi32
-        comctl32
-        ole32
-        uuid
-        shell32
-        winspool
-        imm32
-        comdlg32
-        version
-        PkgConfig::GIO
-        PkgConfig::GOBJECT
-        PkgConfig::GLIB
-        PkgConfig::LIBXML2
-        PkgConfig::FRIBIDI
-        PkgConfig::GSF
-        PkgConfig::CAIRO
-        PkgConfig::PANGO
-        PkgConfig::ENCHANT
-        PkgConfig::ZLIB
-        PkgConfig::JPEG
-        PkgConfig::PNG
-        PkgConfig::XSLT
-        PkgConfig::WV
+target_include_directories(abiword_core PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
 )
 
-target_compile_options(abiword PRIVATE
+target_link_libraries(abiword_core PRIVATE
+    PkgConfig::GIO
+    PkgConfig::GOBJECT
+    PkgConfig::GLIB
+    PkgConfig::LIBXML2
+    PkgConfig::FRIBIDI
+    PkgConfig::GSF
+    PkgConfig::PANGO
+    PkgConfig::ENCHANT
+    PkgConfig::ZLIB
+    PkgConfig::JPEG
+    PkgConfig::PNG
+    PkgConfig::XSLT
+    PkgConfig::WV
+    PkgConfig::CAIRO   # ⭐ 추가
+)
+
+
+
+target_compile_options(abiword_core PRIVATE
     ${GLIB_CFLAGS_OTHER}
     -Wno-deprecated
     -Wno-deprecated-declarations
@@ -137,7 +100,11 @@ add_executable(abiword_app
 )
 
 
-target_link_libraries(abiword_app abiword)
+target_link_libraries(abiword_app 
+abiword_core
+gdi32 comctl32 ole32 uuid shell32 winspool imm32 comdlg32 version
+)
 
-target_include_directories(abiword_app PRIVATE ${ABIWORD_INCLUDE_DIRS})
+target_include_directories(abiword_app PRIVATE ${CMAKE_SOURCE_DIR}/src
+)
 
