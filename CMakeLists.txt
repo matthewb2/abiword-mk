@@ -10,33 +10,51 @@ pkg_check_modules(GIO      REQUIRED IMPORTED_TARGET gio-2.0)
 pkg_check_modules(LIBXML2  REQUIRED IMPORTED_TARGET libxml-2.0)
 pkg_check_modules(FRIBIDI  REQUIRED IMPORTED_TARGET fribidi)
 pkg_check_modules(GSF      REQUIRED IMPORTED_TARGET libgsf-1)
-pkg_check_modules(CAIRO             IMPORTED_TARGET cairo)
-pkg_check_modules(PANGO             IMPORTED_TARGET pango)
+pkg_check_modules(CAIRO    REQUIRED IMPORTED_TARGET cairo)
+pkg_check_modules(PANGO    REQUIRED IMPORTED_TARGET pango)
 pkg_check_modules(ZLIB     REQUIRED IMPORTED_TARGET zlib)
 pkg_check_modules(JPEG     REQUIRED IMPORTED_TARGET libjpeg)
 pkg_check_modules(PNG      REQUIRED IMPORTED_TARGET libpng)
 pkg_check_modules(XSLT     REQUIRED IMPORTED_TARGET libxslt)
 pkg_check_modules(WV       REQUIRED IMPORTED_TARGET wv-1.0)
-pkg_check_modules(ENCHANT           IMPORTED_TARGET enchant-2)
+pkg_check_modules(ENCHANT  REQUIRED IMPORTED_TARGET enchant-2)
 
 # ========================================
 # AbiWord Sources
 # ========================================
-file(GLOB_RECURSE ABIWORD_SRC CONFIGURE_DEPENDS
-    src/*.cpp
-    src/*.c
-    src/wp/ap/win/*.cpp  
+file(GLOB_RECURSE XAP_SRC src/af/xap/*.cpp)
+file(GLOB_RECURSE UTIL_SRC src/af/util/*.cpp)
+
+file(GLOB_RECURSE AP_SRC src/wp/ap/**/*.cpp)
+file(GLOB_RECURSE IMPEXP_SRC src/wp/impexp/**/*.cpp)
+
+file(GLOB_RECURSE FMT_SRC src/text/fmt/xp/*.cpp)
+file(GLOB_RECURSE PTBL_SRC src/text/ptbl/xp/*.cpp)
+
+
+#file(GLOB_RECURSE EV_SRC src/af/ev/*.cpp)
+#file(GLOB_RECURSE GR_SRC src/af/gr/*.cpp)
+#file(GLOB_RECURSE TF_SRC src/af/tf/*.cpp)
+
+set(ABIWORD_SRC
+    ${XAP_SRC}    
+    ${UTIL_SRC}
+    ${AP_SRC}    
+    ${IMPEXP_SRC}
+ #   ${EV_SRC}
+ #   ${GR_SRC}
+ #   ${TF_SRC}    
+    ${FMT_SRC}
+    ${PTBL_SRC}    
 )
 
 # 테스트/불필요 파일 제외
-list(FILTER ABIWORD_SRC EXCLUDE REGEX "/t/")
 list(FILTER ABIWORD_SRC EXCLUDE REGEX "Grammar")
 list(FILTER ABIWORD_SRC EXCLUDE REGEX "MsWord_97")
-list(FILTER ABIWORD_SRC EXCLUDE REGEX "RTF")
 list(FILTER ABIWORD_SRC EXCLUDE REGEX "CairoGraphics")
 list(FILTER ABIWORD_SRC EXCLUDE REGEX "msxml")
 list(FILTER ABIWORD_SRC EXCLUDE REGEX "fl_Squiggles")
-list(FILTER ABIWORD_SRC EXCLUDE REGEX "fv_View_protected")
+list(FILTER ABIWORD_SRC EXCLUDE REGEX "ap_Dialog_Spell")
 
 set(ABIWORD_INCLUDE_DIRS
     ${CMAKE_SOURCE_DIR}    
@@ -71,7 +89,6 @@ target_compile_definitions(abiword PRIVATE
         ABIWORD_DLL_BUILD
         ABIWORD_DLL_EXPORTS
         ABI_BUILD
-        WIN32
         _WIN32
         XP_WIN
         TOOLKIT_WIN
@@ -79,8 +96,7 @@ target_compile_definitions(abiword PRIVATE
 )
 target_include_directories(abiword PRIVATE ${ABIWORD_INCLUDE_DIRS})
 
-target_link_libraries(abiword PRIVATE
-    ${GLIB_LIBRARIES}
+target_link_libraries(abiword PRIVATE    
         gdi32
         comctl32
         ole32

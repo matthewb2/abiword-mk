@@ -5770,7 +5770,7 @@ void FV_View::_clearIfAtFmtMark(PT_DocPosition dpos)
 }
 
 
-//#ifdef ENABLE_SPELL
+#if 0
 // NB: returns a UCS string that the caller needs to FREEP
 UT_UCSChar * FV_View::_lookupSuggestion(fl_BlockLayout* pBL,
 										const fl_PartOfBlockPtr& pPOB, UT_sint32 ndx)
@@ -5817,18 +5817,19 @@ UT_UCSChar * FV_View::_lookupSuggestion(fl_BlockLayout* pBL,
 		// compatible with ispell
 		const UT_UCSChar * pWord;
 		UT_sint32 iLength, iPTLength, iBlockPos;
-
 		fl_BlockSpellIterator BSI(pBL, pPOB->getOffset());
 		BSI.nextWordForSpellChecking(pWord, iLength, iBlockPos, iPTLength);
 
 
 		UT_uint32 len = iLength;
+		#if 0
 		for (UT_uint32 ldex=0; ldex < len && ldex < INPUTWORDLEN; ldex++)
 		{
 			stMisspelledWord += *pWord == UCS_RQUOTE ? '\'' : *pWord;
 			++pWord;
 		}
-
+		#endif
+		
 		// get language code for misspelled word
 		std::string lang;
 
@@ -5844,14 +5845,16 @@ UT_UCSChar * FV_View::_lookupSuggestion(fl_BlockLayout* pBL,
 
 		if (!lang.empty())
 		{
+			#if 0
 			// we get smart and request the proper dictionary
 			checker = SpellManager::instance().requestDictionary(lang.c_str());
+			#endif
 		}
 		else
 		{
 			// we just (dumbly) default to the last dictionary
 			// TODO this is known to return the wrong dictionary sometimes in multilanguge docs
-			checker = SpellManager::instance().lastDictionary();
+			//checker = SpellManager::instance().lastDictionary();
 		}
 
 		// lookup suggestions
@@ -5865,14 +5868,13 @@ UT_UCSChar * FV_View::_lookupSuggestion(fl_BlockLayout* pBL,
 
 
 
-
 		if (checker && (checker->checkWord(stMisspelledWord.ucs4_str(), iLength) == SpellChecker::LOOKUP_FAILED))
 		{
 
 			// get suggestions from spelling engine
 			const UT_GenericVector<UT_UCSChar*>* cpvEngineSuggestions;
 
-			cpvEngineSuggestions = checker->suggestWord (stMisspelledWord.ucs4_str(), iLength);
+			//cpvEngineSuggestions = checker->suggestWord (stMisspelledWord.ucs4_str(), iLength);
 
         //pascal
 
@@ -5909,8 +5911,9 @@ UT_UCSChar * FV_View::_lookupSuggestion(fl_BlockLayout* pBL,
 
 	return szSuggest;
 }
-//#endif
+#endif
 
+#if 0
 void FV_View::_prefsListener( XAP_Prefs *pPrefs, UT_StringPtrMap * /*phChanges*/, void *data )
 {
 	FV_View *pView = static_cast<FV_View *>(data);
@@ -6032,7 +6035,10 @@ void FV_View::_prefsListener( XAP_Prefs *pPrefs, UT_StringPtrMap * /*phChanges*/
 	}
 }
 
+#endif
 
+
+#if 0
 /*!
  * Copy a header/footer from a pHdrFtrSrc to an empty pHdrFtrDest.
  * into a new type of header/footer in the same section.
@@ -6077,7 +6083,9 @@ void FV_View::_populateThisHdrFtr(fl_HdrFtrSectionLayout * pHdrFtrSrc, fl_HdrFtr
 	m_pApp->pasteFromClipboard(&dr_dest,true,true);
 }
 
+#endif
 
+#if 0
 /*!
  * This method removes the HdrFtr pHdrFtr
  */
@@ -6101,6 +6109,9 @@ void FV_View::_removeThisHdrFtr(fl_HdrFtrSectionLayout * pHdrFtr)
 	m_pDoc->deleteHdrFtrStrux(sdhHdrFtr);
 }
 
+#endif
+
+#if 0
 void FV_View::_cmdEditHdrFtr(HdrFtrType hfType)
 {
 	fp_Page * pPage = getCurrentPage();
@@ -6136,7 +6147,10 @@ void FV_View::_cmdEditHdrFtr(HdrFtrType hfType)
 	_updateInsertionPoint();
 }
 
+#endif
 
+
+#if 0
 /*	the problem with using bool to store the PT state is that
 	when we make two successive calls to _saveAndNotifyPieceTableChange
 	all subsequent calls to _restorePieceTableState will end up in the
@@ -6152,6 +6166,9 @@ void FV_View::_saveAndNotifyPieceTableChange(void)
 	m_pDoc->notifyPieceTableChangeStart();
 }
 
+#endif
+
+#if 0
 void FV_View::_restorePieceTableState(void)
 {
 	if(m_iPieceTableState > 0)
@@ -6168,7 +6185,9 @@ void FV_View::_restorePieceTableState(void)
 	}
 }
 
+#endif
 
+#if 0
 void FV_View::_fixInsertionPointAfterRevision()
 {
 	if(!m_pDoc->isMarkRevisions() && isSelectionEmpty())
@@ -6197,6 +6216,9 @@ void FV_View::_fixInsertionPointAfterRevision()
 	}
 }
 
+#endif
+
+#if 0
 bool FV_View::_makePointLegal(void)
 {
 		bool bOK = true;
@@ -6227,7 +6249,9 @@ bool FV_View::_makePointLegal(void)
 		}
 		return bOK;
 }
+#endif
 
+#if 0
 bool FV_View::_charInsert(const UT_UCSChar * text, UT_uint32 count, bool bForce)
 {
 
@@ -6407,7 +6431,9 @@ bool FV_View::_charInsert(const UT_UCSChar * text, UT_uint32 count, bool bForce)
 
 	return bResult;
 }
+#endif
 
+#if 0
 void FV_View::_adjustDeletePosition(UT_uint32 &iDocPos, UT_uint32 &iCount)
 {
 	// This code deals with character clusters, such as the Thai base character + vowel + tone
@@ -6485,6 +6511,9 @@ void FV_View::_adjustDeletePosition(UT_uint32 &iDocPos, UT_uint32 &iCount)
 	iDocPos = pos1;
 }
 
+#endif
+
+#if 0
 void FV_View::_updateSelectionHandles(void)
 {
 	if (!getVisualSelectionEnabled()){
@@ -6496,3 +6525,5 @@ void FV_View::_updateSelectionHandles(void)
 										getSelectionRightAnchor());
 	}
 }
+#endif
+

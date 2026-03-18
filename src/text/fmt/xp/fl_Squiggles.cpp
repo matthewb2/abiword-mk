@@ -210,7 +210,10 @@ fl_Squiggles::_move(UT_sint32 iOffset, UT_sint32 chg,
 		if (pNewBlock)
 		{
 			UT_ASSERT(pNewBlock != m_pOwner);
-			pNewBlock->getSpellSquiggles()->add(pPOB);
+			//pNewBlock->getSpellSquiggles()->add(pPOB);
+			// Spell squiggles disabled (API removed)
+(void)pPOB;
+			
 			m_vecSquiggles.erase(m_vecSquiggles.begin() + j);
 		}
 	}
@@ -488,10 +491,11 @@ fl_Squiggles::textInserted(UT_sint32 iOffset, UT_sint32 iLength)
 	if (m_pOwner->isHdrFtr())
 		return;
 
-	// Return if auto spell-checking disabled
+	/* Return if auto spell-checking disabled
 	if (!m_pOwner->getDocLayout()->getAutoSpellCheck())
 		return;
-
+	*/
+	return;
 	xxx_UT_DEBUGMSG(("fl_Squiggles::textInserted(%d, %d)\n", 
 					 iOffset, iLength));
 
@@ -504,7 +508,7 @@ fl_Squiggles::textInserted(UT_sint32 iOffset, UT_sint32 iLength)
 	_move(iOffset, chg);
 
 	// Deal with pending word, if any
-  
+  /*
 	if (m_pOwner->getDocLayout()->isPendingWordForSpell() && (getSquiggleType() ==  FL_SQUIGGLE_SPELL) )
 	{
 		// If not affected by insert, check it
@@ -530,7 +534,7 @@ fl_Squiggles::textInserted(UT_sint32 iOffset, UT_sint32 iLength)
 #endif 
 		}
 	}
-
+*/
 	// Recheck word at boundary
 	if(getSquiggleType() ==  FL_SQUIGGLE_SPELL) 
 	{
@@ -551,9 +555,10 @@ fl_Squiggles::textDeleted(UT_sint32 iOffset, UT_sint32 iLength)
 		return;
 
 	// Return if auto spell-checking disabled
+	/*
 	if (!m_pOwner->getDocLayout()->getAutoSpellCheck())
 		return;
-
+	*/
 	xxx_UT_DEBUGMSG(("fl_Squiggles::textDeleted(%d, %d)\n",
 					 iOffset, iLength));
 
@@ -572,6 +577,7 @@ fl_Squiggles::textDeleted(UT_sint32 iOffset, UT_sint32 iLength)
 	_move(iOffset, chg);
 
 	// Deal with pending word, if any
+	/*
 	if (m_pOwner->getDocLayout()->isPendingWordForSpell() && (getSquiggleType() ==  FL_SQUIGGLE_SPELL) )
 	{
 		// If not affected by delete, check it
@@ -595,7 +601,7 @@ fl_Squiggles::textDeleted(UT_sint32 iOffset, UT_sint32 iLength)
 #endif
 		}
 	}
-
+	*/
 	// Recheck at boundary
 	if(getSquiggleType() ==  FL_SQUIGGLE_SPELL) 
 	  m_pOwner->_recalcPendingWord(iOffset, chg);
