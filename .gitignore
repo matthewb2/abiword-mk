@@ -1,0 +1,10 @@
+src/.deps
+src/.libs
+
+*.lo
+*.o
+*.la
+*.a
+*.dll
+*.exe
+

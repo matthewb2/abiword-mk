@@ -1,0 +1,13 @@
+/test.pwl
+/main.test
+/main.test.exe
+libenchant_*.so
+libenchant_*.dylib
+*enchant*.dll
+enchant*.so
+/_Noreturn.h
+/arg-nonnull.h
+/c++defs.h
+/dummy.c
+/unused-parameter.h
+/warn-on-use.h
