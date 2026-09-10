@@ -744,6 +744,7 @@ UT_Error IE_Imp_OpenDocument::_parseStream (GsfInput* pInput, UT_XML & parser)
 /**
  * Set some document properties. The ones that goes on the <abiword> element.
  */
+ /*
 void IE_Imp_OpenDocument::_setDocumentProperties() {
 
     const gchar* ppProps[5];
@@ -757,5 +758,25 @@ void IE_Imp_OpenDocument::_setDocumentProperties() {
     ppProps[4] = 0;
 
     UT_DebugOnly<bool> ok = getDoc()->setProperties(ppProps);
+    UT_ASSERT_HARMLESS(ok);
+}
+*/
+/**
+ * Set some document properties. The ones that goes on the <abiword> element.
+ */
+void IE_Imp_OpenDocument::_setDocumentProperties() {
+
+    // [수정 포인트] C 스타일 배열 대신 코어가 요구하는 PP_PropertyVector 객체를 생성합니다.
+    PP_PropertyVector vProps;
+    vProps.reserve(4); // 4개의 요소를 담을 공간을 미리 예약 (성능 최적화)
+
+    // 벡터에 순서대로 속성과 값을 추가합니다.
+    vProps.push_back("document-endnote-place-enddoc");
+    vProps.push_back("1");
+    vProps.push_back("document-endnote-place-endsection");
+    vProps.push_back("0");
+    
+    // 기존 getDoc()->setProperties(ppProps); 대신 새로 만든 vProps를 전달합니다.
+    UT_DebugOnly<bool> ok = getDoc()->setProperties(vProps);
     UT_ASSERT_HARMLESS(ok);
 }

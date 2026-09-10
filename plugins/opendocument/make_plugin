@@ -1,0 +1,5 @@
+#!/bin/sh
+set -x
+g++ -shared -o opendocument.dll     -Wl,--allow-multiple-definition     -Wl,--whole-archive     ./imp/.libs/libimp.a     ./imp/xp/.libs/libxp.a     ./exp/.libs/libexp.a     ./exp/xp/.libs/libxp.a     ./common/.libs/libcommon.a     ./common/xp/.libs/libxp.a     -Wl,--no-whole-archive     ./common/xp/crypto/.libs/*.o     -L/mingw64/bin -LD:/msys64_20251213/home/user/abiword-3/src/ $(pkg-config --libs libgsf-1 libxml-2.0 gtk+-3.0 fribidi)  -labiword-3.0 -lgcrypt
+
+cp opendocument.dll D:/msys64_20251213/home/user/abiword_dist/plugins/

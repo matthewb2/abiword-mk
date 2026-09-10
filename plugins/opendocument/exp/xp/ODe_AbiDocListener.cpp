@@ -1340,14 +1340,18 @@ void ODe_AbiDocListener::_insertMath(PT_AttrPropIndex api) {
 
     UT_return_if_fail(szMath);
 
-    const UT_ByteBuf * pByteBuf = NULL;
-    bool bOK = m_pDocument->getDataItemDataByName(szMath, const_cast<const UT_ByteBuf **>(&pByteBuf), NULL, NULL);
-
+    //const UT_ByteBuf * pByteBuf = NULL;
+    // [수정 포인트 1] 생 포인터 대신 스마트 포인터 타입(UT_ConstByteBufPtr)을 사용합니다.
+    UT_ConstByteBufPtr pByteBuf; 
+    
+    // [수정 포인트 2] pByteBuf가 이미 shared_ptr 레퍼런스를 요구하므로 캐스팅이나 주소 연산 없이 그대로 전달합니다.
+    bool bOK = m_pDocument->getDataItemDataByName(szMath, pByteBuf, NULL, NULL);
+    
     UT_return_if_fail(bOK);
 
     UT_UCS4_mbtowc myWC;
     UT_UTF8String sMathML;
-    sMathML.appendBuf(*pByteBuf, myWC);
+    sMathML.appendBuf(pByteBuf, myWC);
 
     UT_return_if_fail(!sMathML.empty());
 

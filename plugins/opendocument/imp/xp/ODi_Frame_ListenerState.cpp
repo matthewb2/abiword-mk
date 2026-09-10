@@ -123,8 +123,7 @@ void ODi_Frame_ListenerState::startElement (const gchar* pName,
 
 
 /**
- * 
- */                
+ * */        
 void ODi_Frame_ListenerState::endElement (const gchar* pName,
                                          ODi_ListenerStateAction& rAction) {
 
@@ -143,51 +142,53 @@ void ODi_Frame_ListenerState::endElement (const gchar* pName,
     }
 
     if (!strcmp(pName, "draw:frame")) {
-		
-		if (m_bInlineImagePending || m_bPositionedImagePending)
-		{
-			if (!m_sAltTitle.empty())
-				m_mPendingImgProps["title"] = m_sAltTitle;
-			if (!m_sAltDesc.empty())
-				m_mPendingImgProps["alt"] = m_sAltDesc;
+        
+        if (m_bInlineImagePending || m_bPositionedImagePending)
+        {
+            if (!m_sAltTitle.empty())
+                m_mPendingImgProps["title"] = m_sAltTitle;
+            if (!m_sAltDesc.empty())
+                m_mPendingImgProps["alt"] = m_sAltDesc;
 
-			// write out the pending image
-			const UT_sint32 size = m_mPendingImgProps.size()*2+1;
-			const gchar** attribs = (const gchar**)g_malloc(size * sizeof(const gchar*));
-			UT_sint32 i = 0;
-			for (std::map<std::string, std::string>::const_iterator cit = m_mPendingImgProps.begin(); cit != m_mPendingImgProps.end(); cit++)
-			{
-				attribs[i++] = reinterpret_cast<const gchar*>((*cit).first.c_str());
-				attribs[i++] = reinterpret_cast<const gchar*>((*cit).second.c_str());
-			}
-			attribs[i] = NULL;
+            // =================================================================
+            // 🛠️ [수정] C 스타일 배열 할당 대신 PP_PropertyVector 객체 사용
+            // =================================================================
+            PP_PropertyVector attribsProps;
+            for (std::map<std::string, std::string>::const_iterator cit = m_mPendingImgProps.begin(); cit != m_mPendingImgProps.end(); cit++)
+            {
+                attribsProps.push_back((*cit).first);
+                attribsProps.push_back((*cit).second);
+            }
 
-			if (m_bInlineImagePending)
-			{
-				if (!m_pAbiDocument->appendObject (PTO_Image, attribs)) {
-					UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
-				}
-				
-				m_bInlineImagePending = false;
-			}
-			else if (m_bPositionedImagePending)
-			{
-				if(!m_pAbiDocument->appendStrux(PTX_SectionFrame, attribs)) {
-					UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
-				} else {
-					m_iFrameDepth++;
-				}
-				m_bPositionedImagePending = false;
-			}
+            if (m_bInlineImagePending)
+            {
+                // `attribs` 대신 `attribsProps` 전달
+                if (!m_pAbiDocument->appendObject (PTO_Image, attribsProps)) {
+                    UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
+                }
+                
+                m_bInlineImagePending = false;
+            }
+            else if (m_bPositionedImagePending)
+            {
+                // `attribs` 대신 `attribsProps` 전달
+                if(!m_pAbiDocument->appendStrux(PTX_SectionFrame, attribsProps)) {
+                    UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
+                } else {
+                    m_iFrameDepth++;
+                }
+                m_bPositionedImagePending = false;
+            }
 
-			FREEP(attribs);
-			m_sAltTitle = "";
-			m_sAltDesc = "";
-			m_mPendingImgProps.clear();
-		}
+            // 동적 할당을 하지 않으므로 FREEP(attribs)는 제거합니다.
+            m_sAltTitle = "";
+            m_sAltDesc = "";
+            m_mPendingImgProps.clear();
+        }
 
         if (!m_inlinedImage && (m_iFrameDepth > 0)) {
-            if(!m_pAbiDocument->appendStrux(PTX_EndFrame, NULL)) {
+            // NULL 대신 빈 PP_PropertyVector 객체 전달 (반영 완료 상태)
+            if(!m_pAbiDocument->appendStrux(PTX_EndFrame, PP_PropertyVector())) {
                 UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
             } else {
                 m_iFrameDepth--;
@@ -196,10 +197,10 @@ void ODi_Frame_ListenerState::endElement (const gchar* pName,
 
         // We're done.
         rAction.popState();
-	} else if (!strcmp(pName, "svg:title")) {
-		m_bInAltTitle = false;
-	} else if (!strcmp(pName, "svg:desc")) {
-		m_bInAltDesc = false;
+    } else if (!strcmp(pName, "svg:title")) {
+        m_bInAltTitle = false;
+    } else if (!strcmp(pName, "svg:desc")) {
+        m_bInAltDesc = false;
     } else if (!strcmp(pName, "math:math")) {
         
         if (m_pMathBB) {
@@ -208,31 +209,39 @@ void ODi_Frame_ListenerState::endElement (const gchar* pName,
 
             // Create the data item
             UT_uint32 id = m_pAbiDocument->getUID(UT_UniqueId::Math);
-	    std::string sID = UT_std_string_sprintf("MathLatex%d", id);
+            std::string sID = UT_std_string_sprintf("MathLatex%d", id);
 
             std::string lID;
-	    lID.assign("LatexMath");
-     	    lID.append((sID.substr(9,sID.size()-8)).c_str());
-			
-      	    UT_ByteBuf latexBuf;
-   	    UT_UTF8String PMathml = (const char*)(m_pMathBB->getPointer(0));
-	    UT_UTF8String PLatex,Pitex;
+            lID.assign("LatexMath");
+            lID.append((sID.substr(9,sID.size()-8)).c_str());
+            
+            auto latexBuf = std::make_shared<UT_ByteBuf>();
+            UT_UTF8String PMathml = (const char*)(m_pMathBB->getPointer(0));
+            UT_UTF8String PLatex,Pitex;
 
-	    m_pAbiDocument->createDataItem(sID.c_str(), false, m_pMathBB, "", NULL);
-			
-	    if(convertMathMLtoLaTeX(PMathml, PLatex) && convertLaTeXtoEqn(PLatex,Pitex))
- 	    {    
-		// Conversion of MathML to LaTeX and the Equation Form suceeds
-		latexBuf.ins(0,reinterpret_cast<const UT_Byte *>(Pitex.utf8_str()),static_cast<UT_uint32>(Pitex.size()));
-		m_pAbiDocument->createDataItem(lID.c_str(), false,&latexBuf,"", NULL);
-    	    }
+            // 임시 shared_ptr 생성 전달 (반영 완료 상태)
+            m_pAbiDocument->createDataItem(sID.c_str(), false, std::shared_ptr<const UT_ByteBuf>(m_pMathBB, [](const UT_ByteBuf*){}), "", NULL);
+                
+            if(convertMathMLtoLaTeX(PMathml, PLatex) && convertLaTeXtoEqn(PLatex,Pitex))
+            {    
+                // Conversion of MathML to LaTeX and the Equation Form succeeds
+                
+                // 화살표 연산자 이용 (반영 완료 상태)
+                latexBuf->ins(0, reinterpret_cast<const UT_Byte *>(Pitex.utf8_str()), static_cast<UT_uint32>(Pitex.size()));
 
-            const gchar *atts[5] = { NULL, NULL, NULL, NULL, NULL };
-            atts[0] = PT_IMAGE_DATAID;
-            atts[1] = sID.c_str();
-	    atts[2] = static_cast<const gchar *>("latexid");
-	    atts[3] = static_cast<const gchar *>(lID.c_str());
-            m_pAbiDocument->appendObject(PTO_Math, atts);
+                m_pAbiDocument->createDataItem(lID.c_str(), false, latexBuf, "", NULL);
+            }
+            
+            // =================================================================
+            // 🛠️ [수정] 수식 오브젝트 속성 쌍(Key-Value) 순서 고정
+            // =================================================================
+            PP_PropertyVector attsProps;
+            attsProps.push_back("data-id");  // 대개 고유 ID의 속성 키값 이름입니다.
+            attsProps.push_back(sID);
+            attsProps.push_back("latexid");
+            attsProps.push_back(lID);
+        
+            m_pAbiDocument->appendObject(PTO_Math, attsProps);
 
             DELETEP(m_pMathBB);
         }
@@ -434,7 +443,19 @@ void ODi_Frame_ListenerState::_drawObject (const gchar** ppAtts,
         attribs[2] = "dataid";
         attribs[3] = static_cast<const gchar *>(dataId.c_str());    
     
-        if (!m_pAbiDocument->appendObject ((PTObjectType)pto_Type, attribs)) {
+    // 1. 기존의 const gchar* attribs[7]; 선언을 지우고 벡터로 대체
+        PP_PropertyVector attribsProps;
+
+        // 2. 기존에 attribs 배열에 차례대로 넣던 값들을 순서대로 push_back
+        attribsProps.push_back("props"); // 예시 키
+        attribsProps.push_back(propsBuffer.c_str());       // 예시 값
+        attribsProps.push_back("dataid");
+        attribsProps.push_back(static_cast<const gchar *>(dataId.c_str()));
+        attribsProps.push_back(static_cast<const gchar *>("latexid"));
+        attribsProps.push_back(static_cast<const gchar *>(extraID.c_str()));
+        attribsProps.push_back(0);
+        
+        if (!m_pAbiDocument->appendObject ((PTObjectType)pto_Type, attribsProps)) {
             UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
         }
         
@@ -633,11 +654,14 @@ void ODi_Frame_ListenerState::_drawTextBox (const gchar** ppAtts,
         props += "bot-style:1; left-style:1; right-style:1; top-style:1";
     }
 
-    attribs[0] = "props";
-    attribs[1] = props.c_str();
-    attribs[2] = 0;
-		   
-    if(!m_pAbiDocument->appendStrux(PTX_SectionFrame, attribs)) {
+    //  =================================================================
+    // 🛠️ [수정 구간] C 스타일 배열 대신 PP_PropertyVector 객체 사용
+    //      =================================================================
+    PP_PropertyVector attribsProps;
+    attribsProps.push_back("props");
+    attribsProps.push_back(props);
+               
+    if(!m_pAbiDocument->appendStrux(PTX_SectionFrame, attribsProps)) {
         UT_ASSERT_HARMLESS(UT_SHOULD_NOT_HAPPEN);
     } else {
         m_iFrameDepth++;

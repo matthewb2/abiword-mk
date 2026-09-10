@@ -3,6 +3,7 @@ src/.libs
 
 *.lo
 *.o
+*.Plo
 *.la
 *.a
 *.dll
