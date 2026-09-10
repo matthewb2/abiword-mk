@@ -1472,4 +1472,3 @@ void	EV_Win32Toolbar::onDropArrow(UINT cmd)
 		pDialogFactory->releaseDialog(pDialog);
 	}
 }
-

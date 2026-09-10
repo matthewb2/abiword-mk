@@ -349,7 +349,7 @@ void AP_Dialog_Styles::ModifyFont(void)
 	if (bOK)
 	{
 		std::string s1;
-
+		
 		if (pDialog->getChangedFontFamily(s1))
 		{
 			PP_addOrSetAttribute("font-family", s1, m_vecAllProps);

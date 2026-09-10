@@ -388,17 +388,28 @@ bool AP_Win32App::initialize(void)
 	return bSuccess;
 }
 
-
-// if app is NULL then we use 'this'
 XAP_Frame * AP_Win32App::newFrame(void)
 {
-	AP_Win32Frame * pWin32Frame = new AP_Win32Frame();
+    g_printerr("[DEBUG] 5-1. Entered AP_Win32App::newFrame\n");
 
-	if (pWin32Frame)
-		pWin32Frame->initialize();
+    // 기본 생성자로 생성 후 필요한 초기화를 수행하거나 올바른 생성자 인자를 전달합니다.
+    AP_Win32Frame * pFrame = new AP_Win32Frame();
+    g_printerr("[DEBUG] 5-2. AP_Win32Frame object created: %p\n", (void*)pFrame);
 
-	return pWin32Frame;
+    if (!pFrame)
+    {
+        g_printerr("[DEBUG] 5-3. Failed to allocate AP_Win32Frame\n");
+        return NULL;
+    }
+
+    // 만약 프레임 초기화 메서드가 존재한다면 여기서 호출합니다 (예: pFrame->initialize(this) 등)
+    pFrame->initialize();
+    // 원본 코드의 생성 방식을 따르되 포인터 및 로그를 유지합니다.
+
+    g_printerr("[DEBUG] 5-4. Leaving AP_Win32App::newFrame successfully\n");
+    return pFrame;
 }
+
 
 
 bool AP_Win32App::shutdown(void)
@@ -1064,195 +1075,183 @@ ReturnTrue:
 /*****************************************************************/
 
 int AP_Win32App::WinMain(const char * szAppName, HINSTANCE hInstance,
-						 HINSTANCE /*hPrevInstance*/, PSTR /*szCmdLine*/, int iCmdShow)
+                         HINSTANCE /*hPrevInstance*/, PSTR /*szCmdLine*/, int iCmdShow)
 {
+    g_printerr("[DEBUG] 3-1. Entered AP_Win32App::WinMain\n");
+    
 #if !GLIB_CHECK_VERSION(2,32,0)
-	if (!g_thread_supported ())
-		g_thread_init (NULL);
+    if (!g_thread_supported ())
+        g_thread_init (NULL);
 #endif
 
-	bool bShowApp = true;
-	BOOL bInitialized = FALSE;
+    bool bShowApp = true;
+    BOOL bInitialized = FALSE;
 
-	// this is a static function and doesn't have a 'this' pointer.
-	MSG msg;
+    // this is a static function and doesn't have a 'this' pointer.
+    MSG msg;
 
 #ifdef _MSC_VER
-	_CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_DEBUG );
-	_CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_DEBUG );
-	_CrtSetReportMode( _CRT_ASSERT, _CRTDBG_MODE_DEBUG | _CRTDBG_MODE_WNDW);
+    _CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_DEBUG );
+    _CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_DEBUG );
+    _CrtSetReportMode( _CRT_ASSERT, _CRTDBG_MODE_DEBUG | _CRTDBG_MODE_WNDW);
 #endif
 
-	// HACK: load least-common-denominator Rich Edit control
-	// TODO: fix Spell dlg so we don't rely on this
-	// ALT:  make it a Preview widget instead
+    HINSTANCE hinstRich = LoadLibraryW(L"riched32.dll");
+    if (!hinstRich)
+        hinstRich = LoadLibraryW(L"riched20.dll");
+    UT_return_val_if_fail (hinstRich, 1);
+    g_printerr("[DEBUG] 3-2. RichEdit library loaded\n");
 
-	HINSTANCE hinstRich = LoadLibraryW(L"riched32.dll");
-	if (!hinstRich)
-		hinstRich = LoadLibraryW(L"riched20.dll");
-	UT_return_val_if_fail (hinstRich, 1);
+    AP_Win32App * pMyWin32App;
 
-	AP_Win32App * pMyWin32App;
-
-	// OLE Stuff
-	if (SUCCEEDED(OleInitialize(NULL)))
-            bInitialized = TRUE;
+    // OLE Stuff
+    if (SUCCEEDED(OleInitialize(NULL)))
+        bInitialized = TRUE;
+    g_printerr("[DEBUG] 3-3. OLE Initialized (bInitialized=%d)\n", bInitialized);
 
 
 // We put this in a block to force the destruction of Args in the stack
 {
-	UT_Win32LocaleString scnv;
-	UT_UTF8String sUTFCmdLine;
+    UT_Win32LocaleString scnv;
+    UT_UTF8String sUTFCmdLine;
 
-	// Load the command line into an XAP_Args class
-	scnv.fromLocale(GetCommandLineW());
-	sUTFCmdLine=scnv.utf8_str();
-	XAP_Args XArgs = XAP_Args(sUTFCmdLine.utf8_str());
+    // Load the command line into an XAP_Args class
+    scnv.fromLocale(GetCommandLineW());
+    sUTFCmdLine=scnv.utf8_str();
+    XAP_Args XArgs = XAP_Args(sUTFCmdLine.utf8_str());
 
-	// Step 1: Initialize our application.
-	pMyWin32App = new AP_Win32App(hInstance, szAppName);
-	AP_Args Args = AP_Args(&XArgs, szAppName, pMyWin32App);
+    // Step 1: Initialize our application.
+    pMyWin32App = new AP_Win32App(hInstance, szAppName);
+    AP_Args Args = AP_Args(&XArgs, szAppName, pMyWin32App);
 
-	Args.parseOptions();
-	pMyWin32App->initialize();
+    Args.parseOptions();
+    pMyWin32App->initialize();
+    g_printerr("[DEBUG] 3-4. pMyWin32App created and initialized\n");
 
-	// Step 2: Handle all non-window args.
-	// process args (calls common arg handler, which then calls platform specific)
-	// As best I understand, it returns true to continue and show window, or
-	// false if no window should be shown (and thus we should simply exit).
-	bool windowlessArgsWereSuccessful = true;
-	if (!Args.doWindowlessArgs(windowlessArgsWereSuccessful))
-	{
-		pMyWin32App->shutdown();	// properly shutdown the app 1st
-		delete pMyWin32App;
-		return (windowlessArgsWereSuccessful ? 0 : -1);
-	}
+    // Step 2: Handle all non-window args.
+    bool windowlessArgsWereSuccessful = true;
+    if (!Args.doWindowlessArgs(windowlessArgsWereSuccessful))
+    {
+        g_printerr("[DEBUG] 3-5. doWindowlessArgs failed\n");
+        pMyWin32App->shutdown();    // properly shutdown the app 1st
+        delete pMyWin32App;
+        return (windowlessArgsWereSuccessful ? 0 : -1);
+    }
+    g_printerr("[DEBUG] 3-5. doWindowlessArgs passed\n");
 
-	// Step 3: Create windows as appropriate.
-	// if some args are botched, it returns false and we should
-	// continue out the door.
-	// We used to check for bShowApp here.  It shouldn't be needed
-	// anymore, because doWindowlessArgs was supposed to bail already. -PL
-	if (!pMyWin32App->openCmdLineFiles(&Args))
-	{
-		pMyWin32App->shutdown();	// properly shutdown the app 1st
-		delete pMyWin32App;
-		return 0;
-	}
+    // Step 3: Create windows as appropriate.
+    if (!pMyWin32App->openCmdLineFiles(&Args))
+    {
+        g_printerr("[DEBUG] 3-6. openCmdLineFiles failed\n");
+        pMyWin32App->shutdown();    // properly shutdown the app 1st
+        delete pMyWin32App;
+        return 0;
+    }
+    g_printerr("[DEBUG] 3-6. openCmdLineFiles passed\n");
 }
 //
 // This block is controlled by the Structured Exception Handle
-// if any crash happens here we will recover it and save the file (cross fingers)
 //
 
 
 try
 {
-	UT_uint32 iHeight = 0, iWidth = 0, t_flag =0;
-	UT_sint32 iPosX = 0, iPosY = 0;
+    g_printerr("[DEBUG] 3-7. Entering main try block (showing windows)\n");
+    UT_uint32 iHeight = 0, iWidth = 0, t_flag =0;
+    UT_sint32 iPosX = 0, iPosY = 0;
 
-	if (!((XAP_App::getApp()->getGeometry(&iPosX,&iPosY,&iWidth,&iHeight,&t_flag)) &&
-	       ((iWidth > 0) && (iHeight > 0)))	)
-		XAP_App::getApp()->getDefaultGeometry(iWidth,iHeight,t_flag);
+    if (!((XAP_App::getApp()->getGeometry(&iPosX,&iPosY,&iWidth,&iHeight,&t_flag)) &&
+          ((iWidth > 0) && (iHeight > 0)))    )
+        XAP_App::getApp()->getDefaultGeometry(iWidth,iHeight,t_flag);
 
-	if ((t_flag & PREF_FLAG_GEOMETRY_MAXIMIZED)==PREF_FLAG_GEOMETRY_MAXIMIZED)
-			iCmdShow = SW_SHOWMAXIMIZED;
+    if ((t_flag & PREF_FLAG_GEOMETRY_MAXIMIZED)==PREF_FLAG_GEOMETRY_MAXIMIZED)
+        iCmdShow = SW_SHOWMAXIMIZED;
 
-	if (bShowApp)
-	{
-		// display the windows
-		for(UT_sint32 i = 0; i < pMyWin32App->m_vecFrames.getItemCount(); i++)
-		{
-			AP_Win32Frame * curFrame = (AP_Win32Frame*)pMyWin32App->m_vecFrames[i];
-			UT_continue_if_fail(curFrame);
+    if (bShowApp)
+    {
+        // display the windows
+        for(UT_sint32 i = 0; i < pMyWin32App->m_vecFrames.getItemCount(); i++)
+        {
+            AP_Win32Frame * curFrame = (AP_Win32Frame*)pMyWin32App->m_vecFrames[i];
+            UT_continue_if_fail(curFrame);
 
-			HWND hwnd = curFrame->getTopLevelWindow();
-			ShowWindow(hwnd, iCmdShow);
-			UpdateWindow(hwnd);
-		}
+            HWND hwnd = curFrame->getTopLevelWindow();
+            ShowWindow(hwnd, iCmdShow);
+            UpdateWindow(hwnd);
+        }
+        g_printerr("[DEBUG] 3-8. Windows displayed successfully, entering message loop\n");
 
-		// do dispatch loop
-		while(UT_GetMessage(&msg, NULL, 0, 0))
-	    {
-   	      	// TranslateMessage is not called because AbiWord
-	      	// has its own way of decoding keyboard accelerators
-	      	if (pMyWin32App->handleModelessDialogMessage(&msg))
-				continue;
+        // do dispatch loop
+        while(UT_GetMessage(&msg, NULL, 0, 0))
+        {
+             if (pMyWin32App->handleModelessDialogMessage(&msg))
+                continue;
 
-			TranslateMessage(&msg);
-			UT_DispatchMessage(&msg);
+            TranslateMessage(&msg);
+            UT_DispatchMessage(&msg);
 
-			// Check for idle condition
-			while( !UT_Win32Idle::_isEmpty() &&
+            // Check for idle condition
+            while( !UT_Win32Idle::_isEmpty() &&
                    !PeekMessageW(&msg, NULL, 0, 0, PM_NOREMOVE) )
-			{
-				// Fire idle functions when no pending messages
-		    	UT_Win32Idle::_fireall();
-			}
-	    }
-	}
+            {
+                // Fire idle functions when no pending messages
+                UT_Win32Idle::_fireall();
+            }
+        }
+        g_printerr("[DEBUG] 3-9. Exited message loop normally\n");
+    }
 
-	// Un-init OLE
-        if (bInitialized)
-                OleUninitialize();
+    // Un-init OLE
+    if (bInitialized)
+        OleUninitialize();
 
-	FreeLibrary(hinstRich);
+    FreeLibrary(hinstRich);
 
-	// unload all loaded plugins (remove some of the memory leaks shown at shutdown :-)
-	XAP_ModuleManager::instance().unloadAllPlugins();
+    // unload all loaded plugins
+    XAP_ModuleManager::instance().unloadAllPlugins();
 
-	// Step 4: Destroy the App.  It should take care of deleting all frames.
-	pMyWin32App->shutdown();
-	delete pMyWin32App;
+    // Step 4: Destroy the App.  It should take care of deleting all frames.
+    pMyWin32App->shutdown();
+    delete pMyWin32App;
+    g_printerr("[DEBUG] 3-10. Application successfully shut down\n");
 
+}// end of this block is controlled by the Exception Handler
 
-}// end of thes block is controlled by the Exception Handler
-
-//
-// If an exception happens, with "catch" the block
-// and then the save it into disk
-//
 catch (...)
 {
+    g_printerr("[DEBUG] 3-EX. Exception caught in WinMain catch block!\n");
 #ifdef DEBUG
-	throw;
+    throw;
 #endif
 
-	AP_Win32App *pApp = (AP_Win32App *) XAP_App::getApp();
+    AP_Win32App *pApp = (AP_Win32App *) XAP_App::getApp();
 
-	UT_return_val_if_fail (pApp,1);
+    UT_return_val_if_fail (pApp,1);
 
-	// first of all, try to save the current prefs (so that any log entries are dumped
-	// onto disk -- this allows us to save useful info for dbg purposes) we will enclose
-	// this inside of a try/catch block, so that in the (unlikely) case something goes
-	// badly wrong when writing the prefs file, we still get chance to save the open
-	// documents
+    try
+    {
+        if(pApp->getPrefs())
+        {
+            pApp->getPrefs()->savePrefsFile();
+        }
+    }
+    catch(...)
+    {
+        // do nothing
+    }
 
-	try
-	{
-		if(pApp->getPrefs())
-		{
-			pApp->getPrefs()->savePrefsFile();
-		}
-	}
-	catch(...)
-	{
-		// do nothing
-	}
+    pApp->saveRecoveryFiles();
 
-	pApp->saveRecoveryFiles();
-
-	// Tell the user was has just happened
-	AP_Win32Frame * curFrame = (AP_Win32Frame*)pApp->m_vecFrames[0];
-	if (curFrame)
-	{
-		curFrame->showMessageBox(AP_STRING_ID_MSG_Exception,XAP_Dialog_MessageBox::b_O, XAP_Dialog_MessageBox::a_OK);
-
-	}
+    // Tell the user was has just happened
+    AP_Win32Frame * curFrame = (AP_Win32Frame*)pApp->m_vecFrames[0];
+    if (curFrame)
+    {
+        curFrame->showMessageBox(AP_STRING_ID_MSG_Exception,XAP_Dialog_MessageBox::b_O, XAP_Dialog_MessageBox::a_OK);
+    }
 }// end of except
 
-	SET_CRT_DEBUG_FIELD( _CRTDBG_LEAK_CHECK_DF );
-	return msg.wParam;
+    SET_CRT_DEBUG_FIELD( _CRTDBG_LEAK_CHECK_DF );
+    return msg.wParam;
 }
 
 /* This function takes a description and compares it all the registerd

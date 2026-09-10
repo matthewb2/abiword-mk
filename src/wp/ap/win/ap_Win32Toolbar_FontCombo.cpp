@@ -19,6 +19,7 @@
 
 #include <windows.h>
 #include <stdlib.h>
+#include <glib.h>
 
 #include "ut_assert.h"
 #include "ut_vector.h"
@@ -32,27 +33,34 @@
 /*****************************************************************/
 
 EV_Toolbar_Control * AP_Win32Toolbar_FontCombo::static_constructor(EV_Toolbar * pToolbar,
-														  XAP_Toolbar_Id id)
+                                            XAP_Toolbar_Id id)
 {
-	AP_Win32Toolbar_FontCombo * p = new AP_Win32Toolbar_FontCombo(pToolbar,id);
-	return p;
+    g_printerr("[DEBUG] static_constructor called for id=%d\n", id);
+    AP_Win32Toolbar_FontCombo * p = new AP_Win32Toolbar_FontCombo(pToolbar,id);
+    if (!p) {
+        g_printerr("[DEBUG] Failed to create ComboBox window for id=%d\n", id);
+    }
+    return p;
 }
 
 AP_Win32Toolbar_FontCombo::AP_Win32Toolbar_FontCombo(EV_Toolbar * pToolbar,
-													 XAP_Toolbar_Id id)
-	: EV_Toolbar_Control(pToolbar/*,id*/)
+                                           XAP_Toolbar_Id id)
+    : EV_Toolbar_Control(pToolbar/*,id*/)
 {
-	UT_return_if_fail (id==AP_TOOLBAR_ID_FMT_FONT);
+    g_printerr("[DEBUG] FontCombo Constructor Entered\n");
+    UT_return_if_fail (id==AP_TOOLBAR_ID_FMT_FONT);
 
-	m_nPixels = 160;		// TODO: do a better calculation
-	m_nLimit = LF_FACESIZE;
-	m_bSort = true;
+    m_nPixels = 160;        // TODO: do a better calculation
+    m_nLimit = LF_FACESIZE;
+    m_bSort = true;
+    g_printerr("[DEBUG] FontCombo Constructor Exited\n");
 }
 
 AP_Win32Toolbar_FontCombo::~AP_Win32Toolbar_FontCombo(void)
 {
-	UT_VECTOR_FREEALL(char *, m_vecContents);
-	
+    g_printerr("[DEBUG] FontCombo Destructor Entered\n");
+    UT_VECTOR_FREEALL(char *, m_vecContents);
+    g_printerr("[DEBUG] FontCombo Destructor Exited\n");
 }
 
 /*****************************************************************/
@@ -62,74 +70,91 @@ static std::set<std::string> seenFonts;
 
 bool AP_Win32Toolbar_FontCombo::populate(void)
 {
-	// clear anything that's already there
-	m_vecContents.clear();
-	m_vecFontCharSet.clear();
+    g_printerr("[DEBUG] FontCombo populate Entered, this=%p\n", (void*)this);
 
-	seenFonts.clear();
+    // clear anything that's already there
+    g_printerr("[DEBUG] populate: clearing m_vecContents\n");
+    m_vecContents.clear();
+    
+    g_printerr("[DEBUG] populate: clearing m_vecFontCharSet\n");
+    m_vecFontCharSet.clear();
 
-	// populate the vector
-	HWND hwnd = NULL;
-    HDC hdc = GetDC(hwnd) ;
-	LOGFONTW lf;
-	lf.lfCharSet=DEFAULT_CHARSET;
-	*lf.lfFaceName=0;
-	lf.lfPitchAndFamily=0;
-    EnumFontFamiliesExW(hdc, &lf, (FONTENUMPROCW) AP_Win32Toolbar_FontCombo::_EnumFontsProc, (LONG_PTR) this, 0) ;
-    ReleaseDC(hwnd, hdc) ;
+    g_printerr("[DEBUG] populate: clearing seenFonts\n");
+    seenFonts.clear();
 
-	seenFonts.clear();
+    // populate the vector
+    HWND hwnd = NULL;
+    g_printerr("[DEBUG] populate: calling GetDC\n");
+    HDC hdc = GetDC(hwnd);
+    if (!hdc) {
+        g_printerr("[DEBUG] Failed to get DC for Font enumeration, hwnd=%p\n", (void*)hwnd);
+        return false;
+    }
+    g_printerr("[DEBUG] populate: GetDC succeeded, hdc=%p\n", (void*)hdc);
 
-	return true;
+    LOGFONTW lf;
+    lf.lfCharSet = DEFAULT_CHARSET;
+    *lf.lfFaceName = 0;
+    lf.lfPitchAndFamily = 0;
+    
+    g_printerr("[DEBUG] populate: calling EnumFontFamiliesExW\n");
+    int enumResult = EnumFontFamiliesExW(hdc, &lf, (FONTENUMPROCW) AP_Win32Toolbar_FontCombo::_EnumFontsProc, (LONG_PTR) this, 0);
+    g_printerr("[DEBUG] populate: EnumFontFamiliesExW finished with result=%d\n", enumResult);
+
+    ReleaseDC(hwnd, hdc);
+    g_printerr("[DEBUG] populate: ReleaseDC called\n");
+
+    seenFonts.clear();
+    g_printerr("[DEBUG] FontCombo populate Exited successfully\n");
+
+    return true;
 }
 
 int CALLBACK AP_Win32Toolbar_FontCombo::_EnumFontsProc(LPLOGFONTW lplf, 
-						       LPTEXTMETRICW /*lptm*/,
-													  DWORD dwStyle, 
-													  LONG lParam)
+                             LPTEXTMETRICW /*lptm*/,
+                             DWORD dwStyle, 
+                             LPARAM lParam)
 {
-	AP_Win32Toolbar_FontCombo * ctl = (AP_Win32Toolbar_FontCombo *) lParam;
-	UT_return_val_if_fail (ctl, 0);
+    g_printerr("[DEBUG] _EnumFontsProc Entered, lParam=%p\n", (void*)lParam);
 
-	/*
-	   WARNING: any changes to this function should be closely coordinated
-	   with the equivalent logic in Win32Graphics::FindFont()
-	*/
+    AP_Win32Toolbar_FontCombo * ctl = (AP_Win32Toolbar_FontCombo *) lParam;
+    if (!ctl) {
+        g_printerr("[DEBUG] _EnumFontsProc: ctl is NULL\n");
+        return 0;
+    }
 
-	// filter out fonts we don't use
-	if (dwStyle & RASTER_FONTTYPE)
-		return 1 ;
-#if 0
-	// This is too restrictive.  Since EnumFontFamilies chooses at random
-	// the character set for the chosen font family, we were missing things
-	// here.  Perhaps use EnumFontFamiliesEx instead?
-	if (lplf->lfCharSet != ANSI_CHARSET)
-		return 1 ;
-#endif
+    // filter out fonts we don't use
+    if (dwStyle & RASTER_FONTTYPE)
+        return 1;
 
-	// filter out vertical fonts which aren't supported
-	if (lplf->lfFaceName[0]=='@')
-		return 1;
+    // filter out vertical fonts which aren't supported
+    if (lplf->lfFaceName[0] == '@')
+        return 1;
 
-	UT_Win32LocaleString str;
-	str.fromLocale (lplf->lfFaceName);
-	char * p = g_strdup((str.utf8_str().utf8_str()));
+    g_printerr("[DEBUG] _EnumFontsProc: processing font face name\n");
+    UT_Win32LocaleString str;
+    str.fromLocale (lplf->lfFaceName);
+    char * p = g_strdup((str.utf8_str().utf8_str()));
+    if (!p) {
+        g_printerr("[DEBUG] _EnumFontsProc: g_strdup failed\n");
+        return 1;
+    }
 
-	if (seenFonts.find(p)!=seenFonts.end()) {
-		FREEP(p);
-		return 1;
-	}
+    if (seenFonts.find(p) != seenFonts.end()) {
+        FREEP(p);
+        return 1;
+    }
 
-	ctl->m_vecContents.addItem(p);
-	ctl->m_vecFontCharSet.addItem((void*)lplf->lfCharSet);
+    g_printerr("[DEBUG] _EnumFontsProc: adding item to vectors, p=%p\n", (void*)p);
+    ctl->m_vecContents.addItem(p);
+    ctl->m_vecFontCharSet.addItem((void*)lplf->lfCharSet);
 
-	seenFonts.insert(p);
+    seenFonts.insert(p);
 
-	return 1;
+    return 1;
 }
 
 UT_uint32 AP_Win32Toolbar_FontCombo::getDroppedWidth() const
 {
-	// TODO make better calculation of dropped width
-	return getPixelWidth() + 100;
+    return getPixelWidth() + 100;
 }

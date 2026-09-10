@@ -43,7 +43,7 @@ protected:
 	static int CALLBACK				_EnumFontsProc(LPLOGFONTW lplf,
 												   LPTEXTMETRICW lptm,
 												   DWORD dwStyle,
-												   LONG lParam);
+												   LPARAM lParam);
 
 	UT_Vector			m_vecFontCharSet;
 };

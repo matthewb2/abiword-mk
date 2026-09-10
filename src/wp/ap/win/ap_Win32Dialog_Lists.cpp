@@ -306,7 +306,7 @@ BOOL AP_Win32Dialog_Lists::_onCommand(HWND /*hWnd*/, WPARAM wParam, LPARAM /*lPa
 		return 0;
 
 	case AP_RID_DIALOG_LIST_BTN_FONT:
-		_selectFont();
+		//_selectFont();
 		return 1;						// return zero to let windows take care of it.
 
 	case AP_RID_DIALOG_LIST_EDIT_FORMAT:
@@ -1016,132 +1016,119 @@ void AP_Win32Dialog_Lists::_setListType(FL_ListType type)
 
 void AP_Win32Dialog_Lists::_selectFont()
 {
-	if (_getTypeComboCurSel() != 2)
-	{
-		// What the...? The Font select button should only be active
-		// when Numbered list type is selected!
-	}
+    g_printerr("[DEBUG] 1. Entered _selectFont()\n");
+    if (_getTypeComboCurSel() != 2)
+    {
+        // What the...? The Font select button should only be active
+        // when Numbered list type is selected!
+    }
 
-	XAP_Frame* pFrame = getActiveFrame();
-	FV_View* pView = getView();
-	if (!pFrame || !pView)
-	{
-		// take the easy way out for now
-		MessageBeep(MB_ICONASTERISK);
-//		_win32Dialog.enableControl(AP_RID_DIALOG_LIST_BTN_FONT, false);
-		return;
-	}
+    XAP_Frame* pFrame = getActiveFrame();
+    FV_View* pView = getView();
+    if (!pFrame || !pView)
+    {
+        g_printerr("[DEBUG] 2. pFrame or pView is null\n");
+        MessageBeep(MB_ICONASTERISK);
+        return;
+    }
 
-	XAP_DialogFactory* pDialogFactory = pFrame->getDialogFactory();
-	UT_return_if_fail (pDialogFactory);
+    XAP_DialogFactory* pDialogFactory = pFrame->getDialogFactory();
+    UT_return_if_fail (pDialogFactory);
 
-	XAP_Dialog_FontChooser* pDialog
-		= (XAP_Dialog_FontChooser *)(pDialogFactory->requestDialog(XAP_DIALOG_ID_FONT));
-	UT_ASSERT_HARMLESS(pDialog);
+    g_printerr("[DEBUG] 3. Requesting font dialog...\n");
+    XAP_Dialog_FontChooser* pDialog
+        = (XAP_Dialog_FontChooser *)(pDialogFactory->requestDialog(XAP_DIALOG_ID_FONT));
+    UT_ASSERT_HARMLESS(pDialog);
 
-	if (!pDialog)	// runtime failsafe
-	{
-		// Disable the Font button. If we couldn't get the dialog
-		// this time, chances are we never will. :-(
-		_win32Dialog.enableControl(AP_RID_DIALOG_LIST_BTN_FONT, false);
-		MessageBeep(MB_ICONASTERISK);
-		return;
-	}
+    if (!pDialog)    // runtime failsafe
+    {
+        g_printerr("[DEBUG] 4. pDialog is null after request\n");
+        _win32Dialog.enableControl(AP_RID_DIALOG_LIST_BTN_FONT, false);
+        MessageBeep(MB_ICONASTERISK);
+        return;
+    }
 
-	PP_PropertyVector props_in;
+    PP_PropertyVector props_in;
 
-	bool bUnderline = false;
+    bool bUnderline = false;
+    bool bOverline = false;
+    bool bStrikeOut = false;
+    bool bTopLine = false;
+    bool bBottomLine = false;
 
-	bool bOverline = false;
+    g_printerr("[DEBUG] 5. Getting character format...\n");
+    if (pView->getCharFormat(props_in))
+    {
+        g_printerr("[DEBUG] 6. Setting font properties to dialog...\n");
+        const std::string & sFontFamily = PP_getAttribute("font-family", props_in);
+        const std::string & sFontSize = PP_getAttribute("font-size", props_in);
+        const std::string & sFontWeight = PP_getAttribute("font-weight", props_in);
+        const std::string & sFontStyle = PP_getAttribute("font-style", props_in);
+        const std::string & sColor = PP_getAttribute("color", props_in);
 
-	bool bStrikeOut = false;
+        pDialog->setFontFamily(sFontFamily);
+        pDialog->setFontSize(sFontSize);
+        pDialog->setFontWeight(sFontWeight);
+        pDialog->setFontStyle(sFontStyle);
+        pDialog->setColor(sColor);
 
-	bool bTopLine = false;
-	bool bBottomLine = false;
+        const std::string & s = PP_getAttribute("text-decoration", props_in);
+        if (!s.empty())
+        {
+            bUnderline = s.find("underline") != std::string::npos;
+            bOverline = s.find("overline") != std::string::npos;
+            bStrikeOut = s.find("line-through") != std::string::npos;
+            bTopLine = s.find("topline") != std::string::npos;
+            bBottomLine = s.find("bottomline") != std::string::npos;
+        }
+        pDialog->setFontDecoration(bUnderline,bOverline,bStrikeOut,false,false);
+    }
 
+    g_printerr("[DEBUG] 7. Setting graphics context and running modal...\n");
+    pDialog->setGraphicsContext(pView->getGraphics());
+    pDialog->runModal(pFrame);
 
-	if (pView->getCharFormat(props_in))
-	{
-		// stuff font properties into the dialog.
+    g_printerr("[DEBUG] 8. Checking dialog answer...\n");
+    XAP_Dialog_FontChooser::tAnswer ans = pDialog->getAnswer();
+    g_printerr("[DEBUG] 8-1. Dialog answer received: %d\n", (int)ans);
 
-		const std::string & sFontFamily = PP_getAttribute("font-family", props_in);
-		const std::string & sFontSize = PP_getAttribute("font-size", props_in);
-		const std::string & sFontWeight = PP_getAttribute("font-weight", props_in);
-		const std::string & sFontStyle = PP_getAttribute("font-style", props_in);
-		const std::string & sColor = PP_getAttribute("color", props_in);
+    if (ans != XAP_Dialog_FontChooser::a_OK &&
+        ans != XAP_Dialog_FontChooser::a_YES)
+    {
+        g_printerr("[DEBUG] 9. Dialog cancelled or closed without confirmation.\n");
+        return;
+    }
 
-		pDialog->setFontFamily(sFontFamily);
-		pDialog->setFontSize(sFontSize);
-		pDialog->setFontWeight(sFontWeight);
-		pDialog->setFontStyle(sFontStyle);
-		pDialog->setColor(sColor);
+    std::string szFont;
+    try
+    {
+        g_printerr("[DEBUG] 10. Calling getChangedFontFamily()...\n");
+        std::string tempFont;
+        if (pDialog->getChangedFontFamily(tempFont))
+        {
+            szFont = tempFont;
+            g_printerr("[DEBUG] 11. Font family retrieved successfully: %s\n", szFont.c_str());
+        }
+        else
+        {
+            g_printerr("[DEBUG] 11-1. getChangedFontFamily returned false.\n");
+        }
+    }
+    catch (...)
+    {
+        g_printerr("[DEBUG] EXCEPTION caught in getChangedFontFamily block\n");
+        return;
+    }
 
-		// these behave a little differently since they are
-		// probably just check boxes and we don't have to
-		// worry about initializing a combo box with a choice
-		// (and because they are all stuck under one CSS attribute).
-
-                const std::string & s = PP_getAttribute("text-decoration", props_in);
-		if (!s.empty())
-		{
-			bUnderline = s.find("underline") != std::string::npos;
-			bOverline = s.find("overline") != std::string::npos;
-			bStrikeOut = s.find("line-through") != std::string::npos;
-
-			bTopLine = s.find("topline") != std::string::npos;
-
-			bBottomLine = s.find("bottomline") != std::string::npos;
-		}
-		pDialog->setFontDecoration(bUnderline,bOverline,bStrikeOut,false,false);
-	}
-
-	pDialog->setGraphicsContext(pView->getGraphics());
-	pDialog->runModal(pFrame);
-
-	if (pDialog->getAnswer() != XAP_Dialog_FontChooser::a_OK &&
-		pDialog->getAnswer() != XAP_Dialog_FontChooser::a_YES)
-	{
-		return;
-	}
-
-	std::string szFont;
-
-
-	if (pDialog->getChangedFontFamily(szFont))
-
-/*
-
-		|| pDialog->getChangedFontSize(szFont)
-
-		|| pDialog->getChangedFontWeight(szFont)
-
-		|| pDialog->getChangedFontStyle(szFont)
-
-		|| pDialog->getChangedBGColor(szFont)
-
-		|| pDialog->getChangedColor(szFont)
-
-		|| pDialog->getChangedUnderline(&bUnderline)
-
-		|| pDialog->getChangedOverline(&bOverline)
-
-		|| pDialog->getChangedStrikeOut(&bStrikeOut)
-
-		|| pDialog->getChangedTopline(&bTopLine)
-
-		|| pDialog->getChangedBottomline(&bBottomLine)
-
-		)
-
-*/
-	{
-
-		setDirty();
-		copyCharToFont(szFont);
-		_previewExposed();
-
-		_enableControls();
-	}
+    if (!szFont.empty())
+    {
+        g_printerr("[DEBUG] 12. Applying changes (setDirty, copyCharToFont, etc.)...\n");
+        setDirty();
+        copyCharToFont(szFont.c_str());
+        _previewExposed();
+        _enableControls();
+    }
+    g_printerr("[DEBUG] 13. Exiting _selectFont() normally.\n");
 }
 
 

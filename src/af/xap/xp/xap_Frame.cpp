@@ -191,190 +191,204 @@ int XAP_Frame::_getNextUntitledNumber(void)
 /*****************************************************************/
 
 bool XAP_Frame::initialize(const char * /*szKeyBindingsKey*/, const char * /*szKeyBindingsDefaultValue*/,
-						   const char * szMenuLayoutKey, const char * szMenuLayoutDefaultValue,
-						   const char * szMenuLabelSetKey, const char * szMenuLabelSetDefaultValue,
-						   const char * szToolbarLayoutsKey, const char * szToolbarLayoutsDefaultValue,
-						   const char * szToolbarLabelSetKey, const char * szToolbarLabelSetDefaultValue)
+                           const char * szMenuLayoutKey, const char * szMenuLayoutDefaultValue,
+                           const char * szMenuLabelSetKey, const char * szMenuLabelSetDefaultValue,
+                           const char * szToolbarLayoutsKey, const char * szToolbarLayoutsDefaultValue,
+                           const char * szToolbarLabelSetKey, const char * szToolbarLabelSetDefaultValue)
 {
-	XAP_App * pApp = XAP_App::getApp();
+    g_printerr("[DEBUG] XAP_Frame::initialize entered. m_pFrameImpl=%p\n", (void*)m_pFrameImpl);
+    
+    XAP_App * pApp = XAP_App::getApp();
+    if (!pApp) {
+        g_printerr("[DEBUG] XAP_App::getApp() returned NULL!\n");
+        return false;
+    }
 
+    if (!m_pFrameImpl) {
+        g_printerr("[DEBUG] m_pFrameImpl is NULL!\n");
+        return false;
+    }
 
-	//////////////////////////////////////////////////////////////////
-	// select which menu bar we should use
-	//////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
+    // select which menu bar we should use
+    ////////////////////////////////////////////////////////////////
 
-	const char * szMenuLayoutName = NULL;
-	if ((pApp->getPrefsValue(szMenuLayoutKey,
-				 static_cast<const gchar**>(&szMenuLayoutName))) &&
-	    (szMenuLayoutName) && (*szMenuLayoutName))
-		;
-	else
-		szMenuLayoutName = szMenuLayoutDefaultValue;
-	m_pFrameImpl->m_szMenuLayoutName = g_strdup(szMenuLayoutName);
-	
-	//////////////////////////////////////////////////////////////////
-	// select language for menu labels
-	//////////////////////////////////////////////////////////////////
+    const char * szMenuLayoutName = NULL;
+    if ((pApp->getPrefsValue(szMenuLayoutKey,
+                 static_cast<const gchar**>(&szMenuLayoutName))) &&
+        (szMenuLayoutName) && (*szMenuLayoutName))
+        ;
+    else
+        szMenuLayoutName = szMenuLayoutDefaultValue;
+    
+    g_printerr("[DEBUG] Menu layout name resolved: %s\n", szMenuLayoutName ? szMenuLayoutName : "(null)");
+    m_pFrameImpl->m_szMenuLayoutName = g_strdup(szMenuLayoutName);
+    
+    ////////////////////////////////////////////////////////////////
+    // select language for menu labels
+    ////////////////////////////////////////////////////////////////
 
-	const char * szMenuLabelSetName = NULL;
-	if ((pApp->getPrefsValue(szMenuLabelSetKey,
-				 static_cast<const gchar**>(&szMenuLabelSetName))) &&
-	    (szMenuLabelSetName) && (*szMenuLabelSetName))
-		;
-	else
-		szMenuLabelSetName = szMenuLabelSetDefaultValue;
-	m_pFrameImpl->m_szMenuLabelSetName = g_strdup(szMenuLabelSetName);
-	
-	//////////////////////////////////////////////////////////////////
-	// select which toolbars we should display
-	//////////////////////////////////////////////////////////////////
+    const char * szMenuLabelSetName = NULL;
+    if ((pApp->getPrefsValue(szMenuLabelSetKey,
+                 static_cast<const gchar**>(&szMenuLabelSetName))) &&
+        (szMenuLabelSetName) && (*szMenuLabelSetName))
+        ;
+    else
+        szMenuLabelSetName = szMenuLabelSetDefaultValue;
+    
+    g_printerr("[DEBUG] Menu label set name resolved: %s\n", szMenuLabelSetName ? szMenuLabelSetName : "(null)");
+    m_pFrameImpl->m_szMenuLabelSetName = g_strdup(szMenuLabelSetName);
+    
+    ////////////////////////////////////////////////////////////////
+    // select which toolbars we should display
+    ////////////////////////////////////////////////////////////////
 
-	const char * szToolbarLayouts = NULL;
-	if ((pApp->getPrefsValue(szToolbarLayoutsKey,
-							 static_cast<const gchar**>(&szToolbarLayouts))) &&
-	    (szToolbarLayouts) && (*szToolbarLayouts))
-		;
-	else
-		szToolbarLayouts = szToolbarLayoutsDefaultValue;
+    const char * szToolbarLayouts = NULL;
+    if ((pApp->getPrefsValue(szToolbarLayoutsKey,
+                           static_cast<const gchar**>(&szToolbarLayouts))) &&
+        (szToolbarLayouts) && (*szToolbarLayouts))
+        ;
+    else
+        szToolbarLayouts = szToolbarLayoutsDefaultValue;
 
-	// take space-delimited list and call addItem() for each name in the list.
-	
-	{
-		char * szTemp;
-		szTemp = g_strdup(szToolbarLayouts);
-		UT_ASSERT(szTemp);
-		for (char * p=strtok(szTemp," "); (p); p=strtok(NULL," "))
-		{
-			char * szTempName;
-			szTempName = g_strdup(p);
-			m_pFrameImpl->m_vecToolbarLayoutNames.addItem(szTempName);
-		}
-		g_free(szTemp);
-	}
-	
-	//////////////////////////////////////////////////////////////////
-	// select language for the toolbar labels.
-	// i'm not sure if it would ever make sense to
-	// deviate from what we set the menus to, but
-	// we can if we have to.
-	// all toolbars will have the same language.
-	//////////////////////////////////////////////////////////////////
+    g_printerr("[DEBUG] Toolbar layouts resolved: %s\n", szToolbarLayouts ? szToolbarLayouts : "(null)");
 
-	const char * szToolbarLabelSetName = NULL;
-	if ((pApp->getPrefsValue(szToolbarLabelSetKey,
-				 static_cast<const gchar**>(&szToolbarLabelSetName))) &&
-	    (szToolbarLabelSetName) && (*szToolbarLabelSetName))
-		;
-	else
-		szToolbarLabelSetName = szToolbarLabelSetDefaultValue;
-	m_pFrameImpl->m_szToolbarLabelSetName = g_strdup(szToolbarLabelSetName);
-	
-	//////////////////////////////////////////////////////////////////
-	// select the appearance of the toolbar buttons
-	//////////////////////////////////////////////////////////////////
+    // take space-delimited list and call addItem() for each name in the list.
+    {
+        char * szTemp;
+        szTemp = g_strdup(szToolbarLayouts);
+        UT_ASSERT(szTemp);
+        for (char * p=strtok(szTemp," "); (p); p=strtok(NULL," "))
+        {
+            char * szTempName;
+            szTempName = g_strdup(p);
+            m_pFrameImpl->m_vecToolbarLayoutNames.addItem(szTempName);
+        }
+        g_free(szTemp);
+    }
+    g_printerr("[DEBUG] Toolbar layout names added successfully\n");
+    
+    ////////////////////////////////////////////////////////////////
+    // select language for the toolbar labels.
+    ////////////////////////////////////////////////////////////////
 
-	const char * szToolbarAppearance = NULL;
-	pApp->getPrefsValue(XAP_PREF_KEY_ToolbarAppearance,
-			    static_cast<const gchar**>(&szToolbarAppearance));
-	UT_ASSERT((szToolbarAppearance) && (*szToolbarAppearance));
-	m_pFrameImpl->m_szToolbarAppearance = g_strdup(szToolbarAppearance);
+    const char * szToolbarLabelSetName = NULL;
+    if ((pApp->getPrefsValue(szToolbarLabelSetKey,
+                 static_cast<const gchar**>(&szToolbarLabelSetName))) &&
+        (szToolbarLabelSetName) && (*szToolbarLabelSetName))
+        ;
+    else
+        szToolbarLabelSetName = szToolbarLabelSetDefaultValue;
+    
+    m_pFrameImpl->m_szToolbarLabelSetName = g_strdup(szToolbarLabelSetName);
+    
+    ////////////////////////////////////////////////////////////////
+    // select the appearance of the toolbar buttons
+    ////////////////////////////////////////////////////////////////
 
-	//////////////////////////////////////////////////////////////////
-	// select the auto save options
-	//////////////////////////////////////////////////////////////////
-	UT_String stTmp;
-	bool autosave = true;
+    const char * szToolbarAppearance = NULL;
+    pApp->getPrefsValue(XAP_PREF_KEY_ToolbarAppearance,
+                static_cast<const gchar**>(&szToolbarAppearance));
+    
+    if (szToolbarAppearance && *szToolbarAppearance) {
+        m_pFrameImpl->m_szToolbarAppearance = g_strdup(szToolbarAppearance);
+    } else {
+        g_printerr("[DEBUG] ToolbarAppearance preference is missing or empty\n");
+        m_pFrameImpl->m_szToolbarAppearance = g_strdup("standard"); // 안전한 기본값 대처
+    }
 
-	pApp->getPrefsValue(XAP_PREF_KEY_AutoSaveFileExt, m_stAutoSaveExt);
-	pApp->getPrefsValueBool(XAP_PREF_KEY_AutoSaveFile, &autosave);
+    ////////////////////////////////////////////////////////////////
+    // select the auto save options
+    ////////////////////////////////////////////////////////////////
+    UT_String stTmp;
+    bool autosave = true;
 
-	if (autosave)
-		_createAutoSaveTimer();
-	setAutoSaveFile(autosave);
+    pApp->getPrefsValue(XAP_PREF_KEY_AutoSaveFileExt, m_stAutoSaveExt);
+    pApp->getPrefsValueBool(XAP_PREF_KEY_AutoSaveFile, &autosave);
 
-	//////////////////////////////////////////////////////////////////
-	// select the default zoom settings
-	//////////////////////////////////////////////////////////////////
-	pApp->getPrefsValue(XAP_PREF_KEY_ZoomType, stTmp);
-	UT_DEBUGMSG(("Zoom type from prefs is %s \n",stTmp.c_str()));
-	UT_uint32 iZoom = 100;
-	if( g_ascii_strcasecmp( stTmp.c_str(), "100" ) == 0 )
-	{
-		m_zoomType = z_100;
-		iZoom = 100;
-	}
-	else if( g_ascii_strcasecmp( stTmp.c_str(), "75" ) == 0 )
-	{
-		m_zoomType = z_75;
-		iZoom = 75;
-	}
-	else if( g_ascii_strcasecmp( stTmp.c_str(), "200" ) == 0 )
-	{
-		m_zoomType = z_200;
-		iZoom = 200;
-	}
-	else if( g_ascii_strcasecmp( stTmp.c_str(), "Width" ) == 0 )
-	{
-		m_zoomType = z_PAGEWIDTH;
-		const gchar * szZoom = NULL;
-		pApp->getPrefsValue(XAP_PREF_KEY_ZoomPercentage,
-							  static_cast<const gchar**>(&szZoom));
-		if(szZoom)
-		{
-			iZoom = atoi(szZoom);
-			if(iZoom < XAP_DLG_ZOOM_MINIMUM_ZOOM) 
-				iZoom = 100;
-			else if (iZoom > XAP_DLG_ZOOM_MAXIMUM_ZOOM) 
-				iZoom = 100;
-		}
-		else
-		{
-			iZoom = 100;
-		}
-	}
-	else if( g_ascii_strcasecmp( stTmp.c_str(), "Page" ) == 0 )
-	{
-		m_zoomType = z_WHOLEPAGE;
-		const gchar * szZoom = NULL;
-		pApp->getPrefsValue(XAP_PREF_KEY_ZoomPercentage,
-							  static_cast<const gchar**>(&szZoom));
-		if(szZoom)
-		{
-			iZoom = atoi(szZoom);
-			if(iZoom < XAP_DLG_ZOOM_MINIMUM_ZOOM) 
-				iZoom = 100;
-			else if (iZoom > XAP_DLG_ZOOM_MAXIMUM_ZOOM) 
-				iZoom = 100;
-		}
-		else
-		{
-			iZoom = 100;
-		}
-	}
-	else
-	{
-		iZoom = atoi( stTmp.c_str() );
+    if (autosave)
+        _createAutoSaveTimer();
+    setAutoSaveFile(autosave);
 
-		// These limits are defined in xap_Dlg_Zoom.h
-		if ((iZoom <= XAP_DLG_ZOOM_MAXIMUM_ZOOM) && (iZoom >= XAP_DLG_ZOOM_MINIMUM_ZOOM)) 
-		{
-			m_zoomType = z_PERCENT;
-			XAP_Frame::setZoomPercentage( iZoom );
-		}
-		else
-		  m_zoomType = z_100;
-	}
-	XAP_Frame::setZoomPercentage( iZoom );
+    ////////////////////////////////////////////////////////////////
+    // select the default zoom settings
+    ////////////////////////////////////////////////////////////////
+    pApp->getPrefsValue(XAP_PREF_KEY_ZoomType, stTmp);
+    UT_DEBUGMSG(("Zoom type from prefs is %s \n",stTmp.c_str()));
+    UT_uint32 iZoom = 100;
+    if( g_ascii_strcasecmp( stTmp.c_str(), "100" ) == 0 )
+    {
+        m_zoomType = z_100;
+        iZoom = 100;
+    }
+    else if( g_ascii_strcasecmp( stTmp.c_str(), "75" ) == 0 )
+    {
+        m_zoomType = z_75;
+        iZoom = 75;
+    }
+    else if( g_ascii_strcasecmp( stTmp.c_str(), "200" ) == 0 )
+    {
+        m_zoomType = z_200;
+        iZoom = 200;
+    }
+    else if( g_ascii_strcasecmp( stTmp.c_str(), "Width" ) == 0 )
+    {
+        m_zoomType = z_PAGEWIDTH;
+        const gchar * szZoom = NULL;
+        pApp->getPrefsValue(XAP_PREF_KEY_ZoomPercentage,
+                            static_cast<const gchar**>(&szZoom));
+        if(szZoom)
+        {
+            iZoom = atoi(szZoom);
+            if(iZoom < XAP_DLG_ZOOM_MINIMUM_ZOOM) 
+                iZoom = 100;
+            else if (iZoom > XAP_DLG_ZOOM_MAXIMUM_ZOOM) 
+                iZoom = 100;
+        }
+        else
+        {
+            iZoom = 100;
+        }
+    }
+    else if( g_ascii_strcasecmp( stTmp.c_str(), "Page" ) == 0 )
+    {
+        m_zoomType = z_WHOLEPAGE;
+        const gchar * szZoom = NULL;
+        pApp->getPrefsValue(XAP_PREF_KEY_ZoomPercentage,
+                            static_cast<const gchar**>(&szZoom));
+        if(szZoom)
+        {
+            iZoom = atoi(szZoom);
+            if(iZoom < XAP_DLG_ZOOM_MINIMUM_ZOOM) 
+                iZoom = 100;
+            else if (iZoom > XAP_DLG_ZOOM_MAXIMUM_ZOOM) 
+                iZoom = 100;
+        }
+        else
+        {
+            iZoom = 100;
+        }
+    }
+    else
+    {
+        iZoom = atoi( stTmp.c_str() );
 
-	
-	//////////////////////////////////////////////////////////////////
-	// ... add other stuff here ...
-	//////////////////////////////////////////////////////////////////
+        if ((iZoom <= XAP_DLG_ZOOM_MAXIMUM_ZOOM) && (iZoom >= XAP_DLG_ZOOM_MINIMUM_ZOOM)) 
+        {
+            m_zoomType = z_PERCENT;
+            XAP_Frame::setZoomPercentage( iZoom );
+        }
+        else
+          m_zoomType = z_100;
+    }
+    XAP_Frame::setZoomPercentage( iZoom );
 
-	// initialize our helper
-	m_pFrameImpl->_initialize();
+    g_printerr("[DEBUG] About to call m_pFrameImpl->_initialize()\n");
+    // initialize our helper
+    m_pFrameImpl->_initialize();
+    g_printerr("[DEBUG] m_pFrameImpl->_initialize() completed successfully\n");
 
-	return true;
+    return true;
 }
 
 extern "C" {
@@ -676,21 +690,33 @@ bool XAP_Frame::repopulateCombos(void)
 
 void XAP_FrameImpl::_createToolbars(void)
 {
-	bool bResult;
-	UT_sint32 nrToolbars = m_vecToolbarLayoutNames.getItemCount();
-	for (UT_sint32 k=0; k < nrToolbars; k++)
-	{
-		EV_Toolbar * pToolbar = m_pFrame->_newToolbar(m_pFrame,
-							      reinterpret_cast<const char *>(m_vecToolbarLayoutNames.getNthItem(k)),
-							      reinterpret_cast<const char *>(m_szToolbarLabelSetName));
-		UT_continue_if_fail(pToolbar);
-		bResult = pToolbar->synthesize();
-		UT_ASSERT(bResult);
-		
-		m_vecToolbars.addItem(pToolbar);
-	}
-	UT_UNUSED(bResult); // TODO deal with the result
+    g_printerr("[DEBUG] XAP_FrameImpl::_createToolbars entered. nrToolbars=%d\n", m_vecToolbarLayoutNames.getItemCount());
+    bool bResult = true;
+    UT_sint32 nrToolbars = m_vecToolbarLayoutNames.getItemCount();
+    for (UT_sint32 k=0; k < nrToolbars; k++)
+    {
+        const char * szName = reinterpret_cast<const char *>(m_vecToolbarLayoutNames.getNthItem(k));
+        g_printerr("[DEBUG] Creating toolbar [%d]: %s\n", k, szName ? szName : "(null)");
+
+        EV_Toolbar * pToolbar = m_pFrame->_newToolbar(m_pFrame,
+                                szName,
+                                reinterpret_cast<const char *>(m_szToolbarLabelSetName));
+        
+        if (!pToolbar) {
+            g_printerr("[DEBUG] _newToolbar returned NULL for %s\n", szName ? szName : "(null)");
+        }
+        UT_continue_if_fail(pToolbar);
+
+        g_printerr("[DEBUG] Synthesizing toolbar: %s\n", szName ? szName : "(null)");
+        bResult = pToolbar->synthesize();
+        UT_ASSERT(bResult);
+        
+        m_vecToolbars.addItem(pToolbar);
+    }
+    g_printerr("[DEBUG] XAP_FrameImpl::_createToolbars finished\n");
+    UT_UNUSED(bResult);
 }
+
 
 UT_sint32 XAP_Frame::findToolbarNr(EV_Toolbar * pTB)
 {

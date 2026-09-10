@@ -93,12 +93,18 @@ XAP_FrameImpl * AP_Win32FrameImpl::createInstance(XAP_Frame *pFrame)
 
 void AP_Win32FrameImpl::_initialize(void)
 {
-	// FrameData initialized by AP_Win32Frame
+    g_printerr("[DEBUG] AP_Win32FrameImpl::_initialize entered\n");
 
-	XAP_Win32FrameImpl::_initialize();
+    // FrameData initialized by AP_Win32Frame
+    g_printerr("[DEBUG] AP_Win32FrameImpl::_initialize: about to call XAP_Win32FrameImpl::_initialize()\n");
+    XAP_Win32FrameImpl::_initialize();
+    g_printerr("[DEBUG] AP_Win32FrameImpl::_initialize: XAP_Win32FrameImpl::_initialize() passed\n");
 
-	_createTopLevelWindow();
+    g_printerr("[DEBUG] AP_Win32FrameImpl::_initialize: about to call _createTopLevelWindow()\n");
+    _createTopLevelWindow();
+    g_printerr("[DEBUG] AP_Win32FrameImpl::_initialize: _createTopLevelWindow() passed successfully\n");
 }
+
 
 HWND AP_Win32FrameImpl::_createDocumentWindow(XAP_Frame *pFrame, HWND hwndParent,
 							UT_uint32 iLeft, UT_uint32 iTop,

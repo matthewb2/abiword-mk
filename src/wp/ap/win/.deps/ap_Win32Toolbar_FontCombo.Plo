@@ -290,9 +290,6 @@ ap_Win32Toolbar_FontCombo.lo: ap_Win32Toolbar_FontCombo.cpp \
  D:/msys64_20251213/mingw64/include/winsvc.h \
  D:/msys64_20251213/mingw64/include/mcx.h \
  D:/msys64_20251213/mingw64/include/imm.h \
- ../../../../src/af/util/xp/ut_assert.h ../../../../config.h \
- ../../../../src/af/util/xp/ut_debugmsg.h \
- ../../../../src/af/util/xp/ut_types.h \
  D:/msys64_20251213/mingw64/include/glib-2.0/glib.h \
  D:/msys64_20251213/mingw64/include/glib-2.0/glib/galloca.h \
  D:/msys64_20251213/mingw64/include/glib-2.0/glib/gtypes.h \
@@ -392,6 +389,9 @@ ap_Win32Toolbar_FontCombo.lo: ap_Win32Toolbar_FontCombo.cpp \
  D:/msys64_20251213/mingw64/include/glib-2.0/glib/deprecated/grel.h \
  D:/msys64_20251213/mingw64/include/glib-2.0/glib/deprecated/gthread.h \
  D:/msys64_20251213/mingw64/include/glib-2.0/glib/glib-autocleanups.h \
+ ../../../../src/af/util/xp/ut_assert.h ../../../../config.h \
+ ../../../../src/af/util/xp/ut_debugmsg.h \
+ ../../../../src/af/util/xp/ut_types.h \
  ../../../../src/af/util/xp/ut_export.h \
  ../../../../src/af/util/xp/ut_vector.h \
  ../../../../src/af/util/xp/ut_assert.h \
@@ -885,10 +885,6 @@ D:/msys64_20251213/mingw64/include/sec_api/stralign_s.h:
 D:/msys64_20251213/mingw64/include/winsvc.h:
 D:/msys64_20251213/mingw64/include/mcx.h:
 D:/msys64_20251213/mingw64/include/imm.h:
-../../../../src/af/util/xp/ut_assert.h:
-../../../../config.h:
-../../../../src/af/util/xp/ut_debugmsg.h:
-../../../../src/af/util/xp/ut_types.h:
 D:/msys64_20251213/mingw64/include/glib-2.0/glib.h:
 D:/msys64_20251213/mingw64/include/glib-2.0/glib/galloca.h:
 D:/msys64_20251213/mingw64/include/glib-2.0/glib/gtypes.h:
@@ -988,6 +984,10 @@ D:/msys64_20251213/mingw64/include/glib-2.0/glib/deprecated/gmain.h:
 D:/msys64_20251213/mingw64/include/glib-2.0/glib/deprecated/grel.h:
 D:/msys64_20251213/mingw64/include/glib-2.0/glib/deprecated/gthread.h:
 D:/msys64_20251213/mingw64/include/glib-2.0/glib/glib-autocleanups.h:
+../../../../src/af/util/xp/ut_assert.h:
+../../../../config.h:
+../../../../src/af/util/xp/ut_debugmsg.h:
+../../../../src/af/util/xp/ut_types.h:
 ../../../../src/af/util/xp/ut_export.h:
 ../../../../src/af/util/xp/ut_vector.h:
 ../../../../src/af/util/xp/ut_assert.h:

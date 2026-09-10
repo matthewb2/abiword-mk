@@ -95,7 +95,7 @@ public:
 	// the dialog and must be valid only until the dialog is released.
 	bool                            didPropChange(const std::string & v1, const std::string & v2) const;
 	bool							getChangedTextTransform(std::string&) const;
-	bool							getChangedFontFamily(std::string&) const;
+	bool							getChangedFontFamily(std::string&) const;	
 	bool							getChangedFontSize(std::string&) const;
 	bool							getChangedFontWeight(std::string&) const;
 	bool							getChangedFontStyle(std::string&) const;

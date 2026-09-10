@@ -199,173 +199,155 @@ void XAP_Win32FrameImpl::_initialize(void)
 
 void XAP_Win32FrameImpl::_createTopLevelWindow(void)
 {
-	RECT r;
-	UT_uint32 iHeight, iWidth;
-	UT_sint32 iPosX, iPosY;
-	static bool firstWindow = true;	/* position only 1st window! */
+    g_printerr("[DEBUG] _createTopLevelWindow: started\n");
+    RECT r;
+    UT_uint32 iHeight, iWidth;
+    UT_sint32 iPosX, iPosY;
+    static bool firstWindow = true;    /* position only 1st window! */
 
-	// create a top-level window for us.
-	// get the default window size from preferences or something.
-	// should set size for all, but position only on 1st created
-	// TODO determine where to save & restore from Window flag (since
-	//      we can't use the geometry flag (its some other junk about validity of pos & size)
-	//      so we can properly restore Maximized/Minimized/Normal mode windows
-
-	// get window width & height from preferences
-	UT_uint32 t_flag;		// dummy variable
-	if ( !(XAP_App::getApp()->getGeometry(&iPosX,&iPosY,&iWidth,&iHeight,&t_flag)) ||
-           !((iWidth > 0) && (iHeight > 0)) )
-	{
-		UT_DEBUGMSG(("Unable to obtain saved geometry, using window defaults!\n"));
-		iWidth = CW_USEDEFAULT;
-		iHeight = CW_USEDEFAULT;
-		iPosX = CW_USEDEFAULT;
-		iPosY = CW_USEDEFAULT;
-	} else {
-		// Ensure the window fits current desktop area
-		RECT rcDesktop, rcWindow;
+    UT_uint32 t_flag;        // dummy variable
+    if ( !(XAP_App::getApp()->getGeometry(&iPosX,&iPosY,&iWidth,&iHeight,&t_flag)) ||
+            !((iWidth > 0) && (iHeight > 0)) )
+    {
+        UT_DEBUGMSG(("Unable to obtain saved geometry, using window defaults!\n"));
+        iWidth = CW_USEDEFAULT;
+        iHeight = CW_USEDEFAULT;
+        iPosX = CW_USEDEFAULT;
+        iPosY = CW_USEDEFAULT;
+    } else {
+        RECT rcDesktop, rcWindow;
 #if (_WIN32_WINNT >= 0x0500)
-		rcDesktop.left=rcDesktop.right=0;
+        rcDesktop.left=rcDesktop.right=0;
 
-		if (GetSystemMetrics(SM_CMONITORS)>1) {
-			HMONITOR m;
-			MONITORINFO mif;
-			SetRect(&rcWindow,iPosX,iPosY,iPosX+iWidth,iPosY+iHeight);
-			if ((m = MonitorFromRect(&rcWindow, MONITOR_DEFAULTTONEAREST))) {;
-				mif.cbSize=sizeof(MONITORINFO);
-				if (GetMonitorInfoW(m,&mif)) {
-					rcDesktop=mif.rcWork;
-				}
-			}
-		}
+        if (GetSystemMetrics(SM_CMONITORS)>1) {
+            HMONITOR m;
+            MONITORINFO mif;
+            SetRect(&rcWindow,iPosX,iPosY,iPosX+iWidth,iPosY+iHeight);
+            if ((m = MonitorFromRect(&rcWindow, MONITOR_DEFAULTTONEAREST))) {;
+                mif.cbSize=sizeof(MONITORINFO);
+                if (GetMonitorInfoW(m,&mif)) {
+                    rcDesktop=mif.rcWork;
+                }
+            }
+        }
 
-		if (rcDesktop.left==rcDesktop.right)
+        if (rcDesktop.left==rcDesktop.right)
 #endif
-			if (!SystemParametersInfoW(SPI_GETWORKAREA,0,&rcDesktop,0))
-				SetRect(&rcDesktop,0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN));
+            if (!SystemParametersInfoW(SPI_GETWORKAREA,0,&rcDesktop,0))
+                SetRect(&rcDesktop,0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN));
 
-		if (iWidth > (rcDesktop.right-rcDesktop.left)) iWidth=rcDesktop.right-rcDesktop.left;
-		if (iHeight > (rcDesktop.bottom-rcDesktop.top)) iHeight=rcDesktop.bottom-rcDesktop.top;
+        if (iWidth > (rcDesktop.right-rcDesktop.left)) iWidth=rcDesktop.right-rcDesktop.left;
+        if (iHeight > (rcDesktop.bottom-rcDesktop.top)) iHeight=rcDesktop.bottom-rcDesktop.top;
 
-		if (iPosX+iWidth > rcDesktop.right) iPosX=rcDesktop.right-iWidth;
-		if (iPosY+iHeight > rcDesktop.bottom) iPosY=rcDesktop.bottom-iHeight;
+        if (iPosX+iWidth > rcDesktop.right) iPosX=rcDesktop.right-iWidth;
+        if (iPosY+iHeight > rcDesktop.bottom) iPosY=rcDesktop.bottom-iHeight;
 
-		if (iPosX < rcDesktop.left) iPosX=rcDesktop.left;
-		if (iPosY < rcDesktop.top)  iPosY=rcDesktop.top;
-	}
-	/* let Windows(R) place the Window for all but 1st one, for stairstep effect */
-	if (!firstWindow)
-	{
-		iPosX = CW_USEDEFAULT;
-		iPosY = CW_USEDEFAULT;
-	}
-	else firstWindow = false;
+        if (iPosX < rcDesktop.left) iPosX=rcDesktop.left;
+        if (iPosY < rcDesktop.top)  iPosY=rcDesktop.top;
+    }
 
-	UT_DEBUGMSG(("KJD: Window Frame should be %d x %d [width x height]\n", iWidth, iHeight));
+    if (!firstWindow)
+    {
+        iPosX = CW_USEDEFAULT;
+        iPosY = CW_USEDEFAULT;
+    }
+    else firstWindow = false;
 
+    XAP_Win32App *pWin32App = static_cast<XAP_Win32App *>(XAP_App::getApp());
 
-	XAP_Win32App *pWin32App = static_cast<XAP_Win32App *>(XAP_App::getApp());
+    UT_Win32LocaleString str, title;
+    str.fromASCII (pWin32App->getApplicationName());
+    title.fromASCII (pWin32App->getApplicationTitleForTitleBar());
 
-	UT_Win32LocaleString str, title;
-	str.fromASCII (pWin32App->getApplicationName());
-	title.fromASCII (pWin32App->getApplicationTitleForTitleBar());
+    g_printerr("[DEBUG] _createTopLevelWindow: about to call UT_CreateWindowEx for frame\n");
+    m_hwndFrame = UT_CreateWindowEx(0L, str.c_str(), title.c_str(),
+                                    WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
+                                    iPosX, iPosY, iWidth, iHeight,
+                                    NULL, NULL, pWin32App->getInstance(), NULL);
 
-	m_hwndFrame = UT_CreateWindowEx(0L, str.c_str(), title.c_str(),
-									WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
-									iPosX, iPosY, iWidth, iHeight,
-									NULL, NULL, pWin32App->getInstance(), NULL);
+    g_printerr("[DEBUG] _createTopLevelWindow: m_hwndFrame=%p\n", (void*)m_hwndFrame);
+    UT_ASSERT(m_hwndFrame);
 
-	UT_ASSERT(m_hwndFrame);
-
-
-	// bind this frame to its window
-	// WARNING: We assume in many places this refers to a XAP_Frame or descendant!!!
-	//SetWindowLongPtrW(m_hwndFrame, GWLP_USERDATA,(LONG_PTR)this);
-	SetWindowLongPtrW(m_hwndFrame, GWLP_USERDATA,(LONG_PTR)getFrame());
+    SetWindowLongPtrW(m_hwndFrame, GWLP_USERDATA,(LONG_PTR)getFrame());
 
 #ifndef UNICODE
-	// remove this when we are a true unicode app
-	m_mouseWheelMessage = RegisterWindowMessageW(L"MSWHEEL_ROLLMSG");
+    m_mouseWheelMessage = RegisterWindowMessageW(L"MSWHEEL_ROLLMSG");
 #else
-	m_mouseWheelMessage = RegisterWindowMessageW(MSH_MOUSEWHEEL);
+    m_mouseWheelMessage = RegisterWindowMessageW(MSH_MOUSEWHEEL);
 #endif
 
-	// synthesize a menu from the info in our
-	// base class and install it into the window.
-	m_pWin32Menu = new EV_Win32MenuBar(pWin32App,
-							 XAP_App::getApp()->getEditEventMapper(),
-							m_szMenuLayoutName,
-							m_szMenuLabelSetName);
-	UT_return_if_fail(m_pWin32Menu);
-	UT_DebugOnly<bool> bResult = m_pWin32Menu->synthesizeMenuBar(getFrame());
-	UT_ASSERT(bResult);
+    g_printerr("[DEBUG] _createTopLevelWindow: about to create EV_Win32MenuBar\n");
+    m_pWin32Menu = new EV_Win32MenuBar(pWin32App,
+                       XAP_App::getApp()->getEditEventMapper(),
+                        m_szMenuLayoutName,
+                        m_szMenuLabelSetName);
+    UT_return_if_fail(m_pWin32Menu);
+    
+    g_printerr("[DEBUG] _createTopLevelWindow: about to synthesizeMenuBar\n");
+    UT_DebugOnly<bool> bResult = m_pWin32Menu->synthesizeMenuBar(getFrame());
+    UT_ASSERT(bResult);
 
-	HMENU oldMenu = GetMenu(m_hwndFrame);
-	if (SetMenu(m_hwndFrame, m_pWin32Menu->getMenuHandle()))
-	{
-		DrawMenuBar(m_hwndFrame);
-		if (oldMenu)
-			DestroyMenu(oldMenu);
-	}
+    HMENU oldMenu = GetMenu(m_hwndFrame);
+    if (SetMenu(m_hwndFrame, m_pWin32Menu->getMenuHandle()))
+    {
+        DrawMenuBar(m_hwndFrame);
+        if (oldMenu)
+            DestroyMenu(oldMenu);
+    }
 
-	// create a rebar container for all the toolbars
-	m_hwndRebar = UT_CreateWindowEx(0L, REBARCLASSNAMEW, NULL,
-									WS_VISIBLE | WS_BORDER | WS_CHILD | WS_CLIPCHILDREN |
-									WS_CLIPSIBLINGS | CCS_NODIVIDER | CCS_NOPARENTALIGN |
-									RBS_VARHEIGHT | RBS_BANDBORDERS,
-									0, 0, 0, 0,
-									m_hwndFrame, NULL, pWin32App->getInstance(), NULL);
-	UT_ASSERT(m_hwndRebar);
+    g_printerr("[DEBUG] _createTopLevelWindow: about to create rebar window\n");
+    m_hwndRebar = UT_CreateWindowEx(0L, REBARCLASSNAMEW, NULL,
+                                    WS_VISIBLE | WS_BORDER | WS_CHILD | WS_CLIPCHILDREN |
+                                    WS_CLIPSIBLINGS | CCS_NODIVIDER | CCS_NOPARENTALIGN |
+                                    RBS_VARHEIGHT | RBS_BANDBORDERS,
+                                    0, 0, 0, 0,
+                                    m_hwndFrame, NULL, pWin32App->getInstance(), NULL);
+    UT_ASSERT(m_hwndRebar);
 
-	/* override the window procedure*/
-	s_oldRedBar = (WHICHPROC)GetWindowLongPtrW(m_hwndRebar, GWLP_WNDPROC);
-	SetWindowLongPtrW(m_hwndRebar, GWLP_WNDPROC, (LONG_PTR)s_rebarWndProc);
+    s_oldRedBar = (WHICHPROC)GetWindowLongPtrW(m_hwndRebar, GWLP_WNDPROC);
+    SetWindowLongPtrW(m_hwndRebar, GWLP_WNDPROC, (LONG_PTR)s_rebarWndProc);
 
-	// create a toolbar instance for each toolbar listed in our base class.
+    g_printerr("[DEBUG] _createTopLevelWindow: about to call _createToolbars()\n");
+    _createToolbars();
 
-	_createToolbars();
+    GetClientRect(m_hwndFrame, &r);
+    iHeight = r.bottom - r.top;
+    iWidth = r.right - r.left;
 
-	// figure out how much room is left for the child
-	GetClientRect(m_hwndFrame, &r);
-	iHeight = r.bottom - r.top;
-	iWidth = r.right - r.left;
+    m_iSizeWidth = iWidth;
+    m_iSizeHeight = iHeight;
 
-	m_iSizeWidth = iWidth;
-	m_iSizeHeight = iHeight;
+    if( m_hwndRebar != NULL )
+    {
+        MoveWindow(m_hwndRebar, 0, 0, iWidth, iHeight, TRUE);
 
-	// force rebar to resize itself
-	// TODO for some reason, we give REBAR the height of the FRAME
-	// TODO and let it decide how much it actually needs....
-	if( m_hwndRebar != NULL )
-	{
-		MoveWindow(m_hwndRebar, 0, 0, iWidth, iHeight, TRUE);
+        GetClientRect(m_hwndRebar, &r);
+        m_iBarHeight = r.bottom - r.top + 6;
 
-		GetClientRect(m_hwndRebar, &r);
-		m_iBarHeight = r.bottom - r.top + 6;
+        UT_ASSERT(iHeight > m_iBarHeight);
+        iHeight -= m_iBarHeight;
+    }
+    else
+        m_iBarHeight = 0;
 
-		UT_ASSERT(iHeight > m_iBarHeight);
-		iHeight -= m_iBarHeight;
-	}
-	else
-		m_iBarHeight = 0;
+    g_printerr("[DEBUG] _createTopLevelWindow: about to create document window\n");
+    m_hwndContainer = _createDocumentWindow(getFrame(), m_hwndFrame, 0, m_iBarHeight, iWidth, iHeight);
 
-	m_hwndContainer = _createDocumentWindow(getFrame(), m_hwndFrame, 0, m_iBarHeight, iWidth, iHeight);
+    g_printerr("[DEBUG] _createTopLevelWindow: about to create status bar window\n");
+    m_hwndStatusBar = _createStatusBarWindow(getFrame(), m_hwndFrame,0,m_iBarHeight+iHeight,iWidth);
+    if (m_hwndStatusBar) {
+        GetClientRect(m_hwndStatusBar,&r);
+        m_iStatusBarHeight = r.bottom;
+    } else {
+        m_iStatusBarHeight = 0;
+    }
 
-	// Let the app-specific frame code create the status bar
-	// if it wants to.  we will put it below the document
-	// window (a peer with toolbars and the overall sunkenbox)
-	// so that it will appear outside of the scrollbars.
+    g_printerr("[DEBUG] _createTopLevelWindow: about to register drop target\n");
+    m_dropTarget.setFrame(getFrame());
+    RegisterDragDrop(m_hwndFrame, &m_dropTarget);
 
-	m_hwndStatusBar = _createStatusBarWindow(getFrame(), m_hwndFrame,0,m_iBarHeight+iHeight,iWidth);
-	GetClientRect(m_hwndStatusBar,&r);
-	m_iStatusBarHeight = r.bottom;
-
-
-	// Register drag and drop data and files
-	m_dropTarget.setFrame(getFrame());
-	RegisterDragDrop(m_hwndFrame, &m_dropTarget);
-
-	return;
+    g_printerr("[DEBUG] _createTopLevelWindow: finished successfully\n");
+    return;
 }
 
 bool XAP_Win32FrameImpl::_close(void)

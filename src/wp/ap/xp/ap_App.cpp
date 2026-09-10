@@ -61,71 +61,81 @@ AP_App::~AP_App ()
  */
 bool AP_App::openCmdLineFiles(const AP_Args * args)
 {
-	int kWindowsOpened = 0;
-	const char *file = NULL;
-
+    g_printerr("[DEBUG] 4-1. Entered AP_App::openCmdLineFiles\n");
+    int kWindowsOpened = 0;
+    const char *file = NULL;
 	if (AP_Args::m_sFiles == NULL) {
-		// no files to open, this is ok
-		XAP_Frame * pFrame = newFrame();
-		pFrame->loadDocument((const char *)NULL, IEFT_Unknown);
-		return true;
-	}
+			g_printerr("[DEBUG] 4-2-1. m_sFiles is NULL, about to call newFrame()\n");
+			XAP_Frame * pFrame = newFrame();
+			g_printerr("[DEBUG] 4-2-2. newFrame() returned: %p, about to call loadDocument()\n", (void*)pFrame);
+			
+			if (pFrame) {
+				pFrame->loadDocument((const char *)NULL, IEFT_Unknown);
+				g_printerr("[DEBUG] 4-2-3. loadDocument() finished successfully\n");
+			} else {
+				g_printerr("[DEBUG] 4-2-3. pFrame is NULL, cannot call loadDocument()\n");
+			}
+			return true;
+		}
 
-	int i = 0;
-	while ((file = AP_Args::m_sFiles[i++]) != NULL) {
-		char * uri = NULL;
+    g_printerr("[DEBUG] 4-3. Entering file argument loop\n");
+    int i = 0;
+    while ((file = AP_Args::m_sFiles[i++]) != NULL) {
+        g_printerr("[DEBUG] 4-4. Processing file argument: %s\n", file ? file : "(null)");
+        char * uri = NULL;
 
-		uri = UT_go_shell_arg_to_uri (file);
+        uri = UT_go_shell_arg_to_uri (file);
+        g_printerr("[DEBUG] 4-5. Converted to URI: %s\n", uri ? uri : "(null)");
 
-		XAP_Frame * pFrame = newFrame();
+        XAP_Frame * pFrame = newFrame();
+        g_printerr("[DEBUG] 4-6. New frame created for file\n");
 
-		UT_Error error = pFrame->loadDocument (uri, IEFT_Unknown, true);
-		g_free (uri);
+        UT_Error error = pFrame->loadDocument (uri, IEFT_Unknown, true);
+        g_printerr("[DEBUG] 4-7. loadDocument finished with error code: %d\n", error);
+        g_free (uri);
 
-		if (UT_IS_IE_SUCCESS(error))
-		{
-			kWindowsOpened++;
-			if (error == UT_IE_TRY_RECOVER) {
-				pFrame->showMessageBox(AP_STRING_ID_MSG_OpenRecovered,
+        if (UT_IS_IE_SUCCESS(error))
+        {
+            g_printerr("[DEBUG] 4-8. loadDocument succeeded\n");
+            kWindowsOpened++;
+            if (error == UT_IE_TRY_RECOVER) {
+                pFrame->showMessageBox(AP_STRING_ID_MSG_OpenRecovered,
                            XAP_Dialog_MessageBox::b_O,
                            XAP_Dialog_MessageBox::a_OK);
-			}
-		}
-		else
-		{
-			// TODO we crash if we just delete this without putting something
-			// TODO in it, so let's go ahead and open an untitled document
-			// TODO for now.  this would cause us to get 2 untitled documents
-			// TODO if the user gave us 2 bogus pathnames....
+            }
+        }
+        else
+        {
+            g_printerr("[DEBUG] 4-9. loadDocument failed, opening fallback untitled document\n");
+            kWindowsOpened++;
+            pFrame->loadDocument((const char *)NULL, IEFT_Unknown);
+            pFrame->raise();
 
-			// Because of the incremental loader, we should not crash anymore;
-			// I've got other things to do now though.
-			kWindowsOpened++;
-			pFrame->loadDocument((const char *)NULL, IEFT_Unknown);
-			pFrame->raise();
+            errorMsgBadFile (pFrame, file, error);
+        }
 
-			errorMsgBadFile (pFrame, file, error);
-		}
+        if (args->m_sMerge) {
+            g_printerr("[DEBUG] 4-10. Processing mail merge link\n");
+            PD_Document * pDoc = static_cast<PD_Document*>(pFrame->getCurrentDoc());
+            pDoc->setMailMergeLink(args->m_sMerge);
+        }
+    }
 
-		if (args->m_sMerge) {
-			PD_Document * pDoc = static_cast<PD_Document*>(pFrame->getCurrentDoc());
-			pDoc->setMailMergeLink(args->m_sMerge);
-		}
-	}
+    if (kWindowsOpened == 0)
+    {
+        g_printerr("[DEBUG] 4-11. kWindowsOpened is 0, opening untitled fallback frame\n");
+        // no documents specified or openable, open an untitled one
+        
+        XAP_Frame * pFrame = newFrame();
+        pFrame->loadDocument((const char *)NULL, IEFT_Unknown);
+        if (args->m_sMerge) {
+            PD_Document * pDoc = static_cast<PD_Document*>(pFrame->getCurrentDoc());
+            pDoc->setMailMergeLink(args->m_sMerge);
+        }
+    }
 
-	if (kWindowsOpened == 0)
-	{
-		// no documents specified or openable, open an untitled one
-		
-		XAP_Frame * pFrame = newFrame();
-		pFrame->loadDocument((const char *)NULL, IEFT_Unknown);
-		if (args->m_sMerge) {
-			PD_Document * pDoc = static_cast<PD_Document*>(pFrame->getCurrentDoc());
-			pDoc->setMailMergeLink(args->m_sMerge);
-		}
-	}
-
-	return true;
+    g_printerr("[DEBUG] 4-12. Leaving AP_App::openCmdLineFiles successfully\n");
+    return true;
 }
 
 bool AP_App::openCmdLinePlugins(const AP_Args * Args, bool &bSuccess)

@@ -66,21 +66,32 @@ void AP_Win32Frame::setStatusMessage(const char * szMsg)
 
 bool AP_Win32Frame::initialize(XAP_FrameMode /*frameMode*/)
 {
-	if (!initFrameData())
-		return false;
+    g_printerr("[DEBUG] 6-1. Entered AP_Win32Frame::initialize\n");
 
-	// this will call XAP_FrameImpl->_initialize() for us (aka static_cast<AP_Win32FrameImpl*>(getFrameImpl())->_initialize(); )
-	if (!XAP_Frame::initialize(AP_PREF_KEY_KeyBindings,AP_PREF_DEFAULT_KeyBindings,
-									AP_PREF_KEY_MenuLayout, AP_PREF_DEFAULT_MenuLayout,
-									AP_PREF_KEY_StringSet, AP_PREF_DEFAULT_StringSet,
-									AP_PREF_KEY_ToolbarLayouts, AP_PREF_DEFAULT_ToolbarLayouts,
-									AP_PREF_KEY_StringSet, AP_PREF_DEFAULT_StringSet))
-		return false;
+    if (!initFrameData())
+    {
+        g_printerr("[DEBUG] 6-2. initFrameData() failed\n");
+        return false;
+    }
+    g_printerr("[DEBUG] 6-3. initFrameData() passed\n");
 
-	getAPWin32FrameImpl()->_showOrHideToolbars();
-	getAPWin32FrameImpl()->_showOrHideStatusbar();
+    // this will call XAP_FrameImpl->_initialize() for us (aka static_cast<AP_Win32FrameImpl*>(getFrameImpl())->_initialize(); )
+    if (!XAP_Frame::initialize(AP_PREF_KEY_KeyBindings,AP_PREF_DEFAULT_KeyBindings,
+                                 AP_PREF_KEY_MenuLayout, AP_PREF_DEFAULT_MenuLayout,
+                                 AP_PREF_KEY_StringSet, AP_PREF_DEFAULT_StringSet,
+                                 AP_PREF_KEY_ToolbarLayouts, AP_PREF_DEFAULT_ToolbarLayouts,
+                                 AP_PREF_KEY_StringSet, AP_PREF_DEFAULT_StringSet))
+    {
+        g_printerr("[DEBUG] 6-4. XAP_Frame::initialize() failed\n");
+        return false;
+    }
+    g_printerr("[DEBUG] 6-5. XAP_Frame::initialize() passed\n");
 
-	return true;
+    getAPWin32FrameImpl()->_showOrHideToolbars();
+    getAPWin32FrameImpl()->_showOrHideStatusbar();
+    g_printerr("[DEBUG] 6-6. Toolbars and statusbar processed, initialize finished successfully\n");
+
+    return true;
 }
 
 void AP_Win32Frame::toggleStatusBar(bool bStatusBarOn)
